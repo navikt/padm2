@@ -42,3 +42,14 @@ spec:
         mountPath: /secrets/serviceuser
   ingresses:
     - "https://padm2.nais.adeo.no"
+  env:
+    - name: MQ_INPUT_QUEUE_NAME
+      value: QA.P_PADM.INPUT
+    - name: MQ_HOST_NAME
+      value: a01apvl064.adeo.no
+    - name: MQ_PORT
+      value: '1414'
+    - name: MQ_GATEWAY_NAME
+      value: MPLSC04
+    - name: MQ_CHANNEL_NAME
+      value: P_PADM

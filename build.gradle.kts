@@ -8,6 +8,7 @@ val ktorVersion = "1.3.2"
 val logbackVersion = "1.2.3"
 val logstashEncoderVersion = "5.1"
 val prometheusVersion = "0.6.0"
+val padmCommonVersion = "1.b8f56a2"
 
 plugins {
     kotlin("jvm") version "1.3.72"
@@ -15,9 +16,19 @@ plugins {
     id("org.jmailen.kotlinter") version "2.2.0"
 }
 
+val githubUser: String by project
+val githubPassword: String by project
+
 repositories {
     mavenCentral()
     jcenter()
+    maven {
+        url = uri("https://maven.pkg.github.com/navikt/padm-common")
+        credentials {
+            username = githubUser
+            password = githubPassword
+        }
+    }
 }
 
 dependencies {
@@ -31,6 +42,8 @@ dependencies {
 
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashEncoderVersion")
+
+    implementation("no.nav.syfo:padm-common-mq:$padmCommonVersion")
 }
 
 tasks {
