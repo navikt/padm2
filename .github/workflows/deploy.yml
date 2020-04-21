@@ -4,7 +4,7 @@ on:
     branches:
       - master
 env:
-  IMAGE: docker.pkg.github.com/${{ github.repository }}/padm-2:${{ github.sha }}
+  IMAGE: docker.pkg.github.com/${{ github.repository }}/padm2:${{ github.sha }}
 
 jobs:
   build-push-deploy:

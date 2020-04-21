@@ -8,7 +8,7 @@ import no.nav.syfo.util.getFileAsString
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-val log: Logger = LoggerFactory.getLogger("no.nav.syfo.padm-2")
+val log: Logger = LoggerFactory.getLogger("no.nav.syfo.padm2")
 
 @KtorExperimentalAPI
 fun main() {
@@ -32,5 +32,5 @@ fun main() {
 
     applicationState.ready = true
 
-    log.info("Hello from PADM-2")
+    log.info("Hello from PADM2")
 }

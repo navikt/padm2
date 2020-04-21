@@ -1,7 +1,7 @@
 package no.nav.syfo
 
 data class Environment(
-    val applicationName: String = getEnvVar("NAIS_APP_NAME", "padm-2"),
+    val applicationName: String = getEnvVar("NAIS_APP_NAME", "padm2"),
     val applicationPort: Int = getEnvVar("APPLICATION_PORT", "8080").toInt()
 )
 

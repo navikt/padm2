@@ -36,9 +36,9 @@ spec:
   vault:
     enabled: true
     paths:
-      - kvPath: /kv/prod/fss/padm-2/default
+      - kvPath: /kv/prod/fss/padm2/default
         mountPath: /secrets/default
       - kvPath: serviceuser/data/prod/srvpadm2
         mountPath: /secrets/serviceuser
   ingresses:
-    - "https://padm-2.nais.adeo.no"
+    - "https://padm2.nais.adeo.no"
