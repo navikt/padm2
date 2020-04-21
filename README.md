@@ -1,4 +1,4 @@
-[![Build status](https://github.com/navikt/padm-2/workflows/Deploy%20to%20dev%20and%20prod/badge.svg)](https://github.com/navikt/padm-2/workflows/Deploy%20to%20dev%20and%20prod/badge.svg)
+[![Build status](https://github.com/navikt/padm2/workflows/Deploy%20to%20dev%20and%20prod/badge.svg)](https://github.com/navikt/padm2/workflows/Deploy%20to%20dev%20and%20prod/badge.svg)
 
 # Prosessering av dialogmledinger (PADM)
 Repository for PADM. Application written in Kotlin used to receive dialogmeldinger from external systems, doing some validation, then pushing it to our internal systems.
@@ -22,10 +22,10 @@ To build locally and run the integration tests you can simply run `./gradlew sha
 `gradlew.bat shadowJar`
 
 #### Creating a docker image
-Creating a docker image should be as simple as `docker build -t padm-2 .`
+Creating a docker image should be as simple as `docker build -t padm2 .`
 
 #### Running a docker image
-`docker run --rm -it -p 8080:8080 padm-2`
+`docker run --rm -it -p 8080:8080 padm2`
 
 
 ## Contact us
