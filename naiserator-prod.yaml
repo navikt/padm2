@@ -33,5 +33,12 @@ spec:
     requests:
       cpu: 200m
       memory: 512Mi
+  vault:
+    enabled: true
+    paths:
+      - kvPath: /kv/prod/fss/padm-2/default
+        mountPath: /secrets/default
+      - kvPath: serviceuser/data/prod/srvpadm2
+        mountPath: /secrets/serviceuser
   ingresses:
     - "https://padm-2.nais.adeo.no"
