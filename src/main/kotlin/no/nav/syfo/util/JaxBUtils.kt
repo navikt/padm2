@@ -6,8 +6,8 @@ import javax.xml.bind.Unmarshaller
 import no.nav.helse.apprecV1.XMLAppRec
 import no.nav.helse.base64container.Base64Container
 import no.nav.helse.dialogmelding.XMLDialogmelding
-import no.nav.helse.eiFellesformat.XMLEIFellesformat
-import no.nav.helse.eiFellesformat.XMLMottakenhetBlokk
+import no.nav.helse.eiFellesformat2.XMLEIFellesformat
+import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
 
 val fellesformatJaxBContext: JAXBContext = JAXBContext.newInstance(

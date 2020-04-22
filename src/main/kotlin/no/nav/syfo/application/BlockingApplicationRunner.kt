@@ -7,8 +7,8 @@ import javax.jms.Session
 import javax.jms.TextMessage
 import kotlinx.coroutines.delay
 import net.logstash.logback.argument.StructuredArguments
-import no.nav.helse.eiFellesformat.XMLEIFellesformat
-import no.nav.helse.eiFellesformat.XMLMottakenhetBlokk
+import no.nav.helse.eiFellesformat2.XMLEIFellesformat
+import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.Environment
 import no.nav.syfo.VaultSecrets
