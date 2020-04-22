@@ -1,19 +1,36 @@
 package no.nav.syfo
 
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import io.ktor.client.HttpClient
+import io.ktor.client.HttpClientConfig
+import io.ktor.client.engine.apache.Apache
+import io.ktor.client.engine.apache.ApacheEngineConfig
+import io.ktor.client.features.json.JacksonSerializer
+import io.ktor.client.features.json.JsonFeature
 import io.ktor.util.KtorExperimentalAPI
+import io.prometheus.client.hotspot.DefaultExports
 import javax.jms.Session
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import no.nav.emottak.subscription.SubscriptionPort
 import no.nav.syfo.application.ApplicationServer
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.BlockingApplicationRunner
 import no.nav.syfo.application.createApplicationEngine
+import no.nav.syfo.client.AktoerIdClient
+import no.nav.syfo.client.SarClient
+import no.nav.syfo.client.StsOidcClient
 import no.nav.syfo.mq.connectionFactory
 import no.nav.syfo.mq.consumerForQueue
 import no.nav.syfo.util.TrackableException
 import no.nav.syfo.util.getFileAsString
+import no.nav.syfo.ws.createPort
+import org.apache.cxf.ws.addressing.WSAddressingFeature
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -39,7 +56,32 @@ fun main() {
     val applicationServer = ApplicationServer(applicationEngine, applicationState)
     applicationServer.start()
 
-    launchListeners(applicationState, env, vaultSecrets)
+    DefaultExports.initialize()
+
+    val config: HttpClientConfig<ApacheEngineConfig>.() -> Unit = {
+        install(JsonFeature) {
+            serializer = JacksonSerializer {
+                registerKotlinModule()
+                registerModule(JavaTimeModule())
+                configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+                configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            }
+        }
+        expectSuccess = false
+    }
+
+    val httpClient = HttpClient(Apache, config)
+
+    val oidcClient = StsOidcClient(vaultSecrets.serviceuserUsername, vaultSecrets.serviceuserPassword)
+    val aktoerIdClient = AktoerIdClient(env.aktoerregisterV1Url, oidcClient, httpClient)
+    val sarClient = SarClient(env.kuhrSarApiUrl, httpClient)
+
+    val subscriptionEmottak = createPort<SubscriptionPort>(env.subscriptionEndpointURL) {
+        proxy { features.add(WSAddressingFeature()) }
+        port { withBasicAuth(vaultSecrets.serviceuserUsername, vaultSecrets.serviceuserPassword) }
+    }
+
+    launchListeners(applicationState, env, vaultSecrets, aktoerIdClient, sarClient, subscriptionEmottak)
 }
 
 fun createListener(applicationState: ApplicationState, action: suspend CoroutineScope.() -> Unit): Job =
@@ -57,7 +99,10 @@ fun createListener(applicationState: ApplicationState, action: suspend Coroutine
 fun launchListeners(
     applicationState: ApplicationState,
     env: Environment,
-    secrets: VaultSecrets
+    secrets: VaultSecrets,
+    aktoerIdClient: AktoerIdClient,
+    kuhrSarClient: SarClient,
+    subscriptionEmottak: SubscriptionPort
 ) {
     createListener(applicationState) {
         connectionFactory(env).createConnection(secrets.mqUsername, secrets.mqPassword).use { connection ->
@@ -68,7 +113,9 @@ fun launchListeners(
 
             applicationState.ready = true
 
-            BlockingApplicationRunner().run(applicationState, inputconsumer, session, env, secrets)
+            BlockingApplicationRunner().run(applicationState, inputconsumer,
+                session, env, secrets, aktoerIdClient,
+                kuhrSarClient, subscriptionEmottak)
         }
     }
 }

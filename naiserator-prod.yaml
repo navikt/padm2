@@ -53,3 +53,7 @@ spec:
       value: MPLSC04
     - name: MQ_CHANNEL_NAME
       value: P_PADM
+    - name: AKTOR_REGISTER_V1_URL
+      value: https://app.adeo.no/aktoerregister/api/v1
+    - name: SUBSCRIPTION_ENDPOINT_URL
+      value: https://wasapp.adeo.no/nav-emottak-eletter-web/services/

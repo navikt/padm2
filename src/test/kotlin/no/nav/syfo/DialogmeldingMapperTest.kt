@@ -15,6 +15,6 @@ internal class DialogmeldingMapperTest {
             StringReader(getFileAsString("src/test/resources/dialogmelding_dialog_svar.xml"))
         ) as XMLEIFellesformat
 
-        val dialomelding = extractDialogmelding(felleformatDm)
+        val dialomeldingxml = extractDialogmelding(felleformatDm)
     }
 }

@@ -1,5 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
+import no.nils.wsdl2java.Wsdl2JavaTask
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 group = "no.nav.syfo"
 version = "1.0.0"
@@ -8,7 +10,7 @@ val ktorVersion = "1.3.2"
 val logbackVersion = "1.2.3"
 val logstashEncoderVersion = "5.1"
 val prometheusVersion = "0.6.0"
-val padmCommonVersion = "1.b8f56a2"
+val padmCommonVersion = "1.83bcc15"
 val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
 val fellesformat2Version = "1.0329dd1"
 val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
@@ -23,8 +25,12 @@ val base64containerVersion = "1.5ac2176"
 val junitJupiterVersion = "5.6.0"
 val kluentVersion = "1.39"
 val mockkVersion = "1.9.3"
+val jacksonVersion = "2.9.8"
+val commonsTextVersion = "1.4"
 
 plugins {
+    java
+    id("no.nils.wsdl2java") version "0.10"
     kotlin("jvm") version "1.3.72"
     id("com.github.johnrengelman.shadow") version "5.2.0"
     id("org.jmailen.kotlinter") version "2.2.0"
@@ -57,18 +63,36 @@ repositories {
 }
 
 dependencies {
+    wsdl2java("javax.annotation:javax.annotation-api:$javaxAnnotationApiVersion")
+    wsdl2java("javax.activation:activation:$javaxActivationVersion")
+    wsdl2java("org.glassfish.jaxb:jaxb-runtime:$jaxbRuntimeVersion")
+    wsdl2java("javax.xml.bind:jaxb-api:$jaxbApiVersion")
+    wsdl2java ("javax.xml.ws:jaxws-api:$jaxwsApiVersion")
+    wsdl2java ("com.sun.xml.ws:jaxws-tools:$jaxwsToolsVersion") {
+        exclude(group = "com.sun.xml.ws", module = "policy")
+    }
+
     implementation(kotlin("stdlib"))
 
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-client-apache:$ktorVersion")
+    implementation("io.ktor:ktor-client-jackson:$ktorVersion")
 
     implementation("io.prometheus:simpleclient_hotspot:$prometheusVersion")
     implementation("io.prometheus:simpleclient_common:$prometheusVersion")
+
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
+
+    implementation("org.apache.commons:commons-text:$commonsTextVersion")
 
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashEncoderVersion")
 
     implementation("no.nav.syfo:padm-common-mq:$padmCommonVersion")
+    implementation("no.nav.syfo:padm-common-models:$padmCommonVersion")
+    implementation("no.nav.syfo:padm-common-networking:$padmCommonVersion")
+    implementation("no.nav.syfo:padm-common-rest-sts:$padmCommonVersion")
+    implementation("no.nav.syfo:padm-common-ws:$padmCommonVersion")
 
     implementation("no.nav.helse.xml:xmlfellesformat2:$fellesformat2Version")
     implementation("no.nav.helse.xml:kith-hodemelding:$kithHodemeldingVersion")
@@ -108,11 +132,16 @@ tasks {
     }
 
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        dependsOn("wsdl2java")
+
         kotlinOptions.jvmTarget = "12"
     }
 
-    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions.jvmTarget = "12"
+    withType<Wsdl2JavaTask> {
+        wsdlDir = file("$projectDir/src/main/resources/wsdl")
+        wsdlsToGenerate = listOf(
+            mutableListOf("-xjc", "-b", "$projectDir/src/main/resources/xjb/binding.xml", "$projectDir/src/main/resources/wsdl/subscription.wsdl")
+        )
     }
 
     withType<ShadowJar> {

@@ -9,7 +9,10 @@ data class Environment(
     override val mqPort: Int = getEnvVar("MQ_PORT").toInt(),
     override val mqGatewayName: String = getEnvVar("MQ_GATEWAY_NAME"),
     override val mqChannelName: String = getEnvVar("MQ_CHANNEL_NAME"),
-    val inputQueueName: String = getEnvVar("MQ_INPUT_QUEUE_NAME")
+    val inputQueueName: String = getEnvVar("MQ_INPUT_QUEUE_NAME"),
+    val aktoerregisterV1Url: String = getEnvVar("AKTOR_REGISTER_V1_URL"),
+    val kuhrSarApiUrl: String = getEnvVar("KUHR_SAR_API_URL", "http://kuhr-sar-api"),
+    val subscriptionEndpointURL: String = getEnvVar("SUBSCRIPTION_ENDPOINT_URL")
 ) : MqConfig
 
 data class VaultSecrets(

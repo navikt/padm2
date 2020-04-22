@@ -53,3 +53,7 @@ spec:
       value: MQ1LSC04
     - name: MQ_CHANNEL_NAME
       value: Q1_PADM
+    - name: AKTOR_REGISTER_V1_URL
+      value: https://app-q1.adeo.no/aktoerregister/api/v1
+    - name: SUBSCRIPTION_ENDPOINT_URL
+      value: https://wasapp-q1.adeo.no/nav-emottak-eletter-web/services/
