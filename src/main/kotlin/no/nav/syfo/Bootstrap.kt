@@ -1,12 +1,14 @@
 package no.nav.syfo
 
 import io.ktor.util.KtorExperimentalAPI
+import javax.jms.Session
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import no.nav.syfo.application.ApplicationServer
 import no.nav.syfo.application.ApplicationState
+import no.nav.syfo.application.BlockingApplicationRunner
 import no.nav.syfo.application.createApplicationEngine
 import no.nav.syfo.mq.connectionFactory
 import no.nav.syfo.mq.consumerForQueue
@@ -14,7 +16,6 @@ import no.nav.syfo.util.TrackableException
 import no.nav.syfo.util.getFileAsString
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import javax.jms.Session
 
 val log: Logger = LoggerFactory.getLogger("no.nav.syfo.padm2")
 
@@ -38,7 +39,7 @@ fun main() {
     val applicationServer = ApplicationServer(applicationEngine, applicationState)
     applicationServer.start()
 
-    launchListeners(applicationState, env,  vaultSecrets)
+    launchListeners(applicationState, env, vaultSecrets)
 }
 
 fun createListener(applicationState: ApplicationState, action: suspend CoroutineScope.() -> Unit): Job =
@@ -66,6 +67,8 @@ fun launchListeners(
             val inputconsumer = session.consumerForQueue(env.inputQueueName)
 
             applicationState.ready = true
+
+            BlockingApplicationRunner().run(applicationState, inputconsumer, session, env, secrets)
         }
     }
 }
