@@ -2,6 +2,7 @@ package no.nav.syfo.application
 
 import io.ktor.util.KtorExperimentalAPI
 import java.io.StringReader
+import java.util.UUID
 import javax.jms.MessageConsumer
 import javax.jms.MessageProducer
 import javax.jms.Session
@@ -19,14 +20,19 @@ import no.nav.syfo.application.services.startSubscription
 import no.nav.syfo.client.AktoerIdClient
 import no.nav.syfo.client.SarClient
 import no.nav.syfo.client.findBestSamhandlerPraksis
+import no.nav.syfo.handlestatus.handleDoctorNotFoundInAktorRegister
 import no.nav.syfo.handlestatus.handleDuplicateEdiloggid
 import no.nav.syfo.handlestatus.handleDuplicateSM2013Content
+import no.nav.syfo.handlestatus.handlePatientNotFoundInAktorRegister
+import no.nav.syfo.handlestatus.handleTestFnrInProd
 import no.nav.syfo.log
 import no.nav.syfo.metrics.INCOMING_MESSAGE_COUNTER
 import no.nav.syfo.model.findDialogmeldingType
+import no.nav.syfo.model.toDialogmelding
 import no.nav.syfo.services.sha256hashstring
 import no.nav.syfo.services.updateRedis
 import no.nav.syfo.util.LoggingMeta
+import no.nav.syfo.util.erTestFnr
 import no.nav.syfo.util.extractDialogmelding
 import no.nav.syfo.util.extractOrganisationHerNumberFromSender
 import no.nav.syfo.util.extractOrganisationNumberFromSender
@@ -73,9 +79,9 @@ class BlockingApplicationRunner {
                     val personNumberDoctor = receiverBlock.avsenderFnrFraDigSignatur
                     val legekontorOrgName = extractSenderOrganisationName(fellesformat)
                     val legekontorHerId = extractOrganisationHerNumberFromSender(fellesformat)?.id
-                    val dialogmelding = extractDialogmelding(fellesformat)
+                    val dialogmeldingXml = extractDialogmelding(fellesformat)
                     val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
-                    val sha256String = sha256hashstring(dialogmelding)
+                    val sha256String = sha256hashstring(dialogmeldingXml)
 
                     val loggingMeta = LoggingMeta(
                             mottakId = ediLoggId,
@@ -151,6 +157,35 @@ class BlockingApplicationRunner {
                     } else {
                         updateRedis(jedis, ediLoggId, sha256String)
                     }
+
+                    val patientIdents = aktoerIds[personNumberPatient]
+                    val doctorIdents = aktoerIds[personNumberDoctor]
+
+                    if (patientIdents == null || patientIdents.feilmelding != null) {
+                        handlePatientNotFoundInAktorRegister(
+                            patientIdents, session,
+                            receiptProducer, fellesformat, ediLoggId, jedis, redisSha256String, env, loggingMeta
+                        )
+                        continue@loop
+                    }
+                    if (doctorIdents == null || doctorIdents.feilmelding != null) {
+                        handleDoctorNotFoundInAktorRegister(
+                            doctorIdents, session,
+                            receiptProducer, fellesformat, ediLoggId, jedis, redisSha256String, env, loggingMeta
+                        )
+                        continue@loop
+                    }
+                    if (erTestFnr(personNumberPatient) && env.cluster == "prod-fss") {
+                        handleTestFnrInProd(
+                            session, receiptProducer, fellesformat,
+                            ediLoggId, jedis, redisSha256String, env, loggingMeta
+                        )
+                        continue@loop
+                    }
+
+                    val dialogmelding = dialogmeldingXml.toDialogmelding(
+                        dialogmeldingId = UUID.randomUUID().toString()
+                    )
                 } catch (e: Exception) {
                     log.error("Exception caught while handling message {}", e)
                 }

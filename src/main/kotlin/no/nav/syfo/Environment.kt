@@ -14,7 +14,8 @@ data class Environment(
     val aktoerregisterV1Url: String = getEnvVar("AKTOR_REGISTER_V1_URL"),
     val kuhrSarApiUrl: String = getEnvVar("KUHR_SAR_API_URL", "http://kuhr-sar-api"),
     val subscriptionEndpointURL: String = getEnvVar("SUBSCRIPTION_ENDPOINT_URL"),
-    val redishost: String = getEnvVar("REDIS_HOST", "padm2-redis.default.svc.nais.local")
+    val redishost: String = getEnvVar("REDIS_HOST", "padm2-redis.default.svc.nais.local"),
+    val cluster: String = getEnvVar("NAIS_CLUSTER_NAME")
 ) : MqConfig
 
 data class VaultSecrets(
