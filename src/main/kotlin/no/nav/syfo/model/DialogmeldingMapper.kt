@@ -15,12 +15,12 @@ fun XMLDialogmelding.toDialogmelding(
     } else {
         null
     },
-    dialogmeldingSvar = if (dialogmeldingType == DialogmeldingType.DIALOGMELDING_SVAR_FORESPORSEL_OM_PASIENT) {
+    dialogmeldingSvar = if (dialogmeldingType == DialogmeldingType.DIALOGMELDING_SVAR_INNKALLING_DIALOGMOTE) {
         notat.firstOrNull()?.toDialogmeldingSvar()
     } else {
         null
     },
-    dialogmeldingForesporsel = if (dialogmeldingType == DialogmeldingType.DIALOGMELDING_SVAR_INNKALLING_DIALOGMOTE) {
+    dialogmeldingForesporsel = if (dialogmeldingType == DialogmeldingType.DIALOGMELDING_SVAR_FORESPORSEL_OM_PASIENT) {
         notat.firstOrNull()?.toDialogmeldingForesporsel()
     } else {
         null
@@ -42,9 +42,7 @@ fun XMLNotat.toDialogmeldingSvar(): DialogmeldingSvar {
 
     return DialogmeldingSvar(
         teamakode = temaKodet.toTeamakode(),
-        tekstNotatInnhold = tekstNotatInnhold.toString(),
-        dokIdNotat = dokIdNotat,
-        foresporsel = foresporsel.toForesporsel()
+        tekstNotatInnhold = tekstNotatInnhold.toString()
     )
 }
 
@@ -52,7 +50,9 @@ fun XMLNotat.toDialogmeldingForesporsel(): DialogmeldingForesporsel {
 
     return DialogmeldingForesporsel(
         teamakode = temaKodet.toTeamakode(),
-        tekstNotatInnhold = tekstNotatInnhold.toString()
+        tekstNotatInnhold = tekstNotatInnhold.toString(),
+        dokIdNotat = dokIdNotat,
+        foresporsel = foresporsel.toForesporsel()
     )
 }
 
