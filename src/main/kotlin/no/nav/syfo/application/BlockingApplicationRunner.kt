@@ -43,6 +43,8 @@ import no.nav.syfo.util.extractSenderOrganisationName
 import no.nav.syfo.util.fellesformatUnmarshaller
 import no.nav.syfo.util.get
 import no.nav.syfo.util.wrapExceptions
+import org.apache.kafka.clients.producer.KafkaProducer
+import org.apache.kafka.clients.producer.ProducerRecord
 import redis.clients.jedis.Jedis
 
 class BlockingApplicationRunner {
@@ -58,7 +60,8 @@ class BlockingApplicationRunner {
         kuhrSarClient: SarClient,
         subscriptionEmottak: SubscriptionPort,
         jedis: Jedis,
-        receiptProducer: MessageProducer
+        receiptProducer: MessageProducer,
+        kafkaProducerReceivedDialogmelding: KafkaProducer<String, ReceivedDialogmelding>
     ) {
         wrapExceptions {
             loop@ while (applicationState.ready) {
@@ -213,6 +216,11 @@ class BlockingApplicationRunner {
                         fellesformat = inputMessageText,
                         tssid = samhandlerPraksis?.tss_ident ?: ""
                     )
+
+                    kafkaProducerReceivedDialogmelding.send(
+                        ProducerRecord(env.padm2ArenaTopic, receivedDialogmelding)
+                    )
+                    log.info("Melding sendt til kafka topic {}", env.padm2ArenaTopic)
                 } catch (e: Exception) {
                     log.error("Exception caught while handling message {}", e)
                 }

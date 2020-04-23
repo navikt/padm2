@@ -24,8 +24,10 @@ import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.BlockingApplicationRunner
 import no.nav.syfo.application.createApplicationEngine
 import no.nav.syfo.client.AktoerIdClient
+import no.nav.syfo.client.KafkaClients
 import no.nav.syfo.client.SarClient
 import no.nav.syfo.client.StsOidcClient
+import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.mq.connectionFactory
 import no.nav.syfo.mq.consumerForQueue
 import no.nav.syfo.mq.producerForQueue
@@ -33,6 +35,7 @@ import no.nav.syfo.util.TrackableException
 import no.nav.syfo.util.getFileAsString
 import no.nav.syfo.ws.createPort
 import org.apache.cxf.ws.addressing.WSAddressingFeature
+import org.apache.kafka.clients.producer.KafkaProducer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import redis.clients.jedis.Jedis
@@ -90,7 +93,10 @@ fun main() {
         port { withBasicAuth(vaultSecrets.serviceuserUsername, vaultSecrets.serviceuserPassword) }
     }
 
-    launchListeners(applicationState, env, vaultSecrets, aktoerIdClient, sarClient, subscriptionEmottak)
+    val kafkaClients = KafkaClients(env, vaultSecrets)
+
+    launchListeners(applicationState, env, vaultSecrets, aktoerIdClient, sarClient, subscriptionEmottak,
+    kafkaClients.kafkaProducerReceivedDialogmelding)
 }
 
 fun createListener(applicationState: ApplicationState, action: suspend CoroutineScope.() -> Unit): Job =
@@ -111,7 +117,8 @@ fun launchListeners(
     secrets: VaultSecrets,
     aktoerIdClient: AktoerIdClient,
     kuhrSarClient: SarClient,
-    subscriptionEmottak: SubscriptionPort
+    subscriptionEmottak: SubscriptionPort,
+    kafkaProducerReceivedDialogmelding: KafkaProducer<String, ReceivedDialogmelding>
 ) {
     createListener(applicationState) {
         connectionFactory(env).createConnection(secrets.mqUsername, secrets.mqPassword).use { connection ->
@@ -128,7 +135,7 @@ fun launchListeners(
                 BlockingApplicationRunner().run(
                     applicationState, inputconsumer,
                     session, env, secrets, aktoerIdClient,
-                    kuhrSarClient, subscriptionEmottak, jedis, receiptProducer
+                    kuhrSarClient, subscriptionEmottak, jedis, receiptProducer, kafkaProducerReceivedDialogmelding
                 )
             }
         }

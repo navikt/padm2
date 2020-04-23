@@ -10,7 +10,7 @@ val ktorVersion = "1.3.2"
 val logbackVersion = "1.2.3"
 val logstashEncoderVersion = "5.1"
 val prometheusVersion = "0.6.0"
-val padmCommonVersion = "1.24037cd"
+val padmCommonVersion = "1.a9e3cc6"
 val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
 val fellesformat2Version = "1.0329dd1"
 val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
@@ -28,6 +28,7 @@ val mockkVersion = "1.9.3"
 val jacksonVersion = "2.9.8"
 val commonsTextVersion = "1.4"
 val jedisVersion = "2.9.0"
+val kafkaVersion = "2.4.0"
 
 plugins {
     java
@@ -79,6 +80,8 @@ dependencies {
     implementation("io.ktor:ktor-client-apache:$ktorVersion")
     implementation("io.ktor:ktor-client-jackson:$ktorVersion")
 
+    implementation("org.apache.kafka:kafka_2.12:$kafkaVersion")
+
     implementation("io.prometheus:simpleclient_hotspot:$prometheusVersion")
     implementation("io.prometheus:simpleclient_common:$prometheusVersion")
 
@@ -94,6 +97,7 @@ dependencies {
     implementation("no.nav.syfo:padm-common-networking:$padmCommonVersion")
     implementation("no.nav.syfo:padm-common-rest-sts:$padmCommonVersion")
     implementation("no.nav.syfo:padm-common-ws:$padmCommonVersion")
+    implementation("no.nav.syfo:padm-common-kafka:$padmCommonVersion")
 
     implementation("no.nav.helse.xml:xmlfellesformat2:$fellesformat2Version")
     implementation("no.nav.helse.xml:kith-hodemelding:$kithHodemeldingVersion")
