@@ -36,15 +36,6 @@ Deploying redis can be done with the following command:
 `kubectl apply --context prod-fss --namespace default -f redis.yaml`
 
 
-##Dialogmeldinger:
-`Role         Service                            Action
-Sykmelder	HenvendelseFraLege                  Henvendelse
-Sykmelder	Oppfolgingsplan	                    Kvittering
-Sykmelder	DialogmoteInnkalling	            MoteRespons
-Sykmelder	Oppfolgingsplan		                Svar
-Sykmelder	ForesporselFraSaksbehandler	        ForesporselSvar`
-
-
 ## Contact us
 ### Code/project related questions can be sent to
 * Joakim Kartveit, `joakim.kartveit@nav.no`

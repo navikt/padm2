@@ -190,7 +190,8 @@ class BlockingApplicationRunner {
                     }
 
                     val dialogmelding = dialogmeldingXml.toDialogmelding(
-                        dialogmeldingId = UUID.randomUUID().toString()
+                        dialogmeldingId = UUID.randomUUID().toString(),
+                        dialogmeldingType = dialogmeldingType
                     )
 
                     val receivedDialogmelding = ReceivedDialogmelding(
