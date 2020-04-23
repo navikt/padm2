@@ -24,6 +24,9 @@ val dialogmeldingMarshaller: Marshaller = dialogmeldingJaxBContext.createMarshal
 val senderMarshaller: Marshaller = JAXBContext.newInstance(XMLSender::class.java).createMarshaller()
     .apply { setProperty(Marshaller.JAXB_ENCODING, "ISO-8859-1") }
 
+val apprecJaxBContext: JAXBContext = JAXBContext.newInstance(XMLEIFellesformat::class.java, XMLAppRec::class.java)
+val apprecMarshaller: Marshaller = apprecJaxBContext.createMarshaller()
+
 fun Marshaller.toString(input: Any): String = StringWriter().use {
     marshal(input, it)
     it.toString()

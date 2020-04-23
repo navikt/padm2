@@ -57,3 +57,5 @@ spec:
       value: https://app.adeo.no/aktoerregister/api/v1
     - name: SUBSCRIPTION_ENDPOINT_URL
       value: https://wasapp.adeo.no/nav-emottak-eletter-web/services/
+    - name: MQ_APPREC_QUEUE_NAME
+      value: QA.P414.IU03_UTSENDING

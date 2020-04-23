@@ -1,6 +1,7 @@
 package no.nav.syfo
 
 import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
@@ -27,12 +28,19 @@ import no.nav.syfo.client.SarClient
 import no.nav.syfo.client.StsOidcClient
 import no.nav.syfo.mq.connectionFactory
 import no.nav.syfo.mq.consumerForQueue
+import no.nav.syfo.mq.producerForQueue
 import no.nav.syfo.util.TrackableException
 import no.nav.syfo.util.getFileAsString
 import no.nav.syfo.ws.createPort
 import org.apache.cxf.ws.addressing.WSAddressingFeature
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import redis.clients.jedis.Jedis
+
+val objectMapper: ObjectMapper = ObjectMapper()
+    .registerModule(JavaTimeModule())
+    .registerKotlinModule()
+    .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
 
 val log: Logger = LoggerFactory.getLogger("no.nav.syfo.padm2")
 
@@ -50,7 +58,8 @@ fun main() {
         serviceuserPassword = getFileAsString("/secrets/serviceuser/password"),
         serviceuserUsername = getFileAsString("/secrets/serviceuser/username"),
         mqUsername = getFileAsString("/secrets/default/mqUsername"),
-        mqPassword = getFileAsString("/secrets/default/mqPassword")
+        mqPassword = getFileAsString("/secrets/default/mqPassword"),
+        redisSecret = getFileAsString("/secrets/default/redisSecret")
     )
 
     val applicationServer = ApplicationServer(applicationEngine, applicationState)
@@ -106,16 +115,22 @@ fun launchListeners(
 ) {
     createListener(applicationState) {
         connectionFactory(env).createConnection(secrets.mqUsername, secrets.mqPassword).use { connection ->
-            connection.start()
-            val session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE)
+            Jedis(env.redishost, 6379).use { jedis ->
+                connection.start()
+                val session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE)
 
-            val inputconsumer = session.consumerForQueue(env.inputQueueName)
+                val inputconsumer = session.consumerForQueue(env.inputQueueName)
+                val receiptProducer = session.producerForQueue(env.apprecQueueName)
 
-            applicationState.ready = true
+                applicationState.ready = true
+                jedis.auth(secrets.redisSecret)
 
-            BlockingApplicationRunner().run(applicationState, inputconsumer,
-                session, env, secrets, aktoerIdClient,
-                kuhrSarClient, subscriptionEmottak)
+                BlockingApplicationRunner().run(
+                    applicationState, inputconsumer,
+                    session, env, secrets, aktoerIdClient,
+                    kuhrSarClient, subscriptionEmottak, jedis, receiptProducer
+                )
+            }
         }
     }
 }

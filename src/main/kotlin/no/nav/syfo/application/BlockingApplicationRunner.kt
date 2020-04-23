@@ -3,6 +3,7 @@ package no.nav.syfo.application
 import io.ktor.util.KtorExperimentalAPI
 import java.io.StringReader
 import javax.jms.MessageConsumer
+import javax.jms.MessageProducer
 import javax.jms.Session
 import javax.jms.TextMessage
 import kotlinx.coroutines.delay
@@ -18,9 +19,13 @@ import no.nav.syfo.application.services.startSubscription
 import no.nav.syfo.client.AktoerIdClient
 import no.nav.syfo.client.SarClient
 import no.nav.syfo.client.findBestSamhandlerPraksis
+import no.nav.syfo.handlestatus.handleDuplicateEdiloggid
+import no.nav.syfo.handlestatus.handleDuplicateSM2013Content
 import no.nav.syfo.log
 import no.nav.syfo.metrics.INCOMING_MESSAGE_COUNTER
 import no.nav.syfo.model.findDialogmeldingType
+import no.nav.syfo.services.sha256hashstring
+import no.nav.syfo.services.updateRedis
 import no.nav.syfo.util.LoggingMeta
 import no.nav.syfo.util.extractDialogmelding
 import no.nav.syfo.util.extractOrganisationHerNumberFromSender
@@ -29,6 +34,7 @@ import no.nav.syfo.util.extractSenderOrganisationName
 import no.nav.syfo.util.fellesformatUnmarshaller
 import no.nav.syfo.util.get
 import no.nav.syfo.util.wrapExceptions
+import redis.clients.jedis.Jedis
 
 class BlockingApplicationRunner {
 
@@ -41,7 +47,9 @@ class BlockingApplicationRunner {
         secrets: VaultSecrets,
         aktoerIdClient: AktoerIdClient,
         kuhrSarClient: SarClient,
-        subscriptionEmottak: SubscriptionPort
+        subscriptionEmottak: SubscriptionPort,
+        jedis: Jedis,
+        receiptProducer: MessageProducer
     ) {
         wrapExceptions {
             loop@ while (applicationState.ready) {
@@ -60,15 +68,17 @@ class BlockingApplicationRunner {
                     val fellesformat = fellesformatUnmarshaller.unmarshal(StringReader(inputMessageText)) as XMLEIFellesformat
                     val msgHead: XMLMsgHead = fellesformat.get()
                     val receiverBlock = fellesformat.get<XMLMottakenhetBlokk>()
+                    val ediLoggId = receiverBlock.ediLoggId
                     val personNumberPatient = msgHead.msgInfo.patient.ident.find { it.typeId.v == "FNR" }?.id ?: "" // TODO dersom tom avvist meldingen
                     val personNumberDoctor = receiverBlock.avsenderFnrFraDigSignatur
                     val legekontorOrgName = extractSenderOrganisationName(fellesformat)
                     val legekontorHerId = extractOrganisationHerNumberFromSender(fellesformat)?.id
                     val dialogmelding = extractDialogmelding(fellesformat)
                     val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
+                    val sha256String = sha256hashstring(dialogmelding)
 
                     val loggingMeta = LoggingMeta(
-                            mottakId = receiverBlock.ediLoggId,
+                            mottakId = ediLoggId,
                             orgNr = extractOrganisationNumberFromSender(fellesformat)?.id,
                             msgId = msgHead.msgInfo.msgId
                     )
@@ -121,6 +131,25 @@ class BlockingApplicationRunner {
                                 )
                             }
                         }
+                    }
+
+                    val redisSha256String = jedis.get(sha256String)
+                    val redisEdiloggid = jedis.get(ediLoggId)
+
+                    if (redisSha256String != null) {
+                        handleDuplicateSM2013Content(
+                            session, receiptProducer,
+                            fellesformat, loggingMeta, env, redisSha256String
+                        )
+                        continue@loop
+                    } else if (redisEdiloggid != null) {
+                        handleDuplicateEdiloggid(
+                            session, receiptProducer,
+                            fellesformat, loggingMeta, env, redisEdiloggid
+                        )
+                        continue@loop
+                    } else {
+                        updateRedis(jedis, ediLoggId, sha256String)
                     }
                 } catch (e: Exception) {
                     log.error("Exception caught while handling message {}", e)

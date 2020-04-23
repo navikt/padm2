@@ -27,6 +27,7 @@ val kluentVersion = "1.39"
 val mockkVersion = "1.9.3"
 val jacksonVersion = "2.9.8"
 val commonsTextVersion = "1.4"
+val jedisVersion = "2.9.0"
 
 plugins {
     java
@@ -99,6 +100,8 @@ dependencies {
     implementation("no.nav.helse.xml:kith-apprec:$kithApprecVersion")
     implementation("no.nav.helse.xml:dialogmelding:$dialogmeldingVersion")
     implementation("no.nav.helse.xml:base64Container:$base64containerVersion")
+
+    implementation("redis.clients:jedis:$jedisVersion")
 
     implementation("javax.xml.ws:jaxws-api:$jaxwsApiVersion")
     implementation("javax.annotation:javax.annotation-api:$javaxAnnotationApiVersion")
