@@ -28,6 +28,11 @@ fun extractOrganisationHerNumberFromSender(fellesformat: XMLEIFellesformat): XML
         it.typeId.v == "HER"
     }
 
+fun extractOrganisationRashNumberFromSender(fellesformat: XMLEIFellesformat): XMLIdent? =
+    fellesformat.get<XMLMsgHead>().msgInfo.sender.organisation.ident.find {
+        it.typeId.v == "RSH"
+    }
+
 fun extractSenderOrganisationName(fellesformat: XMLEIFellesformat): String =
     fellesformat.get<XMLMsgHead>().msgInfo.sender.organisation?.organisationName ?: ""
 

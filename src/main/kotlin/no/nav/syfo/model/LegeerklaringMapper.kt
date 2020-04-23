@@ -10,15 +10,15 @@ fun XMLDialogmelding.toDialogmelding(
     dialogmeldingId: String
 ) = Dialogmelding(
         id = dialogmeldingId,
-        dialogmeldingNotat = true,
-        dialogmeldingSvar = false,
-        notat = notat.first().toNotat()
+        dialogmeldingNotat = notat.firstOrNull()?.toDialogmeldingNotat(),
+        dialogmeldingSvar = null,
+        dialogmeldingForesporsel = null
 
 )
 
-fun XMLNotat.toNotat(): Notat {
+fun XMLNotat.toDialogmeldingNotat(): DialogmeldingNotat {
 
-        return Notat(
+        return DialogmeldingNotat(
                 teamakode = temaKodet.toTeamakode(),
                 tekstNotatInnhold = tekstNotatInnhold.toString(),
                 dokIdNotat = dokIdNotat,

@@ -2,6 +2,7 @@ package no.nav.syfo.application
 
 import io.ktor.util.KtorExperimentalAPI
 import java.io.StringReader
+import java.time.ZoneOffset
 import java.util.UUID
 import javax.jms.MessageConsumer
 import javax.jms.MessageProducer
@@ -27,6 +28,7 @@ import no.nav.syfo.handlestatus.handlePatientNotFoundInAktorRegister
 import no.nav.syfo.handlestatus.handleTestFnrInProd
 import no.nav.syfo.log
 import no.nav.syfo.metrics.INCOMING_MESSAGE_COUNTER
+import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.model.findDialogmeldingType
 import no.nav.syfo.model.toDialogmelding
 import no.nav.syfo.services.sha256hashstring
@@ -36,6 +38,7 @@ import no.nav.syfo.util.erTestFnr
 import no.nav.syfo.util.extractDialogmelding
 import no.nav.syfo.util.extractOrganisationHerNumberFromSender
 import no.nav.syfo.util.extractOrganisationNumberFromSender
+import no.nav.syfo.util.extractOrganisationRashNumberFromSender
 import no.nav.syfo.util.extractSenderOrganisationName
 import no.nav.syfo.util.fellesformatUnmarshaller
 import no.nav.syfo.util.get
@@ -75,10 +78,13 @@ class BlockingApplicationRunner {
                     val msgHead: XMLMsgHead = fellesformat.get()
                     val receiverBlock = fellesformat.get<XMLMottakenhetBlokk>()
                     val ediLoggId = receiverBlock.ediLoggId
+                    val msgId = msgHead.msgInfo.msgId
+                    val legekontorOrgNr = extractOrganisationNumberFromSender(fellesformat)?.id
                     val personNumberPatient = msgHead.msgInfo.patient.ident.find { it.typeId.v == "FNR" }?.id ?: "" // TODO dersom tom avvist meldingen
                     val personNumberDoctor = receiverBlock.avsenderFnrFraDigSignatur
                     val legekontorOrgName = extractSenderOrganisationName(fellesformat)
                     val legekontorHerId = extractOrganisationHerNumberFromSender(fellesformat)?.id
+                    val legekontorReshId = extractOrganisationRashNumberFromSender(fellesformat)?.id
                     val dialogmeldingXml = extractDialogmelding(fellesformat)
                     val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
                     val sha256String = sha256hashstring(dialogmeldingXml)
@@ -185,6 +191,26 @@ class BlockingApplicationRunner {
 
                     val dialogmelding = dialogmeldingXml.toDialogmelding(
                         dialogmeldingId = UUID.randomUUID().toString()
+                    )
+
+                    val receivedDialogmelding = ReceivedDialogmelding(
+                        dialogmelding = dialogmelding,
+                        personNrPasient = personNumberPatient,
+                        pasientAktoerId = patientIdents.identer!!.first().ident,
+                        personNrLege = personNumberDoctor,
+                        legeAktoerId = doctorIdents.identer!!.first().ident,
+                        navLogId = ediLoggId,
+                        msgId = msgId,
+                        legekontorOrgNr = legekontorOrgNr,
+                        legekontorOrgName = legekontorOrgName,
+                        legekontorHerId = legekontorHerId,
+                        legekontorReshId = legekontorReshId,
+                        mottattDato = receiverBlock.mottattDatotid.toGregorianCalendar().toZonedDateTime()
+                            .withZoneSameInstant(
+                                ZoneOffset.UTC
+                            ).toLocalDateTime(),
+                        fellesformat = inputMessageText,
+                        tssid = samhandlerPraksis?.tss_ident ?: ""
                     )
                 } catch (e: Exception) {
                     log.error("Exception caught while handling message {}", e)
