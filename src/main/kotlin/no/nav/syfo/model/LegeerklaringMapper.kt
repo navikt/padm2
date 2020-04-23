@@ -4,7 +4,6 @@ import no.nav.helse.dialogmelding.CV
 import no.nav.helse.dialogmelding.XMLDialogmelding
 import no.nav.helse.dialogmelding.XMLForesporsel
 import no.nav.helse.dialogmelding.XMLNotat
-import no.nav.helse.msgHead.XMLHealthcareProfessional
 
 fun XMLDialogmelding.toDialogmelding(
     dialogmeldingId: String
@@ -34,17 +33,11 @@ fun XMLForesporsel.toForesporsel(): Foresporsel {
 
         return Foresporsel(
                 typeForesp = TypeForesp(typeForesp.dn, typeForesp.s, typeForesp.v),
-                sporsmal = "",
-                dokIdForesp = "",
+                sporsmal = sporsmal,
+                dokIdForesp = dokIdForesp,
                 rollerRelatertNotat = RollerRelatertNotat(
                         rolleNotat = RolleNotat(rollerRelatertNotat.first().rolleNotat.s, rollerRelatertNotat.first().rolleNotat.v),
                         person = Person(rollerRelatertNotat.first().person.givenName, rollerRelatertNotat.first().person.familyName)
                 )
         )
-}
-
-fun XMLHealthcareProfessional.formatName(): String = if (middleName == null) {
-        "${familyName.toUpperCase()} ${givenName.toUpperCase()}"
-} else {
-        "${familyName.toUpperCase()} ${givenName.toUpperCase()} ${middleName.toUpperCase()}"
 }
