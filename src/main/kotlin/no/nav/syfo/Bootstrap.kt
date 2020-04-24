@@ -131,6 +131,7 @@ fun launchListeners(
 
                 val inputconsumer = session.consumerForQueue(env.inputQueueName)
                 val receiptProducer = session.producerForQueue(env.apprecQueueName)
+                val backoutProducer = session.producerForQueue(env.inputBackoutQueueName)
 
                 applicationState.ready = true
                 jedis.auth(secrets.redisSecret)
@@ -139,7 +140,7 @@ fun launchListeners(
                     applicationState, inputconsumer,
                     session, env, secrets, aktoerIdClient,
                     kuhrSarClient, subscriptionEmottak, jedis, receiptProducer,
-                    kafkaProducerReceivedDialogmelding, padm2ReglerClient
+                    kafkaProducerReceivedDialogmelding, padm2ReglerClient, backoutProducer
                 )
             }
         }

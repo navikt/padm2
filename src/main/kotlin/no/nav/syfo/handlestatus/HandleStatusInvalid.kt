@@ -25,19 +25,11 @@ fun handleStatusINVALID(
     receiptProducer: MessageProducer,
     fellesformat: XMLEIFellesformat,
     loggingMeta: LoggingMeta,
-    pale2AvvistTopic: String,
     apprecQueueName: String
 ) {
     sendReceipt(session, receiptProducer, fellesformat, ApprecStatus.avvist,
         validationResult.ruleHits.map { it.toApprecCV() })
     log.info("Apprec Receipt sent to {}, {}", apprecQueueName, fields(loggingMeta))
-
-    /*
-    kafkaProducerLegeerklaeringSak.send(
-        ProducerRecord(pale2AvvistTopic, legeerklaeringSak)
-    )*/
-
-    log.info("Melding sendt til kafka topic {}", pale2AvvistTopic)
 }
 
 fun handleDuplicateSM2013Content(

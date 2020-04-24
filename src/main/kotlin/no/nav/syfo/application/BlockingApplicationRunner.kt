@@ -26,11 +26,14 @@ import no.nav.syfo.handlestatus.handleDoctorNotFoundInAktorRegister
 import no.nav.syfo.handlestatus.handleDuplicateEdiloggid
 import no.nav.syfo.handlestatus.handleDuplicateSM2013Content
 import no.nav.syfo.handlestatus.handlePatientNotFoundInAktorRegister
+import no.nav.syfo.handlestatus.handleStatusINVALID
+import no.nav.syfo.handlestatus.handleStatusOK
 import no.nav.syfo.handlestatus.handleTestFnrInProd
 import no.nav.syfo.log
 import no.nav.syfo.metrics.INCOMING_MESSAGE_COUNTER
 import no.nav.syfo.metrics.REQUEST_TIME
 import no.nav.syfo.model.ReceivedDialogmelding
+import no.nav.syfo.model.Status
 import no.nav.syfo.model.findDialogmeldingType
 import no.nav.syfo.model.toDialogmelding
 import no.nav.syfo.services.sha256hashstring
@@ -65,7 +68,8 @@ class BlockingApplicationRunner {
         jedis: Jedis,
         receiptProducer: MessageProducer,
         kafkaProducerReceivedDialogmelding: KafkaProducer<String, ReceivedDialogmelding>,
-        padm2ReglerClient: Padm2ReglerClient
+        padm2ReglerClient: Padm2ReglerClient,
+        backoutProducer: MessageProducer
     ) {
         wrapExceptions {
             loop@ while (applicationState.ready) {
@@ -81,13 +85,15 @@ class BlockingApplicationRunner {
                         else -> throw RuntimeException("Incoming message needs to be a byte message or text message")
                     }
 
-                    val fellesformat = fellesformatUnmarshaller.unmarshal(StringReader(inputMessageText)) as XMLEIFellesformat
+                    val fellesformat =
+                        fellesformatUnmarshaller.unmarshal(StringReader(inputMessageText)) as XMLEIFellesformat
                     val msgHead: XMLMsgHead = fellesformat.get()
                     val receiverBlock = fellesformat.get<XMLMottakenhetBlokk>()
                     val ediLoggId = receiverBlock.ediLoggId
                     val msgId = msgHead.msgInfo.msgId
                     val legekontorOrgNr = extractOrganisationNumberFromSender(fellesformat)?.id
-                    val personNumberPatient = msgHead.msgInfo.patient.ident.find { it.typeId.v == "FNR" }?.id ?: "" // TODO dersom tom avvist meldingen
+                    val personNumberPatient = msgHead.msgInfo.patient.ident.find { it.typeId.v == "FNR" }?.id
+                        ?: "" // TODO dersom tom avvist meldingen
                     val personNumberDoctor = receiverBlock.avsenderFnrFraDigSignatur
                     val legekontorOrgName = extractSenderOrganisationName(fellesformat)
                     val legekontorHerId = extractOrganisationHerNumberFromSender(fellesformat)?.id
@@ -99,9 +105,9 @@ class BlockingApplicationRunner {
                     val requestLatency = REQUEST_TIME.startTimer()
 
                     val loggingMeta = LoggingMeta(
-                            mottakId = ediLoggId,
-                            orgNr = extractOrganisationNumberFromSender(fellesformat)?.id,
-                            msgId = msgHead.msgInfo.msgId
+                        mottakId = ediLoggId,
+                        orgNr = extractOrganisationNumberFromSender(fellesformat)?.id,
+                        msgId = msgHead.msgInfo.msgId
                     )
 
                     log.info("Received message, {}", StructuredArguments.fields(loggingMeta))
@@ -231,6 +237,25 @@ class BlockingApplicationRunner {
                     log.info("Melding sendt til kafka topic {}", env.padm2ArenaTopic)
                     val currentRequestLatency = requestLatency.observeDuration()
 
+                    when (validationResult.status) {
+                        Status.OK -> handleStatusOK(
+                            session,
+                            receiptProducer,
+                            fellesformat,
+                            loggingMeta,
+                            env.apprecQueueName
+                        )
+
+                        Status.INVALID -> handleStatusINVALID(
+                            validationResult,
+                            session,
+                            receiptProducer,
+                            fellesformat,
+                            loggingMeta,
+                            env.apprecQueueName
+                        )
+                    }
+
                     log.info(
                         "Finished message got outcome {}, {}, processing took {}s",
                         StructuredArguments.keyValue("status", validationResult.status),
@@ -245,10 +270,12 @@ class BlockingApplicationRunner {
                         "Exception caught, redis issue while handling message, sending to backout",
                         jedisException
                     )
+                    backoutProducer.send(message)
                     log.error("Setting applicationState.alive to false")
                     applicationState.alive = false
                 } catch (e: Exception) {
-                    log.error("Exception caught while handling message {}", e)
+                    log.error("Exception caught while handling message, sending to backout, {}", e)
+                    backoutProducer.send(message)
                 }
             }
         }
