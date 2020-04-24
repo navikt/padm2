@@ -25,6 +25,7 @@ import no.nav.syfo.application.BlockingApplicationRunner
 import no.nav.syfo.application.createApplicationEngine
 import no.nav.syfo.client.AktoerIdClient
 import no.nav.syfo.client.KafkaClients
+import no.nav.syfo.client.Padm2ReglerClient
 import no.nav.syfo.client.SarClient
 import no.nav.syfo.client.StsOidcClient
 import no.nav.syfo.model.ReceivedDialogmelding
@@ -87,6 +88,7 @@ fun main() {
     val oidcClient = StsOidcClient(vaultSecrets.serviceuserUsername, vaultSecrets.serviceuserPassword)
     val aktoerIdClient = AktoerIdClient(env.aktoerregisterV1Url, oidcClient, httpClient)
     val sarClient = SarClient(env.kuhrSarApiUrl, httpClient)
+    val padm2ReglerClient = Padm2ReglerClient(env.padm2ReglerEndpointURL, httpClient)
 
     val subscriptionEmottak = createPort<SubscriptionPort>(env.subscriptionEndpointURL) {
         proxy { features.add(WSAddressingFeature()) }
@@ -96,7 +98,7 @@ fun main() {
     val kafkaClients = KafkaClients(env, vaultSecrets)
 
     launchListeners(applicationState, env, vaultSecrets, aktoerIdClient, sarClient, subscriptionEmottak,
-    kafkaClients.kafkaProducerReceivedDialogmelding)
+    kafkaClients.kafkaProducerReceivedDialogmelding, padm2ReglerClient)
 }
 
 fun createListener(applicationState: ApplicationState, action: suspend CoroutineScope.() -> Unit): Job =
@@ -118,7 +120,8 @@ fun launchListeners(
     aktoerIdClient: AktoerIdClient,
     kuhrSarClient: SarClient,
     subscriptionEmottak: SubscriptionPort,
-    kafkaProducerReceivedDialogmelding: KafkaProducer<String, ReceivedDialogmelding>
+    kafkaProducerReceivedDialogmelding: KafkaProducer<String, ReceivedDialogmelding>,
+    padm2ReglerClient: Padm2ReglerClient
 ) {
     createListener(applicationState) {
         connectionFactory(env).createConnection(secrets.mqUsername, secrets.mqPassword).use { connection ->
@@ -135,7 +138,8 @@ fun launchListeners(
                 BlockingApplicationRunner().run(
                     applicationState, inputconsumer,
                     session, env, secrets, aktoerIdClient,
-                    kuhrSarClient, subscriptionEmottak, jedis, receiptProducer, kafkaProducerReceivedDialogmelding
+                    kuhrSarClient, subscriptionEmottak, jedis, receiptProducer,
+                    kafkaProducerReceivedDialogmelding, padm2ReglerClient
                 )
             }
         }

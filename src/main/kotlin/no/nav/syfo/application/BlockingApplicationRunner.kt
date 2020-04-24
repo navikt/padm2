@@ -19,6 +19,7 @@ import no.nav.syfo.VaultSecrets
 import no.nav.syfo.application.services.samhandlerParksisisLegevakt
 import no.nav.syfo.application.services.startSubscription
 import no.nav.syfo.client.AktoerIdClient
+import no.nav.syfo.client.Padm2ReglerClient
 import no.nav.syfo.client.SarClient
 import no.nav.syfo.client.findBestSamhandlerPraksis
 import no.nav.syfo.handlestatus.handleDoctorNotFoundInAktorRegister
@@ -28,6 +29,7 @@ import no.nav.syfo.handlestatus.handlePatientNotFoundInAktorRegister
 import no.nav.syfo.handlestatus.handleTestFnrInProd
 import no.nav.syfo.log
 import no.nav.syfo.metrics.INCOMING_MESSAGE_COUNTER
+import no.nav.syfo.metrics.REQUEST_TIME
 import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.model.findDialogmeldingType
 import no.nav.syfo.model.toDialogmelding
@@ -46,6 +48,7 @@ import no.nav.syfo.util.wrapExceptions
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
 import redis.clients.jedis.Jedis
+import redis.clients.jedis.exceptions.JedisConnectionException
 
 class BlockingApplicationRunner {
 
@@ -61,7 +64,8 @@ class BlockingApplicationRunner {
         subscriptionEmottak: SubscriptionPort,
         jedis: Jedis,
         receiptProducer: MessageProducer,
-        kafkaProducerReceivedDialogmelding: KafkaProducer<String, ReceivedDialogmelding>
+        kafkaProducerReceivedDialogmelding: KafkaProducer<String, ReceivedDialogmelding>,
+        padm2ReglerClient: Padm2ReglerClient
     ) {
         wrapExceptions {
             loop@ while (applicationState.ready) {
@@ -91,6 +95,8 @@ class BlockingApplicationRunner {
                     val dialogmeldingXml = extractDialogmelding(fellesformat)
                     val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
                     val sha256String = sha256hashstring(dialogmeldingXml)
+
+                    val requestLatency = REQUEST_TIME.startTimer()
 
                     val loggingMeta = LoggingMeta(
                             mottakId = ediLoggId,
@@ -217,10 +223,30 @@ class BlockingApplicationRunner {
                         tssid = samhandlerPraksis?.tss_ident ?: ""
                     )
 
+                    val validationResult = padm2ReglerClient.executeRuleValidation(receivedDialogmelding)
+
                     kafkaProducerReceivedDialogmelding.send(
                         ProducerRecord(env.padm2ArenaTopic, receivedDialogmelding)
                     )
                     log.info("Melding sendt til kafka topic {}", env.padm2ArenaTopic)
+                    val currentRequestLatency = requestLatency.observeDuration()
+
+                    log.info(
+                        "Finished message got outcome {}, {}, processing took {}s",
+                        StructuredArguments.keyValue("status", validationResult.status),
+                        StructuredArguments.keyValue(
+                            "ruleHits",
+                            validationResult.ruleHits.joinToString(", ", "(", ")") { it.ruleName }),
+                        StructuredArguments.keyValue("latency", currentRequestLatency),
+                        StructuredArguments.fields(loggingMeta)
+                    )
+                } catch (jedisException: JedisConnectionException) {
+                    log.error(
+                        "Exception caught, redis issue while handling message, sending to backout",
+                        jedisException
+                    )
+                    log.error("Setting applicationState.alive to false")
+                    applicationState.alive = false
                 } catch (e: Exception) {
                     log.error("Exception caught while handling message {}", e)
                 }

@@ -19,7 +19,8 @@ data class Environment(
     val redishost: String = getEnvVar("REDIS_HOST", "padm2-redis.default.svc.nais.local"),
     val cluster: String = getEnvVar("NAIS_CLUSTER_NAME"),
     override val kafkaBootstrapServers: String = getEnvVar("KAFKA_BOOTSTRAP_SERVERS_URL"),
-    val padm2ArenaTopic: String = getEnvVar("KAFKA_PALE_2_SAK_TOPIC", "privat-syfo-padm2-arena-v1")
+    val padm2ArenaTopic: String = getEnvVar("KAFKA_PALE_2_SAK_TOPIC", "privat-syfo-padm2-arena-v1"),
+    val padm2ReglerEndpointURL: String = getEnvVar("PADM2REGLER_ENDPOINT_URL", "http://padm2regler")
 ) : MqConfig, KafkaConfig
 
 data class VaultSecrets(
