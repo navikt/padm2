@@ -10,7 +10,7 @@ fun extractDialogmelding(fellesformat: XMLEIFellesformat): XMLDialogmelding =
         it.refDoc.msgType.v == "XML"
     }.refDoc.content.any[0] as XMLDialogmelding
 
-fun extractVedlegg(msgHead: XMLMsgHead) = msgHead.document.filter {
+fun extractVedlegg(fellesformat: XMLEIFellesformat) = fellesformat.get<XMLMsgHead>().document.filter {
     it.refDoc.msgType.v == "A" &&
             it.refDoc.mimeType == "application/pdf" ||
             it.refDoc.mimeType == "image/tiff" ||

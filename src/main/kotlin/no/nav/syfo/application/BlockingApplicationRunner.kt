@@ -48,6 +48,7 @@ import no.nav.syfo.util.extractOrganisationHerNumberFromSender
 import no.nav.syfo.util.extractOrganisationNumberFromSender
 import no.nav.syfo.util.extractOrganisationRashNumberFromSender
 import no.nav.syfo.util.extractSenderOrganisationName
+import no.nav.syfo.util.extractVedlegg
 import no.nav.syfo.util.fellesformatUnmarshaller
 import no.nav.syfo.util.get
 import no.nav.syfo.util.wrapExceptions
@@ -107,6 +108,7 @@ class BlockingApplicationRunner {
                     val sha256String = sha256hashstring(dialogmeldingXml)
                     val legeHpr = extractLegeHpr(fellesformat)
                     val navnHelsePersonellNavn = extractHelsePersonellNavn(fellesformat)
+                    val extractVedlegg = extractVedlegg(fellesformat)
 
                     val requestLatency = REQUEST_TIME.startTimer()
 
@@ -214,7 +216,8 @@ class BlockingApplicationRunner {
                         dialogmeldingId = UUID.randomUUID().toString(),
                         dialogmeldingType = dialogmeldingType,
                         signaturDato = msgHead.msgInfo.genDate,
-                        navnHelsePersonellNavn = navnHelsePersonellNavn
+                        navnHelsePersonellNavn = navnHelsePersonellNavn,
+                        vedlegg = extractVedlegg
                     )
 
                     val receivedDialogmelding = ReceivedDialogmelding(

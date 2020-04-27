@@ -1,16 +1,19 @@
 package no.nav.syfo.model
 
 import java.time.LocalDateTime
+import no.nav.helse.base64container.Base64Container
 import no.nav.helse.dialogmelding.CV
 import no.nav.helse.dialogmelding.XMLDialogmelding
 import no.nav.helse.dialogmelding.XMLForesporsel
 import no.nav.helse.dialogmelding.XMLNotat
+import no.nav.helse.msgHead.XMLDocument
 
 fun XMLDialogmelding.toDialogmelding(
     dialogmeldingId: String,
     dialogmeldingType: DialogmeldingType,
     signaturDato: LocalDateTime,
-    navnHelsePersonellNavn: String?
+    navnHelsePersonellNavn: String?,
+    vedlegg: List<XMLDocument>?
 ) = Dialogmelding(
     id = dialogmeldingId,
     dialogmeldingNotat = if (dialogmeldingType == DialogmeldingType.DIALOGMELDING_HENVENDELSE_FRA_LEGE) {
@@ -29,9 +32,21 @@ fun XMLDialogmelding.toDialogmelding(
         null
     },
     signaturDato = signaturDato,
-    navnHelsepersonell = navnHelsePersonellNavn ?: ""
+    navnHelsepersonell = navnHelsePersonellNavn ?: "",
+    vedlegg = vedlegg?.map { it.toVedlegg() } ?: emptyList()
 
 )
+
+fun XMLDocument.toVedlegg(): Vedlegg {
+
+    val base64Container = refDoc.content.any[0] as Base64Container
+
+    return Vedlegg(
+        mimeType = refDoc.mimeType,
+        beskrivelse = refDoc.description,
+        contentBase64 = base64Container.value
+    )
+}
 
 fun XMLNotat.toDialogmeldingNotat(): DialogmeldingNotat {
 
