@@ -23,8 +23,6 @@ import no.nav.syfo.client.Padm2ReglerClient
 import no.nav.syfo.client.SarClient
 import no.nav.syfo.client.findBestSamhandlerPraksis
 import no.nav.syfo.handlestatus.handleDoctorNotFoundInAktorRegister
-import no.nav.syfo.handlestatus.handleDuplicateEdiloggid
-import no.nav.syfo.handlestatus.handleDuplicateSM2013Content
 import no.nav.syfo.handlestatus.handlePatientNotFoundInAktorRegister
 import no.nav.syfo.handlestatus.handleStatusINVALID
 import no.nav.syfo.handlestatus.handleStatusOK
@@ -38,7 +36,6 @@ import no.nav.syfo.model.Status
 import no.nav.syfo.model.findDialogmeldingType
 import no.nav.syfo.model.toDialogmelding
 import no.nav.syfo.services.sha256hashstring
-import no.nav.syfo.services.updateRedis
 import no.nav.syfo.util.LoggingMeta
 import no.nav.syfo.util.erTestFnr
 import no.nav.syfo.util.extractDialogmelding
@@ -170,7 +167,7 @@ class BlockingApplicationRunner {
 
                     val redisSha256String = jedis.get(sha256String)
                     val redisEdiloggid = jedis.get(ediLoggId)
-
+                    /*
                     if (redisSha256String != null) {
                         handleDuplicateSM2013Content(
                             session, receiptProducer,
@@ -186,6 +183,8 @@ class BlockingApplicationRunner {
                     } else {
                         updateRedis(jedis, ediLoggId, sha256String)
                     }
+
+                     */
 
                     val patientIdents = aktoerIds[personNumberPatient]
                     val doctorIdents = aktoerIds[personNumberDoctor]
