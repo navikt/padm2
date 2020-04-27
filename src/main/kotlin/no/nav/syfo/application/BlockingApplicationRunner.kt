@@ -32,6 +32,7 @@ import no.nav.syfo.handlestatus.handleTestFnrInProd
 import no.nav.syfo.log
 import no.nav.syfo.metrics.INCOMING_MESSAGE_COUNTER
 import no.nav.syfo.metrics.REQUEST_TIME
+import no.nav.syfo.model.DialogmeldingSak
 import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.model.Status
 import no.nav.syfo.model.findDialogmeldingType
@@ -41,6 +42,8 @@ import no.nav.syfo.services.updateRedis
 import no.nav.syfo.util.LoggingMeta
 import no.nav.syfo.util.erTestFnr
 import no.nav.syfo.util.extractDialogmelding
+import no.nav.syfo.util.extractHelsePersonellNavn
+import no.nav.syfo.util.extractLegeHpr
 import no.nav.syfo.util.extractOrganisationHerNumberFromSender
 import no.nav.syfo.util.extractOrganisationNumberFromSender
 import no.nav.syfo.util.extractOrganisationRashNumberFromSender
@@ -69,7 +72,8 @@ class BlockingApplicationRunner {
         receiptProducer: MessageProducer,
         kafkaProducerReceivedDialogmelding: KafkaProducer<String, ReceivedDialogmelding>,
         padm2ReglerClient: Padm2ReglerClient,
-        backoutProducer: MessageProducer
+        backoutProducer: MessageProducer,
+        kafkaProducerDialogmeldingSak: KafkaProducer<String, DialogmeldingSak>
     ) {
         wrapExceptions {
             loop@ while (applicationState.ready) {
@@ -101,6 +105,8 @@ class BlockingApplicationRunner {
                     val dialogmeldingXml = extractDialogmelding(fellesformat)
                     val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
                     val sha256String = sha256hashstring(dialogmeldingXml)
+                    val legeHpr = extractLegeHpr(fellesformat)
+                    val navnHelsePersonellNavn = extractHelsePersonellNavn(fellesformat)
 
                     val requestLatency = REQUEST_TIME.startTimer()
 
@@ -206,7 +212,9 @@ class BlockingApplicationRunner {
 
                     val dialogmelding = dialogmeldingXml.toDialogmelding(
                         dialogmeldingId = UUID.randomUUID().toString(),
-                        dialogmeldingType = dialogmeldingType
+                        dialogmeldingType = dialogmeldingType,
+                        signaturDato = msgHead.msgInfo.genDate,
+                        navnHelsePersonellNavn = navnHelsePersonellNavn
                     )
 
                     val receivedDialogmelding = ReceivedDialogmelding(
@@ -225,6 +233,7 @@ class BlockingApplicationRunner {
                             .withZoneSameInstant(
                                 ZoneOffset.UTC
                             ).toLocalDateTime(),
+                        legehpr = legeHpr,
                         fellesformat = inputMessageText,
                         tssid = samhandlerPraksis?.tss_ident ?: ""
                     )
@@ -235,7 +244,11 @@ class BlockingApplicationRunner {
                         ProducerRecord(env.padm2ArenaTopic, receivedDialogmelding)
                     )
                     log.info("Melding sendt til kafka topic {}", env.padm2ArenaTopic)
-                    val currentRequestLatency = requestLatency.observeDuration()
+
+                    val dialogmeldingSak = DialogmeldingSak(
+                        receivedDialogmelding = receivedDialogmelding,
+                        validationResult = validationResult
+                    )
 
                     when (validationResult.status) {
                         Status.OK -> handleStatusOK(
@@ -243,7 +256,10 @@ class BlockingApplicationRunner {
                             receiptProducer,
                             fellesformat,
                             loggingMeta,
-                            env.apprecQueueName
+                            env.apprecQueueName,
+                            kafkaProducerDialogmeldingSak,
+                            env.padm2SakTopic,
+                            dialogmeldingSak
                         )
 
                         Status.INVALID -> handleStatusINVALID(
@@ -252,9 +268,14 @@ class BlockingApplicationRunner {
                             receiptProducer,
                             fellesformat,
                             loggingMeta,
-                            env.apprecQueueName
+                            env.apprecQueueName,
+                            kafkaProducerDialogmeldingSak,
+                            env.padm2SakTopic,
+                            dialogmeldingSak
                         )
                     }
+
+                    val currentRequestLatency = requestLatency.observeDuration()
 
                     log.info(
                         "Finished message got outcome {}, {}, processing took {}s",

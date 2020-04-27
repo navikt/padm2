@@ -1,5 +1,6 @@
 package no.nav.syfo.model
 
+import java.time.LocalDateTime
 import no.nav.helse.dialogmelding.CV
 import no.nav.helse.dialogmelding.XMLDialogmelding
 import no.nav.helse.dialogmelding.XMLForesporsel
@@ -7,7 +8,9 @@ import no.nav.helse.dialogmelding.XMLNotat
 
 fun XMLDialogmelding.toDialogmelding(
     dialogmeldingId: String,
-    dialogmeldingType: DialogmeldingType
+    dialogmeldingType: DialogmeldingType,
+    signaturDato: LocalDateTime,
+    navnHelsePersonellNavn: String?
 ) = Dialogmelding(
     id = dialogmeldingId,
     dialogmeldingNotat = if (dialogmeldingType == DialogmeldingType.DIALOGMELDING_HENVENDELSE_FRA_LEGE) {
@@ -24,7 +27,9 @@ fun XMLDialogmelding.toDialogmelding(
         notat.firstOrNull()?.toDialogmeldingForesporsel()
     } else {
         null
-    }
+    },
+    signaturDato = signaturDato,
+    navnHelsepersonell = navnHelsePersonellNavn ?: ""
 
 )
 

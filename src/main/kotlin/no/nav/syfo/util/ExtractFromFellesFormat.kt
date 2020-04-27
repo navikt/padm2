@@ -36,4 +36,17 @@ fun extractOrganisationRashNumberFromSender(fellesformat: XMLEIFellesformat): XM
 fun extractSenderOrganisationName(fellesformat: XMLEIFellesformat): String =
     fellesformat.get<XMLMsgHead>().msgInfo.sender.organisation?.organisationName ?: ""
 
+fun extractLegeHpr(fellesformat: XMLEIFellesformat): String? =
+    fellesformat.get<XMLMsgHead>().msgInfo.sender.organisation?.healthcareProfessional?.ident?.find {
+        it.typeId.v == "HPR"
+    }?.id
+
+fun extractHelsePersonellNavn(fellesformat: XMLEIFellesformat): String? =
+    if (fellesformat.get<XMLMsgHead>().msgInfo.sender.organisation?.healthcareProfessional?.middleName == null)
+        "${fellesformat.get<XMLMsgHead>().msgInfo.sender.organisation?.healthcareProfessional?.familyName} " +
+                "${fellesformat.get<XMLMsgHead>().msgInfo.sender.organisation?.healthcareProfessional?.givenName}" else
+        "${fellesformat.get<XMLMsgHead>().msgInfo.sender.organisation?.healthcareProfessional?.familyName} " +
+                "${fellesformat.get<XMLMsgHead>().msgInfo.sender.organisation?.healthcareProfessional?.givenName} " +
+                "${fellesformat.get<XMLMsgHead>().msgInfo.sender.organisation?.healthcareProfessional?.middleName}"
+
 inline fun <reified T> XMLEIFellesformat.get() = this.any.find { it is T } as T

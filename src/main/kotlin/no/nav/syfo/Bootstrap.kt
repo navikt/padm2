@@ -28,6 +28,7 @@ import no.nav.syfo.client.KafkaClients
 import no.nav.syfo.client.Padm2ReglerClient
 import no.nav.syfo.client.SarClient
 import no.nav.syfo.client.StsOidcClient
+import no.nav.syfo.model.DialogmeldingSak
 import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.mq.connectionFactory
 import no.nav.syfo.mq.consumerForQueue
@@ -98,7 +99,7 @@ fun main() {
     val kafkaClients = KafkaClients(env, vaultSecrets)
 
     launchListeners(applicationState, env, vaultSecrets, aktoerIdClient, sarClient, subscriptionEmottak,
-    kafkaClients.kafkaProducerReceivedDialogmelding, padm2ReglerClient)
+    kafkaClients.kafkaProducerReceivedDialogmelding, padm2ReglerClient, kafkaClients.kafkaProducerDialogmeldingSak)
 }
 
 fun createListener(applicationState: ApplicationState, action: suspend CoroutineScope.() -> Unit): Job =
@@ -121,7 +122,8 @@ fun launchListeners(
     kuhrSarClient: SarClient,
     subscriptionEmottak: SubscriptionPort,
     kafkaProducerReceivedDialogmelding: KafkaProducer<String, ReceivedDialogmelding>,
-    padm2ReglerClient: Padm2ReglerClient
+    padm2ReglerClient: Padm2ReglerClient,
+    kafkaProducerDialogmeldingSak: KafkaProducer<String, DialogmeldingSak>
 ) {
     createListener(applicationState) {
         connectionFactory(env).createConnection(secrets.mqUsername, secrets.mqPassword).use { connection ->
@@ -140,7 +142,7 @@ fun launchListeners(
                     applicationState, inputconsumer,
                     session, env, secrets, aktoerIdClient,
                     kuhrSarClient, subscriptionEmottak, jedis, receiptProducer,
-                    kafkaProducerReceivedDialogmelding, padm2ReglerClient, backoutProducer
+                    kafkaProducerReceivedDialogmelding, padm2ReglerClient, backoutProducer, kafkaProducerDialogmeldingSak
                 )
             }
         }

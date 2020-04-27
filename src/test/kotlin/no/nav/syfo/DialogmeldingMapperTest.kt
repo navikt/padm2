@@ -1,6 +1,7 @@
 package no.nav.syfo
 
 import java.io.StringReader
+import java.time.LocalDateTime
 import java.util.UUID
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.syfo.model.DialogmeldingType
@@ -21,10 +22,14 @@ internal class DialogmeldingMapperTest {
 
         val dialomeldingxml = extractDialogmelding(felleformatDm)
         val dialogmeldingId = UUID.randomUUID().toString()
+        val signaturDato = LocalDateTime.of(2017, 11, 5, 0, 0, 0)
+        val navnHelsePersonellNavn = "Per Hansen"
 
         val dialogmelding = dialomeldingxml.toDialogmelding(
             dialogmeldingId = dialogmeldingId,
-            dialogmeldingType = DialogmeldingType.DIALOGMELDING_SVAR_INNKALLING_DIALOGMOTE
+            dialogmeldingType = DialogmeldingType.DIALOGMELDING_SVAR_INNKALLING_DIALOGMOTE,
+            signaturDato = signaturDato,
+            navnHelsePersonellNavn = navnHelsePersonellNavn
         )
 
         dialogmelding.id shouldBeEqualTo dialogmeldingId
@@ -38,10 +43,14 @@ internal class DialogmeldingMapperTest {
 
         val dialomeldingxml = extractDialogmelding(felleformatDm)
         val dialogmeldingId = UUID.randomUUID().toString()
+        val signaturDato = LocalDateTime.of(2017, 11, 5, 0, 0, 0)
+        val navnHelsePersonellNavn = "Per Hansen"
 
         val dialogmelding = dialomeldingxml.toDialogmelding(
             dialogmeldingId = dialogmeldingId,
-            dialogmeldingType = DialogmeldingType.DIALOGMELDING_SVAR_FORESPORSEL_OM_PASIENT
+            dialogmeldingType = DialogmeldingType.DIALOGMELDING_SVAR_FORESPORSEL_OM_PASIENT,
+            signaturDato = signaturDato,
+            navnHelsePersonellNavn = navnHelsePersonellNavn
         )
 
         dialogmelding.id shouldBeEqualTo dialogmeldingId
@@ -55,10 +64,14 @@ internal class DialogmeldingMapperTest {
 
         val dialomeldingxml = extractDialogmelding(felleformatDm)
         val dialogmeldingId = UUID.randomUUID().toString()
+        val signaturDato = LocalDateTime.of(2017, 11, 5, 0, 0, 0)
+        val navnHelsePersonellNavn = "Per Hansen"
 
         val dialogmelding = dialomeldingxml.toDialogmelding(
             dialogmeldingId = dialogmeldingId,
-            dialogmeldingType = DialogmeldingType.DIALOGMELDING_HENVENDELSE_FRA_LEGE
+            dialogmeldingType = DialogmeldingType.DIALOGMELDING_HENVENDELSE_FRA_LEGE,
+            signaturDato = signaturDato,
+            navnHelsePersonellNavn = navnHelsePersonellNavn
         )
 
         dialogmelding.id shouldBeEqualTo dialogmeldingId

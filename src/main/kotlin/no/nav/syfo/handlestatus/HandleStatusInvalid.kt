@@ -13,10 +13,13 @@ import no.nav.syfo.client.IdentInfoResult
 import no.nav.syfo.log
 import no.nav.syfo.metrics.INVALID_MESSAGE_NO_NOTICE
 import no.nav.syfo.metrics.TEST_FNR_IN_PROD
+import no.nav.syfo.model.DialogmeldingSak
 import no.nav.syfo.model.ValidationResult
 import no.nav.syfo.services.sendReceipt
 import no.nav.syfo.services.updateRedis
 import no.nav.syfo.util.LoggingMeta
+import org.apache.kafka.clients.producer.KafkaProducer
+import org.apache.kafka.clients.producer.ProducerRecord
 import redis.clients.jedis.Jedis
 
 fun handleStatusINVALID(
@@ -25,8 +28,15 @@ fun handleStatusINVALID(
     receiptProducer: MessageProducer,
     fellesformat: XMLEIFellesformat,
     loggingMeta: LoggingMeta,
-    apprecQueueName: String
+    apprecQueueName: String,
+    kafkaProducerDialogmeldingSak: KafkaProducer<String, DialogmeldingSak>,
+    padm2SakTopic: String,
+    dialogmeldingSak: DialogmeldingSak
 ) {
+    kafkaProducerDialogmeldingSak.send(
+        ProducerRecord(padm2SakTopic, dialogmeldingSak)
+    )
+
     sendReceipt(session, receiptProducer, fellesformat, ApprecStatus.avvist,
         validationResult.ruleHits.map { it.toApprecCV() })
     log.info("Apprec Receipt sent to {}, {}", apprecQueueName, fields(loggingMeta))
