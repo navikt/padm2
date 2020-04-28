@@ -11,8 +11,10 @@ import javax.jms.TextMessage
 import kotlinx.coroutines.delay
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.emottak.subscription.SubscriptionPort
+import no.nav.helse.base64container.Base64Container
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
+import no.nav.helse.msgHead.XMLDocument
 import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.Environment
 import no.nav.syfo.VaultSecrets
@@ -32,9 +34,9 @@ import no.nav.syfo.handlestatus.handleTestFnrInProd
 import no.nav.syfo.log
 import no.nav.syfo.metrics.INCOMING_MESSAGE_COUNTER
 import no.nav.syfo.metrics.REQUEST_TIME
-import no.nav.syfo.model.DialogmeldingSak
 import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.model.Status
+import no.nav.syfo.model.Vedlegg
 import no.nav.syfo.model.findDialogmeldingType
 import no.nav.syfo.model.toDialogmelding
 import no.nav.syfo.services.JournalService
@@ -110,6 +112,7 @@ class BlockingApplicationRunner {
                     val legeHpr = extractLegeHpr(fellesformat)
                     val navnHelsePersonellNavn = extractHelsePersonellNavn(fellesformat)
                     val extractVedlegg = extractVedlegg(fellesformat)
+                    val vedleggListe = extractVedlegg.map { it.toVedlegg() }
 
                     val requestLatency = REQUEST_TIME.startTimer()
 
@@ -217,8 +220,7 @@ class BlockingApplicationRunner {
                         dialogmeldingId = UUID.randomUUID().toString(),
                         dialogmeldingType = dialogmeldingType,
                         signaturDato = msgHead.msgInfo.genDate,
-                        navnHelsePersonellNavn = navnHelsePersonellNavn,
-                        vedlegg = extractVedlegg
+                        navnHelsePersonellNavn = navnHelsePersonellNavn
                     )
 
                     val receivedDialogmelding = ReceivedDialogmelding(
@@ -249,11 +251,6 @@ class BlockingApplicationRunner {
                     )
                     log.info("Melding sendt til kafka topic {}", env.padm2ArenaTopic)
 
-                    val dialogmeldingSak = DialogmeldingSak(
-                        receivedDialogmelding = receivedDialogmelding,
-                        validationResult = validationResult
-                    )
-
                     when (validationResult.status) {
                         Status.OK -> handleStatusOK(
                             session,
@@ -262,7 +259,9 @@ class BlockingApplicationRunner {
                             loggingMeta,
                             env.apprecQueueName,
                             journalService,
-                            dialogmeldingSak
+                            receivedDialogmelding,
+                            validationResult,
+                            vedleggListe
                         )
 
                         Status.INVALID -> handleStatusINVALID(
@@ -273,7 +272,8 @@ class BlockingApplicationRunner {
                             loggingMeta,
                             env.apprecQueueName,
                             journalService,
-                            dialogmeldingSak
+                            receivedDialogmelding,
+                            vedleggListe
                         )
                     }
 
@@ -303,4 +303,15 @@ class BlockingApplicationRunner {
             }
         }
     }
+}
+
+fun XMLDocument.toVedlegg(): Vedlegg {
+
+    val base64Container = refDoc.content.any[0] as Base64Container
+
+    return Vedlegg(
+        mimeType = refDoc.mimeType,
+        beskrivelse = refDoc.description,
+        contentBase64 = base64Container.value
+    )
 }

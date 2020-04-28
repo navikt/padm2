@@ -68,7 +68,8 @@ fun createJournalpostPayload(
     ediLoggId: String,
     signaturDato: LocalDateTime,
     validationResult: ValidationResult,
-    pasientFnr: String
+    pasientFnr: String,
+    vedleggListe: List<Vedlegg>?
 ) = JournalpostRequest(
     avsenderMottaker = when (validatePersonAndDNumber(avsenderFnr)) {
         true -> createAvsenderMottakerValidFnr(avsenderFnr, dialogmelding)
@@ -78,7 +79,7 @@ fun createJournalpostPayload(
         id = pasientFnr,
         idType = "FNR"
     ),
-    dokumenter = leggtilDokument(ediLoggId, dialogmelding, pdf, validationResult, signaturDato),
+    dokumenter = leggtilDokument(ediLoggId, dialogmelding, pdf, validationResult, signaturDato, vedleggListe),
     eksternReferanseId = ediLoggId,
     journalfoerendeEnhet = "9999",
     journalpostType = "INNGAAENDE",
@@ -96,7 +97,8 @@ fun leggtilDokument(
     dialogmelding: Dialogmelding,
     pdf: ByteArray,
     validationResult: ValidationResult,
-    signaturDato: LocalDateTime
+    signaturDato: LocalDateTime,
+    vedleggListe: List<Vedlegg>?
 ): List<Dokument> {
     val listDokument = ArrayList<Dokument>()
     listDokument.add(
@@ -118,9 +120,9 @@ fun leggtilDokument(
             tittel = createTittleJournalpost(validationResult, signaturDato)
         )
     )
-    if (!dialogmelding.vedlegg.isNullOrEmpty()) {
+    if (!vedleggListe.isNullOrEmpty()) {
         val listDokumentvarianter = ArrayList<Dokumentvarianter>()
-        dialogmelding.vedlegg!!.map {
+        vedleggListe.map {
             listDokumentvarianter.add(
                 Dokumentvarianter(
                     filtype = findFiltype(it),

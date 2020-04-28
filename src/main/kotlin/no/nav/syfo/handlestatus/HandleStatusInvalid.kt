@@ -14,8 +14,9 @@ import no.nav.syfo.client.IdentInfoResult
 import no.nav.syfo.log
 import no.nav.syfo.metrics.INVALID_MESSAGE_NO_NOTICE
 import no.nav.syfo.metrics.TEST_FNR_IN_PROD
-import no.nav.syfo.model.DialogmeldingSak
+import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.model.ValidationResult
+import no.nav.syfo.model.Vedlegg
 import no.nav.syfo.services.JournalService
 import no.nav.syfo.services.sendReceipt
 import no.nav.syfo.services.updateRedis
@@ -31,11 +32,13 @@ suspend fun handleStatusINVALID(
     loggingMeta: LoggingMeta,
     apprecQueueName: String,
     journalService: JournalService,
-    dialogmeldingSak: DialogmeldingSak
+    receivedDialogmelding: ReceivedDialogmelding,
+    vedleggListe: List<Vedlegg>?
 ) {
     journalService.onJournalRequest(
-        dialogmeldingSak.receivedDialogmelding,
-        dialogmeldingSak.validationResult,
+        receivedDialogmelding,
+        validationResult,
+        vedleggListe,
         loggingMeta
     )
 

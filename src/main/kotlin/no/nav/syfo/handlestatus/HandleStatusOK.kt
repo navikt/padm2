@@ -7,7 +7,9 @@ import net.logstash.logback.argument.StructuredArguments
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.syfo.apprec.ApprecStatus
 import no.nav.syfo.log
-import no.nav.syfo.model.DialogmeldingSak
+import no.nav.syfo.model.ReceivedDialogmelding
+import no.nav.syfo.model.ValidationResult
+import no.nav.syfo.model.Vedlegg
 import no.nav.syfo.services.JournalService
 import no.nav.syfo.services.sendReceipt
 import no.nav.syfo.util.LoggingMeta
@@ -20,12 +22,15 @@ suspend fun handleStatusOK(
     loggingMeta: LoggingMeta,
     apprecQueueName: String,
     journalService: JournalService,
-    dialogmeldingSak: DialogmeldingSak
+    receivedDialogmelding: ReceivedDialogmelding,
+    validationResult: ValidationResult,
+    vedleggListe: List<Vedlegg>?
 ) {
 
     journalService.onJournalRequest(
-        dialogmeldingSak.receivedDialogmelding,
-        dialogmeldingSak.validationResult,
+        receivedDialogmelding,
+        validationResult,
+        vedleggListe,
         loggingMeta
     )
 

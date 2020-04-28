@@ -31,8 +31,7 @@ internal class DialogmeldingMapperTest {
             dialogmeldingId = dialogmeldingId,
             dialogmeldingType = DialogmeldingType.DIALOGMELDING_SVAR_INNKALLING_DIALOGMOTE,
             signaturDato = signaturDato,
-            navnHelsePersonellNavn = navnHelsePersonellNavn,
-            vedlegg = emptyList()
+            navnHelsePersonellNavn = navnHelsePersonellNavn
         )
 
         dialogmelding.id shouldBeEqualTo dialogmeldingId
@@ -53,8 +52,7 @@ internal class DialogmeldingMapperTest {
             dialogmeldingId = dialogmeldingId,
             dialogmeldingType = DialogmeldingType.DIALOGMELDING_SVAR_FORESPORSEL_OM_PASIENT,
             signaturDato = signaturDato,
-            navnHelsePersonellNavn = navnHelsePersonellNavn,
-            vedlegg = emptyList()
+            navnHelsePersonellNavn = navnHelsePersonellNavn
         )
 
         dialogmelding.id shouldBeEqualTo dialogmeldingId
@@ -75,8 +73,7 @@ internal class DialogmeldingMapperTest {
             dialogmeldingId = dialogmeldingId,
             dialogmeldingType = DialogmeldingType.DIALOGMELDING_HENVENDELSE_FRA_LEGE,
             signaturDato = signaturDato,
-            navnHelsePersonellNavn = navnHelsePersonellNavn,
-            vedlegg = emptyList()
+            navnHelsePersonellNavn = navnHelsePersonellNavn
         )
 
         dialogmelding.id shouldBeEqualTo dialogmeldingId
@@ -97,8 +94,7 @@ internal class DialogmeldingMapperTest {
             dialogmeldingId = dialogmeldingId,
             dialogmeldingType = DialogmeldingType.DIALOGMELDING_HENVENDELSE_FRA_LEGE,
             signaturDato = signaturDato,
-            navnHelsePersonellNavn = navnHelsePersonellNavn,
-            vedlegg = emptyList()
+            navnHelsePersonellNavn = navnHelsePersonellNavn
         )
         val extractVedlegg = extractVedlegg(felleformatDm)
 

@@ -72,8 +72,7 @@ internal class PdfModelTest {
                 )
             ),
             navnHelsepersonell = navnHelsePersonellNavn,
-            signaturDato = signaturDato,
-            vedlegg = emptyList()
+            signaturDato = signaturDato
         )
         val pdfPayload = PdfModel(
             dialogmelding = dialogmelding,

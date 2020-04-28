@@ -11,6 +11,7 @@ import no.nav.syfo.log
 import no.nav.syfo.metrics.MELDING_LAGER_I_JOARK
 import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.model.ValidationResult
+import no.nav.syfo.model.Vedlegg
 import no.nav.syfo.util.LoggingMeta
 
 @KtorExperimentalAPI
@@ -22,6 +23,7 @@ class JournalService(
     suspend fun onJournalRequest(
         receivedDialogmelding: ReceivedDialogmelding,
         validationResult: ValidationResult,
+        vedleggListe: List<Vedlegg>?,
         loggingMeta: LoggingMeta
     ) {
             log.info("Prover aa lagre i Joark {}", StructuredArguments.fields(loggingMeta))
@@ -44,7 +46,8 @@ class JournalService(
                 receivedDialogmelding.navLogId,
                 receivedDialogmelding.dialogmelding.signaturDato,
                 validationResult,
-                receivedDialogmelding.personNrPasient
+                receivedDialogmelding.personNrPasient,
+                vedleggListe
             )
             val journalpost = dokArkivClient.createJournalpost(journalpostPayload, loggingMeta)
 
