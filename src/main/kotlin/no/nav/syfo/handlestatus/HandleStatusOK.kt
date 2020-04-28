@@ -5,7 +5,11 @@ import javax.jms.MessageProducer
 import javax.jms.Session
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
+import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
+import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.apprec.ApprecStatus
+import no.nav.syfo.client.createArenaDialogNotat
+import no.nav.syfo.client.sendArenaDialogNotat
 import no.nav.syfo.log
 import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.model.ValidationResult
@@ -24,7 +28,10 @@ suspend fun handleStatusOK(
     journalService: JournalService,
     receivedDialogmelding: ReceivedDialogmelding,
     validationResult: ValidationResult,
-    vedleggListe: List<Vedlegg>?
+    vedleggListe: List<Vedlegg>?,
+    arenaProducer: MessageProducer,
+    msgHead: XMLMsgHead,
+    receiverBlock: XMLMottakenhetBlokk
 ) {
 
     journalService.onJournalRequest(
@@ -33,6 +40,17 @@ suspend fun handleStatusOK(
         vedleggListe,
         loggingMeta
     )
+
+    sendArenaDialogNotat(arenaProducer, session,
+        createArenaDialogNotat(
+            fellesformat,
+            receivedDialogmelding.tssid,
+            receivedDialogmelding.personNrLege,
+            receivedDialogmelding.personNrPasient,
+            receivedDialogmelding.dialogmelding.signaturDato,
+            msgHead,
+            receiverBlock),
+        loggingMeta)
 
     sendReceipt(session, receiptProducer, fellesformat, ApprecStatus.ok)
     log.info("Apprec Receipt sent to {}, {}", apprecQueueName, StructuredArguments.fields(loggingMeta))

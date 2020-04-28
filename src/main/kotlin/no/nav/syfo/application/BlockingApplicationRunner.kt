@@ -56,7 +56,6 @@ import no.nav.syfo.util.fellesformatUnmarshaller
 import no.nav.syfo.util.get
 import no.nav.syfo.util.wrapExceptions
 import org.apache.kafka.clients.producer.KafkaProducer
-import org.apache.kafka.clients.producer.ProducerRecord
 import redis.clients.jedis.Jedis
 import redis.clients.jedis.exceptions.JedisConnectionException
 
@@ -77,7 +76,8 @@ class BlockingApplicationRunner {
         kafkaProducerReceivedDialogmelding: KafkaProducer<String, ReceivedDialogmelding>,
         padm2ReglerClient: Padm2ReglerClient,
         backoutProducer: MessageProducer,
-        journalService: JournalService
+        journalService: JournalService,
+        arenaProducer: MessageProducer
     ) {
         wrapExceptions {
             loop@ while (applicationState.ready) {
@@ -246,11 +246,6 @@ class BlockingApplicationRunner {
 
                     val validationResult = padm2ReglerClient.executeRuleValidation(receivedDialogmelding)
 
-                    kafkaProducerReceivedDialogmelding.send(
-                        ProducerRecord(env.padm2ArenaTopic, receivedDialogmelding)
-                    )
-                    log.info("Melding sendt til kafka topic {}", env.padm2ArenaTopic)
-
                     when (validationResult.status) {
                         Status.OK -> handleStatusOK(
                             session,
@@ -261,7 +256,10 @@ class BlockingApplicationRunner {
                             journalService,
                             receivedDialogmelding,
                             validationResult,
-                            vedleggListe
+                            vedleggListe,
+                            arenaProducer,
+                            msgHead,
+                            receiverBlock
                         )
 
                         Status.INVALID -> handleStatusINVALID(
@@ -273,7 +271,10 @@ class BlockingApplicationRunner {
                             env.apprecQueueName,
                             journalService,
                             receivedDialogmelding,
-                            vedleggListe
+                            vedleggListe,
+                            arenaProducer,
+                            msgHead,
+                            receiverBlock
                         )
                     }
 

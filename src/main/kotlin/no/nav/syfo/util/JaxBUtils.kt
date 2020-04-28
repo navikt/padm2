@@ -5,6 +5,7 @@ import javax.xml.bind.JAXBContext
 import javax.xml.bind.Marshaller
 import javax.xml.bind.Unmarshaller
 import no.nav.helse.apprecV1.XMLAppRec
+import no.nav.helse.arenadialognotat.ArenaDialogNotat
 import no.nav.helse.base64container.Base64Container
 import no.nav.helse.dialogmelding.XMLDialogmelding
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
@@ -26,6 +27,9 @@ val senderMarshaller: Marshaller = JAXBContext.newInstance(XMLSender::class.java
 
 val apprecJaxBContext: JAXBContext = JAXBContext.newInstance(XMLEIFellesformat::class.java, XMLAppRec::class.java)
 val apprecMarshaller: Marshaller = apprecJaxBContext.createMarshaller()
+
+val arenaDialogNotatJaxBContext: JAXBContext = JAXBContext.newInstance(ArenaDialogNotat::class.java)
+val arenaDialogNotatMarshaller: Marshaller = arenaDialogNotatJaxBContext.createMarshaller()
 
 fun Marshaller.toString(input: Any): String = StringWriter().use {
     marshal(input, it)
