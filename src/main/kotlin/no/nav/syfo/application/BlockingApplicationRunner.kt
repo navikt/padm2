@@ -37,6 +37,7 @@ import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.model.Status
 import no.nav.syfo.model.findDialogmeldingType
 import no.nav.syfo.model.toDialogmelding
+import no.nav.syfo.services.JournalService
 import no.nav.syfo.services.sha256hashstring
 import no.nav.syfo.services.updateRedis
 import no.nav.syfo.util.LoggingMeta
@@ -74,7 +75,7 @@ class BlockingApplicationRunner {
         kafkaProducerReceivedDialogmelding: KafkaProducer<String, ReceivedDialogmelding>,
         padm2ReglerClient: Padm2ReglerClient,
         backoutProducer: MessageProducer,
-        kafkaProducerDialogmeldingSak: KafkaProducer<String, DialogmeldingSak>
+        journalService: JournalService
     ) {
         wrapExceptions {
             loop@ while (applicationState.ready) {
@@ -260,8 +261,7 @@ class BlockingApplicationRunner {
                             fellesformat,
                             loggingMeta,
                             env.apprecQueueName,
-                            kafkaProducerDialogmeldingSak,
-                            env.padm2SakTopic,
+                            journalService,
                             dialogmeldingSak
                         )
 
@@ -272,8 +272,7 @@ class BlockingApplicationRunner {
                             fellesformat,
                             loggingMeta,
                             env.apprecQueueName,
-                            kafkaProducerDialogmeldingSak,
-                            env.padm2SakTopic,
+                            journalService,
                             dialogmeldingSak
                         )
                     }

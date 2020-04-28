@@ -8,25 +8,25 @@ import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.syfo.apprec.ApprecStatus
 import no.nav.syfo.log
 import no.nav.syfo.model.DialogmeldingSak
+import no.nav.syfo.services.JournalService
 import no.nav.syfo.services.sendReceipt
 import no.nav.syfo.util.LoggingMeta
-import org.apache.kafka.clients.producer.KafkaProducer
-import org.apache.kafka.clients.producer.ProducerRecord
 
 @KtorExperimentalAPI
-fun handleStatusOK(
+suspend fun handleStatusOK(
     session: Session,
     receiptProducer: MessageProducer,
     fellesformat: XMLEIFellesformat,
     loggingMeta: LoggingMeta,
     apprecQueueName: String,
-    kafkaProducerDialogmeldingSak: KafkaProducer<String, DialogmeldingSak>,
-    padm2SakTopic: String,
+    journalService: JournalService,
     dialogmeldingSak: DialogmeldingSak
 ) {
 
-    kafkaProducerDialogmeldingSak.send(
-        ProducerRecord(padm2SakTopic, dialogmeldingSak)
+    journalService.onJournalRequest(
+        dialogmeldingSak.receivedDialogmelding,
+        dialogmeldingSak.validationResult,
+        loggingMeta
     )
 
     sendReceipt(session, receiptProducer, fellesformat, ApprecStatus.ok)

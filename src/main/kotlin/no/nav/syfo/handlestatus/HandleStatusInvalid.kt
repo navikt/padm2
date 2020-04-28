@@ -1,5 +1,6 @@
 package no.nav.syfo.handlestatus
 
+import io.ktor.util.KtorExperimentalAPI
 import javax.jms.MessageProducer
 import javax.jms.Session
 import net.logstash.logback.argument.StructuredArguments.fields
@@ -15,26 +16,27 @@ import no.nav.syfo.metrics.INVALID_MESSAGE_NO_NOTICE
 import no.nav.syfo.metrics.TEST_FNR_IN_PROD
 import no.nav.syfo.model.DialogmeldingSak
 import no.nav.syfo.model.ValidationResult
+import no.nav.syfo.services.JournalService
 import no.nav.syfo.services.sendReceipt
 import no.nav.syfo.services.updateRedis
 import no.nav.syfo.util.LoggingMeta
-import org.apache.kafka.clients.producer.KafkaProducer
-import org.apache.kafka.clients.producer.ProducerRecord
 import redis.clients.jedis.Jedis
 
-fun handleStatusINVALID(
+@KtorExperimentalAPI
+suspend fun handleStatusINVALID(
     validationResult: ValidationResult,
     session: Session,
     receiptProducer: MessageProducer,
     fellesformat: XMLEIFellesformat,
     loggingMeta: LoggingMeta,
     apprecQueueName: String,
-    kafkaProducerDialogmeldingSak: KafkaProducer<String, DialogmeldingSak>,
-    padm2SakTopic: String,
+    journalService: JournalService,
     dialogmeldingSak: DialogmeldingSak
 ) {
-    kafkaProducerDialogmeldingSak.send(
-        ProducerRecord(padm2SakTopic, dialogmeldingSak)
+    journalService.onJournalRequest(
+        dialogmeldingSak.receivedDialogmelding,
+        dialogmeldingSak.validationResult,
+        loggingMeta
     )
 
     sendReceipt(session, receiptProducer, fellesformat, ApprecStatus.avvist,

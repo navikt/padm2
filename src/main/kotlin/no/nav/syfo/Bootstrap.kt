@@ -24,15 +24,18 @@ import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.BlockingApplicationRunner
 import no.nav.syfo.application.createApplicationEngine
 import no.nav.syfo.client.AktoerIdClient
+import no.nav.syfo.client.DokArkivClient
 import no.nav.syfo.client.KafkaClients
 import no.nav.syfo.client.Padm2ReglerClient
+import no.nav.syfo.client.PdfgenClient
+import no.nav.syfo.client.SakClient
 import no.nav.syfo.client.SarClient
 import no.nav.syfo.client.StsOidcClient
-import no.nav.syfo.model.DialogmeldingSak
 import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.mq.connectionFactory
 import no.nav.syfo.mq.consumerForQueue
 import no.nav.syfo.mq.producerForQueue
+import no.nav.syfo.services.JournalService
 import no.nav.syfo.util.TrackableException
 import no.nav.syfo.util.getFileAsString
 import no.nav.syfo.ws.createPort
@@ -90,6 +93,12 @@ fun main() {
     val aktoerIdClient = AktoerIdClient(env.aktoerregisterV1Url, oidcClient, httpClient)
     val sarClient = SarClient(env.kuhrSarApiUrl, httpClient)
     val padm2ReglerClient = Padm2ReglerClient(env.padm2ReglerEndpointURL, httpClient)
+    val stsClient = StsOidcClient(vaultSecrets.serviceuserUsername, vaultSecrets.serviceuserPassword)
+    val sakClient = SakClient(env.opprettSakUrl, stsClient, httpClient)
+    val dokArkivClient = DokArkivClient(env.dokArkivUrl, stsClient, httpClient)
+    val pdfgenClient = PdfgenClient(env.syfopdfgen, httpClient)
+
+    val journalService = JournalService(sakClient, dokArkivClient, pdfgenClient)
 
     val subscriptionEmottak = createPort<SubscriptionPort>(env.subscriptionEndpointURL) {
         proxy { features.add(WSAddressingFeature()) }
@@ -99,7 +108,7 @@ fun main() {
     val kafkaClients = KafkaClients(env, vaultSecrets)
 
     launchListeners(applicationState, env, vaultSecrets, aktoerIdClient, sarClient, subscriptionEmottak,
-    kafkaClients.kafkaProducerReceivedDialogmelding, padm2ReglerClient, kafkaClients.kafkaProducerDialogmeldingSak)
+    kafkaClients.kafkaProducerReceivedDialogmelding, padm2ReglerClient, journalService)
 }
 
 fun createListener(applicationState: ApplicationState, action: suspend CoroutineScope.() -> Unit): Job =
@@ -123,7 +132,7 @@ fun launchListeners(
     subscriptionEmottak: SubscriptionPort,
     kafkaProducerReceivedDialogmelding: KafkaProducer<String, ReceivedDialogmelding>,
     padm2ReglerClient: Padm2ReglerClient,
-    kafkaProducerDialogmeldingSak: KafkaProducer<String, DialogmeldingSak>
+    journalService: JournalService
 ) {
     createListener(applicationState) {
         connectionFactory(env).createConnection(secrets.mqUsername, secrets.mqPassword).use { connection ->
@@ -142,7 +151,7 @@ fun launchListeners(
                     applicationState, inputconsumer,
                     session, env, secrets, aktoerIdClient,
                     kuhrSarClient, subscriptionEmottak, jedis, receiptProducer,
-                    kafkaProducerReceivedDialogmelding, padm2ReglerClient, backoutProducer, kafkaProducerDialogmeldingSak
+                    kafkaProducerReceivedDialogmelding, padm2ReglerClient, backoutProducer, journalService
                 )
             }
         }

@@ -22,7 +22,11 @@ data class Environment(
     val padm2ArenaTopic: String = getEnvVar("KAFKA_PALE_2_SAK_TOPIC", "privat-syfo-padm2-arena-v1"),
     val padm2ReglerEndpointURL: String = getEnvVar("PADM2REGLER_ENDPOINT_URL", "http://padm2regler"),
     val inputBackoutQueueName: String = getEnvVar("MQ_INPUT_BOQ_QUEUE_NAME"),
-    val padm2SakTopic: String = getEnvVar("KAFKA_PADM2SAK_TOPIC", "privat-syfo-padm2sak-v1")
+    val padm2SakTopic: String = getEnvVar("KAFKA_PADM2SAK_TOPIC", "privat-syfo-padm2sak-v1"),
+    val opprettSakUrl: String = getEnvVar("OPPRETT_SAK_URL", "http://sak/api/v1/saker"),
+    val dokArkivUrl: String = getEnvVar("DOK_ARKIV_URL"),
+    val securityTokenServiceURL: String = getEnvVar("SECURITY_TOKEN_SERVICE_URL"),
+    val syfopdfgen: String = getEnvVar("PDF_GEN_URL", "http://syfopdfgen/api/v1/genpdf/padm2sak/padm2sak")
 ) : MqConfig, KafkaConfig
 
 data class VaultSecrets(

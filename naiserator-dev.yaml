@@ -63,3 +63,7 @@ spec:
       value: SSL://b27apvl00045.preprod.local:8443,SSL://b27apvl00046.preprod.local:8443,SSL://b27apvl00047.preprod.local:8443
     - name: MQ_INPUT_BOQ_QUEUE_NAME
       value: QA.Q1_PADM.INPUT_BOQ
+    - name: SECURITY_TOKEN_SERVICE_URL
+      value: https://sts-q1.preprod.local/SecurityTokenServiceProvider/
+    - name: DOK_ARKIV_URL
+      value: https://dokarkiv-q1.nais.preprod.local/rest/journalpostapi/v1/journalpost
