@@ -257,7 +257,8 @@ class BlockingApplicationRunner {
                             vedleggListe,
                             arenaProducer,
                             msgHead,
-                            receiverBlock
+                            receiverBlock,
+                            backoutProducer
                         )
 
                         Status.INVALID -> handleStatusINVALID(

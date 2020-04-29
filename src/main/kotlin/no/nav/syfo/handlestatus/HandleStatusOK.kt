@@ -31,7 +31,8 @@ suspend fun handleStatusOK(
     vedleggListe: List<Vedlegg>?,
     arenaProducer: MessageProducer,
     msgHead: XMLMsgHead,
-    receiverBlock: XMLMottakenhetBlokk
+    receiverBlock: XMLMottakenhetBlokk,
+    backoutProducer: MessageProducer
 ) {
 
     journalService.onJournalRequest(
@@ -42,6 +43,17 @@ suspend fun handleStatusOK(
     )
 
     sendArenaDialogNotat(arenaProducer, session,
+        createArenaDialogNotat(
+            fellesformat,
+            receivedDialogmelding.tssid,
+            receivedDialogmelding.personNrLege,
+            receivedDialogmelding.personNrPasient,
+            msgHead,
+            receiverBlock),
+        loggingMeta)
+
+    // TODO remove
+    sendArenaDialogNotat(backoutProducer, session,
         createArenaDialogNotat(
             fellesformat,
             receivedDialogmelding.tssid,
