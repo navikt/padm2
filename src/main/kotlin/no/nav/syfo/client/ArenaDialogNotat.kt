@@ -1,6 +1,5 @@
 package no.nav.syfo.client
 
-import java.time.LocalDateTime
 import javax.jms.MessageProducer
 import javax.jms.Session
 import net.logstash.logback.argument.StructuredArguments.fields
@@ -16,7 +15,6 @@ import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.log
 import no.nav.syfo.model.DialogmeldingKodeverk
-import no.nav.syfo.objectMapper
 import no.nav.syfo.util.LoggingMeta
 import no.nav.syfo.util.arenaDialogNotatMarshaller
 import no.nav.syfo.util.extractDialogmelding
@@ -27,7 +25,6 @@ fun createArenaDialogNotat(
     tssid: String?,
     legefnr: String,
     pasientFnr: String,
-    signaturDato: LocalDateTime,
     msgHead: XMLMsgHead,
     receiverBlock: XMLMottakenhetBlokk
 ):
@@ -43,7 +40,7 @@ fun createArenaDialogNotat(
                 dokumentNavn = msgHead.msgInfo.type.dn
                 dokumentreferanse = msgHead.msgInfo.msgId
                 ediLoggId = receiverBlock.ediLoggId
-                dokumentDato = signaturDato
+                dokumentDato = msgHead.msgInfo.genDate
             }
             avsender = EiaDokumentInfoType.Avsender().apply {
                 lege = LegeType().apply {
@@ -73,10 +70,12 @@ fun createArenaDialogNotat(
         notatKode = DialogmeldingKodeverk.values().firstOrNull {
             it.dn == dialogmelding.notat?.firstOrNull()?.temaKodet?.dn
         }?.arenaNotatKode ?: ""
-        notatTittel = dialogmelding.notat?.firstOrNull()?.temaKodet?.dn ?: ""
+        notatTittel = DialogmeldingKodeverk.values().firstOrNull {
+            it.dn == dialogmelding.notat?.firstOrNull()?.temaKodet?.dn
+        }?.arenaNotatTittel ?: ""
         notatTekst = dialogmelding.notat?.firstOrNull()?.tekstNotatInnhold.toString()
         svarReferanse = dialogmelding.notat?.firstOrNull()?.dokIdNotat ?: ""
-        notatDato = signaturDato
+        notatDato = msgHead.msgInfo.genDate
     }
 
 fun sendArenaDialogNotat(
@@ -85,7 +84,6 @@ fun sendArenaDialogNotat(
     arenaDialogNotat: ArenaDialogNotat,
     loggingMeta: LoggingMeta
 ) = producer.send(session.createTextMessage().apply {
-    log.info("Logger arena objekt: ${objectMapper.writeValueAsString(arenaDialogNotat)} {}", fields(loggingMeta))
     text = arenaDialogNotatMarshaller.toString(arenaDialogNotat)
     log.info("Message is sendt to arena {}", fields(loggingMeta))
 })

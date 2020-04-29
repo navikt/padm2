@@ -55,7 +55,6 @@ import no.nav.syfo.util.extractVedlegg
 import no.nav.syfo.util.fellesformatUnmarshaller
 import no.nav.syfo.util.get
 import no.nav.syfo.util.wrapExceptions
-import org.apache.kafka.clients.producer.KafkaProducer
 import redis.clients.jedis.Jedis
 import redis.clients.jedis.exceptions.JedisConnectionException
 
@@ -73,7 +72,6 @@ class BlockingApplicationRunner {
         subscriptionEmottak: SubscriptionPort,
         jedis: Jedis,
         receiptProducer: MessageProducer,
-        kafkaProducerReceivedDialogmelding: KafkaProducer<String, ReceivedDialogmelding>,
         padm2ReglerClient: Padm2ReglerClient,
         backoutProducer: MessageProducer,
         journalService: JournalService,

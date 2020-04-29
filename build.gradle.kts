@@ -27,8 +27,8 @@ val mockkVersion = "1.9.3"
 val jacksonVersion = "2.9.8"
 val commonsTextVersion = "1.4"
 val jedisVersion = "2.9.0"
-val kafkaVersion = "2.4.0"
 val arenaDialogNotatVersion = "1.e1999cf"
+val javaTimeAdapterVersion = "1.1.3"
 
 plugins {
     java
@@ -80,7 +80,6 @@ dependencies {
     implementation("io.ktor:ktor-client-apache:$ktorVersion")
     implementation("io.ktor:ktor-client-jackson:$ktorVersion")
 
-    implementation("org.apache.kafka:kafka_2.12:$kafkaVersion")
 
     implementation("io.prometheus:simpleclient_hotspot:$prometheusVersion")
     implementation("io.prometheus:simpleclient_common:$prometheusVersion")
@@ -97,7 +96,6 @@ dependencies {
     implementation("no.nav.syfo:padm-common-networking:$padmCommonVersion")
     implementation("no.nav.syfo:padm-common-rest-sts:$padmCommonVersion")
     implementation("no.nav.syfo:padm-common-ws:$padmCommonVersion")
-    implementation("no.nav.syfo:padm-common-kafka:$padmCommonVersion")
 
     implementation("no.nav.helse.xml:xmlfellesformat2:$fellesformat2Version")
     implementation("no.nav.helse.xml:kith-hodemelding:$kithHodemeldingVersion")
@@ -116,6 +114,7 @@ dependencies {
     implementation("com.sun.xml.ws:jaxws-tools:$jaxwsToolsVersion") {
         exclude(group = "com.sun.xml.ws", module = "policy")
     }
+    implementation("com.migesok:jaxb-java-time-adapters:$javaTimeAdapterVersion")
 
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion") {
         exclude(group = "org.eclipse.jetty")

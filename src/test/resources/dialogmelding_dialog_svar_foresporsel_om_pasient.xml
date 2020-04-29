@@ -100,9 +100,7 @@
                                    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
                         <Notat>
                             <TemaKodet DN="Svar på forespørsel" OT="Ingen" S="2.16.578.1.12.4.1.1.9069" V="5" />
-                            <TekstNotatInnhold xsi:type="xsd:string">
-                                Pasieten har masse info her
-                            </TekstNotatInnhold>
+                            <TekstNotatInnhold xsi:type="xsd:string">Pasieten har masse info her</TekstNotatInnhold>
                             <DokIdNotat>OD1812186729156</DokIdNotat>
                             <Foresporsel>
                                 <TypeForesp DN="Forespørsel om pasient" S="2.16.578.1.12.4.1.1.8129" V="1" />

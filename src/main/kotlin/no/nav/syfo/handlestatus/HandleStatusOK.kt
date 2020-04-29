@@ -47,7 +47,6 @@ suspend fun handleStatusOK(
             receivedDialogmelding.tssid,
             receivedDialogmelding.personNrLege,
             receivedDialogmelding.personNrPasient,
-            receivedDialogmelding.dialogmelding.signaturDato,
             msgHead,
             receiverBlock),
         loggingMeta)

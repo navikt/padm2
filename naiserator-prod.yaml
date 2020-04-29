@@ -59,8 +59,6 @@ spec:
       value: https://wasapp.adeo.no/nav-emottak-eletter-web/services/
     - name: MQ_APPREC_QUEUE_NAME
       value: QA.P414.IU03_UTSENDING
-    - name: KAFKA_BOOTSTRAP_SERVERS_URL
-      value: SASL_SSL://a01apvl00145.adeo.no:8443,SASL_SSL://a01apvl00146.adeo.no:8443,SASL_SSL://a01apvl00147.adeo.no:8443,SASL_SSL://a01apvl00149.adeo.no:8443
     - name: MQ_INPUT_BOQ_QUEUE_NAME
       value: QA.P_PADM.INPUT_BOQ
     - name: SECURITY_TOKEN_SERVICE_URL

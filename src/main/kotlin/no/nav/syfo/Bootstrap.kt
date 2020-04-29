@@ -25,13 +25,11 @@ import no.nav.syfo.application.BlockingApplicationRunner
 import no.nav.syfo.application.createApplicationEngine
 import no.nav.syfo.client.AktoerIdClient
 import no.nav.syfo.client.DokArkivClient
-import no.nav.syfo.client.KafkaClients
 import no.nav.syfo.client.Padm2ReglerClient
 import no.nav.syfo.client.PdfgenClient
 import no.nav.syfo.client.SakClient
 import no.nav.syfo.client.SarClient
 import no.nav.syfo.client.StsOidcClient
-import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.mq.connectionFactory
 import no.nav.syfo.mq.consumerForQueue
 import no.nav.syfo.mq.producerForQueue
@@ -40,7 +38,6 @@ import no.nav.syfo.util.TrackableException
 import no.nav.syfo.util.getFileAsString
 import no.nav.syfo.ws.createPort
 import org.apache.cxf.ws.addressing.WSAddressingFeature
-import org.apache.kafka.clients.producer.KafkaProducer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import redis.clients.jedis.Jedis
@@ -105,10 +102,9 @@ fun main() {
         port { withBasicAuth(vaultSecrets.serviceuserUsername, vaultSecrets.serviceuserPassword) }
     }
 
-    val kafkaClients = KafkaClients(env, vaultSecrets)
-
-    launchListeners(applicationState, env, vaultSecrets, aktoerIdClient, sarClient, subscriptionEmottak,
-    kafkaClients.kafkaProducerReceivedDialogmelding, padm2ReglerClient, journalService)
+    launchListeners(applicationState, env,
+        vaultSecrets, aktoerIdClient, sarClient,
+        subscriptionEmottak, padm2ReglerClient, journalService)
 }
 
 fun createListener(applicationState: ApplicationState, action: suspend CoroutineScope.() -> Unit): Job =
@@ -130,7 +126,6 @@ fun launchListeners(
     aktoerIdClient: AktoerIdClient,
     kuhrSarClient: SarClient,
     subscriptionEmottak: SubscriptionPort,
-    kafkaProducerReceivedDialogmelding: KafkaProducer<String, ReceivedDialogmelding>,
     padm2ReglerClient: Padm2ReglerClient,
     journalService: JournalService
 ) {
@@ -152,7 +147,7 @@ fun launchListeners(
                     applicationState, inputconsumer,
                     session, env, secrets, aktoerIdClient,
                     kuhrSarClient, subscriptionEmottak, jedis, receiptProducer,
-                    kafkaProducerReceivedDialogmelding, padm2ReglerClient, backoutProducer, journalService,
+                    padm2ReglerClient, backoutProducer, journalService,
                     arenaProducer
                 )
             }
