@@ -271,10 +271,7 @@ class BlockingApplicationRunner {
                             env.apprecQueueName,
                             journalService,
                             receivedDialogmelding,
-                            vedleggListe,
-                            arenaProducer,
-                            msgHead,
-                            receiverBlock
+                            vedleggListe
                         )
                     }
 

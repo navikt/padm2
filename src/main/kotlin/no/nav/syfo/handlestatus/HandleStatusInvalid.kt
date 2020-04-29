@@ -7,14 +7,10 @@ import net.logstash.logback.argument.StructuredArguments.fields
 import net.logstash.logback.argument.StructuredArguments.keyValue
 import no.nav.helse.apprecV1.XMLCV
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
-import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
-import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.Environment
 import no.nav.syfo.apprec.ApprecStatus
 import no.nav.syfo.apprec.toApprecCV
 import no.nav.syfo.client.IdentInfoResult
-import no.nav.syfo.client.createArenaDialogNotat
-import no.nav.syfo.client.sendArenaDialogNotat
 import no.nav.syfo.log
 import no.nav.syfo.metrics.INVALID_MESSAGE_NO_NOTICE
 import no.nav.syfo.metrics.TEST_FNR_IN_PROD
@@ -37,10 +33,7 @@ suspend fun handleStatusINVALID(
     apprecQueueName: String,
     journalService: JournalService,
     receivedDialogmelding: ReceivedDialogmelding,
-    vedleggListe: List<Vedlegg>?,
-    arenaProducer: MessageProducer,
-    msgHead: XMLMsgHead,
-    receiverBlock: XMLMottakenhetBlokk
+    vedleggListe: List<Vedlegg>?
 ) {
     journalService.onJournalRequest(
         receivedDialogmelding,
@@ -48,17 +41,6 @@ suspend fun handleStatusINVALID(
         vedleggListe,
         loggingMeta
     )
-
-    sendArenaDialogNotat(arenaProducer, session,
-        createArenaDialogNotat(
-            fellesformat,
-            receivedDialogmelding.tssid,
-            receivedDialogmelding.personNrLege,
-            receivedDialogmelding.personNrPasient,
-            receivedDialogmelding.dialogmelding.signaturDato,
-            msgHead,
-            receiverBlock),
-        loggingMeta)
 
     sendReceipt(session, receiptProducer, fellesformat, ApprecStatus.avvist,
         validationResult.ruleHits.map { it.toApprecCV() })
