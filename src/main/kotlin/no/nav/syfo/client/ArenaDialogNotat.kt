@@ -16,6 +16,7 @@ import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.log
 import no.nav.syfo.model.DialogmeldingKodeverk
+import no.nav.syfo.objectMapper
 import no.nav.syfo.util.LoggingMeta
 import no.nav.syfo.util.arenaDialogNotatMarshaller
 import no.nav.syfo.util.extractDialogmelding
@@ -84,6 +85,7 @@ fun sendArenaDialogNotat(
     arenaDialogNotat: ArenaDialogNotat,
     loggingMeta: LoggingMeta
 ) = producer.send(session.createTextMessage().apply {
+    log.info("Logger arena objekt: ${objectMapper.writeValueAsString(arenaDialogNotat)}")
     text = arenaDialogNotatMarshaller.toString(arenaDialogNotat)
     log.info("Message is sendt to arena {}", fields(loggingMeta))
 })
