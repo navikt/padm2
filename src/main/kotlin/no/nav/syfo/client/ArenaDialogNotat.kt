@@ -85,7 +85,7 @@ fun sendArenaDialogNotat(
     arenaDialogNotat: ArenaDialogNotat,
     loggingMeta: LoggingMeta
 ) = producer.send(session.createTextMessage().apply {
-    log.info("Logger arena objekt: ${objectMapper.writeValueAsString(arenaDialogNotat)}")
+    log.info("Logger arena objekt: ${objectMapper.writeValueAsString(arenaDialogNotat)} {}", fields(loggingMeta))
     text = arenaDialogNotatMarshaller.toString(arenaDialogNotat)
     log.info("Message is sendt to arena {}", fields(loggingMeta))
 })
