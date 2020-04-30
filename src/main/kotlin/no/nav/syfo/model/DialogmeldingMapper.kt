@@ -37,7 +37,9 @@ fun XMLNotat.toDialogmeldingHenvendelseFraLege(): DialogmeldingHenvendelseFraLeg
 
     return DialogmeldingHenvendelseFraLege(
         teamakode = temaKodet.toTeamakode(),
-        tekstNotatInnhold = tekstNotatInnhold.toString()
+        tekstNotatInnhold = tekstNotatInnhold.toString(),
+        dokIdNotat = dokIdNotat,
+        datoNotat = datoNotat?.toGregorianCalendar()?.toZonedDateTime()?.toLocalDateTime()
     )
 }
 

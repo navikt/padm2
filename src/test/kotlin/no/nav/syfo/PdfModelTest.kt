@@ -37,7 +37,9 @@ internal class PdfModelTest {
                     "2.16.578.1.12.4.1.1.8128",
                     "1"
                 ),
-                tekstNotatInnhold = "Jeg er klar 12.30. Mvh, Lege legsesn"
+                tekstNotatInnhold = "Jeg er klar 12.30. Mvh, Lege legsesn",
+                dokIdNotat = "",
+                datoNotat = null
             ),
             dialogmeldingInnkallingDialogmote = DialogmeldingInnkallingDialogmote(
                 teamakode = TemaKode(
