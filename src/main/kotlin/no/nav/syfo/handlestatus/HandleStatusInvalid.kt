@@ -124,6 +124,26 @@ fun handlePatientNotFoundInAktorRegister(
     updateRedis(jedis, ediLoggId, sha256String)
 }
 
+fun handlePatientNotFound(
+    session: Session,
+    receiptProducer: MessageProducer,
+    fellesformat: XMLEIFellesformat,
+    env: Environment,
+    loggingMeta: LoggingMeta
+) {
+    log.warn("Patient not found i dialogmeldingen {}", fields(loggingMeta))
+
+    sendReceipt(
+        session, receiptProducer, fellesformat, ApprecStatus.avvist, listOf(
+            createApprecError("Pasienten er ikkje funnet i dialogmeldingen")
+        )
+    )
+
+    log.info("Apprec Receipt sent to {}, {}", env.apprecQueueName, fields(loggingMeta))
+
+    INVALID_MESSAGE_NO_NOTICE.inc()
+}
+
 fun handleDoctorNotFoundInAktorRegister(
     doctorIdents: IdentInfoResult?,
     session: Session,

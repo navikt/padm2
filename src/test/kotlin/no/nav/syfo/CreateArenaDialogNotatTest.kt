@@ -2,13 +2,18 @@ package no.nav.syfo
 
 import java.io.StringReader
 import java.time.LocalDateTime
+import java.util.UUID
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.client.createArenaDialogNotat
 import no.nav.syfo.model.DialogmeldingKodeverk
+import no.nav.syfo.model.findDialogmeldingType
+import no.nav.syfo.model.toDialogmelding
+import no.nav.syfo.util.extractDialogmelding
 import no.nav.syfo.util.fellesformatUnmarshaller
 import no.nav.syfo.util.get
+import no.nav.syfo.util.getFileAsString
 import no.nav.syfo.util.getFileAsStringISO88591
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldEqual
@@ -28,13 +33,28 @@ internal class CreateArenaDialogNotatTest {
         val personNumberDoctor = receiverBlock.avsenderFnrFraDigSignatur
         val tssid = "1321415"
 
+        val dialomeldingxml = extractDialogmelding(felleformatDm)
+        val dialogmeldingId = UUID.randomUUID().toString()
+        val signaturDato = LocalDateTime.of(2017, 11, 5, 0, 0, 0)
+        val navnHelsePersonellNavn = "Per Hansen"
+
+        val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
+
+        val dialogmelding = dialomeldingxml.toDialogmelding(
+            dialogmeldingId = dialogmeldingId,
+            dialogmeldingType = dialogmeldingType,
+            signaturDato = signaturDato,
+            navnHelsePersonellNavn = navnHelsePersonellNavn
+        )
+
         val arenaDialogNotat = createArenaDialogNotat(
             felleformatDm,
             tssid,
             personNumberDoctor,
             personNumberPatient,
             msgHead,
-            receiverBlock
+            receiverBlock,
+            dialogmelding
         )
 
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentType shouldBeEqualTo "DM"
@@ -71,13 +91,28 @@ internal class CreateArenaDialogNotatTest {
         val personNumberDoctor = receiverBlock.avsenderFnrFraDigSignatur
         val tssid = "1321415"
 
+        val dialomeldingxml = extractDialogmelding(felleformatDm)
+        val dialogmeldingId = UUID.randomUUID().toString()
+        val signaturDato = LocalDateTime.of(2017, 11, 5, 0, 0, 0)
+        val navnHelsePersonellNavn = "Per Hansen"
+
+        val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
+
+        val dialogmelding = dialomeldingxml.toDialogmelding(
+            dialogmeldingId = dialogmeldingId,
+            dialogmeldingType = dialogmeldingType,
+            signaturDato = signaturDato,
+            navnHelsePersonellNavn = navnHelsePersonellNavn
+        )
+
         val arenaDialogNotat = createArenaDialogNotat(
             felleformatDm,
             tssid,
             personNumberDoctor,
             personNumberPatient,
             msgHead,
-            receiverBlock
+            receiverBlock,
+            dialogmelding
         )
 
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentType shouldBeEqualTo "DM"
@@ -114,13 +149,28 @@ internal class CreateArenaDialogNotatTest {
         val personNumberDoctor = receiverBlock.avsenderFnrFraDigSignatur
         val tssid = "1321415"
 
+        val dialomeldingxml = extractDialogmelding(felleformatDm)
+        val dialogmeldingId = UUID.randomUUID().toString()
+        val signaturDato = LocalDateTime.of(2017, 11, 5, 0, 0, 0)
+        val navnHelsePersonellNavn = "Per Hansen"
+
+        val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
+
+        val dialogmelding = dialomeldingxml.toDialogmelding(
+            dialogmeldingId = dialogmeldingId,
+            dialogmeldingType = dialogmeldingType,
+            signaturDato = signaturDato,
+            navnHelsePersonellNavn = navnHelsePersonellNavn
+        )
+
         val arenaDialogNotat = createArenaDialogNotat(
             felleformatDm,
             tssid,
             personNumberDoctor,
             personNumberPatient,
             msgHead,
-            receiverBlock
+            receiverBlock,
+            dialogmelding
         )
 
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentType shouldBeEqualTo "DM"
@@ -143,5 +193,46 @@ internal class CreateArenaDialogNotatTest {
         arenaDialogNotat.notatTekst shouldBeEqualTo "Hei,Det gjelder pas. Sender som vedlegg epikrisen"
         arenaDialogNotat.svarReferanse shouldBeEqualTo "A1578B81-0042-453B-8527-6CF182BDA6C7"
         arenaDialogNotat.notatDato.shouldEqual(LocalDateTime.of(2019, 1, 16, 21, 51, 35, 531000000))
+    }
+
+    @Test
+    internal fun `Tester mapping av arena biten`() {
+        val felleformatDm = fellesformatUnmarshaller.unmarshal(
+            StringReader(getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml"))
+        ) as XMLEIFellesformat
+
+        val msgHead: XMLMsgHead = felleformatDm.get()
+        val receiverBlock = felleformatDm.get<XMLMottakenhetBlokk>()
+        val personNumberPatient = msgHead.msgInfo.patient.ident.find { it.typeId.v == "FNR" }?.id ?: ""
+        val personNumberDoctor = receiverBlock.avsenderFnrFraDigSignatur
+        val tssid = "1321415"
+
+        val dialomeldingxml = extractDialogmelding(felleformatDm)
+        val dialogmeldingId = UUID.randomUUID().toString()
+        val signaturDato = LocalDateTime.of(2017, 11, 5, 0, 0, 0)
+        val navnHelsePersonellNavn = "Per Hansen"
+
+        val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
+
+        val dialogmelding = dialomeldingxml.toDialogmelding(
+            dialogmeldingId = dialogmeldingId,
+            dialogmeldingType = dialogmeldingType,
+            signaturDato = signaturDato,
+            navnHelsePersonellNavn = navnHelsePersonellNavn
+        )
+
+        val arenaDialogNotat = createArenaDialogNotat(
+            felleformatDm,
+            tssid,
+            personNumberDoctor,
+            personNumberPatient,
+            msgHead,
+            receiverBlock,
+            dialogmelding
+        )
+
+        arenaDialogNotat.notatKategori shouldBeEqualTo "3"
+        arenaDialogNotat.notatKode shouldBeEqualTo "31"
+        arenaDialogNotat.notatTittel shouldBeEqualTo DialogmeldingKodeverk.HENVENDELSE_OM_PASIENT_HENVENDELSE_OM_SYKEFRAVARSOPPFOLGING.arenaNotatTittel
     }
 }

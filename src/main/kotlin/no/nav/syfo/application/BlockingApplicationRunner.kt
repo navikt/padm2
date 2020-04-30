@@ -27,6 +27,7 @@ import no.nav.syfo.client.findBestSamhandlerPraksis
 import no.nav.syfo.handlestatus.handleDoctorNotFoundInAktorRegister
 import no.nav.syfo.handlestatus.handleDuplicateEdiloggid
 import no.nav.syfo.handlestatus.handleDuplicateSM2013Content
+import no.nav.syfo.handlestatus.handlePatientNotFound
 import no.nav.syfo.handlestatus.handlePatientNotFoundInAktorRegister
 import no.nav.syfo.handlestatus.handleStatusINVALID
 import no.nav.syfo.handlestatus.handleStatusOK
@@ -99,7 +100,6 @@ class BlockingApplicationRunner {
                     val msgId = msgHead.msgInfo.msgId
                     val legekontorOrgNr = extractOrganisationNumberFromSender(fellesformat)?.id
                     val personNumberPatient = msgHead.msgInfo.patient.ident.find { it.typeId.v == "FNR" }?.id
-                        ?: "" // TODO dersom tom avvist meldingen
                     val personNumberDoctor = receiverBlock.avsenderFnrFraDigSignatur
                     val legekontorOrgName = extractSenderOrganisationName(fellesformat)
                     val legekontorHerId = extractOrganisationHerNumberFromSender(fellesformat)?.id
@@ -124,167 +124,176 @@ class BlockingApplicationRunner {
 
                     INCOMING_MESSAGE_COUNTER.inc()
 
-                    val aktoerIds = aktoerIdClient.getAktoerIds(
-                        listOf(personNumberDoctor, personNumberPatient),
-                        secrets.serviceuserUsername, loggingMeta
-                    )
-
-                    val samhandlerInfo = kuhrSarClient.getSamhandler(personNumberDoctor)
-                    val samhandlerPraksisMatch = findBestSamhandlerPraksis(
-                        samhandlerInfo,
-                        legekontorOrgName,
-                        legekontorHerId,
-                        loggingMeta
-                    )
-
-                    val samhandlerPraksis = samhandlerPraksisMatch?.samhandlerPraksis
-
-                    if (samhandlerPraksisMatch?.percentageMatch != null && samhandlerPraksisMatch.percentageMatch == 999.0) {
-                        log.info(
-                            "SamhandlerPraksis is found but is FALE or FALO, subscription_emottak is not created, {}",
-                            StructuredArguments.fields(loggingMeta)
+                    if (personNumberPatient.isNullOrEmpty()) {
+                        handlePatientNotFound(
+                            session, receiptProducer, fellesformat, env, loggingMeta
                         )
+                        continue@loop
                     } else {
-                        when (samhandlerPraksis) {
-                            null -> log.info(
-                                "SamhandlerPraksis is Not found, {}",
+
+                        val aktoerIds = aktoerIdClient.getAktoerIds(
+                            listOf(personNumberDoctor, personNumberPatient),
+                            secrets.serviceuserUsername, loggingMeta
+                        )
+
+                        val samhandlerInfo = kuhrSarClient.getSamhandler(personNumberDoctor)
+                        val samhandlerPraksisMatch = findBestSamhandlerPraksis(
+                            samhandlerInfo,
+                            legekontorOrgName,
+                            legekontorHerId,
+                            loggingMeta
+                        )
+
+                        val samhandlerPraksis = samhandlerPraksisMatch?.samhandlerPraksis
+
+                        if (samhandlerPraksisMatch?.percentageMatch != null && samhandlerPraksisMatch.percentageMatch == 999.0) {
+                            log.info(
+                                "SamhandlerPraksis is found but is FALE or FALO, subscription_emottak is not created, {}",
                                 StructuredArguments.fields(loggingMeta)
                             )
-                            else -> if (!samhandlerParksisisLegevakt(samhandlerPraksis) &&
-                                !receiverBlock.partnerReferanse.isNullOrEmpty() &&
-                                receiverBlock.partnerReferanse.isNotBlank()
-                            ) {
-                                startSubscription(
-                                    subscriptionEmottak,
-                                    samhandlerPraksis,
-                                    msgHead,
-                                    receiverBlock,
-                                    loggingMeta
-                                )
-                            } else {
-                                log.info(
-                                    "SamhandlerPraksis is Legevakt or partnerReferanse is empty or blank, subscription_emottak is not created, {}",
+                        } else {
+                            when (samhandlerPraksis) {
+                                null -> log.info(
+                                    "SamhandlerPraksis is Not found, {}",
                                     StructuredArguments.fields(loggingMeta)
                                 )
+                                else -> if (!samhandlerParksisisLegevakt(samhandlerPraksis) &&
+                                    !receiverBlock.partnerReferanse.isNullOrEmpty() &&
+                                    receiverBlock.partnerReferanse.isNotBlank()
+                                ) {
+                                    startSubscription(
+                                        subscriptionEmottak,
+                                        samhandlerPraksis,
+                                        msgHead,
+                                        receiverBlock,
+                                        loggingMeta
+                                    )
+                                } else {
+                                    log.info(
+                                        "SamhandlerPraksis is Legevakt or partnerReferanse is empty or blank, subscription_emottak is not created, {}",
+                                        StructuredArguments.fields(loggingMeta)
+                                    )
+                                }
                             }
                         }
+
+                        val redisSha256String = jedis.get(sha256String)
+                        val redisEdiloggid = jedis.get(ediLoggId)
+
+                        if (redisSha256String != null) {
+                            handleDuplicateSM2013Content(
+                                session, receiptProducer,
+                                fellesformat, loggingMeta, env, redisSha256String
+                            )
+                            continue@loop
+                        } else if (redisEdiloggid != null) {
+                            handleDuplicateEdiloggid(
+                                session, receiptProducer,
+                                fellesformat, loggingMeta, env, redisEdiloggid
+                            )
+                            continue@loop
+                        } else {
+                            updateRedis(jedis, ediLoggId, sha256String)
+                        }
+
+                        val patientIdents = aktoerIds[personNumberPatient]
+                        val doctorIdents = aktoerIds[personNumberDoctor]
+
+                        if (patientIdents == null || patientIdents.feilmelding != null) {
+                            handlePatientNotFoundInAktorRegister(
+                                patientIdents, session,
+                                receiptProducer, fellesformat, ediLoggId, jedis, redisSha256String, env, loggingMeta
+                            )
+                            continue@loop
+                        }
+                        if (doctorIdents == null || doctorIdents.feilmelding != null) {
+                            handleDoctorNotFoundInAktorRegister(
+                                doctorIdents, session,
+                                receiptProducer, fellesformat, ediLoggId, jedis, redisSha256String, env, loggingMeta
+                            )
+                            continue@loop
+                        }
+                        if (erTestFnr(personNumberPatient) && env.cluster == "prod-fss") {
+                            handleTestFnrInProd(
+                                session, receiptProducer, fellesformat,
+                                ediLoggId, jedis, redisSha256String, env, loggingMeta
+                            )
+                            continue@loop
+                        }
+
+                        val dialogmelding = dialogmeldingXml.toDialogmelding(
+                            dialogmeldingId = UUID.randomUUID().toString(),
+                            dialogmeldingType = dialogmeldingType,
+                            signaturDato = msgHead.msgInfo.genDate,
+                            navnHelsePersonellNavn = navnHelsePersonellNavn
+                        )
+
+                        val receivedDialogmelding = ReceivedDialogmelding(
+                            dialogmelding = dialogmelding,
+                            personNrPasient = personNumberPatient,
+                            pasientAktoerId = patientIdents.identer!!.first().ident,
+                            personNrLege = personNumberDoctor,
+                            legeAktoerId = doctorIdents.identer!!.first().ident,
+                            navLogId = ediLoggId,
+                            msgId = msgId,
+                            legekontorOrgNr = legekontorOrgNr,
+                            legekontorOrgName = legekontorOrgName,
+                            legekontorHerId = legekontorHerId,
+                            legekontorReshId = legekontorReshId,
+                            mottattDato = receiverBlock.mottattDatotid.toGregorianCalendar().toZonedDateTime()
+                                .withZoneSameInstant(
+                                    ZoneOffset.UTC
+                                ).toLocalDateTime(),
+                            legehpr = legeHpr,
+                            fellesformat = inputMessageText,
+                            tssid = samhandlerPraksis?.tss_ident ?: ""
+                        )
+
+                        val validationResult = padm2ReglerClient.executeRuleValidation(receivedDialogmelding)
+
+                        when (validationResult.status) {
+                            Status.OK -> handleStatusOK(
+                                session,
+                                receiptProducer,
+                                fellesformat,
+                                loggingMeta,
+                                env.apprecQueueName,
+                                journalService,
+                                receivedDialogmelding,
+                                validationResult,
+                                vedleggListe,
+                                arenaProducer,
+                                msgHead,
+                                receiverBlock,
+                                backoutProducer,
+                                dialogmelding
+                            )
+
+                            Status.INVALID -> handleStatusINVALID(
+                                validationResult,
+                                session,
+                                receiptProducer,
+                                fellesformat,
+                                loggingMeta,
+                                env.apprecQueueName,
+                                journalService,
+                                receivedDialogmelding,
+                                vedleggListe
+                            )
+                        }
+
+                        val currentRequestLatency = requestLatency.observeDuration()
+
+                        log.info(
+                            "Finished message got outcome {}, {}, processing took {}s",
+                            StructuredArguments.keyValue("status", validationResult.status),
+                            StructuredArguments.keyValue(
+                                "ruleHits",
+                                validationResult.ruleHits.joinToString(", ", "(", ")") { it.ruleName }),
+                            StructuredArguments.keyValue("latency", currentRequestLatency),
+                            StructuredArguments.fields(loggingMeta)
+                        )
                     }
-
-                    val redisSha256String = jedis.get(sha256String)
-                    val redisEdiloggid = jedis.get(ediLoggId)
-
-                    if (redisSha256String != null) {
-                        handleDuplicateSM2013Content(
-                            session, receiptProducer,
-                            fellesformat, loggingMeta, env, redisSha256String
-                        )
-                        continue@loop
-                    } else if (redisEdiloggid != null) {
-                        handleDuplicateEdiloggid(
-                            session, receiptProducer,
-                            fellesformat, loggingMeta, env, redisEdiloggid
-                        )
-                        continue@loop
-                    } else {
-                        updateRedis(jedis, ediLoggId, sha256String)
-                    }
-
-                    val patientIdents = aktoerIds[personNumberPatient]
-                    val doctorIdents = aktoerIds[personNumberDoctor]
-
-                    if (patientIdents == null || patientIdents.feilmelding != null) {
-                        handlePatientNotFoundInAktorRegister(
-                            patientIdents, session,
-                            receiptProducer, fellesformat, ediLoggId, jedis, redisSha256String, env, loggingMeta
-                        )
-                        continue@loop
-                    }
-                    if (doctorIdents == null || doctorIdents.feilmelding != null) {
-                        handleDoctorNotFoundInAktorRegister(
-                            doctorIdents, session,
-                            receiptProducer, fellesformat, ediLoggId, jedis, redisSha256String, env, loggingMeta
-                        )
-                        continue@loop
-                    }
-                    if (erTestFnr(personNumberPatient) && env.cluster == "prod-fss") {
-                        handleTestFnrInProd(
-                            session, receiptProducer, fellesformat,
-                            ediLoggId, jedis, redisSha256String, env, loggingMeta
-                        )
-                        continue@loop
-                    }
-
-                    val dialogmelding = dialogmeldingXml.toDialogmelding(
-                        dialogmeldingId = UUID.randomUUID().toString(),
-                        dialogmeldingType = dialogmeldingType,
-                        signaturDato = msgHead.msgInfo.genDate,
-                        navnHelsePersonellNavn = navnHelsePersonellNavn
-                    )
-
-                    val receivedDialogmelding = ReceivedDialogmelding(
-                        dialogmelding = dialogmelding,
-                        personNrPasient = personNumberPatient,
-                        pasientAktoerId = patientIdents.identer!!.first().ident,
-                        personNrLege = personNumberDoctor,
-                        legeAktoerId = doctorIdents.identer!!.first().ident,
-                        navLogId = ediLoggId,
-                        msgId = msgId,
-                        legekontorOrgNr = legekontorOrgNr,
-                        legekontorOrgName = legekontorOrgName,
-                        legekontorHerId = legekontorHerId,
-                        legekontorReshId = legekontorReshId,
-                        mottattDato = receiverBlock.mottattDatotid.toGregorianCalendar().toZonedDateTime()
-                            .withZoneSameInstant(
-                                ZoneOffset.UTC
-                            ).toLocalDateTime(),
-                        legehpr = legeHpr,
-                        fellesformat = inputMessageText,
-                        tssid = samhandlerPraksis?.tss_ident ?: ""
-                    )
-
-                    val validationResult = padm2ReglerClient.executeRuleValidation(receivedDialogmelding)
-
-                    when (validationResult.status) {
-                        Status.OK -> handleStatusOK(
-                            session,
-                            receiptProducer,
-                            fellesformat,
-                            loggingMeta,
-                            env.apprecQueueName,
-                            journalService,
-                            receivedDialogmelding,
-                            validationResult,
-                            vedleggListe,
-                            arenaProducer,
-                            msgHead,
-                            receiverBlock,
-                            backoutProducer
-                        )
-
-                        Status.INVALID -> handleStatusINVALID(
-                            validationResult,
-                            session,
-                            receiptProducer,
-                            fellesformat,
-                            loggingMeta,
-                            env.apprecQueueName,
-                            journalService,
-                            receivedDialogmelding,
-                            vedleggListe
-                        )
-                    }
-
-                    val currentRequestLatency = requestLatency.observeDuration()
-
-                    log.info(
-                        "Finished message got outcome {}, {}, processing took {}s",
-                        StructuredArguments.keyValue("status", validationResult.status),
-                        StructuredArguments.keyValue(
-                            "ruleHits",
-                            validationResult.ruleHits.joinToString(", ", "(", ")") { it.ruleName }),
-                        StructuredArguments.keyValue("latency", currentRequestLatency),
-                        StructuredArguments.fields(loggingMeta)
-                    )
                 } catch (jedisException: JedisConnectionException) {
                     log.error(
                         "Exception caught, redis issue while handling message, sending to backout",

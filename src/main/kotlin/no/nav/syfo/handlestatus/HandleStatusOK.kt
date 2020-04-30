@@ -11,6 +11,7 @@ import no.nav.syfo.apprec.ApprecStatus
 import no.nav.syfo.client.createArenaDialogNotat
 import no.nav.syfo.client.sendArenaDialogNotat
 import no.nav.syfo.log
+import no.nav.syfo.model.Dialogmelding
 import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.model.ValidationResult
 import no.nav.syfo.model.Vedlegg
@@ -32,7 +33,8 @@ suspend fun handleStatusOK(
     arenaProducer: MessageProducer,
     msgHead: XMLMsgHead,
     receiverBlock: XMLMottakenhetBlokk,
-    backoutProducer: MessageProducer
+    backoutProducer: MessageProducer,
+    dialogmelding: Dialogmelding
 ) {
 
     journalService.onJournalRequest(
@@ -49,7 +51,8 @@ suspend fun handleStatusOK(
             receivedDialogmelding.personNrLege,
             receivedDialogmelding.personNrPasient,
             msgHead,
-            receiverBlock),
+            receiverBlock,
+            dialogmelding),
         loggingMeta)
 
     // TODO remove
@@ -60,7 +63,8 @@ suspend fun handleStatusOK(
             receivedDialogmelding.personNrLege,
             receivedDialogmelding.personNrPasient,
             msgHead,
-            receiverBlock),
+            receiverBlock,
+            dialogmelding),
         loggingMeta)
 
     sendReceipt(session, receiptProducer, fellesformat, ApprecStatus.ok)

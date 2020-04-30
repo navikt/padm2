@@ -14,7 +14,7 @@ import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.log
-import no.nav.syfo.model.DialogmeldingKodeverk
+import no.nav.syfo.model.Dialogmelding
 import no.nav.syfo.util.LoggingMeta
 import no.nav.syfo.util.arenaDialogNotatMarshaller
 import no.nav.syfo.util.extractDialogmelding
@@ -26,13 +26,14 @@ fun createArenaDialogNotat(
     legefnr: String,
     pasientFnr: String,
     msgHead: XMLMsgHead,
-    receiverBlock: XMLMottakenhetBlokk
+    receiverBlock: XMLMottakenhetBlokk,
+    dialogmelding: Dialogmelding
 ):
         ArenaDialogNotat =
     ArenaDialogNotat().apply {
         val org = msgHead.msgInfo.sender.organisation
         val hcp = org.healthcareProfessional
-        val dialogmelding = extractDialogmelding(fellesformat)
+        val dialogmeldingXml = extractDialogmelding(fellesformat)
         eiaDokumentInfo = EiaDokumentInfoType().apply {
             dokumentInfo = DokumentInfoType().apply {
                 dokumentType = "DM"
@@ -64,19 +65,58 @@ fun createArenaDialogNotat(
                 }
             }
         }
-        notatKategori = DialogmeldingKodeverk.values().firstOrNull {
-            it.dn == dialogmelding.notat?.firstOrNull()?.temaKodet?.dn
-        }?.arenaNotatKategori ?: ""
-        notatKode = DialogmeldingKodeverk.values().firstOrNull {
-            it.dn == dialogmelding.notat?.firstOrNull()?.temaKodet?.dn
-        }?.arenaNotatKode ?: ""
-        notatTittel = DialogmeldingKodeverk.values().firstOrNull {
-            it.dn == dialogmelding.notat?.firstOrNull()?.temaKodet?.dn
-        }?.arenaNotatTittel ?: ""
-        notatTekst = dialogmelding.notat?.firstOrNull()?.tekstNotatInnhold.toString()
-        svarReferanse = dialogmelding.notat?.firstOrNull()?.dokIdNotat ?: ""
+        notatKategori = findArenaNotatKategori(dialogmelding)
+        notatKode = findArenaNotatKode(dialogmelding)
+        notatTittel = findArenaNotatTittel(dialogmelding)
+        notatTekst = dialogmeldingXml.notat?.firstOrNull()?.tekstNotatInnhold.toString()
+        svarReferanse = dialogmeldingXml.notat?.firstOrNull()?.dokIdNotat ?: ""
         notatDato = msgHead.msgInfo.genDate
     }
+
+fun findArenaNotatKategori(dialogmelding: Dialogmelding): String {
+    when {
+        dialogmelding.foresporselFraSaksbehandlerForesporselSvar != null -> {
+            return dialogmelding.foresporselFraSaksbehandlerForesporselSvar!!.teamakode.arenaNotatKategori
+        }
+        dialogmelding.henvendelseFraLegeHenvendelse != null -> {
+            return dialogmelding.henvendelseFraLegeHenvendelse!!.teamakode.arenaNotatKategori
+        }
+        dialogmelding.foresporselFraSaksbehandlerForesporselSvar != null -> {
+            return dialogmelding.foresporselFraSaksbehandlerForesporselSvar!!.teamakode.arenaNotatKategori
+        }
+        else -> throw RuntimeException("Ugyldig dialogmeldingtype")
+    }
+}
+
+fun findArenaNotatKode(dialogmelding: Dialogmelding): String {
+    when {
+        dialogmelding.foresporselFraSaksbehandlerForesporselSvar != null -> {
+            return dialogmelding.foresporselFraSaksbehandlerForesporselSvar!!.teamakode.arenaNotatKode
+        }
+        dialogmelding.henvendelseFraLegeHenvendelse != null -> {
+            return dialogmelding.henvendelseFraLegeHenvendelse!!.teamakode.arenaNotatKode
+        }
+        dialogmelding.foresporselFraSaksbehandlerForesporselSvar != null -> {
+            return dialogmelding.foresporselFraSaksbehandlerForesporselSvar!!.teamakode.arenaNotatKode
+        }
+        else -> throw RuntimeException("Ugyldig dialogmeldingtype")
+    }
+}
+
+fun findArenaNotatTittel(dialogmelding: Dialogmelding): String {
+    when {
+        dialogmelding.foresporselFraSaksbehandlerForesporselSvar != null -> {
+            return dialogmelding.foresporselFraSaksbehandlerForesporselSvar!!.teamakode.arenaNotatTittel
+        }
+        dialogmelding.henvendelseFraLegeHenvendelse != null -> {
+            return dialogmelding.henvendelseFraLegeHenvendelse!!.teamakode.arenaNotatTittel
+        }
+        dialogmelding.foresporselFraSaksbehandlerForesporselSvar != null -> {
+            return dialogmelding.foresporselFraSaksbehandlerForesporselSvar!!.teamakode.arenaNotatTittel
+        }
+        else -> throw RuntimeException("Ugyldig dialogmeldingtype")
+    }
+}
 
 fun sendArenaDialogNotat(
     producer: MessageProducer,
