@@ -93,10 +93,11 @@
                 <IssueDate V="2019-01-16T21:57:36" />
                 <MsgType DN="XML-instans" V="XML" />
                 <Content>
-                    <Dialogmelding xmlns="http://www.kith.no/xmlstds/dialog/2006-10-11">
+                    <Dialogmelding xmlns="http://www.kith.no/xmlstds/dialog/2006-10-11"
+                                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
                         <Notat>
                             <TemaKodet DN="Henvendelse om sykefraværsoppfølging" S="2.16.578.1.12.4.1.1.8128" V="1" />
-                            <TekstNotatInnhold>Hei,Det gjelder pas. Sender som vedlegg epikrisen</TekstNotatInnhold>
+                            <TekstNotatInnhold xsi:type="xsd:string">Hei,Det gjelder pas. Sender som vedlegg epikrisen</TekstNotatInnhold>
                             <DokIdNotat>A1578B81-0042-453B-8527-6CF182BDA6C7</DokIdNotat>
                             <DatoNotat>2019-01-16</DatoNotat>
                         </Notat>

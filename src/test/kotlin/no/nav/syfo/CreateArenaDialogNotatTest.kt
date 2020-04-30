@@ -17,12 +17,11 @@ import org.junit.Test
 internal class CreateArenaDialogNotatTest {
 
     @Test
-    internal fun `Tester mapping fra fellesformat til ArenaDialogNotat`() {
+    internal fun `Tester mapping fra fellesformat til ArenaDialogNotat svar foresporsel pasient`() {
         val felleformatDm = fellesformatUnmarshaller.unmarshal(
             StringReader(getFileAsStringISO88591("src/test/resources/dialogmelding_dialog_svar_foresporsel_om_pasient.xml"))
         ) as XMLEIFellesformat
 
-        val signaturDato = LocalDateTime.of(2017, 11, 5, 0, 0, 0)
         val msgHead: XMLMsgHead = felleformatDm.get()
         val receiverBlock = felleformatDm.get<XMLMottakenhetBlokk>()
         val personNumberPatient = msgHead.msgInfo.patient.ident.find { it.typeId.v == "FNR" }?.id ?: ""
@@ -58,5 +57,91 @@ internal class CreateArenaDialogNotatTest {
         arenaDialogNotat.notatTekst shouldBeEqualTo "Pasieten har masse info her"
         arenaDialogNotat.svarReferanse shouldBeEqualTo "OD1812186729156"
         arenaDialogNotat.notatDato.shouldEqual(LocalDateTime.of(2019, 1, 16, 21, 51, 35, 531000000))
+    }
+
+    @Test
+    internal fun `Tester mapping fra fellesformat til ArenaDialogNotat svar innkalling dialogmote`() {
+        val felleformatDm = fellesformatUnmarshaller.unmarshal(
+            StringReader(getFileAsStringISO88591("src/test/resources/dialogmelding_dialog_svar_innkalling_dialogmote.xml"))
+        ) as XMLEIFellesformat
+
+        val msgHead: XMLMsgHead = felleformatDm.get()
+        val receiverBlock = felleformatDm.get<XMLMottakenhetBlokk>()
+        val personNumberPatient = msgHead.msgInfo.patient.ident.find { it.typeId.v == "FNR" }?.id ?: ""
+        val personNumberDoctor = receiverBlock.avsenderFnrFraDigSignatur
+        val tssid = "1321415"
+
+        val arenaDialogNotat = createArenaDialogNotat(
+            felleformatDm,
+            tssid,
+            personNumberDoctor,
+            personNumberPatient,
+            msgHead,
+            receiverBlock
+        )
+
+        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentType shouldBeEqualTo "DM"
+        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentTypeVersjon shouldBeEqualTo "1.0"
+        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentNavn shouldBeEqualTo "Svar på forespørsel"
+        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentreferanse shouldBeEqualTo "9be88bc5-4219-473e-954b-c0dd115ff4e0"
+        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.ediLoggId shouldBeEqualTo "1901162204amsa22108.1"
+        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.shouldEqual(LocalDateTime.of(2019, 1, 16, 21, 3, 23, 847000000))
+        arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeFnr shouldBeEqualTo "12312414234"
+        arenaDialogNotat.eiaDokumentInfo.avsender.lege.tssId.shouldEqual(tssid.toBigInteger())
+        arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.fornavn shouldBeEqualTo "Inga"
+        arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.etternavn shouldBeEqualTo "Valda"
+        arenaDialogNotat.pasientData.person.personFnr shouldBeEqualTo "3143242342"
+        arenaDialogNotat.pasientData.person.personNavn.fornavn shouldBeEqualTo "Etternavn"
+        arenaDialogNotat.pasientData.person.personNavn.mellomnavn shouldBeEqualTo ""
+        arenaDialogNotat.pasientData.person.personNavn.etternavn shouldBeEqualTo "Test"
+        arenaDialogNotat.notatKategori shouldBeEqualTo "3"
+        arenaDialogNotat.notatKode shouldBeEqualTo "31"
+        arenaDialogNotat.notatTittel shouldBeEqualTo DialogmeldingKodeverk.HENVENDELSE_OM_PASIENT_HENVENDELSE_OM_SYKEFRAVARSOPPFOLGING.arenaNotatTittel
+        arenaDialogNotat.notatTekst shouldBeEqualTo "Jeg er klar 12.30. Mvh, Lege legsesn"
+        arenaDialogNotat.svarReferanse shouldBeEqualTo ""
+        arenaDialogNotat.notatDato.shouldEqual(LocalDateTime.of(2019, 1, 16, 21, 3, 23, 847000000))
+    }
+
+    @Test
+    internal fun `Tester mapping fra fellesformat til ArenaDialogNotat notat`() {
+        val felleformatDm = fellesformatUnmarshaller.unmarshal(
+            StringReader(getFileAsStringISO88591("src/test/resources/dialogmelding_dialog_notat.xml"))
+        ) as XMLEIFellesformat
+
+        val msgHead: XMLMsgHead = felleformatDm.get()
+        val receiverBlock = felleformatDm.get<XMLMottakenhetBlokk>()
+        val personNumberPatient = msgHead.msgInfo.patient.ident.find { it.typeId.v == "FNR" }?.id ?: ""
+        val personNumberDoctor = receiverBlock.avsenderFnrFraDigSignatur
+        val tssid = "1321415"
+
+        val arenaDialogNotat = createArenaDialogNotat(
+            felleformatDm,
+            tssid,
+            personNumberDoctor,
+            personNumberPatient,
+            msgHead,
+            receiverBlock
+        )
+
+        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentType shouldBeEqualTo "DM"
+        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentTypeVersjon shouldBeEqualTo "1.0"
+        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentNavn shouldBeEqualTo "Notat"
+        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentreferanse shouldBeEqualTo "37340D30-FE14-42B5-985F-A8FF8FFA0CB5"
+        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.ediLoggId shouldBeEqualTo "1901162157lege21826.1"
+        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.shouldEqual(LocalDateTime.of(2019, 1, 16, 20, 57, 36))
+        arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeFnr shouldBeEqualTo "1231124124"
+        arenaDialogNotat.eiaDokumentInfo.avsender.lege.tssId.shouldEqual(tssid.toBigInteger())
+        arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.fornavn shouldBeEqualTo "Inga"
+        arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.etternavn shouldBeEqualTo "Valda"
+        arenaDialogNotat.pasientData.person.personFnr shouldBeEqualTo "3143242342"
+        arenaDialogNotat.pasientData.person.personNavn.fornavn shouldBeEqualTo "Etternavn"
+        arenaDialogNotat.pasientData.person.personNavn.mellomnavn shouldBeEqualTo ""
+        arenaDialogNotat.pasientData.person.personNavn.etternavn shouldBeEqualTo "Test"
+        arenaDialogNotat.notatKategori shouldBeEqualTo "3"
+        arenaDialogNotat.notatKode shouldBeEqualTo "31"
+        arenaDialogNotat.notatTittel shouldBeEqualTo DialogmeldingKodeverk.HENVENDELSE_OM_PASIENT_HENVENDELSE_OM_SYKEFRAVARSOPPFOLGING.arenaNotatTittel
+        arenaDialogNotat.notatTekst shouldBeEqualTo "Hei,Det gjelder pas. Sender som vedlegg epikrisen"
+        arenaDialogNotat.svarReferanse shouldBeEqualTo "A1578B81-0042-453B-8527-6CF182BDA6C7"
+        arenaDialogNotat.notatDato.shouldEqual(LocalDateTime.of(2019, 1, 16, 20, 57, 36))
     }
 }
