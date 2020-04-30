@@ -13,18 +13,18 @@ fun XMLDialogmelding.toDialogmelding(
     navnHelsePersonellNavn: String?
 ) = Dialogmelding(
     id = dialogmeldingId,
-    dialogmeldingNotat = if (dialogmeldingType == DialogmeldingType.DIALOGMELDING_HENVENDELSE_FRA_LEGE) {
-        notat.firstOrNull()?.toDialogmeldingNotat()
+    dialogmeldingHenvendelseFraLege = if (dialogmeldingType == DialogmeldingType.DIALOGMELDING_HENVENDELSE_FRA_LEGE) {
+        notat.firstOrNull()?.toDialogmeldingHenvendelseFraLege()
     } else {
         null
     },
-    dialogmeldingSvar = if (dialogmeldingType == DialogmeldingType.DIALOGMELDING_SVAR_INNKALLING_DIALOGMOTE) {
-        notat.firstOrNull()?.toDialogmeldingSvar()
+    dialogmeldingInnkallingDialogmote = if (dialogmeldingType == DialogmeldingType.DIALOGMELDING_SVAR_INNKALLING_DIALOGMOTE) {
+        notat.firstOrNull()?.todialogmeldingInnkallingDialogmote()
     } else {
         null
     },
-    dialogmeldingForesporsel = if (dialogmeldingType == DialogmeldingType.DIALOGMELDING_SVAR_FORESPORSEL_OM_PASIENT) {
-        notat.firstOrNull()?.toDialogmeldingForesporsel()
+    dialogmeldingForesporselOmPasier = if (dialogmeldingType == DialogmeldingType.DIALOGMELDING_SVAR_FORESPORSEL_OM_PASIENT) {
+        notat.firstOrNull()?.toDialogmeldingForesporselOmPasient()
     } else {
         null
     },
@@ -33,27 +33,27 @@ fun XMLDialogmelding.toDialogmelding(
 
 )
 
-fun XMLNotat.toDialogmeldingNotat(): DialogmeldingNotat {
+fun XMLNotat.toDialogmeldingHenvendelseFraLege(): DialogmeldingHenvendelseFraLege {
 
-    return DialogmeldingNotat(
-        teamakode = temaKodet.toTeamakode(),
-        tekstNotatInnhold = tekstNotatInnhold.toString(),
-        dokIdNotat = dokIdNotat,
-        datoNotat = datoNotat.toGregorianCalendar().toZonedDateTime().toLocalDate()
-    )
-}
-
-fun XMLNotat.toDialogmeldingSvar(): DialogmeldingSvar {
-
-    return DialogmeldingSvar(
+    return DialogmeldingHenvendelseFraLege(
         teamakode = temaKodet.toTeamakode(),
         tekstNotatInnhold = tekstNotatInnhold.toString()
     )
 }
 
-fun XMLNotat.toDialogmeldingForesporsel(): DialogmeldingForesporsel {
+fun XMLNotat.todialogmeldingInnkallingDialogmote(): DialogmeldingInnkallingDialogmote {
 
-    return DialogmeldingForesporsel(
+    return DialogmeldingInnkallingDialogmote(
+        teamakode = temaKodet.toTeamakode(),
+        tekstNotatInnhold = tekstNotatInnhold.toString(),
+        dokIdNotat = dokIdNotat,
+        foresporsel = foresporsel.toForesporsel()
+    )
+}
+
+fun XMLNotat.toDialogmeldingForesporselOmPasient(): DialogmeldingForesporselOmPasient {
+
+    return DialogmeldingForesporselOmPasient(
         teamakode = temaKodet.toTeamakode(),
         tekstNotatInnhold = tekstNotatInnhold.toString(),
         dokIdNotat = dokIdNotat,

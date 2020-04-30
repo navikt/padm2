@@ -1,12 +1,11 @@
 package no.nav.syfo
 
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 import no.nav.syfo.model.Dialogmelding
-import no.nav.syfo.model.DialogmeldingForesporsel
-import no.nav.syfo.model.DialogmeldingNotat
-import no.nav.syfo.model.DialogmeldingSvar
+import no.nav.syfo.model.DialogmeldingForesporselOmPasient
+import no.nav.syfo.model.DialogmeldingHenvendelseFraLege
+import no.nav.syfo.model.DialogmeldingInnkallingDialogmote
 import no.nav.syfo.model.Foresporsel
 import no.nav.syfo.model.PdfModel
 import no.nav.syfo.model.Person
@@ -30,7 +29,7 @@ internal class PdfModelTest {
 
         val dialogmelding = Dialogmelding(
             id = dialogmeldingId,
-            dialogmeldingSvar = DialogmeldingSvar(
+            dialogmeldingHenvendelseFraLege = DialogmeldingHenvendelseFraLege(
                 teamakode = TemaKode(
                     "Henvendelse om sykefraværsoppfølging",
                     "Benyttes når henvendelsen gjelder en pasient som er sykmeldt, evt henvendelser " +
@@ -40,15 +39,32 @@ internal class PdfModelTest {
                 ),
                 tekstNotatInnhold = "Jeg er klar 12.30. Mvh, Lege legsesn"
             ),
-            dialogmeldingNotat = DialogmeldingNotat(
+            dialogmeldingInnkallingDialogmote = DialogmeldingInnkallingDialogmote(
                 teamakode = TemaKode(
                     "Henvendelse om sykefraværsoppfølging", null, "2.16.578.1.12.4.1.1.8128", "1"
                 ),
                 tekstNotatInnhold = "Hei,Det gjelder pas. Sender som vedlegg epikrisen",
                 dokIdNotat = "A1578B81-0042-453B-8527-6CF182BDA6C7",
-                datoNotat = LocalDate.of(2020, 1, 1)
+                foresporsel = Foresporsel(
+                    typeForesp = TypeForesp(
+                        "Forespørsel om pasient",
+                        "2.16.578.1.12.4.1.1.8129",
+                        "1"
+                    ),
+                    sporsmal = "Ønsker info om pasient",
+                    dokIdForesp = "OD1812186729156",
+                    rollerRelatertNotat = RollerRelatertNotat(
+                        rolleNotat = RolleNotat(
+                            "2.16.578.1.12.4.1.1.9057", "1"
+                        ),
+                        person = Person(
+                            "jon",
+                            "Person"
+                        )
+                    )
+                )
             ),
-            dialogmeldingForesporsel = DialogmeldingForesporsel(
+            dialogmeldingForesporselOmPasier = DialogmeldingForesporselOmPasient(
                 teamakode = TemaKode("Svar på forespørsel", "Ingen", "2.16.578.1.12.4.1.1.9069", "5"),
                 tekstNotatInnhold = "Pasieten har masse info her",
                 dokIdNotat = "OD1812186729156",
