@@ -25,11 +25,9 @@ fun createApprec(fellesformat: XMLEIFellesformat, apprecStatus: ApprecStatus): X
     val fellesformatApprec = XMLEIFellesformat().apply {
         any.add(XMLMottakenhetBlokk().apply {
             ediLoggId = xmlMottakenhetBlokk.ediLoggId
-            ebRole = findEbRole(xmlMottakenhetBlokk.ebAction, xmlMottakenhetBlokk.ebRole, xmlMottakenhetBlokk.ebService)
-            ebService =
-                findEbService(xmlMottakenhetBlokk.ebAction, xmlMottakenhetBlokk.ebRole, xmlMottakenhetBlokk.ebService)
-            ebAction =
-                findEbAction(xmlMottakenhetBlokk.ebAction, xmlMottakenhetBlokk.ebRole, xmlMottakenhetBlokk.ebService)
+            ebRole = ApprecConstant.ebRoleSaksbehandler.string
+            ebService = xmlMottakenhetBlokk.ebService
+            ebAction = ApprecConstant.ebActionBekreftelse.string
         }
         )
         any.add(XMLAppRec().apply {
@@ -66,42 +64,6 @@ fun createApprec(fellesformat: XMLEIFellesformat, apprecStatus: ApprecStatus): X
     }
 
     return fellesformatApprec
-}
-
-fun findEbRole(ebAction: String, ebRole: String, ebService: String): String {
-    if (ebAction == "Henvendelse" && ebRole == "Sykmelder" && ebService == "HenvendelseFraLege") {
-        return "Saksbehandler"
-    } else if (ebAction == "ForesporselSvar" && ebRole == "Sykmelder" && ebService == "ForesporselFraSaksbehandler") {
-        return "Saksbehandler"
-    } else if (ebAction == "ForesporselSvar" && ebRole == "Sykmelder" && ebService == "ForesporselFraSaksbehandler") {
-        return "Saksbehandler"
-    } else {
-        throw RuntimeException("finner ikkje ebRole")
-    }
-}
-
-fun findEbService(ebAction: String, ebRole: String, ebService: String): String {
-    if (ebAction == "Henvendelse" && ebRole == "Sykmelder" && ebService == "HenvendelseFraLege") {
-        return "HenvendelseFraLege"
-    } else if (ebAction == "ForesporselSvar" && ebRole == "Sykmelder" && ebService == "ForesporselFraSaksbehandler") {
-        return "ForesporselFraSaksbehandler"
-    } else if (ebAction == "ForesporselSvar" && ebRole == "Sykmelder" && ebService == "ForesporselFraSaksbehandler") {
-        return "DialogmoteInnkalling"
-    } else {
-        throw RuntimeException("finner ikkje ebService")
-    }
-}
-
-fun findEbAction(ebAction: String, ebRole: String, ebService: String): String {
-    if (ebAction == "Henvendelse" && ebRole == "Sykmelder" && ebService == "HenvendelseFraLege") {
-        return "Bekreftelse"
-    } else if (ebAction == "ForesporselSvar" && ebRole == "Sykmelder" && ebService == "ForesporselFraSaksbehandler") {
-        return "Bekreftelse"
-    } else if (ebAction == "MoteRespons" && ebRole == "Sykmelder" && ebService == "DialogmoteInnkalling") {
-        return "Bekreftelse"
-    } else {
-        throw RuntimeException("finner ikkje ebAction")
-    }
 }
 
 fun XMLHealthcareProfessional.intoHCPerson(): XMLHCPerson = XMLHCPerson().apply {
