@@ -20,12 +20,16 @@ import no.nav.syfo.model.RuleInfo
 import no.nav.syfo.util.get
 
 fun createApprec(fellesformat: XMLEIFellesformat, apprecStatus: ApprecStatus): XMLEIFellesformat {
+    val xmlMottakenhetBlokk = fellesformat.get<XMLMottakenhetBlokk>()
+    val xmlMsgHead = fellesformat.get<XMLMsgHead>()
     val fellesformatApprec = XMLEIFellesformat().apply {
         any.add(XMLMottakenhetBlokk().apply {
-            ediLoggId = fellesformat.get<XMLMottakenhetBlokk>().ediLoggId
-            ebRole = ApprecConstant.ebRoleSaksbehandler.string
-            ebService = ApprecConstant.ebServiceForesporselFraSaksbehandler.string
-            ebAction = ApprecConstant.ebActionSvarmelding.string
+            ediLoggId = xmlMottakenhetBlokk.ediLoggId
+            ebRole = findEbRole(xmlMottakenhetBlokk.ebAction, xmlMottakenhetBlokk.ebRole, xmlMottakenhetBlokk.ebService)
+            ebService =
+                findEbService(xmlMottakenhetBlokk.ebAction, xmlMottakenhetBlokk.ebRole, xmlMottakenhetBlokk.ebService)
+            ebAction =
+                findEbAction(xmlMottakenhetBlokk.ebAction, xmlMottakenhetBlokk.ebRole, xmlMottakenhetBlokk.ebService)
         }
         )
         any.add(XMLAppRec().apply {
@@ -34,14 +38,14 @@ fun createApprec(fellesformat: XMLEIFellesformat, apprecStatus: ApprecStatus): X
             }
             miGversion = ApprecConstant.apprecVersionV1_0.string
             genDate = LocalDateTime.now()
-            id = fellesformat.get<XMLMottakenhetBlokk>().ediLoggId
+            id = xmlMottakenhetBlokk.ediLoggId
 
             sender = XMLAppRec.Sender().apply {
-                hcp = fellesformat.get<XMLMsgHead>().msgInfo.receiver.organisation.intoHCP()
+                hcp = xmlMsgHead.msgInfo.receiver.organisation.intoHCP()
             }
 
             receiver = XMLAppRec.Receiver().apply {
-                hcp = fellesformat.get<XMLMsgHead>().msgInfo.sender.organisation.intoHCP()
+                hcp = xmlMsgHead.msgInfo.sender.organisation.intoHCP()
             }
 
             status = XMLCS().apply {
@@ -51,17 +55,53 @@ fun createApprec(fellesformat: XMLEIFellesformat, apprecStatus: ApprecStatus): X
 
             originalMsgId = XMLOriginalMsgId().apply {
                 msgType = XMLCS().apply {
-                    v = fellesformat.get<XMLMsgHead>().msgInfo.type.v
-                    dn = fellesformat.get<XMLMsgHead>().msgInfo.type.dn
+                    v = xmlMsgHead.msgInfo.type.v
+                    dn = xmlMsgHead.msgInfo.type.dn
                 }
-                issueDate = fellesformat.get<XMLMsgHead>().msgInfo.genDate
-                id = fellesformat.get<XMLMsgHead>().msgInfo.msgId
+                issueDate = xmlMsgHead.msgInfo.genDate
+                id = xmlMsgHead.msgInfo.msgId
             }
         }
         )
     }
 
     return fellesformatApprec
+}
+
+fun findEbRole(ebAction: String, ebRole: String, ebService: String): String {
+    if (ebAction == "Henvendelse" && ebRole == "Sykmelder" && ebService == "HenvendelseFraLege") {
+        return "Saksbehandler"
+    } else if (ebAction == "ForesporselSvar" && ebRole == "Sykmelder" && ebService == "ForesporselFraSaksbehandler") {
+        return "Saksbehandler"
+    } else if (ebAction == "ForesporselSvar" && ebRole == "Sykmelder" && ebService == "ForesporselFraSaksbehandler") {
+        return "Saksbehandler"
+    } else {
+        throw RuntimeException("finner ikkje ebRole")
+    }
+}
+
+fun findEbService(ebAction: String, ebRole: String, ebService: String): String {
+    if (ebAction == "Henvendelse" && ebRole == "Sykmelder" && ebService == "HenvendelseFraLege") {
+        return "HenvendelseFraLege"
+    } else if (ebAction == "ForesporselSvar" && ebRole == "Sykmelder" && ebService == "ForesporselFraSaksbehandler") {
+        return "ForesporselFraSaksbehandler"
+    } else if (ebAction == "ForesporselSvar" && ebRole == "Sykmelder" && ebService == "ForesporselFraSaksbehandler") {
+        return "DialogmoteInnkalling"
+    } else {
+        throw RuntimeException("finner ikkje ebService")
+    }
+}
+
+fun findEbAction(ebAction: String, ebRole: String, ebService: String): String {
+    if (ebAction == "Henvendelse" && ebRole == "Sykmelder" && ebService == "HenvendelseFraLege") {
+        return "Bekreftelse"
+    } else if (ebAction == "ForesporselSvar" && ebRole == "Sykmelder" && ebService == "ForesporselFraSaksbehandler") {
+        return "Bekreftelse"
+    } else if (ebAction == "MoteRespons" && ebRole == "Sykmelder" && ebService == "DialogmoteInnkalling") {
+        return "Bekreftelse"
+    } else {
+        throw RuntimeException("finner ikkje ebAction")
+    }
 }
 
 fun XMLHealthcareProfessional.intoHCPerson(): XMLHCPerson = XMLHCPerson().apply {
@@ -119,7 +159,7 @@ fun RuleInfo.toApprecCV(): AppRecCV {
 }
 
 fun createApprecError(textToTreater: String): AppRecCV = AppRecCV().apply {
-        dn = textToTreater
-        v = "2.16.578.1.12.4.1.1.8221"
-        s = "X99"
-    }
+    dn = textToTreater
+    v = "2.16.578.1.12.4.1.1.8221"
+    s = "X99"
+}
