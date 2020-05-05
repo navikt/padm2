@@ -52,6 +52,33 @@ or the command line:
 ./gradlew -PgithubUser=x-access-token -PgithubPassword=[token]
 ```
 
+### Access to the Postgres database
+
+For utfyllende dokumentasjon se [Postgres i NAV](https://github.com/navikt/utvikling/blob/master/PostgreSQL.md)
+
+#### Tldr
+
+The application uses dynamically generated user / passwords for the database.
+To connect to the database one must generate user / password (which lasts for one hour)
+as follows:
+
+Use The Vault Browser CLI that is build in https://vault.adeo.no
+
+
+Preprod credentials:
+
+```
+read postgresql/preprod-fss/creds/padm2-admin
+
+```
+
+Prod credentials:
+
+```
+read postgresql/prod-fss/creds/padm2-readonly
+
+```
+
 
 #### Build and run tests
 To build locally and run the integration tests you can simply run `./gradlew shadowJar` or on windows 

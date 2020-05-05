@@ -67,3 +67,7 @@ spec:
       value: http://dokarkiv/rest/journalpostapi/v1/journalpost
     - name: ARENA_OUTBOUND_QUEUENAME
       value: QA.P414.FS06_ARENA
+    - name: PADM2_DB_URL
+      value: jdbc:postgresql://A01DBVL009.adeo.no:5432/padm2
+    - name: MOUNT_PATH_VAULT
+      value: /postgresql/prod-fss

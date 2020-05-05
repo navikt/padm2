@@ -67,3 +67,7 @@ spec:
       value: https://dokarkiv-q1.nais.preprod.local/rest/journalpostapi/v1/journalpost
     - name: ARENA_OUTBOUND_QUEUENAME
       value: QA.Q1_414.FS06_ARENA
+    - name: PADM2_DB_URL
+      value: jdbc:postgresql://b27dbvl013.preprod.local:5432/padm2
+    - name: MOUNT_PATH_VAULT
+      value: /postgresql/preprod-fss

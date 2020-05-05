@@ -24,6 +24,7 @@ import no.nav.syfo.client.AktoerIdClient
 import no.nav.syfo.client.Padm2ReglerClient
 import no.nav.syfo.client.SarClient
 import no.nav.syfo.client.findBestSamhandlerPraksis
+import no.nav.syfo.db.Database
 import no.nav.syfo.handlestatus.handleDoctorNotFoundInAktorRegister
 import no.nav.syfo.handlestatus.handleDuplicateEdiloggid
 import no.nav.syfo.handlestatus.handleDuplicateSM2013Content
@@ -76,7 +77,8 @@ class BlockingApplicationRunner {
         padm2ReglerClient: Padm2ReglerClient,
         backoutProducer: MessageProducer,
         journalService: JournalService,
-        arenaProducer: MessageProducer
+        arenaProducer: MessageProducer,
+        database: Database
     ) {
         wrapExceptions {
             loop@ while (applicationState.ready) {
@@ -266,7 +268,8 @@ class BlockingApplicationRunner {
                                 msgHead,
                                 receiverBlock,
                                 backoutProducer,
-                                dialogmelding
+                                dialogmelding,
+                                database
                             )
 
                             Status.INVALID -> handleStatusINVALID(
@@ -278,7 +281,8 @@ class BlockingApplicationRunner {
                                 env.apprecQueueName,
                                 journalService,
                                 receivedDialogmelding,
-                                vedleggListe
+                                vedleggListe,
+                                database
                             )
                         }
 

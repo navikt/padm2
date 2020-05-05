@@ -10,11 +10,13 @@ import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.apprec.ApprecStatus
 import no.nav.syfo.client.createArenaDialogNotat
 import no.nav.syfo.client.sendArenaDialogNotat
+import no.nav.syfo.db.Database
 import no.nav.syfo.log
 import no.nav.syfo.model.Dialogmelding
 import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.model.ValidationResult
 import no.nav.syfo.model.Vedlegg
+import no.nav.syfo.persistering.handleRecivedMessage
 import no.nav.syfo.services.JournalService
 import no.nav.syfo.services.sendReceipt
 import no.nav.syfo.util.LoggingMeta
@@ -34,7 +36,8 @@ suspend fun handleStatusOK(
     msgHead: XMLMsgHead,
     receiverBlock: XMLMottakenhetBlokk,
     backoutProducer: MessageProducer,
-    dialogmelding: Dialogmelding
+    dialogmelding: Dialogmelding,
+    database: Database
 ) {
 
     journalService.onJournalRequest(
@@ -66,6 +69,8 @@ suspend fun handleStatusOK(
             receiverBlock,
             dialogmelding),
         loggingMeta)
+
+    handleRecivedMessage(receivedDialogmelding, validationResult, loggingMeta, database)
 
     sendReceipt(session, receiptProducer, fellesformat, ApprecStatus.ok)
     log.info("Apprec Receipt sent to {}, {}", apprecQueueName, StructuredArguments.fields(loggingMeta))

@@ -22,7 +22,10 @@ data class Environment(
     val dokArkivUrl: String = getEnvVar("DOK_ARKIV_URL"),
     val securityTokenServiceURL: String = getEnvVar("SECURITY_TOKEN_SERVICE_URL"),
     val syfopdfgen: String = getEnvVar("PDF_GEN_URL", "http://syfopdfgen/api/v1/genpdf/padm2sak/padm2sak"),
-    val arenaQueueName: String = getEnvVar("ARENA_OUTBOUND_QUEUENAME")
+    val arenaQueueName: String = getEnvVar("ARENA_OUTBOUND_QUEUENAME"),
+    val padm2DBURL: String = getEnvVar("PADM2_DB_URL"),
+    val mountPathVault: String = getEnvVar("MOUNT_PATH_VAULT"),
+    val databaseName: String = getEnvVar("DATABASE_NAME", "padm2")
 ) : MqConfig
 
 data class VaultSecrets(

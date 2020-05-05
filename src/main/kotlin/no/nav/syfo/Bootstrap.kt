@@ -30,12 +30,15 @@ import no.nav.syfo.client.PdfgenClient
 import no.nav.syfo.client.SakClient
 import no.nav.syfo.client.SarClient
 import no.nav.syfo.client.StsOidcClient
+import no.nav.syfo.db.Database
+import no.nav.syfo.db.VaultCredentialService
 import no.nav.syfo.mq.connectionFactory
 import no.nav.syfo.mq.consumerForQueue
 import no.nav.syfo.mq.producerForQueue
 import no.nav.syfo.services.JournalService
 import no.nav.syfo.util.TrackableException
 import no.nav.syfo.util.getFileAsString
+import no.nav.syfo.vault.RenewVaultService
 import no.nav.syfo.ws.createPort
 import org.apache.cxf.ws.addressing.WSAddressingFeature
 import org.slf4j.Logger
@@ -102,9 +105,14 @@ fun main() {
         port { withBasicAuth(vaultSecrets.serviceuserUsername, vaultSecrets.serviceuserPassword) }
     }
 
+    val vaultCredentialService = VaultCredentialService()
+    val database = Database(env, vaultCredentialService)
+
+    RenewVaultService(vaultCredentialService, applicationState).startRenewTasks()
+
     launchListeners(applicationState, env,
         vaultSecrets, aktoerIdClient, sarClient,
-        subscriptionEmottak, padm2ReglerClient, journalService)
+        subscriptionEmottak, padm2ReglerClient, journalService, database)
 }
 
 fun createListener(applicationState: ApplicationState, action: suspend CoroutineScope.() -> Unit): Job =
@@ -127,7 +135,8 @@ fun launchListeners(
     kuhrSarClient: SarClient,
     subscriptionEmottak: SubscriptionPort,
     padm2ReglerClient: Padm2ReglerClient,
-    journalService: JournalService
+    journalService: JournalService,
+    database: Database
 ) {
     createListener(applicationState) {
         connectionFactory(env).createConnection(secrets.mqUsername, secrets.mqPassword).use { connection ->
@@ -148,7 +157,7 @@ fun launchListeners(
                     session, env, secrets, aktoerIdClient,
                     kuhrSarClient, subscriptionEmottak, jedis, receiptProducer,
                     padm2ReglerClient, backoutProducer, journalService,
-                    arenaProducer
+                    arenaProducer, database
                 )
             }
         }

@@ -29,6 +29,10 @@ val commonsTextVersion = "1.4"
 val jedisVersion = "2.9.0"
 val arenaDialogNotatVersion = "1.e1999cf"
 val javaTimeAdapterVersion = "1.1.3"
+val vaultJavaDriveVersion = "3.1.0"
+val postgresVersion = "42.2.5"
+val flywayVersion = "5.2.4"
+val hikariVersion = "3.3.0"
 
 plugins {
     java
@@ -105,6 +109,11 @@ dependencies {
     implementation("no.nav.helse.xml:arenaDialogNotat:$arenaDialogNotatVersion")
 
     implementation("redis.clients:jedis:$jedisVersion")
+
+    implementation("org.postgresql:postgresql:$postgresVersion")
+    implementation("com.zaxxer:HikariCP:$hikariVersion")
+    implementation("org.flywaydb:flyway-core:$flywayVersion")
+    implementation("com.bettercloud:vault-java-driver:$vaultJavaDriveVersion")
 
     implementation("javax.xml.ws:jaxws-api:$jaxwsApiVersion")
     implementation("javax.annotation:javax.annotation-api:$javaxAnnotationApiVersion")
