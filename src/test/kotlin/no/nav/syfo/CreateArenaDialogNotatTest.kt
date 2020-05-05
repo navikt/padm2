@@ -272,6 +272,6 @@ internal class CreateArenaDialogNotatTest {
             dialogmelding
         )
 
-        arenaDialogNotat.notatTekst shouldBeEqualTo "[TekstNotatInnhold: null]"
+        arenaDialogNotat.notatTekst shouldBeEqualTo "Hei,Det gjelder pas. Sender sm2013 som vedlegg"
     }
 }

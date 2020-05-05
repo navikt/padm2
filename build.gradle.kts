@@ -19,7 +19,7 @@ val jaxbRuntimeVersion = "2.4.0-b180830.0438"
 val jaxbApiVersion = "2.4.0-b180830.0359"
 val javaxActivationVersion = "1.1.1"
 val jaxwsToolsVersion = "2.3.1"
-val dialogmeldingVersion = "1.ef9820a"
+val dialogmeldingVersion = "1.5d21db9"
 val base64containerVersion = "1.5ac2176"
 val junitJupiterVersion = "5.6.0"
 val kluentVersion = "1.39"
@@ -61,6 +61,13 @@ repositories {
     jcenter()
     maven {
         url = uri("https://maven.pkg.github.com/navikt/padm-common")
+        credentials {
+            username = githubUser
+            password = githubPassword
+        }
+    }
+    maven {
+        url = uri("https://maven.pkg.github.com/navikt/syfo-xml-codegen")
         credentials {
             username = githubUser
             password = githubPassword
