@@ -4,6 +4,8 @@
 Repository for PADM. Application written in Kotlin used to receive dialogmeldinger from external systems, doing some validation, then pushing it to our internal systems.
 
 
+<img src="./src/svg/flytdiagram.svg" alt="Image of the flow of the padm2 application">
+
 ## Technologies used
 * Kotlin
 * Ktor
