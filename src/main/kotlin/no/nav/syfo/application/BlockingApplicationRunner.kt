@@ -19,7 +19,6 @@ import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.Environment
 import no.nav.syfo.VaultSecrets
 import no.nav.syfo.application.services.samhandlerParksisisLegevakt
-import no.nav.syfo.application.services.startSubscription
 import no.nav.syfo.client.AktoerIdClient
 import no.nav.syfo.client.Padm2ReglerClient
 import no.nav.syfo.client.SarClient
@@ -162,14 +161,14 @@ class BlockingApplicationRunner {
                                 else -> if (!samhandlerParksisisLegevakt(samhandlerPraksis) &&
                                     !receiverBlock.partnerReferanse.isNullOrEmpty() &&
                                     receiverBlock.partnerReferanse.isNotBlank()
-                                ) {
+                                ) { /*
                                     startSubscription(
                                         subscriptionEmottak,
                                         samhandlerPraksis,
                                         msgHead,
                                         receiverBlock,
                                         loggingMeta
-                                    )
+                                    )*/
                                 } else {
                                     log.info(
                                         "SamhandlerPraksis is Legevakt or partnerReferanse is empty or blank, subscription_emottak is not created, {}",
