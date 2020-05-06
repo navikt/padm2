@@ -4,7 +4,7 @@
 Repository for PADM. Application written in Kotlin used to receive dialogmeldinger from external systems, doing some validation, then pushing it to our internal systems.
 
 
-<img src="./src/svg/flytdiagram.svg" alt="Image of the flow of the padm2 application">
+<img src="./src/svg/flyttdiagram.svg" alt="Image of the flow of the padm2 application">
 
 ## Technologies used
 * Kotlin
@@ -81,6 +81,12 @@ read postgresql/prod-fss/creds/padm2-readonly
 
 ```
 
+### Creating/Updating flowchart
+Open a web browser and go to: https://app.diagrams.net/
+to edit the curent flowchart import it from here: /src/flowchart/flyttdiagram.drawio
+Do the changes you want, and the save it as a drawio, back to /src/flowchart/flyttdiagram.drawio
+And export it to a svg file here: /src/svg/flytdiagram.svg
+Commit and push the changes so its up to date
 
 #### Build and run tests
 To build locally and run the integration tests you can simply run `./gradlew shadowJar` or on windows 
