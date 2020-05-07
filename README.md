@@ -17,7 +17,7 @@ More information on dialogmeldinger can be found here: https://www.nhn.no/veiled
 
 #### Requirements
 
-* JDK 12
+* JDK 14
 
 ### Getting github-package-registry packages NAV-IT
 Some packages used in this repo is uploaded to the Github Package Registry which requires authentication. It can, for example, be solved like this in Gradle:
