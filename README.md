@@ -118,4 +118,4 @@ Deploying redis can be done with the following command:
 * Mathias Hellevang, `mathias.hellevang@nav.no`
 
 ### For NAV employees
-We are available at the Slack channel #veden
+We are available at the Slack channel #team-sykmelding or #isyfo
