@@ -11,7 +11,7 @@ More information on dialogmeldinger can be found here: https://www.nhn.no/veiled
 * Kotlin
 * Ktor
 * Gradle
-* JDK 12
+* JDK 14
 * Spek
 * Jackson
 
