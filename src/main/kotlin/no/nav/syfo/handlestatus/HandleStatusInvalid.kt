@@ -68,7 +68,7 @@ fun handleDuplicateSM2013Content(
     sendReceipt(
         session, receiptProducer, fellesformat, ApprecStatus.avvist, listOf(
             createApprecError(
-                "Duplikat! - Denne legeerklæringen er mottatt tidligere. " +
+                "Duplikat! - Denne dialogmeldingen er mottatt tidligere. " +
                         "Skal ikke sendes på nytt."
             )
         )
@@ -92,8 +92,8 @@ fun handleDuplicateEdiloggid(
     sendReceipt(
         session, receiptProducer, fellesformat, ApprecStatus.avvist, listOf(
             createApprecError(
-                "Legeerklæringen kan ikke rettes, det må skrives en ny. Grunnet følgende:" +
-                        "Denne legeerklæringen har ein identisk identifikator med ein legeerklæring som er mottatt tidligere," +
+                "Dialogmeldingen kan ikke rettes, det må skrives en ny. Grunnet følgende:" +
+                        "Denne dialogmeldingen har ein identisk identifikator med ein dialogmeldingen som er mottatt tidligere," +
                         " og er derfor ein duplikat." +
                         " og skal ikke sendes på nytt. Dersom dette ikke stemmer, kontakt din EPJ-leverandør"
             )
@@ -167,7 +167,7 @@ fun handleDoctorNotFoundInAktorRegister(
 
     sendReceipt(
         session, receiptProducer, fellesformat, ApprecStatus.avvist, listOf(
-            createApprecError("Legeerklæringen kan ikke rettes, det må skrives en ny. Grunnet følgende:" +
+            createApprecError("Dialogmelding kan ikke rettes, det må skrives en ny. Grunnet følgende:" +
                     " Behandler er ikkje registrert i folkeregisteret")
         )
     )
@@ -195,8 +195,8 @@ fun handleTestFnrInProd(
 
     sendReceipt(
         session, receiptProducer, fellesformat, ApprecStatus.avvist, listOf(
-            createApprecError("Legeerklæringen kan ikke rettes, det må skrives en ny. Grunnet følgende:" +
-                        "AnnenFravers Arsakskode V mangler i legeerklæringen. Kontakt din EPJ-leverandør)"
+            createApprecError("Dialogmelding kan ikke rettes, test fødselsnummer er kommet inn i produksjon." +
+                    "Kontakt din EPJ-leverandør)"
             )
         )
     )
@@ -204,6 +204,60 @@ fun handleTestFnrInProd(
 
     INVALID_MESSAGE_NO_NOTICE.inc()
     TEST_FNR_IN_PROD.inc()
+    updateRedis(jedis, ediLoggId, sha256String)
+}
+
+fun handleMeldingsTekstMangler(
+    session: Session,
+    receiptProducer: MessageProducer,
+    fellesformat: XMLEIFellesformat,
+    ediLoggId: String,
+    jedis: Jedis,
+    sha256String: String,
+    env: Environment,
+    loggingMeta: LoggingMeta
+) {
+
+    log.warn("TekstNotatInnhold mangler, {}",
+        fields(loggingMeta))
+
+    sendReceipt(
+        session, receiptProducer, fellesformat, ApprecStatus.avvist, listOf(
+            createApprecError("Dialogmelding kan ikke rettes, meldingstekst (tekstNotatInnhold) mangler, " +
+                    "Kontakt din EPJ-leverandør)"
+            )
+        )
+    )
+    log.info("Apprec Receipt sent to {}, {}", env.apprecQueueName, fields(loggingMeta))
+
+    INVALID_MESSAGE_NO_NOTICE.inc()
+    updateRedis(jedis, ediLoggId, sha256String)
+}
+
+fun handleInvalidDialogMeldingKodeverk(
+    session: Session,
+    receiptProducer: MessageProducer,
+    fellesformat: XMLEIFellesformat,
+    ediLoggId: String,
+    jedis: Jedis,
+    sha256String: String,
+    env: Environment,
+    loggingMeta: LoggingMeta
+) {
+
+    log.warn("Det er brukt ein ugyldig kombinasjon av dialogmelding kodeverk, {}",
+        fields(loggingMeta))
+
+    sendReceipt(
+        session, receiptProducer, fellesformat, ApprecStatus.avvist, listOf(
+            createApprecError("Dialogmelding kan ikke rettes, det er brukt ein ugyldig dialogmelding kodeverk kombinasjon, " +
+                    "Kontakt din EPJ-leverandør)"
+            )
+        )
+    )
+    log.info("Apprec Receipt sent to {}, {}", env.apprecQueueName, fields(loggingMeta))
+
+    INVALID_MESSAGE_NO_NOTICE.inc()
     updateRedis(jedis, ediLoggId, sha256String)
 }
 

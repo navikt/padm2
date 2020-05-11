@@ -27,6 +27,8 @@ import no.nav.syfo.db.Database
 import no.nav.syfo.handlestatus.handleDoctorNotFoundInAktorRegister
 import no.nav.syfo.handlestatus.handleDuplicateEdiloggid
 import no.nav.syfo.handlestatus.handleDuplicateSM2013Content
+import no.nav.syfo.handlestatus.handleInvalidDialogMeldingKodeverk
+import no.nav.syfo.handlestatus.handleMeldingsTekstMangler
 import no.nav.syfo.handlestatus.handlePatientNotFound
 import no.nav.syfo.handlestatus.handlePatientNotFoundInAktorRegister
 import no.nav.syfo.handlestatus.handleStatusINVALID
@@ -35,6 +37,7 @@ import no.nav.syfo.handlestatus.handleTestFnrInProd
 import no.nav.syfo.log
 import no.nav.syfo.metrics.INCOMING_MESSAGE_COUNTER
 import no.nav.syfo.metrics.REQUEST_TIME
+import no.nav.syfo.model.DialogmeldingType
 import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.model.Status
 import no.nav.syfo.model.Vedlegg
@@ -56,6 +59,7 @@ import no.nav.syfo.util.extractVedlegg
 import no.nav.syfo.util.fellesformatUnmarshaller
 import no.nav.syfo.util.get
 import no.nav.syfo.util.wrapExceptions
+import no.nav.syfo.validation.validateDialogMeldingKodeverk
 import redis.clients.jedis.Jedis
 import redis.clients.jedis.exceptions.JedisConnectionException
 
@@ -216,6 +220,23 @@ class BlockingApplicationRunner {
                         }
                         if (erTestFnr(personNumberPatient) && env.cluster == "prod-fss") {
                             handleTestFnrInProd(
+                                session, receiptProducer, fellesformat,
+                                ediLoggId, jedis, redisSha256String, env, loggingMeta
+                            )
+                            continue@loop
+                        }
+                        if (dialogmeldingType == DialogmeldingType.DIALOGMELDING_HENVENDELSE_FRA_LEGE_HENDVENDELSE &&
+                            dialogmeldingXml.notat.first().tekstNotatInnhold.isNullOrEmpty()
+                        ) {
+                            handleMeldingsTekstMangler(
+                                session, receiptProducer, fellesformat,
+                                ediLoggId, jedis, redisSha256String, env, loggingMeta
+                            )
+                            continue@loop
+                        }
+
+                        if (!validateDialogMeldingKodeverk(dialogmeldingXml, dialogmeldingType)) {
+                            handleInvalidDialogMeldingKodeverk(
                                 session, receiptProducer, fellesformat,
                                 ediLoggId, jedis, redisSha256String, env, loggingMeta
                             )

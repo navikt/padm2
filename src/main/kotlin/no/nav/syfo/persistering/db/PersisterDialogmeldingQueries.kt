@@ -83,7 +83,7 @@ private fun Connection.opprettBehandlingsutfall(validationResult: ValidationResu
     }
 }
 
-fun Connection.erLegeerklaeringsopplysningerLagret(dialogmledingid: String) =
+fun Connection.erDialogmeldingOpplysningerLagret(dialogmledingid: String) =
     use { connection ->
         connection.prepareStatement(
             """

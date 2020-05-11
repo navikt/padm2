@@ -14,7 +14,7 @@ fun handleRecivedMessage(
     database: Database
 ) {
 /*
-    if (database.connection.erLegeerklaeringsopplysningerLagret(
+    if (database.connection.erDialogmeldingOpplysningerLagret(
             receivedDialogmelding.dialogmelding.id
         )
     ) {
