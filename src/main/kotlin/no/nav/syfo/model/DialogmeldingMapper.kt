@@ -55,7 +55,7 @@ fun XMLNotat.toInnkallingMoterespons(): InnkallingMoterespons {
 
     return InnkallingMoterespons(
         teamakode = temaKodet.toTeamakode(),
-        tekstNotatInnhold = tekstNotatInnhold.toString(),
+        tekstNotatInnhold = tekstNotatInnhold?.toString(),
         dokIdNotat = dokIdNotat,
         foresporsel = foresporsel?.toForesporsel()
     )
