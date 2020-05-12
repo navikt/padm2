@@ -8,17 +8,17 @@ metadata:
 spec:
   image: navikt/secure-redis:5.0.3-alpine-2
   port: 6379
-  vault:
-    enabled: true
   replicas:
     min: 1
     max: 4
   resources:
     limits:
-      cpu: 500m
-      memory: 1Gi
+      cpu: 250m
+      memory: 256Mi
     requests:
-      cpu: 200m
-      memory: 512Mi
+      cpu: 250m
+      memory: 256Mi
   service:
     port: 6379
+  vault:
+    enabled: true
