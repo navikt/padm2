@@ -15,10 +15,10 @@ spec:
     max: 4
   resources:
     limits:
-      cpu: 250m
-      memory: 256Mi
+      cpu: 500m
+      memory: 1Gi
     requests:
-      cpu: 250m
-      memory: 256Mi
+      cpu: 200m
+      memory: 512Mi
   service:
     port: 6379
