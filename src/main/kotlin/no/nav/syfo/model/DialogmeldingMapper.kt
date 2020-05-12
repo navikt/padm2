@@ -40,12 +40,29 @@ fun XMLNotat.toHenvendelseFraLegeHenvendelse(): HenvendelseFraLegeHenvendelse {
         tekstNotatInnhold = tekstNotatInnhold.toString(),
         dokIdNotat = dokIdNotat,
         foresporsel = foresporsel?.toForesporsel(),
-        rollerRelatertNotat = if (rollerRelatertNotat.isNotEmpty()) { RollerRelatertNotat(
-                    rolleNotat = RolleNotat(rollerRelatertNotat.first().rolleNotat.s, rollerRelatertNotat.first().rolleNotat.v),
-                    person = Person(rollerRelatertNotat.first().person.givenName, rollerRelatertNotat.first().person.familyName),
-                    helsepersonell = if (rollerRelatertNotat.firstOrNull()?.healthcareProfessional != null) { Helsepersonell(rollerRelatertNotat.first().healthcareProfessional.givenName, rollerRelatertNotat.first().healthcareProfessional.familyName) } else { null }
-                )
-        } else { null }
+        rollerRelatertNotat = if (rollerRelatertNotat.isNotEmpty()) {
+            RollerRelatertNotat(
+                rolleNotat = RolleNotat(
+                    rollerRelatertNotat.first().rolleNotat.s,
+                    rollerRelatertNotat.first().rolleNotat.v
+                ),
+                person = if (rollerRelatertNotat.firstOrNull()?.person != null) {
+                    Person(rollerRelatertNotat.first().person.givenName, rollerRelatertNotat.first().person.familyName)
+                } else {
+                    null
+                },
+                helsepersonell = if (rollerRelatertNotat.firstOrNull()?.healthcareProfessional != null) {
+                    Helsepersonell(
+                        rollerRelatertNotat.first().healthcareProfessional.givenName,
+                        rollerRelatertNotat.first().healthcareProfessional.familyName
+                    )
+                } else {
+                    null
+                }
+            )
+        } else {
+            null
+        }
     )
 }
 
@@ -85,9 +102,26 @@ fun XMLForesporsel.toForesporsel(): Foresporsel {
         dokIdForesp = dokIdForesp,
         rollerRelatertNotat = if (rollerRelatertNotat.isNotEmpty()) {
             RollerRelatertNotat(
-            rolleNotat = RolleNotat(rollerRelatertNotat.first().rolleNotat.s, rollerRelatertNotat.first().rolleNotat.v),
-            person = if (rollerRelatertNotat.firstOrNull()?.person != null) { Person(rollerRelatertNotat.first().person.givenName, rollerRelatertNotat.first().person.familyName) } else { null },
-            helsepersonell = if (rollerRelatertNotat.firstOrNull()?.healthcareProfessional != null) { Helsepersonell(rollerRelatertNotat.first().healthcareProfessional.givenName, rollerRelatertNotat.first().healthcareProfessional.familyName) } else { null }
-        ) } else { null }
+                rolleNotat = RolleNotat(
+                    rollerRelatertNotat.first().rolleNotat.s,
+                    rollerRelatertNotat.first().rolleNotat.v
+                ),
+                person = if (rollerRelatertNotat.firstOrNull()?.person != null) {
+                    Person(rollerRelatertNotat.first().person.givenName, rollerRelatertNotat.first().person.familyName)
+                } else {
+                    null
+                },
+                helsepersonell = if (rollerRelatertNotat.firstOrNull()?.healthcareProfessional != null) {
+                    Helsepersonell(
+                        rollerRelatertNotat.first().healthcareProfessional.givenName,
+                        rollerRelatertNotat.first().healthcareProfessional.familyName
+                    )
+                } else {
+                    null
+                }
+            )
+        } else {
+            null
+        }
     )
 }
