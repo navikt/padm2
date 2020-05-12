@@ -5,6 +5,7 @@ import java.util.UUID
 import no.nav.syfo.model.Dialogmelding
 import no.nav.syfo.model.Foresporsel
 import no.nav.syfo.model.ForesporselFraSaksbehandlerForesporselSvar
+import no.nav.syfo.model.Helsepersonell
 import no.nav.syfo.model.HenvendelseFraLegeHenvendelse
 import no.nav.syfo.model.InnkallingMoterespons
 import no.nav.syfo.model.PdfModel
@@ -56,9 +57,14 @@ internal class PdfModelTest {
                         person = Person(
                             "jon",
                             "Person"
+                        ),
+                        helsepersonell = Helsepersonell(
+                            "helse",
+                            "Person"
                         )
                     )
-                )
+                ),
+                rollerRelatertNotat = null
             ),
             innkallingMoterespons = InnkallingMoterespons(
                 teamakode = TemaKode(
@@ -86,7 +92,8 @@ internal class PdfModelTest {
                         person = Person(
                             "jon",
                             "Person"
-                        )
+                        ),
+                        helsepersonell = null
                     )
                 )
             ),
