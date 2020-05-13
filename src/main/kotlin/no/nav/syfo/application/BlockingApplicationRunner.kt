@@ -207,21 +207,21 @@ class BlockingApplicationRunner {
                         if (patientIdents == null || patientIdents.feilmelding != null) {
                             handlePatientNotFoundInAktorRegister(
                                 patientIdents, session,
-                                receiptProducer, fellesformat, ediLoggId, jedis, redisSha256String, env, loggingMeta
+                                receiptProducer, fellesformat, ediLoggId, jedis, sha256String, env, loggingMeta
                             )
                             continue@loop
                         }
                         if (doctorIdents == null || doctorIdents.feilmelding != null) {
                             handleDoctorNotFoundInAktorRegister(
                                 doctorIdents, session,
-                                receiptProducer, fellesformat, ediLoggId, jedis, redisSha256String, env, loggingMeta
+                                receiptProducer, fellesformat, ediLoggId, jedis, sha256String, env, loggingMeta
                             )
                             continue@loop
                         }
                         if (erTestFnr(personNumberPatient) && env.cluster == "prod-fss") {
                             handleTestFnrInProd(
                                 session, receiptProducer, fellesformat,
-                                ediLoggId, jedis, redisSha256String, env, loggingMeta
+                                ediLoggId, jedis, sha256String, env, loggingMeta
                             )
                             continue@loop
                         }
@@ -230,7 +230,7 @@ class BlockingApplicationRunner {
                         ) {
                             handleMeldingsTekstMangler(
                                 session, receiptProducer, fellesformat,
-                                ediLoggId, jedis, redisSha256String, env, loggingMeta
+                                ediLoggId, jedis, sha256String, env, loggingMeta
                             )
                             continue@loop
                         }
@@ -238,7 +238,7 @@ class BlockingApplicationRunner {
                         if (!validateDialogMeldingKodeverk(dialogmeldingXml, dialogmeldingType)) {
                             handleInvalidDialogMeldingKodeverk(
                                 session, receiptProducer, fellesformat,
-                                ediLoggId, jedis, redisSha256String, env, loggingMeta
+                                ediLoggId, jedis, sha256String, env, loggingMeta
                             )
                             continue@loop
                         }
