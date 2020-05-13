@@ -8,6 +8,8 @@ import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.apprec.ApprecStatus
+import no.nav.syfo.client.createArenaDialogNotat
+import no.nav.syfo.client.sendArenaDialogNotat
 import no.nav.syfo.db.Database
 import no.nav.syfo.log
 import no.nav.syfo.model.Dialogmelding
@@ -33,11 +35,10 @@ suspend fun handleStatusOK(
     arenaProducer: MessageProducer,
     msgHead: XMLMsgHead,
     receiverBlock: XMLMottakenhetBlokk,
-    backoutProducer: MessageProducer,
     dialogmelding: Dialogmelding,
     database: Database
 ) {
-/*
+
     journalService.onJournalRequest(
         receivedDialogmelding,
         validationResult,
@@ -45,20 +46,19 @@ suspend fun handleStatusOK(
         loggingMeta
     )
 
- */
-    /*
-       sendArenaDialogNotat(arenaProducer, session,
-           createArenaDialogNotat(
-               fellesformat,
-               receivedDialogmelding.tssid,
-               receivedDialogmelding.personNrLege,
-               receivedDialogmelding.personNrPasient,
-               msgHead,
-               receiverBlock,
-               dialogmelding),
-           loggingMeta)
-
-     */
+    sendArenaDialogNotat(
+        arenaProducer, session,
+        createArenaDialogNotat(
+            fellesformat,
+            receivedDialogmelding.tssid,
+            receivedDialogmelding.personNrLege,
+            receivedDialogmelding.personNrPasient,
+            msgHead,
+            receiverBlock,
+            dialogmelding
+        ),
+        loggingMeta
+    )
 
     handleRecivedMessage(receivedDialogmelding, validationResult, loggingMeta, database)
 

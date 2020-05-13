@@ -38,13 +38,13 @@ suspend fun handleStatusINVALID(
     vedleggListe: List<Vedlegg>?,
     database: Database
 ) {
-    /*
+
     journalService.onJournalRequest(
         receivedDialogmelding,
         validationResult,
         vedleggListe,
         loggingMeta
-    )*/
+    )
 
     handleRecivedMessage(receivedDialogmelding, validationResult, loggingMeta, database)
 
