@@ -225,7 +225,8 @@ class BlockingApplicationRunner {
                             )
                             continue@loop
                         }
-                        if (dialogmeldingType == DialogmeldingType.DIALOGMELDING_HENVENDELSE_FRA_LEGE_HENDVENDELSE &&
+                        if ((dialogmeldingType == DialogmeldingType.DIALOGMELDING_HENVENDELSE_FRA_LEGE_HENDVENDELSE ||
+                                    dialogmeldingType == DialogmeldingType.DIALOGMELDING_FORESPORSEL_FRA_SAKSBEHANDLER_FORESPORSEL_SVAR) &&
                             dialogmeldingXml.notat.first().tekstNotatInnhold.isNullOrEmpty()
                         ) {
                             handleMeldingsTekstMangler(
