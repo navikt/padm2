@@ -54,10 +54,6 @@ fun createArenaDialogNotat(
                     }
                 }
             }
-            avsenderSystem = EiaDokumentInfoType.AvsenderSystem().apply {
-                systemNavn = "SKJEMA-MOTTAK"
-                systemVersjon = "1.0.0"
-            }
         }
         pasientData = PasientDataType().apply {
             person = PersonType().apply {
