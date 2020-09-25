@@ -12,7 +12,7 @@ data class Environment(
     val inputQueueName: String = getEnvVar("MQ_INPUT_QUEUE_NAME"),
     val apprecQueueName: String = getEnvVar("MQ_APPREC_QUEUE_NAME"),
     val aktoerregisterV1Url: String = getEnvVar("AKTOR_REGISTER_V1_URL"),
-    val kuhrSarApiUrl: String = getEnvVar("KUHR_SAR_API_URL", "http://kuhr-sar-api"),
+    val kuhrSarApiUrl: String = getEnvVar("KUHR_SAR_API_URL", "http://kuhr-sar-api.teamkuhr.svc.nais.local"),
     val subscriptionEndpointURL: String = getEnvVar("SUBSCRIPTION_ENDPOINT_URL"),
     val redishost: String = getEnvVar("REDIS_HOST", "padm2-redis.default.svc.nais.local"),
     val cluster: String = getEnvVar("NAIS_CLUSTER_NAME"),
