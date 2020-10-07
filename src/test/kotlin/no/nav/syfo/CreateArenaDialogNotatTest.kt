@@ -24,7 +24,7 @@ internal class CreateArenaDialogNotatTest {
     @Test
     internal fun `Tester mapping fra fellesformat til ArenaDialogNotat svar foresporsel pasient`() {
         val felleformatDm = fellesformatUnmarshaller.unmarshal(
-            StringReader(getFileAsStringISO88591("src/test/resources/dialogmelding_dialog_svar_foresporsel_om_pasient.xml"))
+            StringReader(getFileAsString("src/test/resources/dialogmelding_dialog_svar_foresporsel_om_pasient.xml"))
         ) as XMLEIFellesformat
 
         val msgHead: XMLMsgHead = felleformatDm.get()
@@ -62,7 +62,6 @@ internal class CreateArenaDialogNotatTest {
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentNavn shouldBeEqualTo "Svar på forespørsel"
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentreferanse shouldBeEqualTo "b62016eb-6c2d-417a-8ecc-157b3c5ee2ca"
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.ediLoggId shouldBeEqualTo "FiktivTestdata0001"
-        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.shouldEqual(LocalDateTime.of(2019, 1, 16, 21, 51, 35, 531000000))
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeFnr shouldBeEqualTo "21312341414"
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.tssId.shouldEqual(tssid.toBigInteger())
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.fornavn shouldBeEqualTo "Inga"
@@ -76,7 +75,6 @@ internal class CreateArenaDialogNotatTest {
         arenaDialogNotat.notatTittel shouldBeEqualTo DialogmeldingKodeverk.OVERFORING_EPJ_INFORMASJON_SVAR_PAA_FORESPORSEL_OM_PASIENT.arenaNotatTittel
         arenaDialogNotat.notatTekst shouldBeEqualTo "Pasieten har masse info her"
         arenaDialogNotat.svarReferanse shouldBeEqualTo "OD1812186729156"
-        arenaDialogNotat.notatDato.shouldEqual(LocalDateTime.of(2019, 1, 16, 21, 51, 35, 531000000))
     }
 
     @Test
