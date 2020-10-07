@@ -1,63 +1,48 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<EI_fellesformat xmlns="http://www.nav.no/xml/eiff/2/"
-                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <MsgHead xmlns="http://www.kith.no/xmlstds/msghead/2006-05-24"
-             xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+<?xml version="1.0" encoding="UTF-8"?>
+<EI_fellesformat xmlns="http://www.nav.no/xml/eiff/2/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <MsgHead xmlns="http://www.kith.no/xmlstds/msghead/2006-05-24" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <MsgInfo>
-            <Type DN="Svar på forespørsel" V="DIALOG_SVAR" />
+            <Type DN="Svar pÃ¥ forespÃ¸rsel" V="DIALOG_SVAR"/>
             <MIGversion>v1.2 2006-05-24</MIGversion>
-            <GenDate>2019-01-16T22:51:35.5317672+01:00</GenDate>
+            <GenDate>2020-09-30T18:00:31.4764563+02:00</GenDate>
             <MsgId>b62016eb-6c2d-417a-8ecc-157b3c5ee2ca</MsgId>
-            <ConversationRef>
-                <RefToParent>09d3f405-2ab1-47bc-ac5b-5ef6d58411de</RefToParent>
-                <RefToConversation>09d3f405-2ab1-47bc-ac5b-5ef6d58411de</RefToConversation>
-            </ConversationRef>
+            <Ack DN="Ja" V="J"/>
             <Sender>
                 <Organisation>
                     <OrganisationName>Kule helsetjenester AS</OrganisationName>
                     <Ident>
                         <Id>223456789</Id>
-                        <TypeId DN="Organisasjonsnummeret i Enhetsregister (Brønnøysund)" S="1.16.578.1.12.3.1.1.9051" V="ENH" />
+                        <TypeId DN="Organisasjonsnummeret i Enhetsregister" S="2.16.578.1.12.4.1.1.9051" V="ENH"/>
                     </Ident>
                     <Ident>
                         <Id>0123</Id>
-                        <TypeId DN="Identifikator fra Helsetjenesteenhetsregisteret (HER-id)" V="HER" S="1.23.456.7.89.1.2.3.4567.8912" />
+                        <TypeId DN="HER-id" S="2.16.578.1.12.4.1.1.9051" V="HER"/>
                     </Ident>
                     <Address>
+                        <Type DN="Postadresse" V="PST"/>
                         <StreetAdr>Oppdiktet gate 203</StreetAdr>
                         <PostalCode>1234</PostalCode>
                         <City>Oslo</City>
+                        <County DN="Oslo" V="0712"/>
+                        <Country DN="Norge" V="NO"/>
                     </Address>
-                    <Organisation/>
+                    <TeleCom>
+                        <TypeTelecom DN="Arbeidsplass" V="WP"/>
+                        <TeleAddress V="tel:11223344"/>
+                    </TeleCom>
                     <HealthcareProfessional>
+                        <TypeHealthcareProfessional DN="Lege" V="LE"/>
                         <FamilyName>Valda</FamilyName>
                         <MiddleName>Fos</MiddleName>
                         <GivenName>Inga</GivenName>
                         <Ident>
-                            <Id>1234</Id>
-                            <TypeId DN="Identifikator fra Helsetjenesteenhetsregisteret" S="1.16.578.1.12.4.3.1.8116" V="HER" />
-                        </Ident>
-                        <Ident>
                             <Id>1234567</Id>
-                            <TypeId DN="HPR-nummer" S="1.16.578.1.12.3.1.1.8116" V="HPR" />
+                            <TypeId DN="HPR-nummer" S="2.16.578.1.12.4.1.1.8116" V="HPR"/>
                         </Ident>
                         <Ident>
-                            <Id>04030350265</Id>
-                            <TypeId DN="Fødselsnummer" V="FNR" S="6.87.654.3.21.9.8.7.6543.2198" />
+                            <Id>1234</Id>
+                            <TypeId DN="HER-id" S="2.16.578.1.12.4.1.1.8116" V="HER"/>
                         </Ident>
-                        <Ident>
-                            <Id>45069800525</Id>
-                            <TypeId DN="D-nummer" V="DNR" S="6.16.578.1.12.4.1.4.8116" />
-                        </Ident>
-                        <Address>
-                            <StreetAdr>Oppdiktet gate 9001</StreetAdr>
-                            <PostalCode>9998</PostalCode>
-                            <City>Oppdiktet</City>
-                        </Address>
-                        <TeleCom>
-                            <TeleAddress V="98765432" />
-                            <TypeTelecom DN="Hovedtelefon" />
-                        </TeleCom>
                     </HealthcareProfessional>
                 </Organisation>
             </Sender>
@@ -66,50 +51,72 @@
                     <OrganisationName>NAV</OrganisationName>
                     <Ident>
                         <Id>889640782</Id>
-                        <TypeId DN="Organisasjonsnummeret i Enhetsregister (Brønnøysund)" S="2.16.578.1.12.4.1.1.9051" V="ENH" />
+                        <TypeId DN="Organisasjonsnummeret i Enhetsregister" S="2.16.578.1.12.4.1.1.9051" V="ENH"/>
                     </Ident>
                     <Ident>
                         <Id>79768</Id>
-                        <TypeId DN="Identifikator fra Helsetjenesteenhetsregisteret (HER-id)" S="2.16.578.1.12.4.1.1.9051" V="HER" />
+                        <TypeId DN="HER-id" S="2.16.578.1.12.4.1.1.9051" V="HER"/>
                     </Ident>
+                    <Organisation>
+                        <OrganisationName>NAV Drammen</OrganisationName>
+                        <Ident>
+                            <Id>0602</Id>
+                            <TypeId DN="Lokal identifikator for institusjoner" S="2.16.578.1.12.4.1.1.9051" V="LIN"/>
+                        </Ident>
+                    </Organisation>
                 </Organisation>
             </Receiver>
             <Patient>
                 <FamilyName>Test</FamilyName>
                 <GivenName>Etternavn</GivenName>
-                <DateOfBirth>1991-12-4</DateOfBirth>
-                <Sex DN="Mann" V="1" />
                 <Ident>
                     <Id>3143242342</Id>
-                    <TypeId DN="Fødselsnummer" S="2.16.578.1.12.4.1.1.8116" V="FNR" />
+                    <TypeId DN="FÃ¸dselsnummer" S="2.16.578.1.12.4.1.1.8116" V="FNR"/>
                 </Ident>
                 <Address>
-                    <Type DN="Postadresse" V="PST" />
+                    <Type DN="Folkeregisteradresse" V="HP"/>
                     <StreetAdr>Sannergata 2</StreetAdr>
                     <PostalCode>0655</PostalCode>
                     <City>OSLO</City>
                     <County DN="OSLO" V="0712" />
+                    <Country DN="Norge" V="NO"/>
                 </Address>
+                <TeleCom>
+                    <TypeTelecom DN="Mobiltelefon" V="MC"/>
+                    <TeleAddress V="tel:11223344"/>
+                </TeleCom>
+                <TeleCom>
+                    <TypeTelecom DN="Hjemme" V="H"/>
+                    <TeleAddress V="tel:44332211"/>
+                </TeleCom>
             </Patient>
         </MsgInfo>
         <Document>
             <RefDoc>
-                <MsgType DN="XML-instans" V="XML" />
+                <IssueDate V="2020-09-30T18:00:31"/>
+                <MsgType DN="XML-instans" V="XML"/>
                 <Content>
-                    <Dialogmelding xmlns="http://www.kith.no/xmlstds/dialog/2006-10-11"
-                                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+                    <Dialogmelding xmlns="http://www.kith.no/xmlstds/dialog/2006-10-11" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
                         <Notat>
-                            <TemaKodet DN="Svar på forespørsel" OT="Ingen" S="2.16.578.1.12.4.1.1.9069" V="5" />
+                            <TemaKodet DN="Svar pÃ¥ forespÃ¸rsel" S="2.16.578.1.12.4.1.1.9069" V="5"/>
                             <TekstNotatInnhold xsi:type="xsd:string">Pasieten har masse info her</TekstNotatInnhold>
                             <DokIdNotat>OD1812186729156</DokIdNotat>
                             <Foresporsel>
-                                <TypeForesp DN="Forespørsel om pasient" S="2.16.578.1.12.4.1.1.8129" V="1" />
+                                <TypeForesp DN="PÃ¥minnelse forespÃ¸rsel om pasient" S="2.16.578.1.12.4.1.1.8129" V="2"/>
                                 <Sporsmal>
-                                    Ønsker info om pasient
+                                    PÃ¥minnelse
+                                    Test Etternavn
+                                    Vi viser til tidligere forespÃ¸rsel angÃ¥ende din pasient.
+                                    Vi kan ikke se Ã¥ ha mottatt svar pÃ¥ vÃ¥r henvendelse og ber om at vÃ¥r anmodning om opplysninger angÃ¥ende
+                                    ovennevnte pasient besvares snarest.
+                                    Hvis opplysningene er sendt oss i lÃ¸pet av de siste dagene, kan du se bort fra dette brevet.
+                                    Med hilsen
+                                    NAV
+                                    Jon Person
                                 </Sporsmal>
                                 <DokIdForesp>OD1812186729156</DokIdForesp>
                                 <RollerRelatertNotat>
-                                    <RolleNotat S="2.16.578.1.12.4.1.1.9057" V="1" />
+                                    <RolleNotat S="2.16.578.1.12.4.1.1.9057" V="1"/>
                                     <Person>
                                         <GivenName>Jon</GivenName>
                                         <FamilyName>Person</FamilyName>
@@ -122,5 +129,5 @@
             </RefDoc>
         </Document>
     </MsgHead>
-    <MottakenhetBlokk avsender="1231341" avsenderFnrFraDigSignatur="21312341414" avsenderRef="SERIALNUMBER=988024031, CN=Sentrum Legekontor, O=SENTRUM-LEGEKONTOR ANS, C=NO" ebAction="ForesporselSvar" ebRole="Sykmelder" ebService="ForesporselFraSaksbehandler" ebXMLSamtaleId="3472642a-8920-4241-8916-641cdd9d2c3d" ediLoggId="FiktivTestdata0001" herIdentifikator="" meldingsType="xml" mottattDatotid="2019-01-16T22:51:51" partnerReferanse="676" />
+    <MottakenhetBlokk avsender="1231341" avsenderFnrFraDigSignatur="21312341414" avsenderRef="SERIALNUMBER=988024031, CN=Sentrum Legekontor, O=SENTRUM-LEGEKONTOR ANS, C=NO" ebAction="ForesporselSvar" ebRole="Sykmelder" ebService="ForesporselFraSaksbehandler" ebXMLSamtaleId="47822e21-0151-4fb1-a223-99f0aba5d51b" ediLoggId="FiktivTestdata0001" herIdentifikator="" meldingsType="xml" mottattDatotid="2020-09-30T18:02:10" partnerReferanse="12049"/>
 </EI_fellesformat>
