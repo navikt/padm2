@@ -80,7 +80,7 @@ internal class CreateArenaDialogNotatTest {
     @Test
     internal fun `Tester mapping fra fellesformat til ArenaDialogNotat svar innkalling dialogmote`() {
         val felleformatDm = fellesformatUnmarshaller.unmarshal(
-            StringReader(getFileAsStringISO88591("src/test/resources/dialogmelding_dialog_svar_innkalling_dialogmote.xml"))
+            StringReader(getFileAsString("src/test/resources/dialogmelding_dialog_svar_innkalling_dialogmote.xml"))
         ) as XMLEIFellesformat
 
         val msgHead: XMLMsgHead = felleformatDm.get()
