@@ -24,7 +24,7 @@ internal class CreateArenaDialogNotatTest {
     @Test
     internal fun `Tester mapping fra fellesformat til ArenaDialogNotat svar foresporsel pasient`() {
         val felleformatDm = fellesformatUnmarshaller.unmarshal(
-            StringReader(getFileAsStringISO88591("src/test/resources/dialogmelding_dialog_svar_foresporsel_om_pasient.xml"))
+            StringReader(getFileAsString("src/test/resources/dialogmelding_dialog_svar_foresporsel_om_pasient.xml"))
         ) as XMLEIFellesformat
 
         val msgHead: XMLMsgHead = felleformatDm.get()
@@ -62,7 +62,6 @@ internal class CreateArenaDialogNotatTest {
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentNavn shouldBeEqualTo "Svar på forespørsel"
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentreferanse shouldBeEqualTo "b62016eb-6c2d-417a-8ecc-157b3c5ee2ca"
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.ediLoggId shouldBeEqualTo "FiktivTestdata0001"
-        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.shouldEqual(LocalDateTime.of(2019, 1, 16, 21, 51, 35, 531000000))
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeFnr shouldBeEqualTo "21312341414"
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.tssId.shouldEqual(tssid.toBigInteger())
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.fornavn shouldBeEqualTo "Inga"
@@ -76,13 +75,12 @@ internal class CreateArenaDialogNotatTest {
         arenaDialogNotat.notatTittel shouldBeEqualTo DialogmeldingKodeverk.OVERFORING_EPJ_INFORMASJON_SVAR_PAA_FORESPORSEL_OM_PASIENT.arenaNotatTittel
         arenaDialogNotat.notatTekst shouldBeEqualTo "Pasieten har masse info her"
         arenaDialogNotat.svarReferanse shouldBeEqualTo "OD1812186729156"
-        arenaDialogNotat.notatDato.shouldEqual(LocalDateTime.of(2019, 1, 16, 21, 51, 35, 531000000))
     }
 
     @Test
     internal fun `Tester mapping fra fellesformat til ArenaDialogNotat svar innkalling dialogmote`() {
         val felleformatDm = fellesformatUnmarshaller.unmarshal(
-            StringReader(getFileAsStringISO88591("src/test/resources/dialogmelding_dialog_svar_innkalling_dialogmote.xml"))
+            StringReader(getFileAsString("src/test/resources/dialogmelding_dialog_svar_innkalling_dialogmote.xml"))
         ) as XMLEIFellesformat
 
         val msgHead: XMLMsgHead = felleformatDm.get()
@@ -117,10 +115,12 @@ internal class CreateArenaDialogNotatTest {
 
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentType shouldBeEqualTo "DM"
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentTypeVersjon shouldBeEqualTo "1.0"
-        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentNavn shouldBeEqualTo "Svar på forespørsel"
+        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentNavn shouldBeEqualTo "Svar p.. foresp..rsel"
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentreferanse shouldBeEqualTo "9be88bc5-4219-473e-954b-c0dd115ff4e0"
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.ediLoggId shouldBeEqualTo "1901162204amsa22108.1"
-        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.shouldEqual(LocalDateTime.of(2019, 1, 16, 21, 3, 23, 847000000))
+        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.year shouldEqual 2020
+        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.monthValue shouldEqual 9
+        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.dayOfMonth shouldEqual 21
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeFnr shouldBeEqualTo "12312414234"
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.tssId.shouldEqual(tssid.toBigInteger())
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.fornavn shouldBeEqualTo "Inga"
@@ -129,12 +129,14 @@ internal class CreateArenaDialogNotatTest {
         arenaDialogNotat.pasientData.person.personNavn.fornavn shouldBeEqualTo "Etternavn"
         arenaDialogNotat.pasientData.person.personNavn.mellomnavn shouldBeEqualTo ""
         arenaDialogNotat.pasientData.person.personNavn.etternavn shouldBeEqualTo "Test"
-        arenaDialogNotat.notatKategori shouldBeEqualTo "3"
-        arenaDialogNotat.notatKode shouldBeEqualTo "31"
-        arenaDialogNotat.notatTittel shouldBeEqualTo DialogmeldingKodeverk.HENVENDELSE_OM_PASIENT_HENVENDELSE_OM_SYKEFRAVARSOPPFOLGING.arenaNotatTittel
-        arenaDialogNotat.notatTekst shouldBeEqualTo "Jeg er klar 12.30. Mvh, Lege legsesn"
-        arenaDialogNotat.svarReferanse shouldBeEqualTo ""
-        arenaDialogNotat.notatDato.shouldEqual(LocalDateTime.of(2019, 1, 16, 21, 3, 23, 847000000))
+        arenaDialogNotat.notatKategori shouldBeEqualTo "1"
+        arenaDialogNotat.notatKode shouldBeEqualTo "11"
+        arenaDialogNotat.notatTittel shouldBeEqualTo DialogmeldingKodeverk.SVAR_PAA_INNKALLING_DIALOGMOTE_JA_JEG_KOMMER.arenaNotatTittel
+        arenaDialogNotat.notatTekst shouldBeEqualTo "Ta gjerne kontakt ang hvilket telefonnummer jeg skal ringe. Mvh Inga F. Valda."
+        arenaDialogNotat.svarReferanse shouldBeEqualTo "OD2009169905747"
+        arenaDialogNotat.notatDato.year shouldEqual 2020
+        arenaDialogNotat.notatDato.monthValue shouldEqual 9
+        arenaDialogNotat.notatDato.dayOfMonth shouldEqual 21
     }
 
     @Test

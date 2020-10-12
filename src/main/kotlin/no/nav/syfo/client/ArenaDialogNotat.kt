@@ -85,8 +85,8 @@ fun findArenaNotatKategori(dialogmelding: Dialogmelding): String {
         dialogmelding.henvendelseFraLegeHenvendelse != null -> {
             return dialogmelding.henvendelseFraLegeHenvendelse!!.teamakode.arenaNotatKategori
         }
-        dialogmelding.foresporselFraSaksbehandlerForesporselSvar != null -> {
-            return dialogmelding.foresporselFraSaksbehandlerForesporselSvar!!.teamakode.arenaNotatKategori
+        dialogmelding.innkallingMoterespons != null -> {
+            return dialogmelding.innkallingMoterespons!!.teamakode.arenaNotatKategori
         }
         else -> throw RuntimeException("Ugyldig dialogmeldingtype")
     }
@@ -100,8 +100,8 @@ fun findArenaNotatKode(dialogmelding: Dialogmelding): String {
         dialogmelding.henvendelseFraLegeHenvendelse != null -> {
             return dialogmelding.henvendelseFraLegeHenvendelse!!.teamakode.arenaNotatKode
         }
-        dialogmelding.foresporselFraSaksbehandlerForesporselSvar != null -> {
-            return dialogmelding.foresporselFraSaksbehandlerForesporselSvar!!.teamakode.arenaNotatKode
+        dialogmelding.innkallingMoterespons != null -> {
+            return dialogmelding.innkallingMoterespons!!.teamakode.arenaNotatKode
         }
         else -> throw RuntimeException("Ugyldig dialogmeldingtype")
     }
@@ -115,8 +115,8 @@ fun findArenaNotatTittel(dialogmelding: Dialogmelding): String {
         dialogmelding.henvendelseFraLegeHenvendelse != null -> {
             return dialogmelding.henvendelseFraLegeHenvendelse!!.teamakode.arenaNotatTittel
         }
-        dialogmelding.foresporselFraSaksbehandlerForesporselSvar != null -> {
-            return dialogmelding.foresporselFraSaksbehandlerForesporselSvar!!.teamakode.arenaNotatTittel
+        dialogmelding.innkallingMoterespons != null -> {
+            return dialogmelding.innkallingMoterespons!!.teamakode.arenaNotatTittel
         }
         else -> throw RuntimeException("Ugyldig dialogmeldingtype")
     }
