@@ -25,7 +25,8 @@ data class Environment(
     val arenaQueueName: String = getEnvVar("ARENA_OUTBOUND_QUEUENAME"),
     val padm2DBURL: String = getEnvVar("PADM2_DB_URL"),
     val mountPathVault: String = getEnvVar("MOUNT_PATH_VAULT"),
-    val databaseName: String = getEnvVar("DATABASE_NAME", "padm2")
+    val databaseName: String = getEnvVar("DATABASE_NAME", "padm2"),
+    val eiaQueueName: String = getEnvVar("EIA_INBOUND_MOTTAK_QUEUE_NAME")
 ) : MqConfig
 
 data class VaultSecrets(

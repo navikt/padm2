@@ -81,7 +81,8 @@ class BlockingApplicationRunner {
         backoutProducer: MessageProducer,
         journalService: JournalService,
         arenaProducer: MessageProducer,
-        database: Database
+        database: Database,
+        eiaProducer: MessageProducer
     ) {
         wrapExceptions {
             loop@ while (applicationState.ready) {
@@ -96,6 +97,9 @@ class BlockingApplicationRunner {
                         is TextMessage -> message.text
                         else -> throw RuntimeException("Incoming message needs to be a byte message or text message")
                     }
+
+                    eiaProducer.send(message)
+                    log.error("Proxying message to Eia")
 
                     val fellesformat =
                         fellesformatUnmarshaller.unmarshal(StringReader(inputMessageText)) as XMLEIFellesformat
