@@ -72,4 +72,4 @@ spec:
     - name: MOUNT_PATH_VAULT
       value: /postgresql/prod-fss
     - name: EIA_INBOUND_MOTTAK_QUEUE_NAME
-      value: QA.P414.FS06_EIA_MELDINGER
+      value: QA.P414.FS06_EIA_MELDINGER_FROM_PADM
