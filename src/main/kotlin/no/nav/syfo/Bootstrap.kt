@@ -148,6 +148,7 @@ fun launchListeners(
                 val receiptProducer = session.producerForQueue(env.apprecQueueName)
                 val backoutProducer = session.producerForQueue(env.inputBackoutQueueName)
                 val arenaProducer = session.producerForQueue(env.arenaQueueName)
+                val eiaProducer = session.producerForQueue(env.eiaQueueName)
 
                 applicationState.ready = true
                 jedis.auth(secrets.redisSecret)
@@ -157,7 +158,7 @@ fun launchListeners(
                     session, env, secrets, aktoerIdClient,
                     kuhrSarClient, subscriptionEmottak, jedis, receiptProducer,
                     padm2ReglerClient, backoutProducer, journalService,
-                    arenaProducer, database
+                    arenaProducer, database, eiaProducer
                 )
             }
         }

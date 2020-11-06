@@ -71,3 +71,5 @@ spec:
       value: jdbc:postgresql://b27dbvl013.preprod.local:5432/padm2
     - name: MOUNT_PATH_VAULT
       value: /postgresql/preprod-fss
+    - name: EIA_INBOUND_MOTTAK_QUEUE_NAME
+      value: QA.Q414.FS06_EIA_MELDINGER_FROM_PADM
