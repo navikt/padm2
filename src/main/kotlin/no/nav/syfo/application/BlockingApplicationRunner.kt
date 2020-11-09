@@ -99,7 +99,7 @@ class BlockingApplicationRunner {
                     }
 
                     eiaProducer.send(message)
-                    log.error("Proxying message to Eia")
+                    log.info("Proxying message to Eia")
 
                     val fellesformat =
                         fellesformatUnmarshaller.unmarshal(StringReader(inputMessageText)) as XMLEIFellesformat
