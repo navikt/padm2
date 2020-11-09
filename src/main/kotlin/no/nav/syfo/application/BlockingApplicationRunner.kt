@@ -99,9 +99,6 @@ class BlockingApplicationRunner {
                         else -> throw RuntimeException("Incoming message needs to be a byte message or text message")
                     }
 
-                    eiaProducer.send(message)
-                    log.info("Proxying message to Eia")
-
                     val fellesformat =
                         fellesformatUnmarshaller.unmarshal(StringReader(inputMessageText)) as XMLEIFellesformat
                     val msgHead: XMLMsgHead = fellesformat.get()
@@ -111,6 +108,12 @@ class BlockingApplicationRunner {
                     val legekontorOrgNr = extractOrganisationNumberFromSender(fellesformat)?.id
                     val personNumberPatient = msgHead.msgInfo.patient.ident.find { it.typeId.v == "FNR" }?.id
                     val personNumberDoctor = receiverBlock.avsenderFnrFraDigSignatur
+
+                    if (!personNumberDoctor.equals("01117302624")){
+                        eiaProducer.send(message)
+                        log.info("Proxying message to Eia")
+                        continue@loop
+                    }
                     val legekontorOrgName = extractSenderOrganisationName(fellesformat)
                     val legekontorHerId = extractOrganisationHerNumberFromSender(fellesformat)?.id
                     val legekontorReshId = extractOrganisationRashNumberFromSender(fellesformat)?.id
