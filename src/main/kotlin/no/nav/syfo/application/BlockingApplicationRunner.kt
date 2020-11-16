@@ -105,6 +105,9 @@ class BlockingApplicationRunner {
                     val receiverBlock = fellesformat.get<XMLMottakenhetBlokk>()
                     val ediLoggId = receiverBlock.ediLoggId
                     val msgId = msgHead.msgInfo.msgId
+
+                    log.info("Processing message with ediLoggId $ediLoggId, and msgId $msgId")
+
                     val legekontorOrgNr = extractOrganisationNumberFromSender(fellesformat)?.id
                     val personNumberPatient = msgHead.msgInfo.patient.ident.find { it.typeId.v == "FNR" }?.id
                     val personNumberDoctor = receiverBlock.avsenderFnrFraDigSignatur

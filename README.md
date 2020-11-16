@@ -128,12 +128,10 @@ Deploying redis can be done with the following command:
 
 ## Contact us
 ### Code/project related questions can be sent to
-* Joakim Kartveit, `joakim.kartveit@nav.no`
-* Andreas Nilsen, `andreas.nilsen@nav.no`
-* Sebastian Knudsen, `sebastian.knudsen@nav.no`
-* Tia Firing, `tia.firing@nav.no`
-* Jonas Henie, `jonas.henie@nav.no`
-* Mathias Hellevang, `mathias.hellevang@nav.no`
+* John Martin Lindseth, `john.martin.lindseth@nav.no`
+* June Henriksen, `june.henriksen2@nav.no`
+* Erik Gunnar Jansen, `erik.gunnar.jansen@nav.no`
+* Mathias Rørvik, `mathias.rorvik@nav.no`
 
 ### For NAV employees
-We are available at the Slack channel #team-sykmelding or #isyfo
+We are available at the Slack channel #isyfo

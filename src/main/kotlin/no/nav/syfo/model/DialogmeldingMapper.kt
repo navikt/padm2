@@ -100,8 +100,10 @@ fun XMLNotat.toForesporselFraSaksbehandlerForesporselSvar(): ForesporselFraSaksb
 
 fun XMLForesporsel.toForesporsel(): Foresporsel {
 
+    val description = typeForesp.dn?: ""
+
     return Foresporsel(
-        typeForesp = TypeForesp(typeForesp.dn, typeForesp.s, typeForesp.v),
+        typeForesp = TypeForesp(description, typeForesp.s, typeForesp.v),
         sporsmal = sporsmal,
         dokIdForesp = dokIdForesp,
         rollerRelatertNotat = if (rollerRelatertNotat.isNotEmpty()) {
