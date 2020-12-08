@@ -54,6 +54,7 @@ import no.nav.syfo.util.extractLegeHpr
 import no.nav.syfo.util.extractOrganisationHerNumberFromSender
 import no.nav.syfo.util.extractOrganisationNumberFromSender
 import no.nav.syfo.util.extractOrganisationRashNumberFromSender
+import no.nav.syfo.util.extractPasientNavn
 import no.nav.syfo.util.extractSenderOrganisationName
 import no.nav.syfo.util.extractVedlegg
 import no.nav.syfo.util.fellesformatUnmarshaller
