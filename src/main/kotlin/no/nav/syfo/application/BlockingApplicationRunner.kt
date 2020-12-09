@@ -67,6 +67,11 @@ import redis.clients.jedis.exceptions.JedisConnectionException
 
 class BlockingApplicationRunner {
 
+    val APPROVED_DOCTORS = listOf(
+        "7030843", // Vår første lege i prod
+        "1234567" // Testlege i preprod
+    )
+
     @KtorExperimentalAPI
     suspend fun run(
         applicationState: ApplicationState,
@@ -113,11 +118,6 @@ class BlockingApplicationRunner {
                     val personNumberPatient = msgHead.msgInfo.patient.ident.find { it.typeId.v == "FNR" }?.id
                     val personNumberDoctor = receiverBlock.avsenderFnrFraDigSignatur
 
-                    if (!personNumberDoctor.equals("01117302624")){
-                        eiaProducer.send(message)
-                        log.info("Proxying message to Eia")
-                        continue@loop
-                    }
                     val legekontorOrgName = extractSenderOrganisationName(fellesformat)
                     val legekontorHerId = extractOrganisationHerNumberFromSender(fellesformat)?.id
                     val legekontorReshId = extractOrganisationRashNumberFromSender(fellesformat)?.id
@@ -125,6 +125,15 @@ class BlockingApplicationRunner {
                     val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
                     val sha256String = sha256hashstring(dialogmeldingXml)
                     val legeHpr = extractLegeHpr(fellesformat)
+
+                    val approvedDoctor = isApprovedDoctor(legeHpr)
+
+                    if (!approvedDoctor) {
+                        eiaProducer.send(message)
+                        log.info("Proxying message to Eia")
+                        continue@loop
+                    }
+
                     val navnHelsePersonellNavn = extractHelsePersonellNavn(fellesformat)
                     val extractVedlegg = extractVedlegg(fellesformat)
                     val pasientNavn = extractPasientNavn(fellesformat)
@@ -347,6 +356,10 @@ class BlockingApplicationRunner {
                 }
             }
         }
+    }
+
+    fun isApprovedDoctor(legeHpr: String?): Boolean {
+        return APPROVED_DOCTORS.contains(legeHpr)
     }
 }
 

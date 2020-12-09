@@ -105,7 +105,7 @@ fun leggtilDokument(
         Dokument(
             dokumentvarianter = listOf(
                 Dokumentvarianter(
-                    filnavn = "${ediLoggId}.pdf",
+                    filnavn = "$ediLoggId.pdf",
                     filtype = "PDFA",
                     variantformat = "ARKIV",
                     fysiskDokument = pdf
