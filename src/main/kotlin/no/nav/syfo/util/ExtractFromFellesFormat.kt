@@ -49,4 +49,12 @@ fun extractHelsePersonellNavn(fellesformat: XMLEIFellesformat): String? =
                 "${fellesformat.get<XMLMsgHead>().msgInfo.sender.organisation?.healthcareProfessional?.givenName} " +
                 "${fellesformat.get<XMLMsgHead>().msgInfo.sender.organisation?.healthcareProfessional?.middleName}"
 
+fun extractPasientNavn(fellesformat: XMLEIFellesformat): String =
+    if (fellesformat.get<XMLMsgHead>().msgInfo.patient.middleName == null)
+        "${fellesformat.get<XMLMsgHead>().msgInfo.patient.familyName}, " +
+                "${fellesformat.get<XMLMsgHead>().msgInfo.patient.givenName}" else
+        "${fellesformat.get<XMLMsgHead>().msgInfo.patient.familyName}, " +
+                "${fellesformat.get<XMLMsgHead>().msgInfo.patient.givenName} " +
+                "${fellesformat.get<XMLMsgHead>().msgInfo.patient.middleName}"
+
 inline fun <reified T> XMLEIFellesformat.get() = this.any.find { it is T } as T

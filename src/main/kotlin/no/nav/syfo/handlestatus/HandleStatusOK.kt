@@ -36,14 +36,16 @@ suspend fun handleStatusOK(
     msgHead: XMLMsgHead,
     receiverBlock: XMLMottakenhetBlokk,
     dialogmelding: Dialogmelding,
-    database: Database
+    database: Database,
+    pasientNavn: String
 ) {
 
     journalService.onJournalRequest(
         receivedDialogmelding,
         validationResult,
         vedleggListe,
-        loggingMeta
+        loggingMeta,
+        pasientNavn
     )
 
     sendArenaDialogNotat(

@@ -55,6 +55,7 @@ import no.nav.syfo.util.extractLegeHpr
 import no.nav.syfo.util.extractOrganisationHerNumberFromSender
 import no.nav.syfo.util.extractOrganisationNumberFromSender
 import no.nav.syfo.util.extractOrganisationRashNumberFromSender
+import no.nav.syfo.util.extractPasientNavn
 import no.nav.syfo.util.extractSenderOrganisationName
 import no.nav.syfo.util.extractVedlegg
 import no.nav.syfo.util.fellesformatUnmarshaller
@@ -126,6 +127,7 @@ class BlockingApplicationRunner {
                     val legeHpr = extractLegeHpr(fellesformat)
                     val navnHelsePersonellNavn = extractHelsePersonellNavn(fellesformat)
                     val extractVedlegg = extractVedlegg(fellesformat)
+                    val pasientNavn = extractPasientNavn(fellesformat)
                     val vedleggListe = extractVedlegg.map { it.toVedlegg() }
 
                     val requestLatency = REQUEST_TIME.startTimer()
@@ -300,7 +302,8 @@ class BlockingApplicationRunner {
                                 msgHead,
                                 receiverBlock,
                                 dialogmelding,
-                                database
+                                database,
+                                pasientNavn
                             )
 
                             Status.INVALID -> handleStatusINVALID(
@@ -313,7 +316,8 @@ class BlockingApplicationRunner {
                                 journalService,
                                 receivedDialogmelding,
                                 vedleggListe,
-                                database
+                                database,
+                                pasientNavn
                             )
                         }
 

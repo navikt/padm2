@@ -100,7 +100,7 @@ fun XMLNotat.toForesporselFraSaksbehandlerForesporselSvar(): ForesporselFraSaksb
 
 fun XMLForesporsel.toForesporsel(): Foresporsel {
 
-    val description = typeForesp.dn?: ""
+    val description = typeForesp.dn ?: ""
 
     return Foresporsel(
         typeForesp = TypeForesp(description, typeForesp.s, typeForesp.v),
