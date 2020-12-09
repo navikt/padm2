@@ -28,9 +28,11 @@ class PdfgenClient constructor(
 fun createPdfPayload(
     dialogmelding: Dialogmelding,
     validationResult: ValidationResult,
-    pasientFnr: String
+    pasientFnr: String,
+    pasientNavn: String
 ): PdfModel = PdfModel(
     dialogmelding = dialogmelding,
     validationResult = validationResult,
-    pasientFnr = pasientFnr
+    pasientFnr = pasientFnr,
+    pasientNavn = pasientNavn
 )

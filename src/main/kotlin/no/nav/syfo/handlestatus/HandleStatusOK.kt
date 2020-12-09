@@ -35,14 +35,16 @@ suspend fun handleStatusOK(
     receiverBlock: XMLMottakenhetBlokk,
     backoutProducer: MessageProducer,
     dialogmelding: Dialogmelding,
-    database: Database
+    database: Database,
+    pasientNavn: String
 ) {
 /*
     journalService.onJournalRequest(
         receivedDialogmelding,
         validationResult,
         vedleggListe,
-        loggingMeta
+        loggingMeta,
+        pasientNavn
     )
 
  */

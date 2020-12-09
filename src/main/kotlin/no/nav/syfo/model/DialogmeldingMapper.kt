@@ -98,7 +98,7 @@ fun XMLNotat.toForesporselFraSaksbehandlerForesporselSvar(): ForesporselFraSaksb
 
 fun XMLForesporsel.toForesporsel(): Foresporsel {
 
-    val description = typeForesp.dn?: ""
+    val description = typeForesp.dn ?: ""
 
     return Foresporsel(
         typeForesp = TypeForesp(description, typeForesp.s, typeForesp.v),
@@ -110,7 +110,7 @@ fun XMLForesporsel.toForesporsel(): Foresporsel {
                     rollerRelatertNotat.first().rolleNotat.s,
                     rollerRelatertNotat.first().rolleNotat.v
                 ) } else {
-                     null
+                    null
                 },
                 person = if (rollerRelatertNotat.firstOrNull()?.person != null) {
                     Person(rollerRelatertNotat.first().person.givenName, rollerRelatertNotat.first().person.familyName)
