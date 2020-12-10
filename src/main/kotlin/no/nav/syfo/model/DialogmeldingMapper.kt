@@ -42,10 +42,12 @@ fun XMLNotat.toHenvendelseFraLegeHenvendelse(): HenvendelseFraLegeHenvendelse {
         foresporsel = foresporsel?.toForesporsel(),
         rollerRelatertNotat = if (rollerRelatertNotat.isNotEmpty()) {
             RollerRelatertNotat(
-                rolleNotat = if (rollerRelatertNotat.firstOrNull()?.person != null) { RolleNotat(
-                    rollerRelatertNotat.first().rolleNotat.s,
-                    rollerRelatertNotat.first().rolleNotat.v
-                ) } else {
+                rolleNotat = if (rollerRelatertNotat.firstOrNull()?.person != null) {
+                    RolleNotat(
+                        rollerRelatertNotat.first().rolleNotat.s,
+                        rollerRelatertNotat.first().rolleNotat.v
+                    )
+                } else {
                     null
                 },
                 person = if (rollerRelatertNotat.firstOrNull()?.person != null) {
@@ -106,10 +108,12 @@ fun XMLForesporsel.toForesporsel(): Foresporsel {
         dokIdForesp = dokIdForesp,
         rollerRelatertNotat = if (rollerRelatertNotat.isNotEmpty()) {
             RollerRelatertNotat(
-                rolleNotat = if (rollerRelatertNotat.firstOrNull()?.person != null) { RolleNotat(
-                    rollerRelatertNotat.first().rolleNotat.s,
-                    rollerRelatertNotat.first().rolleNotat.v
-                ) } else {
+                rolleNotat = if (rollerRelatertNotat.firstOrNull()?.person != null) {
+                    RolleNotat(
+                        rollerRelatertNotat.first().rolleNotat.s,
+                        rollerRelatertNotat.first().rolleNotat.v
+                    )
+                } else {
                     null
                 },
                 person = if (rollerRelatertNotat.firstOrNull()?.person != null) {

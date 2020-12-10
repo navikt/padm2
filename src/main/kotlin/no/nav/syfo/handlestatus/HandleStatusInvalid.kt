@@ -39,14 +39,14 @@ suspend fun handleStatusINVALID(
     database: Database,
     pasientNavn: String
 ) {
-    /*
+
     journalService.onJournalRequest(
         receivedDialogmelding,
         validationResult,
         vedleggListe,
         loggingMeta,
         pasientNavn
-    )*/
+    )
 
     handleRecivedMessage(receivedDialogmelding, validationResult, loggingMeta, database)
 

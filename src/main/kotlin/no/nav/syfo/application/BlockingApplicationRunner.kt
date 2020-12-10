@@ -19,6 +19,7 @@ import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.Environment
 import no.nav.syfo.VaultSecrets
 import no.nav.syfo.application.services.samhandlerParksisisLegevakt
+import no.nav.syfo.application.services.startSubscription
 import no.nav.syfo.client.AktoerIdClient
 import no.nav.syfo.client.Padm2ReglerClient
 import no.nav.syfo.client.SarClient
@@ -66,6 +67,11 @@ import redis.clients.jedis.exceptions.JedisConnectionException
 
 class BlockingApplicationRunner {
 
+    val APPROVED_DOCTORS = listOf(
+        "7030843", // Vår første lege i prod
+        "1234567" // Testlege i preprod
+    )
+
     @KtorExperimentalAPI
     suspend fun run(
         applicationState: ApplicationState,
@@ -99,9 +105,6 @@ class BlockingApplicationRunner {
                         else -> throw RuntimeException("Incoming message needs to be a byte message or text message")
                     }
 
-                    eiaProducer.send(message)
-                    log.info("Proxying message to Eia")
-
                     val fellesformat =
                         fellesformatUnmarshaller.unmarshal(StringReader(inputMessageText)) as XMLEIFellesformat
                     val msgHead: XMLMsgHead = fellesformat.get()
@@ -114,6 +117,7 @@ class BlockingApplicationRunner {
                     val legekontorOrgNr = extractOrganisationNumberFromSender(fellesformat)?.id
                     val personNumberPatient = msgHead.msgInfo.patient.ident.find { it.typeId.v == "FNR" }?.id
                     val personNumberDoctor = receiverBlock.avsenderFnrFraDigSignatur
+
                     val legekontorOrgName = extractSenderOrganisationName(fellesformat)
                     val legekontorHerId = extractOrganisationHerNumberFromSender(fellesformat)?.id
                     val legekontorReshId = extractOrganisationRashNumberFromSender(fellesformat)?.id
@@ -121,6 +125,15 @@ class BlockingApplicationRunner {
                     val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
                     val sha256String = sha256hashstring(dialogmeldingXml)
                     val legeHpr = extractLegeHpr(fellesformat)
+
+                    val approvedDoctor = isApprovedDoctor(legeHpr)
+
+                    if (!approvedDoctor) {
+                        eiaProducer.send(message)
+                        log.info("Proxying message to Eia")
+                        continue@loop
+                    }
+
                     val navnHelsePersonellNavn = extractHelsePersonellNavn(fellesformat)
                     val extractVedlegg = extractVedlegg(fellesformat)
                     val pasientNavn = extractPasientNavn(fellesformat)
@@ -174,14 +187,14 @@ class BlockingApplicationRunner {
                                 else -> if (!samhandlerParksisisLegevakt(samhandlerPraksis) &&
                                     !receiverBlock.partnerReferanse.isNullOrEmpty() &&
                                     receiverBlock.partnerReferanse.isNotBlank()
-                                ) { /*
+                                ) {
                                     startSubscription(
                                         subscriptionEmottak,
                                         samhandlerPraksis,
                                         msgHead,
                                         receiverBlock,
                                         loggingMeta
-                                    )*/
+                                    )
                                 } else {
                                     log.info(
                                         "SamhandlerPraksis is Legevakt or partnerReferanse is empty or blank, subscription_emottak is not created, {}",
@@ -297,7 +310,6 @@ class BlockingApplicationRunner {
                                 arenaProducer,
                                 msgHead,
                                 receiverBlock,
-                                backoutProducer,
                                 dialogmelding,
                                 database,
                                 pasientNavn
@@ -344,6 +356,10 @@ class BlockingApplicationRunner {
                 }
             }
         }
+    }
+
+    fun isApprovedDoctor(legeHpr: String?): Boolean {
+        return APPROVED_DOCTORS.contains(legeHpr)
     }
 }
 
