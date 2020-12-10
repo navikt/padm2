@@ -67,7 +67,10 @@ import redis.clients.jedis.exceptions.JedisConnectionException
 
 class BlockingApplicationRunner {
 
-    val APPROVED_DOCTORS = emptyList<String>()
+    val APPROVED_DOCTORS = listOf(
+        "7030843", // Vår første lege i prod
+        "1234567" // Testlege i preprod
+    )
 
     @KtorExperimentalAPI
     suspend fun run(
