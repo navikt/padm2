@@ -26,7 +26,8 @@ data class Environment(
     val padm2DBURL: String = getEnvVar("PADM2_DB_URL"),
     val mountPathVault: String = getEnvVar("MOUNT_PATH_VAULT"),
     val databaseName: String = getEnvVar("DATABASE_NAME", "padm2"),
-    val eiaQueueName: String = getEnvVar("EIA_INBOUND_MOTTAK_QUEUE_NAME")
+    val eiaQueueName: String = getEnvVar("EIA_INBOUND_MOTTAK_QUEUE_NAME"),
+    val syfohelsenettproxyEndpointURL: String = getEnvVar("HELSENETT_ENDPOINT_URL", "http://syfohelsenettproxy")
 ) : MqConfig
 
 data class VaultSecrets(

@@ -20,10 +20,7 @@ import no.nav.syfo.Environment
 import no.nav.syfo.VaultSecrets
 import no.nav.syfo.application.services.samhandlerParksisisLegevakt
 import no.nav.syfo.application.services.startSubscription
-import no.nav.syfo.client.AktoerIdClient
-import no.nav.syfo.client.Padm2ReglerClient
-import no.nav.syfo.client.SarClient
-import no.nav.syfo.client.findBestSamhandlerPraksis
+import no.nav.syfo.client.*
 import no.nav.syfo.db.Database
 import no.nav.syfo.handlestatus.handleDoctorNotFoundInAktorRegister
 import no.nav.syfo.handlestatus.handleDuplicateEdiloggid
@@ -89,7 +86,8 @@ class BlockingApplicationRunner {
         journalService: JournalService,
         arenaProducer: MessageProducer,
         database: Database,
-        eiaProducer: MessageProducer
+        eiaProducer: MessageProducer,
+        syfohelsenettproxyClient: SyfohelsenettproxyClient
     ) {
         wrapExceptions {
             loop@ while (applicationState.ready) {
