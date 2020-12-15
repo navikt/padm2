@@ -5,15 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import io.ktor.client.HttpClient
-import io.ktor.client.HttpClientConfig
-import io.ktor.client.engine.apache.Apache
-import io.ktor.client.engine.apache.ApacheEngineConfig
-import io.ktor.client.features.json.JacksonSerializer
-import io.ktor.client.features.json.JsonFeature
-import io.ktor.util.KtorExperimentalAPI
+import io.ktor.client.*
+import io.ktor.client.engine.apache.*
+import io.ktor.client.features.json.*
+import io.ktor.util.*
 import io.prometheus.client.hotspot.DefaultExports
-import javax.jms.Session
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
@@ -29,6 +25,7 @@ import no.nav.syfo.db.VaultCredentialService
 import no.nav.syfo.mq.connectionFactory
 import no.nav.syfo.mq.consumerForQueue
 import no.nav.syfo.mq.producerForQueue
+import no.nav.syfo.services.BehandlerService
 import no.nav.syfo.services.JournalService
 import no.nav.syfo.util.TrackableException
 import no.nav.syfo.util.getFileAsString
@@ -38,6 +35,7 @@ import org.apache.cxf.ws.addressing.WSAddressingFeature
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import redis.clients.jedis.Jedis
+import javax.jms.Session
 
 val objectMapper: ObjectMapper = ObjectMapper()
     .registerModule(JavaTimeModule())
@@ -94,6 +92,7 @@ fun main() {
     val syfohelsenettproxyClient = SyfohelsenettproxyClient(env.syfohelsenettproxyEndpointURL, httpClient, oidcClient)
 
     val journalService = JournalService(sakClient, dokArkivClient, pdfgenClient)
+    val behandlerService = BehandlerService(syfohelsenettproxyClient)
 
     val subscriptionEmottak = createPort<SubscriptionPort>(env.subscriptionEndpointURL) {
         proxy { features.add(WSAddressingFeature()) }
@@ -105,9 +104,11 @@ fun main() {
 
     RenewVaultService(vaultCredentialService, applicationState).startRenewTasks()
 
-    launchListeners(applicationState, env,
+    launchListeners(
+        applicationState, env,
         vaultSecrets, aktoerIdClient, sarClient,
-        subscriptionEmottak, padm2ReglerClient, journalService, database, syfohelsenettproxyClient)
+        subscriptionEmottak, padm2ReglerClient, journalService, database, behandlerService
+    )
 }
 
 fun createListener(applicationState: ApplicationState, action: suspend CoroutineScope.() -> Unit): Job =
@@ -132,7 +133,7 @@ fun launchListeners(
     padm2ReglerClient: Padm2ReglerClient,
     journalService: JournalService,
     database: Database,
-    syfohelsenettproxyClient: SyfohelsenettproxyClient
+    behandlerService: BehandlerService
 ) {
     createListener(applicationState) {
         connectionFactory(env).createConnection(secrets.mqUsername, secrets.mqPassword).use { connection ->
@@ -154,7 +155,7 @@ fun launchListeners(
                     session, env, secrets, aktoerIdClient,
                     kuhrSarClient, subscriptionEmottak, jedis, receiptProducer,
                     padm2ReglerClient, backoutProducer, journalService,
-                    arenaProducer, database, eiaProducer, syfohelsenettproxyClient
+                    arenaProducer, database, eiaProducer, behandlerService
                 )
             }
         }
