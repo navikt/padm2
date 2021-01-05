@@ -77,5 +77,7 @@ spec:
       value: QA.Q414.FS06_EIA_MELDINGER_FROM_PADM
     - name: PDF_GEN_URL
       value: https://padm2pdfgen.dev.intern.nav.no/api/v1/genpdf/padm2/padm2
+    - name: HELSENETTPROXY_ID
+      value: c18eba24-f676-47db-9a97-3c66e9304aee
     - name: AADACCESSTOKEN_URL
       value: https://login.microsoftonline.com/navq.onmicrosoft.com/oauth2/token

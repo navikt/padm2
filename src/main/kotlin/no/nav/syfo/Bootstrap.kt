@@ -104,7 +104,7 @@ fun main() {
     val dokArkivClient = DokArkivClient(env.dokArkivUrl, stsClient, httpClient)
     val pdfgenClient = PdfgenClient(env.syfopdfgen, httpClient)
     val accessTokenClient = AccessTokenClient(env.aadAccessTokenUrl, vaultSecrets.clientId, vaultSecrets.clientsecret, httpClientWithProxy)
-    val syfohelsenettproxyClient = SyfohelsenettproxyClient(env.syfohelsenettproxyEndpointURL, httpClient, oidcClient)
+    val syfohelsenettproxyClient = SyfohelsenettproxyClient(env.syfohelsenettproxyEndpointURL, accessTokenClient, env.helsenettproxyId, httpClient)
 
     val journalService = JournalService(sakClient, dokArkivClient, pdfgenClient)
     val behandlerService = BehandlerService(syfohelsenettproxyClient)

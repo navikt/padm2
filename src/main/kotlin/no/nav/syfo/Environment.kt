@@ -28,6 +28,7 @@ data class Environment(
     val databaseName: String = getEnvVar("DATABASE_NAME", "padm2"),
     val eiaQueueName: String = getEnvVar("EIA_INBOUND_MOTTAK_QUEUE_NAME"),
     val syfohelsenettproxyEndpointURL: String = getEnvVar("HELSENETT_ENDPOINT_URL", "http://syfohelsenettproxy"),
+    val helsenettproxyId: String = getEnvVar("HELSENETTPROXY_ID"),
     val aadAccessTokenUrl: String = getEnvVar("AADACCESSTOKEN_URL")
 ) : MqConfig
 

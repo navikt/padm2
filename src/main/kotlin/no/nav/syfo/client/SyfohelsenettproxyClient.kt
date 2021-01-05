@@ -18,8 +18,9 @@ import java.io.IOException
 @KtorExperimentalAPI
 class SyfohelsenettproxyClient(
     private val endpointUrl: String,
-    private val httpClient: HttpClient,
-    private val oidcClient: StsOidcClient
+    private val accessTokenClient: AccessTokenClient,
+    private val resourceId: String,
+    private val httpClient: HttpClient
 ) {
 
     suspend fun finnBehandler(
@@ -30,7 +31,7 @@ class SyfohelsenettproxyClient(
         log.info("Henter behandler fra syfohelsenettproxy for msgId {}", msgId)
         val httpStatement = httpClient.get<HttpStatement>("$endpointUrl/api/behandler") {
             accept(ContentType.Application.Json)
-            val accessToken = oidcClient.oidcToken().access_token
+            val accessToken = accessTokenClient.hentAccessToken(resourceId)
             headers {
                 append("Authorization", "Bearer $accessToken") // TODO Dette vil antakeligvis ikke funke fordi appen forventer annen autentisering.
                 append("Nav-CallId", msgId)
