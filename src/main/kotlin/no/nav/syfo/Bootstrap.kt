@@ -32,9 +32,11 @@ import no.nav.syfo.util.getFileAsString
 import no.nav.syfo.vault.RenewVaultService
 import no.nav.syfo.ws.createPort
 import org.apache.cxf.ws.addressing.WSAddressingFeature
+import org.apache.http.impl.conn.SystemDefaultRoutePlanner
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import redis.clients.jedis.Jedis
+import java.net.ProxySelector
 import javax.jms.Session
 
 val objectMapper: ObjectMapper = ObjectMapper()
@@ -59,7 +61,9 @@ fun main() {
         serviceuserUsername = getFileAsString("/secrets/serviceuser/username"),
         mqUsername = getFileAsString("/secrets/default/mqUsername"),
         mqPassword = getFileAsString("/secrets/default/mqPassword"),
-        redisSecret = getFileAsString("/secrets/default/redisSecret")
+        redisSecret = getFileAsString("/secrets/default/redisSecret"),
+        clientId = getFileAsString("/secrets/azuread/padm2/client_id"),
+        clientsecret = getFileAsString("/secrets/azuread/padm2/client_secret")
     )
 
     val applicationServer = ApplicationServer(applicationEngine, applicationState)
@@ -79,7 +83,17 @@ fun main() {
         expectSuccess = false
     }
 
+    val proxyConfig: HttpClientConfig<ApacheEngineConfig>.() -> Unit = {
+        config()
+        engine {
+            customizeClient {
+                setRoutePlanner(SystemDefaultRoutePlanner(ProxySelector.getDefault()))
+            }
+        }
+    }
+
     val httpClient = HttpClient(Apache, config)
+    val httpClientWithProxy = HttpClient(Apache, proxyConfig)
 
     val oidcClient = StsOidcClient(vaultSecrets.serviceuserUsername, vaultSecrets.serviceuserPassword)
     val aktoerIdClient = AktoerIdClient(env.aktoerregisterV1Url, oidcClient, httpClient)
@@ -89,6 +103,7 @@ fun main() {
     val sakClient = SakClient(env.opprettSakUrl, stsClient, httpClient)
     val dokArkivClient = DokArkivClient(env.dokArkivUrl, stsClient, httpClient)
     val pdfgenClient = PdfgenClient(env.syfopdfgen, httpClient)
+    val accessTokenClient = AccessTokenClient(env.aadAccessTokenUrl, vaultSecrets.clientId, vaultSecrets.clientsecret, httpClientWithProxy)
     val syfohelsenettproxyClient = SyfohelsenettproxyClient(env.syfohelsenettproxyEndpointURL, httpClient, oidcClient)
 
     val journalService = JournalService(sakClient, dokArkivClient, pdfgenClient)
