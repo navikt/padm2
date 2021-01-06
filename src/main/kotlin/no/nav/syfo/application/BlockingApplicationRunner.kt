@@ -40,8 +40,8 @@ class BlockingApplicationRunner {
 
     val APPROVED_DOCTORS = listOf(
         "7030843", // Vår første lege i prod
-        "1234567" // Testlege i preprod
-        // "9999973" // Testlege i EPIC
+        "1234567", // Testlege i preprod
+        "9999973" // Testlege i EPIC
     )
 
     @KtorExperimentalAPI
