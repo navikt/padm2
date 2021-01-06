@@ -19,7 +19,7 @@ class BehandlerService(
         return navnFraBehandler(behandler)
     }
 
-    // TODO Alle navnene er nullable, trenger vi å sjekke det, eller skal vi satse på at det er greit?
+    // TODO Alle navnefeltene er nullable, trenger vi å sjekke det, eller skal vi satse på at det er greit?
     private fun navnFraBehandler(behandler: Behandler?): String =
         when {
             behandler == null -> {

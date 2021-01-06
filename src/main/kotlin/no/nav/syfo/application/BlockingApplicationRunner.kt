@@ -122,8 +122,8 @@ class BlockingApplicationRunner {
 
                     log.info("Received message, {}", StructuredArguments.fields(loggingMeta))
 
-                    val signaturlegeNavn = behandlerService.behandlernavn(personNumberDoctor, msgId, loggingMeta)
-                    log.info("Navn på signerende lege: $signaturlegeNavn")
+                    val navnSignerendeLege = behandlerService.behandlernavn(personNumberDoctor, msgId, loggingMeta)
+                    log.info("Navn på signerende lege: $navnSignerendeLege") // TODO Denne burde fjernes før ting havner i prod
 
                     INCOMING_MESSAGE_COUNTER.inc()
 
@@ -288,7 +288,8 @@ class BlockingApplicationRunner {
                                 receiverBlock,
                                 dialogmelding,
                                 database,
-                                pasientNavn
+                                pasientNavn,
+                                navnSignerendeLege
                             )
 
                             Status.INVALID -> handleStatusINVALID(
@@ -302,7 +303,8 @@ class BlockingApplicationRunner {
                                 receivedDialogmelding,
                                 vedleggListe,
                                 database,
-                                pasientNavn
+                                pasientNavn,
+                                navnSignerendeLege
                             )
                         }
 

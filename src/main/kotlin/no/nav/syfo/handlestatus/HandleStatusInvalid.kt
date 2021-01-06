@@ -37,7 +37,8 @@ suspend fun handleStatusINVALID(
     receivedDialogmelding: ReceivedDialogmelding,
     vedleggListe: List<Vedlegg>?,
     database: Database,
-    pasientNavn: String
+    pasientNavn: String,
+    navnSignerendeLege: String
 ) {
 
     journalService.onJournalRequest(
@@ -45,7 +46,8 @@ suspend fun handleStatusINVALID(
         validationResult,
         vedleggListe,
         loggingMeta,
-        pasientNavn
+        pasientNavn,
+        navnSignerendeLege
     )
 
     handleRecivedMessage(receivedDialogmelding, validationResult, loggingMeta, database)

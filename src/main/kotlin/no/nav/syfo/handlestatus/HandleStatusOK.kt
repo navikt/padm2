@@ -37,7 +37,8 @@ suspend fun handleStatusOK(
     receiverBlock: XMLMottakenhetBlokk,
     dialogmelding: Dialogmelding,
     database: Database,
-    pasientNavn: String
+    pasientNavn: String,
+    navnSignerendeLege: String
 ) {
 
     journalService.onJournalRequest(
@@ -45,7 +46,8 @@ suspend fun handleStatusOK(
         validationResult,
         vedleggListe,
         loggingMeta,
-        pasientNavn
+        pasientNavn,
+        navnSignerendeLege
     )
 
     sendArenaDialogNotat(

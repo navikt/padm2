@@ -33,7 +33,7 @@ class SyfohelsenettproxyClient(
             accept(ContentType.Application.Json)
             val accessToken = accessTokenClient.hentAccessToken(resourceId)
             headers {
-                append("Authorization", "Bearer $accessToken") // TODO Dette vil antakeligvis ikke funke fordi appen forventer annen autentisering.
+                append("Authorization", "Bearer $accessToken")
                 append("Nav-CallId", msgId)
                 append("behandlerFnr", behandlerFnr)
             }
