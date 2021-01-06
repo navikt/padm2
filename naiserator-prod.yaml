@@ -42,6 +42,7 @@ spec:
         mountPath: /secrets/serviceuser
       - kvPath: /azuread/data/prod/creds/padm2
         mountPath: /secrets/azuread/padm2
+  webproxy: true
   ingresses:
     - "https://padm2.nais.adeo.no"
   env:
