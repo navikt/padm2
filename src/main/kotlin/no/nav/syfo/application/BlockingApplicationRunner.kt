@@ -40,6 +40,9 @@ class BlockingApplicationRunner {
 
     val APPROVED_DOCTORS = listOf(
         "7030843", // Vår første lege i prod
+        "7070896", // Prodlege
+        "9682414", // Prodlege
+        "7617046", // Prodlege
         "1234567", // Testlege i preprod
         "9999973" // Testlege i EPIC
     )
