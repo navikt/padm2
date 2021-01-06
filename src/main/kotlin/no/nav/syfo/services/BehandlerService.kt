@@ -16,14 +16,16 @@ class BehandlerService(
     ): String {
         val behandler = syfohelsenettproxyClient.finnBehandler(behandlerFnr, msgId, loggingMeta)
 
-        return navnFraBehandler(behandler)
+        return navnFraBehandler(behandler, behandlerFnr)
     }
 
-    // TODO Alle navnefeltene er nullable, trenger vi å sjekke det, eller skal vi satse på at det er greit?
-    private fun navnFraBehandler(behandler: Behandler?): String =
+    private fun navnFraBehandler(behandler: Behandler?, behandlerFnr: String): String =
         when {
             behandler == null -> {
-                "Fant ikke navn" // TODO Dette må feile, fordi det betyr at personen ikke finnes i hpr. Da kommer den vel til å få status INVALID fra padm2regler, og det er kanskje mest naturlig at vi kjører løpet som vanlig, og får en INVALID-status til bruker til slutt?
+                behandlerFnr
+            }
+            behandler.fornavn == null && behandler.mellomnavn == null && behandler.etternavn == null -> {
+                behandlerFnr
             }
             behandler.mellomnavn == null -> {
                 "${behandler.etternavn}, ${behandler.fornavn}"
