@@ -43,7 +43,7 @@ fun extractLegeHpr(fellesformat: XMLEIFellesformat): String? =
 
 fun extractHelsePersonellNavn(fellesformat: XMLEIFellesformat): String? =
     if (fellesformat.get<XMLMsgHead>().msgInfo.sender.organisation?.healthcareProfessional?.middleName == null)
-        "${fellesformat.get<XMLMsgHead>().msgInfo.sender.organisation?.healthcareProfessional?.familyName} " +
+        "${fellesformat.get<XMLMsgHead>().msgInfo.sender.organisation?.healthcareProfessional?.familyName}, " +
                 "${fellesformat.get<XMLMsgHead>().msgInfo.sender.organisation?.healthcareProfessional?.givenName}" else
         "${fellesformat.get<XMLMsgHead>().msgInfo.sender.organisation?.healthcareProfessional?.familyName} " +
                 "${fellesformat.get<XMLMsgHead>().msgInfo.sender.organisation?.healthcareProfessional?.givenName} " +

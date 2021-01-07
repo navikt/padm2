@@ -40,6 +40,9 @@ spec:
         mountPath: /secrets/default
       - kvPath: serviceuser/data/prod/srvpadm2
         mountPath: /secrets/serviceuser
+      - kvPath: /azuread/data/prod/creds/padm2
+        mountPath: /secrets/azuread/padm2
+  webproxy: true
   ingresses:
     - "https://padm2.nais.adeo.no"
   env:
@@ -75,3 +78,7 @@ spec:
       value: QA.P414.FS06_EIA_MELDINGER_FROM_PADM
     - name: PDF_GEN_URL
       value: https://padm2pdfgen.intern.nav.no/api/v1/genpdf/padm2/padm2
+    - name: HELSENETTPROXY_ID
+      value: b813133d-82b8-46ef-be96-3b903ea6c048
+    - name: AADACCESSTOKEN_URL
+      value: https://login.microsoftonline.com/navno.onmicrosoft.com/oauth2/token

@@ -1,13 +1,6 @@
 package no.nav.syfo.application
 
-import io.ktor.util.KtorExperimentalAPI
-import java.io.StringReader
-import java.time.ZoneOffset
-import java.util.UUID
-import javax.jms.MessageConsumer
-import javax.jms.MessageProducer
-import javax.jms.Session
-import javax.jms.TextMessage
+import io.ktor.util.*
 import kotlinx.coroutines.delay
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.emottak.subscription.SubscriptionPort
@@ -20,56 +13,38 @@ import no.nav.syfo.Environment
 import no.nav.syfo.VaultSecrets
 import no.nav.syfo.application.services.samhandlerParksisisLegevakt
 import no.nav.syfo.application.services.startSubscription
-import no.nav.syfo.client.AktoerIdClient
-import no.nav.syfo.client.Padm2ReglerClient
-import no.nav.syfo.client.SarClient
-import no.nav.syfo.client.findBestSamhandlerPraksis
+import no.nav.syfo.client.*
 import no.nav.syfo.db.Database
-import no.nav.syfo.handlestatus.handleDoctorNotFoundInAktorRegister
-import no.nav.syfo.handlestatus.handleDuplicateEdiloggid
-import no.nav.syfo.handlestatus.handleDuplicateSM2013Content
-import no.nav.syfo.handlestatus.handleInvalidDialogMeldingKodeverk
-import no.nav.syfo.handlestatus.handleMeldingsTekstMangler
-import no.nav.syfo.handlestatus.handlePatientNotFound
-import no.nav.syfo.handlestatus.handlePatientNotFoundInAktorRegister
-import no.nav.syfo.handlestatus.handleStatusINVALID
-import no.nav.syfo.handlestatus.handleStatusOK
-import no.nav.syfo.handlestatus.handleTestFnrInProd
+import no.nav.syfo.handlestatus.*
 import no.nav.syfo.log
 import no.nav.syfo.metrics.INCOMING_MESSAGE_COUNTER
 import no.nav.syfo.metrics.REQUEST_TIME
-import no.nav.syfo.model.DialogmeldingType
-import no.nav.syfo.model.ReceivedDialogmelding
-import no.nav.syfo.model.Status
-import no.nav.syfo.model.Vedlegg
-import no.nav.syfo.model.findDialogmeldingType
-import no.nav.syfo.model.toDialogmelding
+import no.nav.syfo.model.*
+import no.nav.syfo.services.BehandlerService
 import no.nav.syfo.services.JournalService
 import no.nav.syfo.services.sha256hashstring
 import no.nav.syfo.services.updateRedis
-import no.nav.syfo.util.LoggingMeta
-import no.nav.syfo.util.erTestFnr
-import no.nav.syfo.util.extractDialogmelding
-import no.nav.syfo.util.extractHelsePersonellNavn
-import no.nav.syfo.util.extractLegeHpr
-import no.nav.syfo.util.extractOrganisationHerNumberFromSender
-import no.nav.syfo.util.extractOrganisationNumberFromSender
-import no.nav.syfo.util.extractOrganisationRashNumberFromSender
-import no.nav.syfo.util.extractPasientNavn
-import no.nav.syfo.util.extractSenderOrganisationName
-import no.nav.syfo.util.extractVedlegg
-import no.nav.syfo.util.fellesformatUnmarshaller
-import no.nav.syfo.util.get
-import no.nav.syfo.util.wrapExceptions
+import no.nav.syfo.util.*
 import no.nav.syfo.validation.validateDialogMeldingKodeverk
 import redis.clients.jedis.Jedis
 import redis.clients.jedis.exceptions.JedisConnectionException
+import java.io.StringReader
+import java.time.ZoneOffset
+import java.util.*
+import javax.jms.MessageConsumer
+import javax.jms.MessageProducer
+import javax.jms.Session
+import javax.jms.TextMessage
 
 class BlockingApplicationRunner {
 
     val APPROVED_DOCTORS = listOf(
         "7030843", // Vår første lege i prod
-        "1234567" // Testlege i preprod
+        "7070896", // Prodlege
+        "9682414", // Prodlege
+        "7617046", // Prodlege
+        "1234567", // Testlege i preprod
+        "9999973" // Testlege i EPIC
     )
 
     @KtorExperimentalAPI
@@ -89,7 +64,8 @@ class BlockingApplicationRunner {
         journalService: JournalService,
         arenaProducer: MessageProducer,
         database: Database,
-        eiaProducer: MessageProducer
+        eiaProducer: MessageProducer,
+        behandlerService: BehandlerService
     ) {
         wrapExceptions {
             loop@ while (applicationState.ready) {
@@ -148,6 +124,8 @@ class BlockingApplicationRunner {
                     )
 
                     log.info("Received message, {}", StructuredArguments.fields(loggingMeta))
+
+                    val navnSignerendeLege = behandlerService.behandlernavn(personNumberDoctor, msgId, loggingMeta)
 
                     INCOMING_MESSAGE_COUNTER.inc()
 
@@ -312,7 +290,8 @@ class BlockingApplicationRunner {
                                 receiverBlock,
                                 dialogmelding,
                                 database,
-                                pasientNavn
+                                pasientNavn,
+                                navnSignerendeLege
                             )
 
                             Status.INVALID -> handleStatusINVALID(
@@ -326,7 +305,8 @@ class BlockingApplicationRunner {
                                 receivedDialogmelding,
                                 vedleggListe,
                                 database,
-                                pasientNavn
+                                pasientNavn,
+                                navnSignerendeLege
                             )
                         }
 

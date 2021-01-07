@@ -25,7 +25,8 @@ class JournalService(
         validationResult: ValidationResult,
         vedleggListe: List<Vedlegg>?,
         loggingMeta: LoggingMeta,
-        pasientNavn: String
+        pasientNavn: String,
+        navnSignerendeLege: String
     ) {
             log.info("Prover aa lagre i Joark {}", StructuredArguments.fields(loggingMeta))
 
@@ -36,7 +37,8 @@ class JournalService(
                 receivedDialogmelding.dialogmelding,
                 validationResult,
                 receivedDialogmelding.personNrPasient,
-                pasientNavn)
+                pasientNavn,
+                navnSignerendeLege)
             val pdf = pdfgenClient.createPdf(pdfPayload)
             log.info("PDF generert {}", StructuredArguments.fields(loggingMeta))
 
