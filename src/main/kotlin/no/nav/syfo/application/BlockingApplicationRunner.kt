@@ -18,6 +18,7 @@ import no.nav.syfo.db.Database
 import no.nav.syfo.handlestatus.*
 import no.nav.syfo.log
 import no.nav.syfo.metrics.INCOMING_MESSAGE_COUNTER
+import no.nav.syfo.metrics.MESSAGES_SENT_TO_BOQ
 import no.nav.syfo.metrics.REQUEST_TIME
 import no.nav.syfo.model.*
 import no.nav.syfo.services.BehandlerService
@@ -328,9 +329,11 @@ class BlockingApplicationRunner {
                         jedisException
                     )
                     backoutProducer.send(message)
+                    MESSAGES_SENT_TO_BOQ.inc()
                     log.error("Setting applicationState.alive to false")
                     applicationState.alive = false
                 } catch (e: Exception) {
+                    MESSAGES_SENT_TO_BOQ.inc()
                     log.error("Exception caught while handling message, sending to backout, {}", e)
                     backoutProducer.send(message)
                 }
