@@ -105,11 +105,11 @@ class BlockingApplicationRunner {
 
                     val approvedDoctor = isApprovedDoctor(legeHpr)
 
-                    if (!approvedDoctor) {
+                    /*if (!approvedDoctor) {
                         eiaProducer.send(message)
                         log.info("Proxying message to Eia")
                         continue@loop
-                    }
+                    }*/
 
                     val navnHelsePersonellNavn = extractHelsePersonellNavn(fellesformat)
                     val extractVedlegg = extractVedlegg(fellesformat)
