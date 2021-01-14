@@ -113,6 +113,11 @@ class BlockingApplicationRunner {
 
                     val navnHelsePersonellNavn = extractHelsePersonellNavn(fellesformat)
                     val extractVedlegg = extractVedlegg(fellesformat)
+
+                    if (!extractVedlegg.isEmpty()){
+                        log.info("Dialogmelding has vedlegg")
+                    }
+
                     val pasientNavn = extractPasientNavn(fellesformat)
                     val vedleggListe = extractVedlegg.map { it.toVedlegg() }
 
