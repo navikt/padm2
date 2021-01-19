@@ -1,10 +1,12 @@
 package no.nav.syfo.client
 
 import io.ktor.client.HttpClient
+import io.ktor.client.call.*
 import io.ktor.client.request.accept
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
-import io.ktor.http.ContentType
+import io.ktor.client.statement.*
+import io.ktor.http.*
 import io.ktor.util.KtorExperimentalAPI
 import java.util.Date
 import kotlin.math.max
@@ -15,6 +17,7 @@ import no.nav.syfo.log
 import no.nav.syfo.model.SamhandlerPraksisType
 import no.nav.syfo.util.LoggingMeta
 import org.apache.commons.text.similarity.LevenshteinDistance
+import java.io.IOException
 
 @KtorExperimentalAPI
 class SarClient(
@@ -22,9 +25,13 @@ class SarClient(
     private val httpClient: HttpClient
 ) {
     suspend fun getSamhandler(ident: String): List<Samhandler> = retry("get_samhandler") {
-        httpClient.get<List<Samhandler>>("$endpointUrl/rest/sar/samh") {
+        val response: HttpResponse = httpClient.get("$endpointUrl/rest/sar/samh") {
             accept(ContentType.Application.Json)
             parameter("ident", ident)
+        }
+        when(response.status) {
+            HttpStatusCode.OK -> response.receive()
+            else -> throw IOException("Vi fikk en uventet feil fra kuhrSar, prøver på nytt! ${response.content}")
         }
     }
 }
