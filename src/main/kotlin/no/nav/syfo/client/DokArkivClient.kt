@@ -121,29 +121,32 @@ fun leggtilDokument(
         )
     )
     if (!vedleggListe.isNullOrEmpty()) {
-        val listDokumentvarianter = ArrayList<Dokumentvarianter>()
+        val listVedleggDokumenter = ArrayList<Dokument>()
         vedleggListe.map {
-            listDokumentvarianter.add(
-                Dokumentvarianter(
-                    filtype = findFiltype(it),
-                    filnavn = when (it.beskrivelse.length >= 200) {
-                        true -> "${it.beskrivelse.substring(0, 199)}.${findFiltype(it).toLowerCase()}"
-                        else -> "${it.beskrivelse}.${findFiltype(it).toLowerCase()}"
-                    },
-                    variantformat = when (it.mimeType == "application/pdf") {
-                        true -> "ARKIV"
-                        else -> "ORIGINAL"
-                    },
-                    fysiskDokument = it.contentBase64
+            listVedleggDokumenter.add(
+                Dokument(
+                    dokumentvarianter = listOf(
+                        Dokumentvarianter(
+                            filtype = findFiltype(it),
+                            filnavn = when (it.beskrivelse.length >= 200) {
+                                true -> "${it.beskrivelse.substring(0, 199)}.${findFiltype(it).toLowerCase()}"
+                                else -> "${it.beskrivelse}.${findFiltype(it).toLowerCase()}"
+                            },
+                            variantformat = when (it.mimeType == "application/pdf") {
+                                true -> "ARKIV"
+                                else -> "ORIGINAL"
+                            },
+                            fysiskDokument = it.contentBase64
+                        )
+                    ),
+                    tittel = "Vedlegg til dialogmelding"
                 )
             )
         }
-        listDokument.add(
-            Dokument(
-                dokumentvarianter = listDokumentvarianter,
-                tittel = "Vedlegg til dialogmelding"
-            )
-        )
+
+        listVedleggDokumenter.map { vedlegg ->
+            listDokument.add(vedlegg)
+        }
     }
 
     return listDokument
