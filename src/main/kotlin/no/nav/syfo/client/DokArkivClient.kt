@@ -95,7 +95,7 @@ fun createJournalpostPayload(
 fun leggtilDokument(
     ediLoggId: String,
     dialogmelding: Dialogmelding,
-    pdf: ByteArray,
+    dialogmeldingPDF: ByteArray,
     validationResult: ValidationResult,
     signaturDato: LocalDateTime,
     vedleggListe: List<Vedlegg>?
@@ -108,7 +108,7 @@ fun leggtilDokument(
                     filnavn = "$ediLoggId.pdf",
                     filtype = "PDFA",
                     variantformat = "ARKIV",
-                    fysiskDokument = pdf
+                    fysiskDokument = dialogmeldingPDF
                 ),
                 Dokumentvarianter(
                     filnavn = "Dialogmelding Original",
