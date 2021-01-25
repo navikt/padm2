@@ -89,7 +89,7 @@ fun createJournalpostPayload(
         arkivsaksystem = "GSAK"
     ),
     tema = "OPP",
-    tittel = createTittleJournalpost(validationResult, signaturDato)
+    tittel = createTitleJournalpost(validationResult, signaturDato)
 )
 
 fun leggtilDokument(
@@ -117,7 +117,7 @@ fun leggtilDokument(
                     fysiskDokument = objectMapper.writeValueAsBytes(dialogmelding)
                 )
             ),
-            tittel = createTittleJournalpost(validationResult, signaturDato)
+            tittel = createTitleJournalpost(validationResult, signaturDato)
         )
     )
     if (!vedleggListe.isNullOrEmpty()) {
@@ -171,7 +171,7 @@ fun createAvsenderMottakerNotValidFnr(dialogmelding: Dialogmelding): AvsenderMot
     navn = dialogmelding.navnHelsepersonell
 )
 
-fun createTittleJournalpost(validationResult: ValidationResult, signaturDato: LocalDateTime): String {
+fun createTitleJournalpost(validationResult: ValidationResult, signaturDato: LocalDateTime): String {
     return if (validationResult.status == Status.INVALID) {
         "Avvist Dialogmelding ${formaterDato(signaturDato)}"
     } else {
