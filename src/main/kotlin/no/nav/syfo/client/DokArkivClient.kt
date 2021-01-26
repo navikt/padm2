@@ -26,7 +26,10 @@ import no.nav.syfo.model.ValidationResult
 import no.nav.syfo.model.Vedlegg
 import no.nav.syfo.objectMapper
 import no.nav.syfo.util.LoggingMeta
+import no.nav.syfo.util.ImageToPDF
 import no.nav.syfo.validation.validatePersonAndDNumber
+import java.io.ByteArrayOutputStream
+
 
 @KtorExperimentalAPI
 class DokArkivClient(
@@ -122,7 +125,9 @@ fun leggtilDokument(
     )
     if (!vedleggListe.isNullOrEmpty()) {
         val listVedleggDokumenter = ArrayList<Dokument>()
-        vedleggListe.map {
+        vedleggListe
+            .map { vedlegg -> vedleggToPDF(vedlegg) }
+            .map {
             listVedleggDokumenter.add(
                 Dokument(
                     dokumentvarianter = listOf(
@@ -148,6 +153,23 @@ fun leggtilDokument(
 
     return listDokument
 }
+
+fun vedleggToPDF(vedlegg: Vedlegg): Vedlegg {
+    if (findFiltype(vedlegg) == "PDFA") return vedlegg
+
+    val image =
+        ByteArrayOutputStream().use { outputStream ->
+            ImageToPDF(vedlegg.contentBase64.inputStream(), outputStream)
+            outputStream.toByteArray()
+        }
+
+    return Vedlegg(
+        "application/pdf",
+        vedlegg.beskrivelse,
+        image
+    )
+}
+
 
 fun findFiltype(vedlegg: Vedlegg): String =
     when (vedlegg.mimeType) {
