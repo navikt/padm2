@@ -127,15 +127,12 @@ fun leggtilDokument(
                 Dokument(
                     dokumentvarianter = listOf(
                         Dokumentvarianter(
-                            filtype = findFiltype(it),
+                            filtype = "PDFA", // Markerer alle filer som type "PDFA" for at Joark skal godta at de får variantformat "ARKIV"
                             filnavn = when (it.beskrivelse.length >= 200) {
                                 true -> "${it.beskrivelse.substring(0, 199)}.${findFiltype(it).toLowerCase()}"
                                 else -> "${it.beskrivelse}.${findFiltype(it).toLowerCase()}"
                             },
-                            variantformat = when (it.mimeType == "application/pdf") {
-                                true -> "ARKIV"
-                                else -> "ORIGINAL"
-                            },
+                            variantformat = "ARKIV",
                             fysiskDokument = it.contentBase64
                         )
                     ),
