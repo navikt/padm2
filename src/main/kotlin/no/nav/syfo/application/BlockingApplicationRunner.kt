@@ -39,15 +39,6 @@ import javax.jms.TextMessage
 
 class BlockingApplicationRunner {
 
-    val APPROVED_DOCTORS = listOf(
-        "7030843", // Vår første lege i prod
-        "7070896", // Prodlege
-        "9682414", // Prodlege
-        "7617046", // Prodlege
-        "1234567", // Testlege i preprod
-        "9999973" // Testlege i EPIC
-    )
-
     @KtorExperimentalAPI
     suspend fun run(
         applicationState: ApplicationState,
@@ -102,14 +93,6 @@ class BlockingApplicationRunner {
                     val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
                     val sha256String = sha256hashstring(dialogmeldingXml)
                     val legeHpr = extractLegeHpr(fellesformat)
-
-                    val approvedDoctor = isApprovedDoctor(legeHpr)
-
-                    /*if (!approvedDoctor) {
-                        eiaProducer.send(message)
-                        log.info("Proxying message to Eia")
-                        continue@loop
-                    }*/
 
                     val navnHelsePersonellNavn = extractHelsePersonellNavn(fellesformat)
                     val extractVedlegg = extractVedlegg(fellesformat)
@@ -346,9 +329,6 @@ class BlockingApplicationRunner {
         }
     }
 
-    fun isApprovedDoctor(legeHpr: String?): Boolean {
-        return APPROVED_DOCTORS.contains(legeHpr)
-    }
 }
 
 fun XMLDocument.toVedlegg(): Vedlegg {

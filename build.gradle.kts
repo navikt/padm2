@@ -98,6 +98,7 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
 
     implementation("org.apache.commons:commons-text:$commonsTextVersion")
+    implementation("org.apache.pdfbox:pdfbox:2.0.22")
 
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashEncoderVersion")

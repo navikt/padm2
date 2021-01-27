@@ -26,7 +26,10 @@ import no.nav.syfo.model.ValidationResult
 import no.nav.syfo.model.Vedlegg
 import no.nav.syfo.objectMapper
 import no.nav.syfo.util.LoggingMeta
+import no.nav.syfo.util.ImageToPDF
 import no.nav.syfo.validation.validatePersonAndDNumber
+import java.io.ByteArrayOutputStream
+
 
 @KtorExperimentalAPI
 class DokArkivClient(
@@ -89,13 +92,13 @@ fun createJournalpostPayload(
         arkivsaksystem = "GSAK"
     ),
     tema = "OPP",
-    tittel = createTittleJournalpost(validationResult, signaturDato)
+    tittel = createTitleJournalpost(validationResult, signaturDato)
 )
 
 fun leggtilDokument(
     ediLoggId: String,
     dialogmelding: Dialogmelding,
-    pdf: ByteArray,
+    dialogmeldingPDF: ByteArray,
     validationResult: ValidationResult,
     signaturDato: LocalDateTime,
     vedleggListe: List<Vedlegg>?
@@ -108,7 +111,7 @@ fun leggtilDokument(
                     filnavn = "$ediLoggId.pdf",
                     filtype = "PDFA",
                     variantformat = "ARKIV",
-                    fysiskDokument = pdf
+                    fysiskDokument = dialogmeldingPDF
                 ),
                 Dokumentvarianter(
                     filnavn = "Dialogmelding Original",
@@ -117,37 +120,58 @@ fun leggtilDokument(
                     fysiskDokument = objectMapper.writeValueAsBytes(dialogmelding)
                 )
             ),
-            tittel = createTittleJournalpost(validationResult, signaturDato)
+            tittel = createTitleJournalpost(validationResult, signaturDato)
         )
     )
     if (!vedleggListe.isNullOrEmpty()) {
-        val listDokumentvarianter = ArrayList<Dokumentvarianter>()
-        vedleggListe.map {
-            listDokumentvarianter.add(
-                Dokumentvarianter(
-                    filtype = findFiltype(it),
-                    filnavn = when (it.beskrivelse.length >= 200) {
-                        true -> "${it.beskrivelse.substring(0, 199)}.${findFiltype(it).toLowerCase()}"
-                        else -> "${it.beskrivelse}.${findFiltype(it).toLowerCase()}"
-                    },
-                    variantformat = when (it.mimeType == "application/pdf") {
-                        true -> "ARKIV"
-                        else -> "ORIGINAL"
-                    },
-                    fysiskDokument = it.contentBase64
+        val listVedleggDokumenter = ArrayList<Dokument>()
+        vedleggListe
+            .map { vedlegg -> vedleggToPDF(vedlegg) }
+            .map {
+            listVedleggDokumenter.add(
+                Dokument(
+                    dokumentvarianter = listOf(
+                        Dokumentvarianter(
+                            filtype = findFiltype(it),
+                            filnavn = when (it.beskrivelse.length >= 200) {
+                                true -> "${it.beskrivelse.substring(0, 199)}.${findFiltype(it).toLowerCase()}"
+                                else -> "${it.beskrivelse}.${findFiltype(it).toLowerCase()}"
+                            },
+                            variantformat = "ARKIV",
+                            fysiskDokument = it.contentBase64
+                        )
+                    ),
+                    tittel = "Vedlegg til dialogmelding"
                 )
             )
         }
-        listDokument.add(
-            Dokument(
-                dokumentvarianter = listDokumentvarianter,
-                tittel = "Vedlegg til dialogmelding"
-            )
-        )
+
+        listVedleggDokumenter.map { vedlegg ->
+            listDokument.add(vedlegg)
+        }
     }
 
     return listDokument
 }
+
+fun vedleggToPDF(vedlegg: Vedlegg): Vedlegg {
+    if (findFiltype(vedlegg) == "PDFA") return vedlegg
+
+    log.info("Converting vedlegg of type ${vedlegg.mimeType} to PDFA")
+
+    val image =
+        ByteArrayOutputStream().use { outputStream ->
+            ImageToPDF(vedlegg.contentBase64.inputStream(), outputStream)
+            outputStream.toByteArray()
+        }
+
+    return Vedlegg(
+        "application/pdf",
+        vedlegg.beskrivelse,
+        image
+    )
+}
+
 
 fun findFiltype(vedlegg: Vedlegg): String =
     when (vedlegg.mimeType) {
@@ -171,7 +195,7 @@ fun createAvsenderMottakerNotValidFnr(dialogmelding: Dialogmelding): AvsenderMot
     navn = dialogmelding.navnHelsepersonell
 )
 
-fun createTittleJournalpost(validationResult: ValidationResult, signaturDato: LocalDateTime): String {
+fun createTitleJournalpost(validationResult: ValidationResult, signaturDato: LocalDateTime): String {
     return if (validationResult.status == Status.INVALID) {
         "Avvist Dialogmelding ${formaterDato(signaturDato)}"
     } else {
