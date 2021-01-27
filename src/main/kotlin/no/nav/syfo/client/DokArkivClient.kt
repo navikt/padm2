@@ -157,6 +157,8 @@ fun leggtilDokument(
 fun vedleggToPDF(vedlegg: Vedlegg): Vedlegg {
     if (findFiltype(vedlegg) == "PDFA") return vedlegg
 
+    log.info("Converting vedlegg of type ${vedlegg.mimeType} to PDFA")
+
     val image =
         ByteArrayOutputStream().use { outputStream ->
             ImageToPDF(vedlegg.contentBase64.inputStream(), outputStream)
