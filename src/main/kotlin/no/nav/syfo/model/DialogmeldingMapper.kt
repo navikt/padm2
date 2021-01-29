@@ -39,7 +39,7 @@ fun XMLNotat.toHenvendelseFraLegeHenvendelse(): HenvendelseFraLegeHenvendelse {
         teamakode = temaKodet.toTeamakode(),
         tekstNotatInnhold = tekstNotatInnhold.toString(),
         dokIdNotat = dokIdNotat,
-        foresporsel = foresporsel?.toForesporsel(),
+        foresporsel = null, // Ignore because EPJ send incorrect data and we don't use it
         rollerRelatertNotat = if (rollerRelatertNotat.isNotEmpty()) {
             RollerRelatertNotat(
                 rolleNotat = if (rollerRelatertNotat.firstOrNull()?.person != null) {

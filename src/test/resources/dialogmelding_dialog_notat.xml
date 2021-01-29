@@ -100,6 +100,14 @@
                             <TekstNotatInnhold xsi:type="xsd:string">Hei,Det gjelder pas. Sender som vedlegg epikrisen</TekstNotatInnhold>
                             <DokIdNotat>A1578B81-0042-453B-8527-6CF182BDA6C7</DokIdNotat>
                             <DatoNotat>2019-01-16</DatoNotat>
+                            <Foresporsel>
+                                <TypeForesp DN="Påminnelse forespørsel om pasient" S="2.16.578.1.12.4.1.1.8129" V="2"/>
+                                <Sporsmal>
+                                    The Foresporsel tag including content is currently ignored if the dialogmelding is
+                                    of type dialog_notat/henvendelse fra lege. This is necessary because EPJs were
+                                    allowed to send incorrect XML to previous system EIA.
+                                </Sporsmal>
+                            </Foresporsel>
                         </Notat>
                     </Dialogmelding>
                 </Content>
