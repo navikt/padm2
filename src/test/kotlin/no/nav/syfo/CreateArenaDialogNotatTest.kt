@@ -84,16 +84,16 @@ internal class CreateArenaDialogNotatTest {
 
     @Test
     internal fun `Default to 0 when tss id is empty string`() {
-        val healthcareProfessional =  XMLHealthcareProfessional()
-        val avsender = createAvsenderLege(FASTLEGE_FNR,"", healthcareProfessional)
+        val healthcareProfessional = XMLHealthcareProfessional()
+        val avsender = createAvsenderLege(FASTLEGE_FNR, "", healthcareProfessional)
         avsender.lege.legeFnr shouldBeEqualTo FASTLEGE_FNR
         avsender.lege.tssId shouldEqual BigInteger("0")
     }
 
     @Test
     internal fun `Default to 0 when tss id is null`() {
-        val healthcareProfessional =  XMLHealthcareProfessional()
-        val avsender = createAvsenderLege(FASTLEGE_FNR,null, healthcareProfessional)
+        val healthcareProfessional = XMLHealthcareProfessional()
+        val avsender = createAvsenderLege(FASTLEGE_FNR, null, healthcareProfessional)
         avsender.lege.legeFnr shouldBeEqualTo FASTLEGE_FNR
         avsender.lege.tssId shouldEqual BigInteger("0")
     }
