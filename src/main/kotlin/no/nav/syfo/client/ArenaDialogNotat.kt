@@ -12,6 +12,7 @@ import no.nav.helse.arenadialognotat.PasientDataType
 import no.nav.helse.arenadialognotat.PersonType
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
+import no.nav.helse.msgHead.XMLHealthcareProfessional
 import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.log
 import no.nav.syfo.model.Dialogmelding
@@ -43,17 +44,7 @@ fun createArenaDialogNotat(
                 ediLoggId = receiverBlock.ediLoggId
                 dokumentDato = msgHead.msgInfo.genDate
             }
-            avsender = EiaDokumentInfoType.Avsender().apply {
-                lege = LegeType().apply {
-                    legeFnr = legefnr
-                    tssId = tssid?.toBigInteger() ?: "0".toBigInteger()
-                    legeNavn = NavnType().apply {
-                        fornavn = hcp.givenName
-                        mellomnavn = hcp?.middleName ?: ""
-                        etternavn = hcp?.familyName
-                    }
-                }
-            }
+            avsender = createAvsenderLege(legefnr, tssid, hcp)
             avsenderSystem = EiaDokumentInfoType.AvsenderSystem().apply {
                 systemNavn = "SKJEMA-MOTTAK"
                 systemVersjon = "1.0.0"
@@ -76,6 +67,25 @@ fun createArenaDialogNotat(
         svarReferanse = dialogmeldingXml.notat?.firstOrNull()?.dokIdNotat ?: ""
         notatDato = msgHead.msgInfo.genDate
     }
+
+fun createAvsenderLege(
+    legefnr: String,
+    tssid: String?,
+    healthCareProfessional: XMLHealthcareProfessional
+): EiaDokumentInfoType.Avsender {
+    val validatedTssID = if(tssid.isNullOrBlank()) "0" else tssid
+    return EiaDokumentInfoType.Avsender().apply {
+        lege = LegeType().apply {
+            legeFnr = legefnr
+            tssId = validatedTssID.toBigInteger()
+            legeNavn = NavnType().apply {
+                fornavn = healthCareProfessional.givenName
+                mellomnavn = healthCareProfessional?.middleName ?: ""
+                etternavn = healthCareProfessional?.familyName
+            }
+        }
+    }
+}
 
 fun findArenaNotatKategori(dialogmelding: Dialogmelding): String {
     when {

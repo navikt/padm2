@@ -5,8 +5,10 @@ import java.time.LocalDateTime
 import java.util.UUID
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
+import no.nav.helse.msgHead.XMLHealthcareProfessional
 import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.client.createArenaDialogNotat
+import no.nav.syfo.client.createAvsenderLege
 import no.nav.syfo.model.DialogmeldingKodeverk
 import no.nav.syfo.model.findDialogmeldingType
 import no.nav.syfo.model.toDialogmelding
@@ -18,8 +20,11 @@ import no.nav.syfo.util.getFileAsStringISO88591
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldEqual
 import org.junit.Test
+import java.math.BigInteger
 
 internal class CreateArenaDialogNotatTest {
+
+    private val FASTLEGE_FNR = "21312341414"
 
     @Test
     internal fun `Tester mapping fra fellesformat til ArenaDialogNotat svar foresporsel pasient`() {
@@ -62,7 +67,7 @@ internal class CreateArenaDialogNotatTest {
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentNavn shouldBeEqualTo "Svar på forespørsel"
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentreferanse shouldBeEqualTo "b62016eb-6c2d-417a-8ecc-157b3c5ee2ca"
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.ediLoggId shouldBeEqualTo "FiktivTestdata0001"
-        arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeFnr shouldBeEqualTo "21312341414"
+        arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeFnr shouldBeEqualTo FASTLEGE_FNR
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.tssId.shouldEqual(tssid.toBigInteger())
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.fornavn shouldBeEqualTo "Inga"
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.etternavn shouldBeEqualTo "Valda"
@@ -75,6 +80,22 @@ internal class CreateArenaDialogNotatTest {
         arenaDialogNotat.notatTittel shouldBeEqualTo DialogmeldingKodeverk.OVERFORING_EPJ_INFORMASJON_SVAR_PAA_FORESPORSEL_OM_PASIENT.arenaNotatTittel
         arenaDialogNotat.notatTekst shouldBeEqualTo "Pasieten har masse info her"
         arenaDialogNotat.svarReferanse shouldBeEqualTo "OD1812186729156"
+    }
+
+    @Test
+    internal fun `Default to 0 when tss id is empty string`() {
+        val healthcareProfessional =  XMLHealthcareProfessional()
+        val avsender = createAvsenderLege(FASTLEGE_FNR,"", healthcareProfessional)
+        avsender.lege.legeFnr shouldBeEqualTo FASTLEGE_FNR
+        avsender.lege.tssId shouldEqual BigInteger("0")
+    }
+
+    @Test
+    internal fun `Default to 0 when tss id is null`() {
+        val healthcareProfessional =  XMLHealthcareProfessional()
+        val avsender = createAvsenderLege(FASTLEGE_FNR,null, healthcareProfessional)
+        avsender.lege.legeFnr shouldBeEqualTo FASTLEGE_FNR
+        avsender.lege.tssId shouldEqual BigInteger("0")
     }
 
     @Test
