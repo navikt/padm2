@@ -126,6 +126,7 @@ fun leggtilDokument(
     if (!vedleggListe.isNullOrEmpty()) {
         val listVedleggDokumenter = ArrayList<Dokument>()
         vedleggListe
+            .filter { vedlegg -> vedlegg.contentBase64.isNotEmpty() }
             .map { vedlegg -> vedleggToPDF(vedlegg) }
             .map {
             listVedleggDokumenter.add(
