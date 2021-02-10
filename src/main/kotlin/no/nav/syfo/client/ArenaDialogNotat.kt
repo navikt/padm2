@@ -1,15 +1,7 @@
 package no.nav.syfo.client
 
-import javax.jms.MessageProducer
-import javax.jms.Session
 import net.logstash.logback.argument.StructuredArguments.fields
-import no.nav.helse.arenadialognotat.ArenaDialogNotat
-import no.nav.helse.arenadialognotat.DokumentInfoType
-import no.nav.helse.arenadialognotat.EiaDokumentInfoType
-import no.nav.helse.arenadialognotat.LegeType
-import no.nav.helse.arenadialognotat.NavnType
-import no.nav.helse.arenadialognotat.PasientDataType
-import no.nav.helse.arenadialognotat.PersonType
+import no.nav.helse.arenadialognotat.*
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLHealthcareProfessional
@@ -20,6 +12,10 @@ import no.nav.syfo.util.LoggingMeta
 import no.nav.syfo.util.arenaDialogNotatMarshaller
 import no.nav.syfo.util.extractDialogmelding
 import no.nav.syfo.util.toString
+import javax.jms.MessageProducer
+import javax.jms.Session
+
+const val MAKS_TEKSTLENGDE = 2000
 
 fun createArenaDialogNotat(
     fellesformat: XMLEIFellesformat,
@@ -64,6 +60,12 @@ fun createArenaDialogNotat(
         notatKode = findArenaNotatKode(dialogmelding)
         notatTittel = findArenaNotatTittel(dialogmelding)
         notatTekst = dialogmeldingXml.notat?.firstOrNull()?.tekstNotatInnhold.toString()
+
+        if (notatTekst.length > MAKS_TEKSTLENGDE) {
+            val kuttetTekst = " [Ufullstendig tekst, les mer i Gosys]"
+            notatTekst = "${notatTekst.substring(0, MAKS_TEKSTLENGDE - kuttetTekst.length)}$kuttetTekst"
+        }
+
         svarReferanse = dialogmeldingXml.notat?.firstOrNull()?.dokIdNotat ?: ""
         notatDato = msgHead.msgInfo.genDate
     }
@@ -73,7 +75,7 @@ fun createAvsenderLege(
     tssid: String?,
     healthCareProfessional: XMLHealthcareProfessional
 ): EiaDokumentInfoType.Avsender {
-    val validatedTssID = if(tssid.isNullOrBlank()) "0" else tssid
+    val validatedTssID = if (tssid.isNullOrBlank()) "0" else tssid
     return EiaDokumentInfoType.Avsender().apply {
         lege = LegeType().apply {
             legeFnr = legefnr
