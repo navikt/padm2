@@ -87,7 +87,7 @@ class BlockingApplicationRunner {
 
                     val legekontorOrgName = extractSenderOrganisationName(fellesformat)
                     val legekontorHerId = extractOrganisationHerNumberFromSender(fellesformat)?.id
-                    val legekontorReshId = extractOrganisationRashNumberFromSender(fellesformat)?.id
+                    val legekontorReshId = extractOrganisationReshNumberFromSender(fellesformat)?.id
                     val dialogmeldingXml = extractDialogmelding(fellesformat)
                     val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
                     val sha256String = sha256hashstring(dialogmeldingXml)
