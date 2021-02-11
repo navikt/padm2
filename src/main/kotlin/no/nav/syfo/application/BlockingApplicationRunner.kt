@@ -56,7 +56,6 @@ class BlockingApplicationRunner {
         journalService: JournalService,
         arenaProducer: MessageProducer,
         database: Database,
-        eiaProducer: MessageProducer,
         behandlerService: BehandlerService
     ) {
         wrapExceptions {
