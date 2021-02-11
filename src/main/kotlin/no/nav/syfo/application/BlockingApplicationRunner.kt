@@ -107,7 +107,7 @@ class BlockingApplicationRunner {
 
                     val loggingMeta = LoggingMeta(
                         mottakId = ediLoggId,
-                        orgNr = extractOrganisationNumberFromSender(fellesformat)?.id,
+                        orgNr = legekontorOrgNr,
                         msgId = msgHead.msgInfo.msgId
                     )
 
