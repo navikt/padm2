@@ -6,20 +6,20 @@ import no.nav.syfo.client.SyfohelsenettproxyClient
 import no.nav.syfo.util.LoggingMeta
 
 @KtorExperimentalAPI
-class BehandlerService(
+class SignerendeLegeService(
     private val syfohelsenettproxyClient: SyfohelsenettproxyClient
 ) {
-    suspend fun behandlernavn(
-        behandlerFnr: String,
+    suspend fun signerendeLegeNavn(
+        signerendeLegeFnr: String,
         msgId: String,
         loggingMeta: LoggingMeta
     ): String {
-        val behandler = syfohelsenettproxyClient.finnBehandler(behandlerFnr, msgId, loggingMeta)
+        val signerendeLege = syfohelsenettproxyClient.finnBehandler(signerendeLegeFnr, msgId, loggingMeta)
 
-        return navnFraBehandler(behandler, behandlerFnr)
+        return getNameSignerendeLege(signerendeLege, signerendeLegeFnr)
     }
 
-    private fun navnFraBehandler(helsenettProxyBehandler: HelsenettProxyBehandler?, behandlerFnr: String): String =
+    private fun getNameSignerendeLege(helsenettProxyBehandler: HelsenettProxyBehandler?, behandlerFnr: String): String =
         when {
             helsenettProxyBehandler == null -> {
                 behandlerFnr

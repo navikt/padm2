@@ -21,7 +21,7 @@ import no.nav.syfo.metrics.INCOMING_MESSAGE_COUNTER
 import no.nav.syfo.metrics.MESSAGES_SENT_TO_BOQ
 import no.nav.syfo.metrics.REQUEST_TIME
 import no.nav.syfo.model.*
-import no.nav.syfo.services.BehandlerService
+import no.nav.syfo.services.SignerendeLegeService
 import no.nav.syfo.services.JournalService
 import no.nav.syfo.services.sha256hashstring
 import no.nav.syfo.services.updateRedis
@@ -56,7 +56,7 @@ class BlockingApplicationRunner {
         journalService: JournalService,
         arenaProducer: MessageProducer,
         database: Database,
-        behandlerService: BehandlerService
+        signerendeLegeService: SignerendeLegeService
     ) {
         wrapExceptions {
             loop@ while (applicationState.ready) {
@@ -71,7 +71,6 @@ class BlockingApplicationRunner {
                         is TextMessage -> message.text
                         else -> throw RuntimeException("Incoming message needs to be a byte message or text message")
                     }
-
                     val fellesformat =
                         fellesformatUnmarshaller.unmarshal(StringReader(inputMessageText)) as XMLEIFellesformat
                     val msgHead: XMLMsgHead = fellesformat.get()
@@ -93,7 +92,7 @@ class BlockingApplicationRunner {
                     val sha256String = sha256hashstring(dialogmeldingXml)
                     val legeHpr = extractLegeHpr(fellesformat)
 
-                    val navnHelsePersonellNavn = extractBehandlerNavn(fellesformat)
+                    val behandlerNavn = extractBehandlerNavn(fellesformat)
                     val extractVedlegg = extractVedlegg(fellesformat)
 
                     if (!extractVedlegg.isEmpty()){
@@ -113,7 +112,7 @@ class BlockingApplicationRunner {
 
                     log.info("Received message, {}", StructuredArguments.fields(loggingMeta))
 
-                    val navnSignerendeLege = behandlerService.behandlernavn(personNumberDoctor, msgId, loggingMeta)
+                    val navnSignerendeLege = signerendeLegeService.signerendeLegeNavn(personNumberDoctor, msgId, loggingMeta)
 
                     INCOMING_MESSAGE_COUNTER.inc()
 
@@ -236,7 +235,7 @@ class BlockingApplicationRunner {
                             dialogmeldingId = UUID.randomUUID().toString(),
                             dialogmeldingType = dialogmeldingType,
                             signaturDato = msgHead.msgInfo.genDate,
-                            navnHelsePersonellNavn = navnHelsePersonellNavn
+                            navnHelsePersonellNavn = behandlerNavn
                         )
 
                         val receivedDialogmelding = ReceivedDialogmelding(
