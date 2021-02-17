@@ -93,7 +93,7 @@ class BlockingApplicationRunner {
                     val sha256String = sha256hashstring(dialogmeldingXml)
                     val legeHpr = extractLegeHpr(fellesformat)
 
-                    val navnHelsePersonellNavn = extractHelsePersonellNavn(fellesformat)
+                    val navnHelsePersonellNavn = extractBehandlerNavn(fellesformat)
                     val extractVedlegg = extractVedlegg(fellesformat)
 
                     if (!extractVedlegg.isEmpty()){

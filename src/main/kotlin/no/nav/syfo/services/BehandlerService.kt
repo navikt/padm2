@@ -1,7 +1,7 @@
 package no.nav.syfo.services
 
 import io.ktor.util.*
-import no.nav.syfo.client.Behandler
+import no.nav.syfo.client.HelsenettProxyBehandler
 import no.nav.syfo.client.SyfohelsenettproxyClient
 import no.nav.syfo.util.LoggingMeta
 
@@ -19,19 +19,19 @@ class BehandlerService(
         return navnFraBehandler(behandler, behandlerFnr)
     }
 
-    private fun navnFraBehandler(behandler: Behandler?, behandlerFnr: String): String =
+    private fun navnFraBehandler(helsenettProxyBehandler: HelsenettProxyBehandler?, behandlerFnr: String): String =
         when {
-            behandler == null -> {
+            helsenettProxyBehandler == null -> {
                 behandlerFnr
             }
-            behandler.fornavn == null && behandler.mellomnavn == null && behandler.etternavn == null -> {
+            helsenettProxyBehandler.fornavn == null && helsenettProxyBehandler.mellomnavn == null && helsenettProxyBehandler.etternavn == null -> {
                 behandlerFnr
             }
-            behandler.mellomnavn == null -> {
-                "${behandler.etternavn}, ${behandler.fornavn}"
+            helsenettProxyBehandler.mellomnavn == null -> {
+                "${helsenettProxyBehandler.etternavn}, ${helsenettProxyBehandler.fornavn}"
             }
             else -> {
-                "${behandler.etternavn}, ${behandler.fornavn} ${behandler.mellomnavn}"
+                "${helsenettProxyBehandler.etternavn}, ${helsenettProxyBehandler.fornavn} ${helsenettProxyBehandler.mellomnavn}"
             }
         }
 }

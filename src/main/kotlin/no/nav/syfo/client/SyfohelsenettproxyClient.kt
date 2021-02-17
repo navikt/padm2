@@ -27,7 +27,7 @@ class SyfohelsenettproxyClient(
         behandlerFnr: String,
         msgId: String,
         loggingMeta: LoggingMeta
-    ): Behandler? = retry("finn_behandler") {
+    ): HelsenettProxyBehandler? = retry("finn_behandler") {
         log.info("Henter behandler fra syfohelsenettproxy for msgId {}", msgId)
         val httpStatement = httpClient.get<HttpStatement>("$endpointUrl/api/behandler") {
             accept(ContentType.Application.Json)
@@ -58,13 +58,13 @@ class SyfohelsenettproxyClient(
             }
             else -> {
                 log.info("Hentet behandler for msgId {}, {}", msgId, fields(loggingMeta))
-                httpResponse.call.response.receive<Behandler>()
+                httpResponse.call.response.receive<HelsenettProxyBehandler>()
             }
         }
     }
 }
 
-data class Behandler(
+data class HelsenettProxyBehandler(
     val godkjenninger: List<Godkjenning>,
     val fnr: String?,
     val hprNummer: Int?,
