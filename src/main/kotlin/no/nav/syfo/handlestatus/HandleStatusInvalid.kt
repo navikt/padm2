@@ -124,7 +124,7 @@ fun handlePatientNotFoundInAktorRegister(
 
     sendReceipt(
         session, receiptProducer, fellesformat, ApprecStatus.avvist, listOf(
-            createApprecError("Pasienten er ikkje registrert i folkeregisteret")
+            createApprecError("Pasienten er ikke registrert i folkeregisteret")
         )
     )
 
@@ -145,7 +145,7 @@ fun handlePatientNotFound(
 
     sendReceipt(
         session, receiptProducer, fellesformat, ApprecStatus.avvist, listOf(
-            createApprecError("Pasienten er ikkje funnet i dialogmeldingen")
+            createApprecError("Pasienten er ikke funnet i dialogmeldingen")
         )
     )
 
@@ -172,7 +172,7 @@ fun handleDoctorNotFoundInAktorRegister(
     sendReceipt(
         session, receiptProducer, fellesformat, ApprecStatus.avvist, listOf(
             createApprecError("Dialogmelding kan ikke rettes, det må skrives en ny. Grunnet følgende:" +
-                    " Behandler er ikkje registrert i folkeregisteret")
+                    " Behandler er ikke registrert i folkeregisteret")
         )
     )
 
