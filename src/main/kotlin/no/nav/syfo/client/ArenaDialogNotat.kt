@@ -4,14 +4,11 @@ import net.logstash.logback.argument.StructuredArguments.fields
 import no.nav.helse.arenadialognotat.*
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
-import no.nav.helse.msgHead.XMLHealthcareProfessional
 import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.log
+import no.nav.syfo.model.Behandler
 import no.nav.syfo.model.Dialogmelding
-import no.nav.syfo.util.LoggingMeta
-import no.nav.syfo.util.arenaDialogNotatMarshaller
-import no.nav.syfo.util.extractDialogmelding
-import no.nav.syfo.util.toString
+import no.nav.syfo.util.*
 import javax.jms.MessageProducer
 import javax.jms.Session
 
@@ -29,8 +26,8 @@ fun createArenaDialogNotat(
         ArenaDialogNotat =
     ArenaDialogNotat().apply {
         val org = msgHead.msgInfo.sender.organisation
-        val hcp = org.healthcareProfessional
         val dialogmeldingXml = extractDialogmelding(fellesformat)
+        val behandler = extractBehandler(fellesformat)
         eiaDokumentInfo = EiaDokumentInfoType().apply {
             dokumentInfo = DokumentInfoType().apply {
                 dokumentType = "DM"
@@ -40,7 +37,7 @@ fun createArenaDialogNotat(
                 ediLoggId = receiverBlock.ediLoggId
                 dokumentDato = msgHead.msgInfo.genDate
             }
-            avsender = createAvsenderLege(legefnr, tssid, hcp)
+            avsender = createAvsender(legefnr, tssid, behandler)
             avsenderSystem = EiaDokumentInfoType.AvsenderSystem().apply {
                 systemNavn = "SKJEMA-MOTTAK"
                 systemVersjon = "1.0.0"
@@ -70,10 +67,10 @@ fun createArenaDialogNotat(
         notatDato = msgHead.msgInfo.genDate
     }
 
-fun createAvsenderLege(
+fun createAvsender(
     legefnr: String,
     tssid: String?,
-    healthCareProfessional: XMLHealthcareProfessional
+    behandler: Behandler?
 ): EiaDokumentInfoType.Avsender {
     val validatedTssID = if (tssid.isNullOrBlank()) "0" else tssid
     return EiaDokumentInfoType.Avsender().apply {
@@ -81,9 +78,9 @@ fun createAvsenderLege(
             legeFnr = legefnr
             tssId = validatedTssID.toBigInteger()
             legeNavn = NavnType().apply {
-                fornavn = healthCareProfessional.givenName
-                mellomnavn = healthCareProfessional?.middleName ?: ""
-                etternavn = healthCareProfessional?.familyName
+                fornavn = behandler?.fornavn ?: ""
+                mellomnavn = behandler?.mellomnavn ?: ""
+                etternavn = behandler?.etternavn ?: ""
             }
         }
     }

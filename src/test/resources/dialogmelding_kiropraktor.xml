@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EI_fellesformat xmlns="http://www.nav.no/xml/eiff/2/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <MsgHead xmlns="http://www.kith.no/xmlstds/msghead/2006-05-24" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.kith.no/xmlstds/msghead/2006-05-24 MsgHead-v1_2.xsd">
+        <MsgInfo>
+            <Type DN="Henvendelse til NAV" V="DIALOG_NOTAT"/>
+            <MIGversion>v1.2 2006-05-24</MIGversion>
+            <GenDate>2021-02-09T08:32:03+01:00</GenDate>
+            <MsgId>0f1daa95-45d0-4a18-8d5d-b79bd069d3b7</MsgId>
+            <ProcessingStatus DN="Produksjon" V="P"/>
+            <Sender>
+                <ComMethod DN="EDI" V="EDI"/>
+                <Organisation>
+                    <OrganisationName>KNEKK OG TØY KIROPRAKTORKLINIKK AS</OrganisationName>
+                    <Ident>
+                        <Id>12345</Id>
+                        <TypeId DN="HER-id" S="2.16.578.1.12.4.1.1.9051" V="HER"/>
+                    </Ident>
+                    <Ident>
+                        <Id>911911911</Id>
+                        <TypeId DN="Organisasjonsnummeret i Enhetsregister" S="2.16.578.1.12.4.1.1.9051" V="ENH"/>
+                    </Ident>
+                    <Organisation>
+                        <OrganisationName>Kiropraktikk ()</OrganisationName>
+                        <Ident>
+                            <Id>111111</Id>
+                            <TypeId DN="HER-id" S="2.16.578.1.12.4.1.1.8116" V="HER"/>
+                        </Ident>
+                    </Organisation>
+                </Organisation>
+            </Sender>
+            <Receiver>
+                <ComMethod DN="EDI" V="EDI"/>
+                <Organisation>
+                    <OrganisationName>NAV</OrganisationName>
+                    <Ident>
+                        <Id>79768</Id>
+                        <TypeId DN="HER-id" S="2.16.578.1.12.4.1.1.9051" V="HER"/>
+                    </Ident>
+                    <Ident>
+                        <Id>889640782</Id>
+                        <TypeId DN="Organisasjonsnummeret i Enhetsregister" S="2.16.578.1.12.4.1.1.9051" V="ENH"/>
+                    </Ident>
+                </Organisation>
+            </Receiver>
+            <Patient>
+                <FamilyName>Kinken</FamilyName>
+                <GivenName>Nakke</GivenName>
+                <Sex DN="Kvinne" V="2"/>
+                <Ident>
+                    <Id>01234567890</Id>
+                    <TypeId DN="Fødselsnummer" S="2.16.578.1.12.4.1.1.8116" V="FNR"/>
+                </Ident>
+                <Address>
+                    <Type DN="Bostedsadresse" V="H"/>
+                    <StreetAdr>Kilevinkveien 1</StreetAdr>
+                    <PostalCode>1234</PostalCode>
+                    <City>OSLO</City>
+                    <County DN="Oslo" V="1234"/>
+                    <Country DN="Norge" V="NO"/>
+                </Address>
+                <TeleCom>
+                    <TypeTelecom DN="Hovedtelefon" V="HP"/>
+                    <TeleAddress V="tel:12345678"/>
+                </TeleCom>
+            </Patient>
+        </MsgInfo>
+        <Document>
+            <DocumentConnection DN="Hoveddokument" V="H"/>
+            <RefDoc>
+                <MsgType DN="XML-instans" V="XML"/>
+                <MimeType>text/xml</MimeType>
+                <Description>Dialogmelding</Description>
+                <Content>
+                    <Dialogmelding xmlns="http://www.kith.no/xmlstds/dialog/2006-10-11" xmlns:fk1="http://www.kith.no/xmlstds/felleskomponent1">
+                        <Notat>
+                            <TemaKodet DN="Henvendelse om sykefraværsoppfølging" S="2.16.578.1.12.4.1.1.8128" V="1"/>
+                            <TekstNotatInnhold>Kink i nakken.
+                                Mvh Lisa Kiropraktorsen</TekstNotatInnhold>
+                            <DatoNotat>2021-01-16</DatoNotat>
+                            <RollerRelatertNotat>
+                                <RoleToPatient DN="Kontakt hos mottaker" S="2.16.578.1.12.4.1.1.9034" V="24"/>
+                                <HealthcareProfessional>
+                                    <TypeHealthcareProfessional DN="Kiropraktor" V="KI"/>
+                                    <FamilyName>Kiropraktorsen</FamilyName>
+                                    <GivenName>Lisa</GivenName>
+                                    <Ident>
+                                        <fk1:Id>123456789</fk1:Id>
+                                        <fk1:TypeId DN="HPR-nummer" S="2.16.578.1.12.4.1.1.8116" V="HPR"/>
+                                    </Ident>
+                                    <TeleCom>
+                                        <fk1:TypeTelecom DN="Hovedtelefon" V="HP"/>
+                                        <fk1:TeleAddress V="tel:12345678"/>
+                                    </TeleCom>
+                                </HealthcareProfessional>
+                            </RollerRelatertNotat>
+                        </Notat>
+                    </Dialogmelding>
+                </Content>
+            </RefDoc>
+        </Document>
+    </MsgHead>
+    <MottakenhetBlokk avsender="12345" avsenderFnrFraDigSignatur="10108000398" avsenderRef="SERIALNUMBER=911969645, CN=KNEKK OG TØY KIROPRAKTORKLINIKK AS v/Lisa Kiropraktorsen, OU=Aspit Online, O=KNEKK OG TØY KIROPRAKTORKLINIKK AS, C=NO" ebAction="Henvendelse" ebRole="Sykmelder" ebService="HenvendelseFraLege" ebXMLSamtaleId="acc8e8e9-77ae-4b0d-ae86-b821e76c4b1f" ediLoggId="2102090840kiro66788.1" herIdentifikator="" meldingsType="xml" mottattDatotid="2021-02-09T08:40:26" partnerReferanse="43618"/>
+</EI_fellesformat>

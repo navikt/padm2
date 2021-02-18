@@ -8,7 +8,8 @@ import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLHealthcareProfessional
 import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.client.createArenaDialogNotat
-import no.nav.syfo.client.createAvsenderLege
+import no.nav.syfo.client.createAvsender
+import no.nav.syfo.model.Behandler
 import no.nav.syfo.model.DialogmeldingKodeverk
 import no.nav.syfo.model.findDialogmeldingType
 import no.nav.syfo.model.toDialogmelding
@@ -84,19 +85,20 @@ internal class CreateArenaDialogNotatTest {
 
     @Test
     internal fun `Default to 0 when tss id is empty string`() {
-        val healthcareProfessional = XMLHealthcareProfessional()
-        val avsender = createAvsenderLege(FASTLEGE_FNR, "", healthcareProfessional)
+        val behandler = Behandler(etternavn="Etternavn", fornavn="Fornavn", mellomnavn="Mellomnavn")
+        val avsender = createAvsender(FASTLEGE_FNR, "", behandler)
         avsender.lege.legeFnr shouldBeEqualTo FASTLEGE_FNR
         avsender.lege.tssId shouldEqual BigInteger("0")
     }
 
     @Test
     internal fun `Default to 0 when tss id is null`() {
-        val healthcareProfessional = XMLHealthcareProfessional()
-        val avsender = createAvsenderLege(FASTLEGE_FNR, null, healthcareProfessional)
+        val behandler = Behandler("Etternavn", "Fornavn", "Mellomnavn")
+        val avsender = createAvsender(FASTLEGE_FNR, null, behandler)
         avsender.lege.legeFnr shouldBeEqualTo FASTLEGE_FNR
         avsender.lege.tssId shouldEqual BigInteger("0")
     }
+
 
     @Test
     internal fun `Tester mapping fra fellesformat til ArenaDialogNotat svar innkalling dialogmote`() {

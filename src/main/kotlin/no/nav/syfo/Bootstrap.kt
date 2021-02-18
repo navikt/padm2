@@ -25,7 +25,7 @@ import no.nav.syfo.db.VaultCredentialService
 import no.nav.syfo.mq.connectionFactory
 import no.nav.syfo.mq.consumerForQueue
 import no.nav.syfo.mq.producerForQueue
-import no.nav.syfo.services.BehandlerService
+import no.nav.syfo.services.SignerendeLegeService
 import no.nav.syfo.services.JournalService
 import no.nav.syfo.util.TrackableException
 import no.nav.syfo.util.getFileAsString
@@ -107,7 +107,7 @@ fun main() {
     val syfohelsenettproxyClient = SyfohelsenettproxyClient(env.syfohelsenettproxyEndpointURL, accessTokenClient, env.helsenettproxyId, httpClient)
 
     val journalService = JournalService(sakClient, dokArkivClient, pdfgenClient)
-    val behandlerService = BehandlerService(syfohelsenettproxyClient)
+    val signerendeLegeService = SignerendeLegeService(syfohelsenettproxyClient)
 
     val subscriptionEmottak = createPort<SubscriptionPort>(env.subscriptionEndpointURL) {
         proxy { features.add(WSAddressingFeature()) }
@@ -122,7 +122,7 @@ fun main() {
     launchListeners(
         applicationState, env,
         vaultSecrets, aktoerIdClient, sarClient,
-        subscriptionEmottak, padm2ReglerClient, journalService, database, behandlerService
+        subscriptionEmottak, padm2ReglerClient, journalService, database, signerendeLegeService
     )
 }
 
@@ -148,7 +148,7 @@ fun launchListeners(
     padm2ReglerClient: Padm2ReglerClient,
     journalService: JournalService,
     database: Database,
-    behandlerService: BehandlerService
+    signerendeLegeService: SignerendeLegeService
 ) {
     createListener(applicationState) {
         connectionFactory(env).createConnection(secrets.mqUsername, secrets.mqPassword).use { connection ->
@@ -160,7 +160,6 @@ fun launchListeners(
                 val receiptProducer = session.producerForQueue(env.apprecQueueName)
                 val backoutProducer = session.producerForQueue(env.inputBackoutQueueName)
                 val arenaProducer = session.producerForQueue(env.arenaQueueName)
-                val eiaProducer = session.producerForQueue(env.eiaQueueName)
 
                 applicationState.ready = true
                 jedis.auth(secrets.redisSecret)
@@ -170,7 +169,7 @@ fun launchListeners(
                     session, env, secrets, aktoerIdClient,
                     kuhrSarClient, subscriptionEmottak, jedis, receiptProducer,
                     padm2ReglerClient, backoutProducer, journalService,
-                    arenaProducer, database, eiaProducer, behandlerService
+                    arenaProducer, database, signerendeLegeService
                 )
             }
         }
