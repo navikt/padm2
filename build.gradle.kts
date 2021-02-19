@@ -5,7 +5,7 @@ import no.nils.wsdl2java.Wsdl2JavaTask
 group = "no.nav.syfo"
 version = "1.0.0"
 
-val ktorVersion = "1.3.2"
+val ktorVersion = "1.5.1"
 val logbackVersion = "1.2.3"
 val logstashEncoderVersion = "5.1"
 val prometheusVersion = "0.6.0"
