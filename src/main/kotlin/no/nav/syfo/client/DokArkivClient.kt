@@ -1,35 +1,23 @@
 package no.nav.syfo.client
 
-import io.ktor.client.HttpClient
-import io.ktor.client.request.header
-import io.ktor.client.request.parameter
-import io.ktor.client.request.post
-import io.ktor.http.ContentType
-import io.ktor.http.contentType
-import io.ktor.util.KtorExperimentalAPI
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.util.ArrayList
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import io.ktor.util.*
 import net.logstash.logback.argument.StructuredArguments.fields
 import no.nav.syfo.helpers.retry
 import no.nav.syfo.log
-import no.nav.syfo.model.AvsenderMottaker
-import no.nav.syfo.model.Bruker
-import no.nav.syfo.model.Dialogmelding
-import no.nav.syfo.model.Dokument
-import no.nav.syfo.model.Dokumentvarianter
-import no.nav.syfo.model.JournalpostRequest
-import no.nav.syfo.model.JournalpostResponse
-import no.nav.syfo.model.Sak
-import no.nav.syfo.model.Status
-import no.nav.syfo.model.ValidationResult
-import no.nav.syfo.model.Vedlegg
+import no.nav.syfo.model.*
 import no.nav.syfo.objectMapper
-import no.nav.syfo.util.LoggingMeta
 import no.nav.syfo.util.ImageToPDF
+import no.nav.syfo.util.LoggingMeta
 import no.nav.syfo.validation.validatePersonAndDNumber
 import java.io.ByteArrayOutputStream
-
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 @KtorExperimentalAPI
 class DokArkivClient(
@@ -45,16 +33,19 @@ class DokArkivClient(
         retryIntervals = arrayOf(500L, 1000L, 3000L, 5000L, 10000L)
     ) {
         try {
-            log.info(
-                "Kall til dokakriv Nav-Callid {}, {}", journalpostRequest.eksternReferanseId,
-                fields(loggingMeta)
-            )
-            httpClient.post<JournalpostResponse>(url) {
-                contentType(ContentType.Application.Json)
+            log.info("Kall til dokarkiv Nav-Callid {}, {}", journalpostRequest.eksternReferanseId, fields(loggingMeta))
+
+            val response: HttpResponse = httpClient.post(url) {
                 header("Authorization", "Bearer ${stsClient.oidcToken().access_token}")
                 header("Nav-Callid", journalpostRequest.eksternReferanseId)
                 body = journalpostRequest
+                contentType(ContentType.Application.Json)
                 parameter("forsoekFerdigstill", true)
+            }
+            when (response.status) {
+                HttpStatusCode.OK -> response.receive()
+                HttpStatusCode.Created -> response.receive()
+                else -> throw RuntimeException("Http status: ${response.status} Content: ${response.content}")
             }
         } catch (e: Exception) {
             log.warn("Oppretting av journalpost feilet: ${e.message}, {}", fields(loggingMeta))
@@ -129,23 +120,23 @@ fun leggtilDokument(
             .filter { vedlegg -> vedlegg.contentBase64.isNotEmpty() }
             .map { vedlegg -> vedleggToPDF(vedlegg) }
             .map {
-            listVedleggDokumenter.add(
-                Dokument(
-                    dokumentvarianter = listOf(
-                        Dokumentvarianter(
-                            filtype = findFiltype(it),
-                            filnavn = when (it.beskrivelse.length >= 200) {
-                                true -> "${it.beskrivelse.substring(0, 199)}.${findFiltype(it).toLowerCase()}"
-                                else -> "${it.beskrivelse}.${findFiltype(it).toLowerCase()}"
-                            },
-                            variantformat = "ARKIV",
-                            fysiskDokument = it.contentBase64
-                        )
-                    ),
-                    tittel = "Vedlegg til dialogmelding"
+                listVedleggDokumenter.add(
+                    Dokument(
+                        dokumentvarianter = listOf(
+                            Dokumentvarianter(
+                                filtype = findFiltype(it),
+                                filnavn = when (it.beskrivelse.length >= 200) {
+                                    true -> "${it.beskrivelse.substring(0, 199)}.${findFiltype(it).toLowerCase()}"
+                                    else -> "${it.beskrivelse}.${findFiltype(it).toLowerCase()}"
+                                },
+                                variantformat = "ARKIV",
+                                fysiskDokument = it.contentBase64
+                            )
+                        ),
+                        tittel = "Vedlegg til dialogmelding"
+                    )
                 )
-            )
-        }
+            }
 
         listVedleggDokumenter.map { vedlegg ->
             listDokument.add(vedlegg)
