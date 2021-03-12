@@ -141,7 +141,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
-    testImplementation( "io.ktor:ktor-client-mock:$ktorVersion")
+    testImplementation("io.ktor:ktor-client-mock:$ktorVersion")
 
 }
 
