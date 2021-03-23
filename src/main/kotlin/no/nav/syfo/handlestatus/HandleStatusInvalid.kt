@@ -1,10 +1,7 @@
 package no.nav.syfo.handlestatus
 
-import io.ktor.util.KtorExperimentalAPI
-import javax.jms.MessageProducer
-import javax.jms.Session
+import io.ktor.util.*
 import net.logstash.logback.argument.StructuredArguments.fields
-import net.logstash.logback.argument.StructuredArguments.keyValue
 import no.nav.helse.apprecV1.XMLCV
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.syfo.Environment
@@ -22,8 +19,12 @@ import no.nav.syfo.persistering.handleRecivedMessage
 import no.nav.syfo.services.JournalService
 import no.nav.syfo.services.sendReceipt
 import no.nav.syfo.services.updateRedis
+import no.nav.syfo.util.LogType
 import no.nav.syfo.util.LoggingMeta
+import no.nav.syfo.util.createLogEntry
 import redis.clients.jedis.Jedis
+import javax.jms.MessageProducer
+import javax.jms.Session
 
 @KtorExperimentalAPI
 suspend fun handleStatusINVALID(
@@ -66,8 +67,14 @@ fun handleDuplicateSM2013Content(
     redisSha256String: String
 ) {
 
-    log.warn("Message with {} marked as duplicate, has same redisSha256String {}",
-        keyValue("originalEdiLoggId", redisSha256String), fields(loggingMeta))
+    log.warn(
+        "Duplicate message: Same redisSha256String {}",
+        createLogEntry(
+            LogType.INVALID_MESSAGE,
+            loggingMeta,
+            "originalEdiLoggId" to redisSha256String,
+        )
+    )
 
     sendReceipt(
         session, receiptProducer, fellesformat, ApprecStatus.avvist, listOf(
@@ -90,8 +97,14 @@ fun handleDuplicateEdiloggid(
     redisEdiloggid: String
 ) {
 
-    log.warn("Message with {} marked as duplicate, has same redisEdiloggid {}",
-        keyValue("originalEdiLoggId", redisEdiloggid), fields(loggingMeta))
+    log.warn(
+        "Duplicate message: Same redisEdiloggid {}",
+        createLogEntry(
+            LogType.INVALID_MESSAGE,
+            loggingMeta,
+            "originalEdiLoggId" to redisEdiloggid,
+        )
+    )
 
     sendReceipt(
         session, receiptProducer, fellesformat, ApprecStatus.avvist, listOf(
@@ -118,9 +131,14 @@ fun handlePatientNotFoundInAktorRegister(
     env: Environment,
     loggingMeta: LoggingMeta
 ) {
-    log.warn("Patient not found i aktorRegister error: {}, {}",
-        keyValue("errorMessage", patientIdents?.feilmelding ?: "No response for FNR"),
-        fields(loggingMeta))
+    log.warn(
+        "Patient not found i aktorRegister error {}",
+        createLogEntry(
+            LogType.INVALID_MESSAGE,
+            loggingMeta,
+            "errorMessage" to (patientIdents?.feilmelding ?: "No response for FNR"),
+        )
+    )
 
     sendReceipt(
         session, receiptProducer, fellesformat, ApprecStatus.avvist, listOf(
@@ -141,7 +159,13 @@ fun handlePatientNotFound(
     env: Environment,
     loggingMeta: LoggingMeta
 ) {
-    log.warn("Patient not found i dialogmeldingen {}", fields(loggingMeta))
+    log.warn(
+        "Pasienten er ikke funnet i dialogmeldingen {}",
+        createLogEntry(
+            LogType.INVALID_MESSAGE,
+            loggingMeta
+        )
+    )
 
     sendReceipt(
         session, receiptProducer, fellesformat, ApprecStatus.avvist, listOf(
@@ -165,14 +189,21 @@ fun handleDoctorNotFoundInAktorRegister(
     env: Environment,
     loggingMeta: LoggingMeta
 ) {
-    log.warn("Doctor not found i aktorRegister error: {}, {}",
-        keyValue("errorMessage", doctorIdents?.feilmelding ?: "No response for FNR"),
-        fields(loggingMeta))
+    log.warn(
+        "Behandler er ikke registrert i folkeregisteret {}",
+        createLogEntry(
+            LogType.INVALID_MESSAGE,
+            loggingMeta,
+            "errorMessage" to (doctorIdents?.feilmelding ?: "No response for FNR")
+        ),
+    )
 
     sendReceipt(
         session, receiptProducer, fellesformat, ApprecStatus.avvist, listOf(
-            createApprecError("Dialogmelding kan ikke rettes, det må skrives en ny. Grunnet følgende:" +
-                    " Behandler er ikke registrert i folkeregisteret")
+            createApprecError(
+                "Dialogmelding kan ikke rettes, det må skrives en ny. Grunnet følgende:" +
+                        " Behandler er ikke registrert i folkeregisteret"
+            )
         )
     )
 
@@ -192,15 +223,27 @@ fun handleTestFnrInProd(
     env: Environment,
     loggingMeta: LoggingMeta
 ) {
-    log.warn("Test fødselsnummer er kommet inn i produksjon {}", fields(loggingMeta))
+    log.warn(
+        "Test fødselsnummer er kommet inn i produksjon {}",
+        createLogEntry(
+            LogType.TEST_FNR_IN_PRODUCTION,
+            loggingMeta
+        )
+    )
 
-    log.warn("Avsender fodselsnummer er registert i Helsepersonellregisteret (HPR), {}",
-        fields(loggingMeta))
+    log.warn(
+        "Avsender fodselsnummer er registert i Helsepersonellregisteret (HPR) {}",
+        createLogEntry(
+            LogType.INVALID_MESSAGE,
+            loggingMeta
+        )
+    )
 
     sendReceipt(
         session, receiptProducer, fellesformat, ApprecStatus.avvist, listOf(
-            createApprecError("Dialogmelding kan ikke rettes, test fødselsnummer er kommet inn i produksjon." +
-                    "Kontakt din EPJ-leverandør)"
+            createApprecError(
+                "Dialogmelding kan ikke rettes, test fødselsnummer er kommet inn i produksjon." +
+                        "Kontakt din EPJ-leverandør)"
             )
         )
     )
@@ -222,13 +265,19 @@ fun handleMeldingsTekstMangler(
     loggingMeta: LoggingMeta
 ) {
 
-    log.warn("TekstNotatInnhold mangler, {}",
-        fields(loggingMeta))
+    log.warn(
+        "TekstNotatInnhold mangler {}",
+        createLogEntry(
+            LogType.INVALID_MESSAGE,
+            loggingMeta
+        )
+    )
 
     sendReceipt(
         session, receiptProducer, fellesformat, ApprecStatus.avvist, listOf(
-            createApprecError("Dialogmelding kan ikke rettes, meldingstekst (tekstNotatInnhold) mangler, " +
-                    "Kontakt din EPJ-leverandør)"
+            createApprecError(
+                "Dialogmelding kan ikke rettes, meldingstekst (tekstNotatInnhold) mangler, " +
+                        "Kontakt din EPJ-leverandør)"
             )
         )
     )
@@ -249,13 +298,19 @@ fun handleInvalidDialogMeldingKodeverk(
     loggingMeta: LoggingMeta
 ) {
 
-    log.warn("Det er brukt ein ugyldig kombinasjon av dialogmelding kodeverk, {}",
-        fields(loggingMeta))
+    log.warn(
+        "Det er brukt ein ugyldig kombinasjon av dialogmelding kodeverk {}",
+        createLogEntry(
+            LogType.INVALID_MESSAGE,
+            loggingMeta
+        )
+    )
 
     sendReceipt(
         session, receiptProducer, fellesformat, ApprecStatus.avvist, listOf(
-            createApprecError("Dialogmelding kan ikke rettes, det er brukt ein ugyldig dialogmelding kodeverk kombinasjon, " +
-                    "Kontakt din EPJ-leverandør)"
+            createApprecError(
+                "Dialogmelding kan ikke rettes, det er brukt ein ugyldig dialogmelding kodeverk kombinasjon, " +
+                        "Kontakt din EPJ-leverandør)"
             )
         )
     )
