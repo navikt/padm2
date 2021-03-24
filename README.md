@@ -119,11 +119,11 @@ Creating a docker image should be as simple as `docker build -t padm2 .`
 
 ### Deploy redis to dev:
 Deploying redis can be done with the following command:
-`kubectl apply --context dev-fss --namespace default -f redis.yaml`
+`kubectl apply --context dev-fss --namespace default -f .nais/redis.yaml`
 
 ### Deploy redis to prod:
 Deploying redis can be done with the following command:
-`kubectl apply --context prod-fss --namespace default -f redis.yaml`
+`kubectl apply --context prod-fss --namespace default -f .nais/redis.yaml`
 
 
 ## Contact us
