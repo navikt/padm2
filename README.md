@@ -132,6 +132,9 @@ Deploying redis can be done with the following command:
 * June Henriksen, `june.henriksen2@nav.no`
 * Erik Gunnar Jansen, `erik.gunnar.jansen@nav.no`
 * Mathias Rørvik, `mathias.rorvik@nav.no`
+* Anders Rognstad, `anders.rognstad@nav.no`
+* Geir Arne Waagbø, `geir.arne.waagbo@nav.no`
+* Audun Sørheim, `audun.sorheim@nav.no`
 
 ### For NAV employees
 We are available at the Slack channel #isyfo
