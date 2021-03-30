@@ -21,10 +21,7 @@ import no.nav.syfo.metrics.INCOMING_MESSAGE_COUNTER
 import no.nav.syfo.metrics.MESSAGES_SENT_TO_BOQ
 import no.nav.syfo.metrics.REQUEST_TIME
 import no.nav.syfo.model.*
-import no.nav.syfo.services.SignerendeLegeService
-import no.nav.syfo.services.JournalService
-import no.nav.syfo.services.sha256hashstring
-import no.nav.syfo.services.updateRedis
+import no.nav.syfo.services.*
 import no.nav.syfo.util.*
 import no.nav.syfo.validation.validateDialogMeldingKodeverk
 import redis.clients.jedis.Jedis
@@ -51,7 +48,7 @@ class BlockingApplicationRunner {
         subscriptionEmottak: SubscriptionPort,
         jedis: Jedis,
         receiptProducer: MessageProducer,
-        padm2ReglerClient: Padm2ReglerClient,
+        padm2ReglerService: RuleService,
         backoutProducer: MessageProducer,
         journalService: JournalService,
         arenaProducer: MessageProducer,
@@ -107,7 +104,7 @@ class BlockingApplicationRunner {
                     val loggingMeta = LoggingMeta(
                         mottakId = ediLoggId,
                         orgNr = legekontorOrgNr,
-                        msgId = msgHead.msgInfo.msgId
+                        msgId = msgHead.msgInfo.msgId,
                     )
 
                     log.info("Received message, {}", StructuredArguments.fields(loggingMeta))
@@ -259,7 +256,7 @@ class BlockingApplicationRunner {
                             tssid = samhandlerPraksis?.tss_ident ?: ""
                         )
 
-                        val validationResult = padm2ReglerClient.executeRuleValidation(receivedDialogmelding)
+                        val validationResult = padm2ReglerService.executeRuleChains(receivedDialogmelding)
 
                         when (validationResult.status) {
                             Status.OK -> handleStatusOK(

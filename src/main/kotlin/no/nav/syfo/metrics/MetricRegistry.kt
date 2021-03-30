@@ -1,6 +1,7 @@
 package no.nav.syfo.metrics
 
 import io.prometheus.client.Counter
+import io.prometheus.client.Histogram
 import io.prometheus.client.Summary
 
 const val METRICS_NS = "padm2"
@@ -56,4 +57,18 @@ val MESSAGES_SENT_TO_BOQ: Counter = Counter.build()
     .namespace(METRICS_NS)
     .name("message_sent_to_boq")
     .help("Counts the number of messages sent to backout queue")
+    .register()
+
+val RULE_HIT_COUNTER: Counter = Counter.Builder()
+    .namespace(METRICS_NS)
+    .name("rule_hit_counter")
+    .labelNames("rule_name")
+    .help("Registers a counter for each rule in the rule set")
+    .register()
+
+val RULE_HIT_STATUS_COUNTER: Counter = Counter.Builder()
+    .namespace(METRICS_NS)
+    .name("rule_hit_status_counter")
+    .labelNames("rule_status")
+    .help("Registers a counter for each rule status")
     .register()

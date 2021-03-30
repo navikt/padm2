@@ -24,7 +24,7 @@ fun handleRecivedMessage(
         )
     ) {
         log.warn(
-            "Dialogmelding med dialogmledingid {}, er allerede lagret i databasen, {}",
+            "Dialogmelding med dialogmeldingid {}, er allerede lagret i databasen, {}",
             receivedDialogmelding.dialogmelding.id, StructuredArguments.fields(loggingMeta)
         )
     } else {
