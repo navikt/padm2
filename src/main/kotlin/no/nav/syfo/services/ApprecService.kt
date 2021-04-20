@@ -1,7 +1,5 @@
 package no.nav.syfo.services
 
-import javax.jms.MessageProducer
-import javax.jms.Session
 import no.nav.helse.apprecV1.XMLAppRec
 import no.nav.helse.apprecV1.XMLCV
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
@@ -11,6 +9,8 @@ import no.nav.syfo.metrics.APPREC_COUNTER
 import no.nav.syfo.util.apprecMarshaller
 import no.nav.syfo.util.get
 import no.nav.syfo.util.toString
+import javax.jms.MessageProducer
+import javax.jms.Session
 
 fun sendReceipt(
     session: Session,

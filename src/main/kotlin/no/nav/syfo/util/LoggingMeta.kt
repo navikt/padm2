@@ -33,7 +33,8 @@ fun createLogEntry(
 data class LoggingMeta(
     val mottakId: String,
     val orgNr: String?,
-    val msgId: String
+    val msgId: String,
+    val dialogmeldingId: String = ""
 )
 
 class TrackableException(override val cause: Throwable) : RuntimeException()

@@ -25,8 +25,9 @@ import no.nav.syfo.db.VaultCredentialService
 import no.nav.syfo.mq.connectionFactory
 import no.nav.syfo.mq.consumerForQueue
 import no.nav.syfo.mq.producerForQueue
-import no.nav.syfo.services.SignerendeLegeService
 import no.nav.syfo.services.JournalService
+import no.nav.syfo.services.RuleService
+import no.nav.syfo.services.SignerendeLegeService
 import no.nav.syfo.util.TrackableException
 import no.nav.syfo.util.getFileAsString
 import no.nav.syfo.vault.RenewVaultService
@@ -98,13 +99,24 @@ fun main() {
     val oidcClient = StsOidcClient(vaultSecrets.serviceuserUsername, vaultSecrets.serviceuserPassword)
     val aktoerIdClient = AktoerIdClient(env.aktoerregisterV1Url, oidcClient, httpClient)
     val sarClient = SarClient(env.kuhrSarApiUrl, httpClient)
-    val padm2ReglerClient = Padm2ReglerClient(env.padm2ReglerEndpointURL, httpClient)
+
     val stsClient = StsOidcClient(vaultSecrets.serviceuserUsername, vaultSecrets.serviceuserPassword)
     val sakClient = SakClient(env.opprettSakUrl, stsClient, httpClient)
     val dokArkivClient = DokArkivClient(env.dokArkivUrl, stsClient, httpClient)
     val pdfgenClient = PdfgenClient(env.syfopdfgen, httpClient)
-    val accessTokenClient = AccessTokenClient(env.aadAccessTokenUrl, vaultSecrets.clientId, vaultSecrets.clientsecret, httpClientWithProxy)
-    val syfohelsenettproxyClient = SyfohelsenettproxyClient(env.syfohelsenettproxyEndpointURL, accessTokenClient, env.helsenettproxyId, httpClient)
+    val accessTokenClient =
+        AccessTokenClient(env.aadAccessTokenUrl, vaultSecrets.clientId, vaultSecrets.clientsecret, httpClientWithProxy)
+
+    val syfohelsenettproxyClient = SyfohelsenettproxyClient(
+        env.syfohelsenettproxyEndpointURL,
+        accessTokenClient,
+        env.helsenettproxyId,
+        httpClient
+    )
+
+    val ruleService = RuleService(
+        LegeSuspensjonClient(env.legeSuspensjonEndpointURL, vaultSecrets, oidcClient, httpClient),
+        syfohelsenettproxyClient)
 
     val journalService = JournalService(sakClient, dokArkivClient, pdfgenClient)
     val signerendeLegeService = SignerendeLegeService(syfohelsenettproxyClient)
@@ -122,7 +134,7 @@ fun main() {
     launchListeners(
         applicationState, env,
         vaultSecrets, aktoerIdClient, sarClient,
-        subscriptionEmottak, padm2ReglerClient, journalService, database, signerendeLegeService
+        subscriptionEmottak, ruleService, journalService, database, signerendeLegeService
     )
 }
 
@@ -145,7 +157,7 @@ fun launchListeners(
     aktoerIdClient: AktoerIdClient,
     kuhrSarClient: SarClient,
     subscriptionEmottak: SubscriptionPort,
-    padm2ReglerClient: Padm2ReglerClient,
+    padm2ReglerService: RuleService,
     journalService: JournalService,
     database: Database,
     signerendeLegeService: SignerendeLegeService
@@ -168,7 +180,7 @@ fun launchListeners(
                     applicationState, inputconsumer,
                     session, env, secrets, aktoerIdClient,
                     kuhrSarClient, subscriptionEmottak, jedis, receiptProducer,
-                    padm2ReglerClient, backoutProducer, journalService,
+                    padm2ReglerService, backoutProducer, journalService,
                     arenaProducer, database, signerendeLegeService
                 )
             }

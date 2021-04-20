@@ -1,6 +1,6 @@
 [![Build status](https://github.com/navikt/padm2/workflows/Deploy%20to%20dev%20and%20prod/badge.svg)](https://github.com/navikt/padm2/workflows/Deploy%20to%20dev%20and%20prod/badge.svg)
 
-# Prosessering av dialogmledinger (PADM)
+# Prosessering av dialogmeldinger (PADM)
 Repository for PADM. Application written in Kotlin used to receive dialogmeldinger from external systems, doing some validation, then pushing it to our internal systems.
 More information on dialogmeldinger can be found here: https://www.nhn.no/veileder-for-elektronisk-meldingsutveksling/del-1-elektronisk-meldingsutveksling/elektronisk-meldingsutveksling/#kap-dialogmeldinger
 

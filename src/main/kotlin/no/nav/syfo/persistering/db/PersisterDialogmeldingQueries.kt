@@ -71,19 +71,19 @@ private fun Connection.opprettDialogmeldingDokument(dialogmelding: Dialogmelding
     }
 }
 
-private fun Connection.opprettBehandlingsutfall(validationResult: ValidationResult, dialogmledingid: String) {
+private fun Connection.opprettBehandlingsutfall(validationResult: ValidationResult, dialogmeldingid: String) {
     this.prepareStatement(
         """
                     INSERT INTO BEHANDLINGSUTFALL(id, behandlingsutfall) VALUES (?, ?)
                 """
     ).use {
-        it.setString(1, dialogmledingid)
+        it.setString(1, dialogmeldingid)
         it.setObject(2, validationResult.toPGObject())
         it.executeUpdate()
     }
 }
 
-fun Connection.erDialogmeldingOpplysningerLagret(dialogmledingid: String) =
+fun Connection.erDialogmeldingOpplysningerLagret(dialogmeldingid: String) =
     use { connection ->
         connection.prepareStatement(
             """
@@ -92,7 +92,7 @@ fun Connection.erDialogmeldingOpplysningerLagret(dialogmledingid: String) =
                 WHERE id=?;
                 """
         ).use {
-            it.setString(1, dialogmledingid)
+            it.setString(1, dialogmeldingid)
             it.executeQuery().next()
         }
     }
