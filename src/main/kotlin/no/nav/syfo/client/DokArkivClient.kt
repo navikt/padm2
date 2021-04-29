@@ -119,18 +119,15 @@ fun leggtilDokument(
         vedleggListe
             .filter { vedlegg -> vedlegg.contentBase64.isNotEmpty() }
             .map { vedlegg -> vedleggToPDF(vedlegg) }
-            .map {
+            .mapIndexed { index, vedlegg ->
                 listVedleggDokumenter.add(
                     Dokument(
                         dokumentvarianter = listOf(
                             Dokumentvarianter(
-                                filtype = findFiltype(it),
-                                filnavn = when (it.beskrivelse.length >= 200) {
-                                    true -> "${it.beskrivelse.substring(0, 199)}.${findFiltype(it).toLowerCase()}"
-                                    else -> "${it.beskrivelse}.${findFiltype(it).toLowerCase()}"
-                                },
+                                filtype = findFiltype(vedlegg),
+                                filnavn = "Vedlegg_nr_${index}_Dialogmelding_$ediLoggId",
                                 variantformat = "ARKIV",
-                                fysiskDokument = it.contentBase64
+                                fysiskDokument = vedlegg.contentBase64
                             )
                         ),
                         tittel = "Vedlegg til dialogmelding"
