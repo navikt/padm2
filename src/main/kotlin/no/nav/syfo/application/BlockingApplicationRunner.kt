@@ -135,6 +135,9 @@ class BlockingApplicationRunner {
 
                         val samhandlerPraksis = samhandlerPraksisMatch?.samhandlerPraksis
 
+                        // Denne får vi hvis vi fant minst én aktiv samhandler, men ikke aktive med navn
+                        // Og minst én av de har praksis type FALE/FALO
+                        // Jeg vet ikke hvorfor det er et case, her logger vi bare litt ekstra.
                         if (samhandlerPraksisMatch?.percentageMatch != null && samhandlerPraksisMatch.percentageMatch == 999.0) {
                             log.info(
                                 "SamhandlerPraksis is found but is FALE or FALO, subscription_emottak is not created, {}",
@@ -142,10 +145,14 @@ class BlockingApplicationRunner {
                             )
                         } else {
                             when (samhandlerPraksis) {
+                                // VI fant ingen samhandlere, verken aktive eller inaktive
+                                // Eller  vi fant minst én aktiv, men ingen aktive med navn, og ingen av de var FALE/FALO
                                 null -> log.info(
                                     "SamhandlerPraksis is Not found, {}",
                                     StructuredArguments.fields(loggingMeta)
                                 )
+                                // Vi fant en match på samhandler, da oppdaterer vi e-mottak hvis samhandleren ikke er av typen legevakt
+                                // Match her er enten HerID, eller beste match på navn på aktive eller inaktive samhandlere.
                                 else -> if (!samhandlerParksisisLegevakt(samhandlerPraksis) &&
                                     !receiverBlock.partnerReferanse.isNullOrEmpty() &&
                                     receiverBlock.partnerReferanse.isNotBlank()
@@ -157,6 +164,7 @@ class BlockingApplicationRunner {
                                         receiverBlock,
                                         loggingMeta
                                     )
+                                    // Logg info hvis den beste samhandleren vi fant er legevakt, ikke oppdater e-mottak.
                                 } else {
                                     log.info(
                                         "SamhandlerPraksis is Legevakt or partnerReferanse is empty or blank, subscription_emottak is not created, {}",

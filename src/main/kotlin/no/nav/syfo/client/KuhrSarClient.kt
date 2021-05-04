@@ -114,9 +114,12 @@ fun findBestSamhandlerPraksis(
     herId: String?,
     loggingMeta: LoggingMeta
 ): SamhandlerPraksisMatch? {
+    // Finn samhandlere med status aktiv.
     val aktiveSamhandlere = samhandlere.flatMap { it.samh_praksis }
         .filter { praksis -> praksis.samh_praksis_status_kode == "aktiv" }
 
+    // Hvis vi ikke finner noen aktive samhandlere, logger vi det.
+    // Hvorfor kan vi ikke prøve match på inaktive her?
     if (aktiveSamhandlere.isEmpty()) {
         log.info("Fant ingen aktive samhandlere. {}  Meta: {}, {} ",
             keyValue("praksis Informasjo", samhandlere.formaterPraksis()),
@@ -125,6 +128,8 @@ fun findBestSamhandlerPraksis(
         )
     }
 
+    // Hvis man har fått med en herID i dialogmeldingen, og man har minst én aktiv samhandler
+    // Hvis man finner en samhandler med samme herID som den vi fikk i meldingen, er det god stemning. Da vet vi at vi har riktig samhandler!
     if (!herId.isNullOrEmpty() && aktiveSamhandlere.isNotEmpty()) {
         val samhandlerByHerId = aktiveSamhandlere.find {
             it.her_id == herId
@@ -138,10 +143,18 @@ fun findBestSamhandlerPraksis(
         }
     }
 
+    // Finn aktive samhandlere som også har navn.
+    // Det ser ut til å gjelde de aller fleste samhandlere.
     val aktiveSamhandlereMedNavn = samhandlere.flatMap { it.samh_praksis }
         .filter { praksis -> praksis.samh_praksis_status_kode == "aktiv" }
         .filter { !it.navn.isNullOrEmpty() }
 
+    // IKke herID
+    // Må være minst én aktiv samhandler, men ingen aktive som har navn (hvis ingen aktive, bryr vi oss ikke om navn)
+    // Dette skjer nesten aldri
+    // Hvis man finner en samhandler (aktiv, uten navn) som er av typen FALE/FALO, returnerer vi 999% match. Det fører til ekstra logging i blockingApplicationRunner
+    // Hvis ingen her er FALE/FALO, kommer vi ut av ifen, og kommer til 'return aktiveSamhandlereMedNavn' (ca. linje 185 med kommentarer)
+    // Hvorfor bryr vi oss om FALE/FALO her??! Det er bare mer logikk, og det fører til en ekstra logging, men resultatet blir det samme: At vi ikke oppdaterer e-mottak. (Vi finner uansett bare den første FALE/FALO-samhandleren, det kan jo være flere her?)
     if (aktiveSamhandlereMedNavn.isNullOrEmpty() && !aktiveSamhandlere.isNullOrEmpty()) {
         val samhandlerFALEOrFALO = aktiveSamhandlere.find {
             it.samh_praksis_type_kode == SamhandlerPraksisType.FASTLEGE.kodeVerdi ||
@@ -150,6 +163,10 @@ fun findBestSamhandlerPraksis(
         if (samhandlerFALEOrFALO != null) {
             return SamhandlerPraksisMatch(samhandlerFALEOrFALO, 999.0)
         }
+        // Hvis vi ikke har funnet noen aktive samhandlere, prøver vi å finne match på inaktive samhandlere.
+        // Man prøver å matche på inaktive som også har navn.
+        // Vi gjør en lignende match lenger opp, der man kun logger
+        // Hvorfor kommer denne sist? Hvis denne er true, vil jo aldri 'aktiveSamhandlereMedNavn' ha elementer? 'aktivMedNavn' er jo et subset av 'aktive'.
     } else if (aktiveSamhandlere.isNullOrEmpty()) {
         val inaktiveSamhandlerMatchingPaaOrganisjonsNavn = samhandlerMatchingPaaOrganisjonsNavn(samhandlere, orgName)
         return filtererBortSamhanlderPraksiserPaaProsentMatch(
@@ -160,6 +177,11 @@ fun findBestSamhandlerPraksis(
         )
     }
 
+    // Hvis ikke noe annet matcher, havner man her
+    // Her må man ha minst én aktiv samhandler med navn, og ingen som har herID
+    // Her er det en metode som prøver å finne best mulig match mellom navnet på samhandler og orgnavn vi fikk med i dialogmeldingen.
+    // Returner den samhandleren som fikk best match på navn.
+    // Hvis man har minst én aktiv samhandler, men ingen med navn, og ingen av typen FALE/FALO, havner man her, men da har man tom liste, da returneres 'null' fra map-metoden.
     return aktiveSamhandlereMedNavn
         .map { samhandlerPraksis ->
             SamhandlerPraksisMatch(samhandlerPraksis, calculatePercentageStringMatch(samhandlerPraksis.navn, orgName) * 100)
