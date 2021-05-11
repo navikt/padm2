@@ -111,7 +111,7 @@ fun List<Samhandler>.formaterPraksis() = flatMap { it.samh_praksis }
 fun findBestSamhandlerPraksis(
     samhandlere: List<Samhandler>,
     orgName: String,
-    herId: String?,
+    legekontorHerId: String?,
     loggingMeta: LoggingMeta
 ): SamhandlerPraksisMatch? {
     val aktiveSamhandlere = samhandlere.flatMap { it.samh_praksis }
@@ -125,13 +125,13 @@ fun findBestSamhandlerPraksis(
         )
     }
 
-    if (!herId.isNullOrEmpty() && aktiveSamhandlere.isNotEmpty()) {
+    if (!legekontorHerId.isNullOrEmpty() && aktiveSamhandlere.isNotEmpty()) {
         val samhandlerByHerId = aktiveSamhandlere.find {
-            it.her_id == herId
+            it.her_id == legekontorHerId
         }
         if (samhandlerByHerId != null) {
-            log.info("Fant samhandler basert på herid. herid: $herId, {}, {}",
-                keyValue("praksis Informasjo", samhandlere.formaterPraksis()),
+            log.info("Fant samhandler basert på herid. herid: $legekontorHerId, {}, {}",
+                keyValue("praksisinformasjon", samhandlere.formaterPraksis()),
                 StructuredArguments.fields(loggingMeta)
             )
             return SamhandlerPraksisMatch(samhandlerByHerId, 100.0)
