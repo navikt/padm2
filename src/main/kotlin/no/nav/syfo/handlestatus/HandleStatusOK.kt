@@ -38,7 +38,8 @@ suspend fun handleStatusOK(
     dialogmelding: Dialogmelding,
     database: Database,
     pasientNavn: String,
-    navnSignerendeLege: String
+    navnSignerendeLege: String,
+    sha256String: String,
 ) {
 
     journalService.onJournalRequest(
@@ -64,7 +65,7 @@ suspend fun handleStatusOK(
         loggingMeta
     )
 
-    handleRecivedMessage(receivedDialogmelding, validationResult, loggingMeta, database)
+    handleRecivedMessage(receivedDialogmelding, validationResult, sha256String, loggingMeta, database)
 
     sendReceipt(session, receiptProducer, fellesformat, ApprecStatus.ok)
     log.info("Apprec Receipt sent to {}, {}", apprecQueueName, StructuredArguments.fields(loggingMeta))
