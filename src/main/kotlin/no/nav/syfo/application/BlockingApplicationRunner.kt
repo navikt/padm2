@@ -275,7 +275,8 @@ class BlockingApplicationRunner {
                                 dialogmelding,
                                 database,
                                 pasientNavn,
-                                navnSignerendeLege
+                                navnSignerendeLege,
+                                sha256String,
                             )
 
                             Status.INVALID -> handleStatusINVALID(
@@ -290,7 +291,8 @@ class BlockingApplicationRunner {
                                 vedleggListe,
                                 database,
                                 pasientNavn,
-                                navnSignerendeLege
+                                navnSignerendeLege,
+                                sha256String,
                             )
                         }
 

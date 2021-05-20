@@ -15,6 +15,7 @@ import no.nav.syfo.util.LoggingMeta
 fun handleRecivedMessage(
     receivedDialogmelding: ReceivedDialogmelding,
     validationResult: ValidationResult,
+    sha256String: String,
     loggingMeta: LoggingMeta,
     database: Database
 ) {
@@ -28,7 +29,7 @@ fun handleRecivedMessage(
             receivedDialogmelding.dialogmelding.id, StructuredArguments.fields(loggingMeta)
         )
     } else {
-        database.lagreMottattDialogmelding(receivedDialogmelding, validationResult)
+        database.lagreMottattDialogmelding(receivedDialogmelding, validationResult, sha256String)
         log.info(
             "Dialogmelding lagret i databasen, for {}",
             StructuredArguments.fields(loggingMeta)

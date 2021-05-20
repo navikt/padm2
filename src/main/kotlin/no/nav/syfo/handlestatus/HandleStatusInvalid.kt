@@ -39,7 +39,8 @@ suspend fun handleStatusINVALID(
     vedleggListe: List<Vedlegg>?,
     database: Database,
     pasientNavn: String,
-    navnSignerendeLege: String
+    navnSignerendeLege: String,
+    sha256String: String,
 ) {
 
     journalService.onJournalRequest(
@@ -51,7 +52,7 @@ suspend fun handleStatusINVALID(
         navnSignerendeLege
     )
 
-    handleRecivedMessage(receivedDialogmelding, validationResult, loggingMeta, database)
+    handleRecivedMessage(receivedDialogmelding, validationResult, sha256String, loggingMeta, database)
 
     sendReceipt(session, receiptProducer, fellesformat, ApprecStatus.avvist,
         validationResult.ruleHits.map { it.toApprecCV() })

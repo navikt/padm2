@@ -11,11 +11,12 @@ import org.postgresql.util.PGobject
 
 fun DatabaseInterface.lagreMottattDialogmelding(
     receivedDialogmelding: ReceivedDialogmelding,
-    validationResult: ValidationResult
+    validationResult: ValidationResult,
+    sha256String: String,
 ) {
     connection.use { connection ->
         connection.opprettDialogmeldingOpplysninger(receivedDialogmelding)
-        connection.opprettDialogmeldingDokument(receivedDialogmelding.dialogmelding)
+        connection.opprettDialogmeldingDokument(receivedDialogmelding.dialogmelding, sha256String)
         connection.opprettBehandlingsutfall(
             validationResult, receivedDialogmelding.dialogmelding.id
         )
@@ -59,14 +60,15 @@ private fun Connection.opprettDialogmeldingOpplysninger(receivedDialogmelding: R
     }
 }
 
-private fun Connection.opprettDialogmeldingDokument(dialogmelding: Dialogmelding) {
+private fun Connection.opprettDialogmeldingDokument(dialogmelding: Dialogmelding, sha256String: String) {
     this.prepareStatement(
         """
-            INSERT INTO DIALOGMELDINGDOKUMENT(id, dialogmleding) VALUES  (?, ?)
+            INSERT INTO DIALOGMELDINGDOKUMENT(id, dialogmelding, sha_string) VALUES  (?, ?, ?)
             """
     ).use {
         it.setString(1, dialogmelding.id)
         it.setObject(2, dialogmelding.toPGObject())
+        it.setString(3, sha256String)
         it.executeUpdate()
     }
 }
