@@ -59,21 +59,20 @@ suspend fun handleStatusINVALID(
     log.info("Apprec Receipt sent to {}, {}", apprecQueueName, fields(loggingMeta))
 }
 
-fun handleDuplicateSM2013Content(
+fun handleDuplicateDialogmeldingContent(
     session: Session,
     receiptProducer: MessageProducer,
     fellesformat: XMLEIFellesformat,
     loggingMeta: LoggingMeta,
     env: Environment,
-    redisSha256String: String
+    sha256String: String,
 ) {
-
     log.warn(
-        "Duplicate message: Same redisSha256String {}",
+        "Duplicate message: Same sha256String {}",
         createLogEntry(
             LogType.INVALID_MESSAGE,
             loggingMeta,
-            "originalEdiLoggId" to redisSha256String,
+            "shaString" to sha256String,
         )
     )
 
@@ -82,38 +81,6 @@ fun handleDuplicateSM2013Content(
             createApprecError(
                 "Duplikat! - Denne dialogmeldingen er mottatt tidligere. " +
                         "Skal ikke sendes på nytt."
-            )
-        )
-    )
-    log.info("Apprec Receipt sent to {}, {}", env.apprecQueueName, fields(loggingMeta))
-    INVALID_MESSAGE_NO_NOTICE.inc()
-}
-
-fun handleDuplicateEdiloggid(
-    session: Session,
-    receiptProducer: MessageProducer,
-    fellesformat: XMLEIFellesformat,
-    loggingMeta: LoggingMeta,
-    env: Environment,
-    redisEdiloggid: String
-) {
-
-    log.warn(
-        "Duplicate message: Same redisEdiloggid {}",
-        createLogEntry(
-            LogType.INVALID_MESSAGE,
-            loggingMeta,
-            "originalEdiLoggId" to redisEdiloggid,
-        )
-    )
-
-    sendReceipt(
-        session, receiptProducer, fellesformat, ApprecStatus.avvist, listOf(
-            createApprecError(
-                "Dialogmeldingen kan ikke rettes, det må skrives en ny. Grunnet følgende:" +
-                        "Denne dialogmeldingen har ein identisk identifikator med ein dialogmeldingen som er mottatt tidligere," +
-                        " og er derfor ein duplikat." +
-                        " og skal ikke sendes på nytt. Dersom dette ikke stemmer, kontakt din EPJ-leverandør"
             )
         )
     )
