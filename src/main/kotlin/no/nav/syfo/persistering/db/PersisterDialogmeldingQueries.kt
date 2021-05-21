@@ -99,6 +99,20 @@ fun Connection.erDialogmeldingOpplysningerLagret(dialogmeldingid: String) =
         }
     }
 
+fun Connection.hasSavedDialogmeldingDokument(shaString: String): Boolean =
+    use { connection ->
+        connection.prepareStatement(
+            """
+                SELECT *
+                FROM DIALOGMELDINGDOKUMENT
+                WHERE sha_string=?;
+                """
+        ).use {
+            it.setString(1, shaString)
+            it.executeQuery().next()
+        }
+    }
+
 fun Dialogmelding.toPGObject() = PGobject().also {
     it.type = "json"
     it.value = objectMapper.writeValueAsString(this)

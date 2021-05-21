@@ -166,23 +166,12 @@ class BlockingApplicationRunner {
                             }
                         }
 
-                        val redisSha256String = jedis.get(sha256String)
-                        val redisEdiloggid = jedis.get(ediLoggId)
-
-                        if (redisSha256String != null) {
-                            handleDuplicateSM2013Content(
+                        if (dialogmeldingDokumentWithShaExists(sha256String, database)) {
+                            handleDuplicateDialogmeldingContent(
                                 session, receiptProducer,
-                                fellesformat, loggingMeta, env, redisSha256String
+                                fellesformat, loggingMeta, env, sha256String
                             )
                             continue@loop
-                        } else if (redisEdiloggid != null) {
-                            handleDuplicateEdiloggid(
-                                session, receiptProducer,
-                                fellesformat, loggingMeta, env, redisEdiloggid
-                            )
-                            continue@loop
-                        } else {
-                            updateRedis(jedis, ediLoggId, sha256String)
                         }
 
                         val patientIdents = aktoerIds[personNumberPatient]
