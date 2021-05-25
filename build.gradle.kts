@@ -26,7 +26,6 @@ val kluentVersion = "1.39"
 val mockkVersion = "1.9.3"
 val jacksonVersion = "2.9.8"
 val commonsTextVersion = "1.4"
-val jedisVersion = "3.1.0"
 val arenaDialogNotatVersion = "1.e1999cf"
 val javaTimeAdapterVersion = "1.1.3"
 val vaultJavaDriveVersion = "3.1.0"
@@ -115,8 +114,6 @@ dependencies {
     implementation("no.nav.helse.xml:dialogmelding:$dialogmeldingVersion")
     implementation("no.nav.helse.xml:base64Container:$base64containerVersion")
     implementation("no.nav.helse.xml:arenaDialogNotat:$arenaDialogNotatVersion")
-
-    implementation("redis.clients:jedis:$jedisVersion")
 
     implementation("org.postgresql:postgresql:$postgresVersion")
     implementation("com.zaxxer:HikariCP:$hikariVersion")

@@ -13,7 +13,9 @@ import no.nav.syfo.Environment
 import no.nav.syfo.VaultSecrets
 import no.nav.syfo.application.services.samhandlerParksisisLegevakt
 import no.nav.syfo.application.services.startSubscription
-import no.nav.syfo.client.*
+import no.nav.syfo.client.AktoerIdClient
+import no.nav.syfo.client.SarClient
+import no.nav.syfo.client.findBestSamhandlerPraksis
 import no.nav.syfo.db.Database
 import no.nav.syfo.handlestatus.*
 import no.nav.syfo.log
@@ -24,8 +26,6 @@ import no.nav.syfo.model.*
 import no.nav.syfo.services.*
 import no.nav.syfo.util.*
 import no.nav.syfo.validation.validateDialogMeldingKodeverk
-import redis.clients.jedis.Jedis
-import redis.clients.jedis.exceptions.JedisConnectionException
 import java.io.StringReader
 import java.time.ZoneOffset
 import java.util.*
@@ -46,7 +46,6 @@ class BlockingApplicationRunner {
         aktoerIdClient: AktoerIdClient,
         kuhrSarClient: SarClient,
         subscriptionEmottak: SubscriptionPort,
-        jedis: Jedis,
         receiptProducer: MessageProducer,
         padm2ReglerService: RuleService,
         backoutProducer: MessageProducer,
@@ -180,21 +179,20 @@ class BlockingApplicationRunner {
                         if (patientIdents == null || patientIdents.feilmelding != null) {
                             handlePatientNotFoundInAktorRegister(
                                 patientIdents, session,
-                                receiptProducer, fellesformat, ediLoggId, jedis, sha256String, env, loggingMeta
+                                receiptProducer, fellesformat, env, loggingMeta
                             )
                             continue@loop
                         }
                         if (doctorIdents == null || doctorIdents.feilmelding != null) {
                             handleDoctorNotFoundInAktorRegister(
                                 doctorIdents, session,
-                                receiptProducer, fellesformat, ediLoggId, jedis, sha256String, env, loggingMeta
+                                receiptProducer, fellesformat, env, loggingMeta
                             )
                             continue@loop
                         }
                         if (erTestFnr(personNumberPatient) && env.cluster == "prod-fss") {
                             handleTestFnrInProd(
-                                session, receiptProducer, fellesformat,
-                                ediLoggId, jedis, sha256String, env, loggingMeta
+                                session, receiptProducer, fellesformat, env, loggingMeta
                             )
                             continue@loop
                         }
@@ -203,16 +201,14 @@ class BlockingApplicationRunner {
                             dialogmeldingXml.notat.first().tekstNotatInnhold.isNullOrEmpty()
                         ) {
                             handleMeldingsTekstMangler(
-                                session, receiptProducer, fellesformat,
-                                ediLoggId, jedis, sha256String, env, loggingMeta
+                                session, receiptProducer, fellesformat, env, loggingMeta
                             )
                             continue@loop
                         }
 
                         if (!validateDialogMeldingKodeverk(dialogmeldingXml, dialogmeldingType)) {
                             handleInvalidDialogMeldingKodeverk(
-                                session, receiptProducer, fellesformat,
-                                ediLoggId, jedis, sha256String, env, loggingMeta
+                                session, receiptProducer, fellesformat, env, loggingMeta
                             )
                             continue@loop
                         }
@@ -297,15 +293,6 @@ class BlockingApplicationRunner {
                             StructuredArguments.fields(loggingMeta)
                         )
                     }
-                } catch (jedisException: JedisConnectionException) {
-                    log.error(
-                        "Exception caught, redis issue while handling message, sending to backout",
-                        jedisException
-                    )
-                    backoutProducer.send(message)
-                    MESSAGES_SENT_TO_BOQ.inc()
-                    log.error("Setting applicationState.alive to false")
-                    applicationState.alive = false
                 } catch (e: Exception) {
                     MESSAGES_SENT_TO_BOQ.inc()
                     log.error("Exception caught while handling message, sending to backout, {}", e)

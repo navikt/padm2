@@ -14,7 +14,6 @@ data class Environment(
     val aktoerregisterV1Url: String = getEnvVar("AKTOR_REGISTER_V1_URL"),
     val kuhrSarApiUrl: String = getEnvVar("KUHR_SAR_API_URL", "http://kuhr-sar-api.teamkuhr.svc.nais.local"),
     val subscriptionEndpointURL: String = getEnvVar("SUBSCRIPTION_ENDPOINT_URL"),
-    val redishost: String = getEnvVar("REDIS_HOST", "padm2-redis.default.svc.nais.local"),
     val cluster: String = getEnvVar("NAIS_CLUSTER_NAME"),
     val padm2ReglerEndpointURL: String = getEnvVar("PADM2REGLER_ENDPOINT_URL", "http://padm2regler"),
     val inputBackoutQueueName: String = getEnvVar("MQ_INPUT_BOQ_QUEUE_NAME"),
@@ -39,7 +38,6 @@ data class VaultSecrets(
     val serviceuserPassword: String,
     val mqUsername: String,
     val mqPassword: String,
-    val redisSecret: String,
     val clientId: String,
     val clientsecret: String
 )

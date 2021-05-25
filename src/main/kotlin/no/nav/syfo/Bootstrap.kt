@@ -36,7 +36,6 @@ import org.apache.cxf.ws.addressing.WSAddressingFeature
 import org.apache.http.impl.conn.SystemDefaultRoutePlanner
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import redis.clients.jedis.Jedis
 import java.net.ProxySelector
 import javax.jms.Session
 
@@ -62,7 +61,6 @@ fun main() {
         serviceuserUsername = getFileAsString("/secrets/serviceuser/username"),
         mqUsername = getFileAsString("/secrets/default/mqUsername"),
         mqPassword = getFileAsString("/secrets/default/mqPassword"),
-        redisSecret = getFileAsString("/secrets/default/redisSecret"),
         clientId = getFileAsString("/secrets/azuread/padm2/client_id"),
         clientsecret = getFileAsString("/secrets/azuread/padm2/client_secret")
     )
@@ -116,7 +114,8 @@ fun main() {
 
     val ruleService = RuleService(
         LegeSuspensjonClient(env.legeSuspensjonEndpointURL, vaultSecrets, oidcClient, httpClient),
-        syfohelsenettproxyClient)
+        syfohelsenettproxyClient
+    )
 
     val journalService = JournalService(sakClient, dokArkivClient, pdfgenClient)
     val signerendeLegeService = SignerendeLegeService(syfohelsenettproxyClient)
@@ -164,26 +163,23 @@ fun launchListeners(
 ) {
     createListener(applicationState) {
         connectionFactory(env).createConnection(secrets.mqUsername, secrets.mqPassword).use { connection ->
-            Jedis(env.redishost, 6379).use { jedis ->
-                connection.start()
-                val session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE)
+            connection.start()
+            val session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE)
 
-                val inputconsumer = session.consumerForQueue(env.inputQueueName)
-                val receiptProducer = session.producerForQueue(env.apprecQueueName)
-                val backoutProducer = session.producerForQueue(env.inputBackoutQueueName)
-                val arenaProducer = session.producerForQueue(env.arenaQueueName)
+            val inputconsumer = session.consumerForQueue(env.inputQueueName)
+            val receiptProducer = session.producerForQueue(env.apprecQueueName)
+            val backoutProducer = session.producerForQueue(env.inputBackoutQueueName)
+            val arenaProducer = session.producerForQueue(env.arenaQueueName)
 
-                applicationState.ready = true
-                jedis.auth(secrets.redisSecret)
+            applicationState.ready = true
 
-                BlockingApplicationRunner().run(
-                    applicationState, inputconsumer,
-                    session, env, secrets, aktoerIdClient,
-                    kuhrSarClient, subscriptionEmottak, jedis, receiptProducer,
-                    padm2ReglerService, backoutProducer, journalService,
-                    arenaProducer, database, signerendeLegeService
-                )
-            }
+            BlockingApplicationRunner().run(
+                applicationState, inputconsumer,
+                session, env, secrets, aktoerIdClient,
+                kuhrSarClient, subscriptionEmottak, receiptProducer,
+                padm2ReglerService, backoutProducer, journalService,
+                arenaProducer, database, signerendeLegeService
+            )
         }
     }
 }
