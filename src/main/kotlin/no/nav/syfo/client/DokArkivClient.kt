@@ -161,7 +161,6 @@ fun vedleggToPDF(vedlegg: Vedlegg): Vedlegg {
     )
 }
 
-
 fun findFiltype(vedlegg: Vedlegg): String =
     when (vedlegg.mimeType) {
         "application/pdf" -> "PDFA"
@@ -172,7 +171,7 @@ fun findFiltype(vedlegg: Vedlegg): String =
     }
 
 fun createAvsenderMottakerValidFnr(avsenderFnr: String, dialogmelding: Dialogmelding):
-        AvsenderMottaker = AvsenderMottaker(
+    AvsenderMottaker = AvsenderMottaker(
     id = avsenderFnr,
     idType = "FNR",
     land = "Norge",

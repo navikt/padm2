@@ -101,7 +101,6 @@ internal class HPRRuleChainTest {
             null
         )
 
-
         HPRRuleChain.BEHANDLER_MANGLER_AUTORISASJON_I_HPR(ruleData(dialogmelding, behandler)) shouldEqual false
     }
 

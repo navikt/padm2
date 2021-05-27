@@ -31,11 +31,11 @@ class SakClient constructor(
             header("X-Correlation-ID", msgId)
             header("Authorization", "Bearer ${oidcClient.oidcToken().access_token}")
             body = OpprettSak(
-                    tema = "OPP",
-                    applikasjon = "FS22",
-                    aktoerId = pasientAktoerId,
-                    orgnr = null,
-                    fagsakNr = null
+                tema = "OPP",
+                applikasjon = "FS22",
+                aktoerId = pasientAktoerId,
+                orgnr = null,
+                fagsakNr = null
             )
         }
     }

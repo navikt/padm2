@@ -69,7 +69,8 @@ class RuleService(
 
             val results = listOf(
                 ValidationRuleChain.values().executeFlow(
-                    dialogmelding, RuleMetadata(
+                    dialogmelding,
+                    RuleMetadata(
                         receivedDate = receivedDialogmelding.mottattDato,
                         signatureDate = receivedDialogmelding.mottattDato,
                         patientPersonNumber = receivedDialogmelding.personNrPasient,

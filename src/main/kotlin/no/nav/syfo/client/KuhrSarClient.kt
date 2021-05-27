@@ -29,7 +29,7 @@ class SarClient(
             accept(ContentType.Application.Json)
             parameter("ident", ident)
         }
-        when(response.status) {
+        when (response.status) {
             HttpStatusCode.OK -> response.receive()
             else -> throw IOException("Vi fikk en uventet feil fra kuhrSar, prøver på nytt! ${response.content}")
         }
@@ -118,7 +118,8 @@ fun findBestSamhandlerPraksis(
         .filter { praksis -> praksis.samh_praksis_status_kode == "aktiv" }
 
     if (aktiveSamhandlere.isEmpty()) {
-        log.info("Fant ingen aktive samhandlere. {}  Meta: {}, {} ",
+        log.info(
+            "Fant ingen aktive samhandlere. {}  Meta: {}, {} ",
             keyValue("praksis Informasjo", samhandlere.formaterPraksis()),
             keyValue("antall praksiser", samhandlere.size),
             StructuredArguments.fields(loggingMeta)
@@ -127,7 +128,8 @@ fun findBestSamhandlerPraksis(
 
     val samhandlerPraksisByHerId = getSamhandlerPraksisByHerId(legekontorHerId, aktiveSamhandlere)
     if (samhandlerPraksisByHerId != null) {
-        log.info("Fant samhandler basert på herid. herid: $legekontorHerId, {}, {}",
+        log.info(
+            "Fant samhandler basert på herid. herid: $legekontorHerId, {}, {}",
             keyValue("praksisinformasjon", samhandlere.formaterPraksis()),
             StructuredArguments.fields(loggingMeta)
         )
@@ -141,7 +143,7 @@ fun findBestSamhandlerPraksis(
     if (erAlleAktiveSamhandlereUtenNavn(aktiveSamhandlereMedNavn, aktiveSamhandlere)) {
         val samhandlerFALEOrFALO = aktiveSamhandlere.find {
             it.samh_praksis_type_kode == SamhandlerPraksisType.FASTLEGE.kodeVerdi ||
-                    it.samh_praksis_type_kode == SamhandlerPraksisType.FASTLONNET.kodeVerdi
+                it.samh_praksis_type_kode == SamhandlerPraksisType.FASTLONNET.kodeVerdi
         }
         if (samhandlerFALEOrFALO != null) {
             return SamhandlerPraksisMatch(samhandlerFALEOrFALO, 999.0)
@@ -211,14 +213,16 @@ fun samhandlerPraksisMatchTest(
     loggingMeta: LoggingMeta
 ): SamhandlerPraksisMatch? {
     return if (samhandlerPraksis != null && samhandlerPraksis.percentageMatch >= percentageMatchLimit) {
-        log.info("Beste match ble samhandler praksis: " +
+        log.info(
+            "Beste match ble samhandler praksis: " +
                 "Orgnumer: ${samhandlerPraksis.samhandlerPraksis.org_id} " +
                 "Navn: ${samhandlerPraksis.samhandlerPraksis.navn} " +
                 "Tssid: ${samhandlerPraksis.samhandlerPraksis.tss_ident} " +
                 "Adresselinje1: ${samhandlerPraksis.samhandlerPraksis.arbeids_adresse_linje_1} " +
                 "Samhandler praksis type: ${samhandlerPraksis.samhandlerPraksis.samh_praksis_type_kode} " +
                 "Prosent match:${samhandlerPraksis.percentageMatch} %, basert på dialogmeldingen organisjons navn: $orgName " +
-                "{}", StructuredArguments.fields(loggingMeta)
+                "{}",
+            StructuredArguments.fields(loggingMeta)
         )
         samhandlerPraksis
     } else {

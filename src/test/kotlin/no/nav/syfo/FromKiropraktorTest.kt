@@ -17,7 +17,6 @@ import java.math.BigInteger
 import java.time.LocalDateTime
 import java.util.*
 
-
 class FromKiropraktorTest {
 
     private val BEHANDLER_FNR = "21312341414"
@@ -26,8 +25,8 @@ class FromKiropraktorTest {
     private val TSS_ID = "1321415"
 
     @Test
-    internal fun `Find behandler in Notat instead of HeadMsg` () {
-        //We need to support behandler details in Notat instead of msgHead, because it was allowed in Eia
+    internal fun `Find behandler in Notat instead of HeadMsg`() {
+        // We need to support behandler details in Notat instead of msgHead, because it was allowed in Eia
         val fellesformat = fellesformatUnmarshaller.unmarshal(
             StringReader(getFileAsString("src/test/resources/dialogmelding_kiropraktor.xml"))
         ) as XMLEIFellesformat

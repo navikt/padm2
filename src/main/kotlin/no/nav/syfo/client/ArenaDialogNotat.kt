@@ -23,7 +23,7 @@ fun createArenaDialogNotat(
     receiverBlock: XMLMottakenhetBlokk,
     dialogmelding: Dialogmelding
 ):
-        ArenaDialogNotat =
+    ArenaDialogNotat =
     ArenaDialogNotat().apply {
         val org = msgHead.msgInfo.sender.organisation
         val dialogmeldingXml = extractDialogmelding(fellesformat)
@@ -136,7 +136,9 @@ fun sendArenaDialogNotat(
     session: Session,
     arenaDialogNotat: ArenaDialogNotat,
     loggingMeta: LoggingMeta
-) = producer.send(session.createTextMessage().apply {
-    text = arenaDialogNotatMarshaller.toString(arenaDialogNotat)
-    log.info("Message is sendt to arena {}", fields(loggingMeta))
-})
+) = producer.send(
+    session.createTextMessage().apply {
+        text = arenaDialogNotatMarshaller.toString(arenaDialogNotat)
+        log.info("Message is sendt to arena {}", fields(loggingMeta))
+    }
+)

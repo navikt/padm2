@@ -17,12 +17,13 @@ enum class HPRRuleChain(
         Status.INVALID,
         "Den som skrev dialogmeldingen manglet autorisasjon.",
         "Dialogmelding kan ikke rettes, det må skrives en ny. Grunnet følgende:" +
-                "Behandler er ikke gyldig i HPR på konsultasjonstidspunkt",
+            "Behandler er ikke gyldig i HPR på konsultasjonstidspunkt",
         { (_, behandler) ->
             !behandler.godkjenninger.any {
                 it.autorisasjon?.aktiv != null && it.autorisasjon.aktiv
             }
-        }),
+        }
+    ),
 
     BEHANDLER_MANGLER_AUTORISASJON_I_HPR(
         1403,
@@ -32,35 +33,38 @@ enum class HPRRuleChain(
         { (_, behandler) ->
             !behandler.godkjenninger.any {
                 it.autorisasjon?.aktiv != null &&
-                        it.autorisasjon.aktiv &&
-                        it.autorisasjon.oid == 7704 &&
-                        it.autorisasjon.verdi != null &&
-                        it.autorisasjon.verdi in arrayOf("1", "17", "4", "2", "14", "18")
+                    it.autorisasjon.aktiv &&
+                    it.autorisasjon.oid == 7704 &&
+                    it.autorisasjon.verdi != null &&
+                    it.autorisasjon.verdi in arrayOf("1", "17", "4", "2", "14", "18")
             }
-        }),
+        }
+    ),
 
     BEHANDLER_IKKE_LE_KI_MT_TL_FT_PS_I_HPR(
         1407,
         Status.INVALID,
         "Den som skrev dialogmelding manglet autorisasjon.",
         "Dialogmelding kan ikke rettes, det må skrives en ny. Grunnet følgende:" +
-                "Behandler finnes i HPR men er ikke lege, kiropraktor, fysioterapeut, manuellterapeut tannlege eller psykolog",
+            "Behandler finnes i HPR men er ikke lege, kiropraktor, fysioterapeut, manuellterapeut tannlege eller psykolog",
         { (_, behandler) ->
             !behandler.godkjenninger.any {
                 it.helsepersonellkategori?.aktiv != null &&
-                        it.autorisasjon?.aktiv == true && it.helsepersonellkategori.verdi != null &&
-                        harAktivHelsepersonellAutorisasjonsSom(
-                            behandler, listOf(
-                                HelsepersonellKategori.LEGE.verdi,
-                                HelsepersonellKategori.KIROPRAKTOR.verdi,
-                                HelsepersonellKategori.MANUELLTERAPEUT.verdi,
-                                HelsepersonellKategori.TANNLEGE.verdi,
-                                HelsepersonellKategori.FYSIOTERAPAEUT.verdi,
-                                HelsepersonellKategori.PSYKOLOG.verdi
-                            )
+                    it.autorisasjon?.aktiv == true && it.helsepersonellkategori.verdi != null &&
+                    harAktivHelsepersonellAutorisasjonsSom(
+                        behandler,
+                        listOf(
+                            HelsepersonellKategori.LEGE.verdi,
+                            HelsepersonellKategori.KIROPRAKTOR.verdi,
+                            HelsepersonellKategori.MANUELLTERAPEUT.verdi,
+                            HelsepersonellKategori.TANNLEGE.verdi,
+                            HelsepersonellKategori.FYSIOTERAPAEUT.verdi,
+                            HelsepersonellKategori.PSYKOLOG.verdi
                         )
+                    )
             }
-        }),
+        }
+    ),
 }
 
 fun harAktivHelsepersonellAutorisasjonsSom(
@@ -69,8 +73,8 @@ fun harAktivHelsepersonellAutorisasjonsSom(
 ): Boolean =
     behandler.godkjenninger.any { godkjenning ->
         godkjenning.helsepersonellkategori?.aktiv != null &&
-                godkjenning.autorisasjon?.aktiv == true && godkjenning.helsepersonellkategori.verdi != null &&
-                godkjenning.helsepersonellkategori.let {
-                    it.aktiv && it.verdi in helsepersonerVerdi
-                }
+            godkjenning.autorisasjon?.aktiv == true && godkjenning.helsepersonellkategori.verdi != null &&
+            godkjenning.helsepersonellkategori.let {
+                it.aktiv && it.verdi in helsepersonerVerdi
+            }
     }

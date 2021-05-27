@@ -7,7 +7,6 @@ import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.model.Behandler
 import no.nav.syfo.model.getName
 
-
 fun extractDialogmelding(fellesformat: XMLEIFellesformat): XMLDialogmelding =
     fellesformat.get<XMLMsgHead>().document.first {
         it.refDoc.msgType.v == "XML"
@@ -15,10 +14,10 @@ fun extractDialogmelding(fellesformat: XMLEIFellesformat): XMLDialogmelding =
 
 fun extractVedlegg(fellesformat: XMLEIFellesformat) = fellesformat.get<XMLMsgHead>().document.filter {
     it.refDoc.msgType.v == "A" &&
-            it.refDoc.mimeType == "application/pdf" ||
-            it.refDoc.mimeType == "image/tiff" ||
-            it.refDoc.mimeType == "image/png" ||
-            it.refDoc.mimeType == "image/jpeg"
+        it.refDoc.mimeType == "application/pdf" ||
+        it.refDoc.mimeType == "image/tiff" ||
+        it.refDoc.mimeType == "image/png" ||
+        it.refDoc.mimeType == "image/jpeg"
 }
 
 fun extractOrganisationNumberFromSender(fellesformat: XMLEIFellesformat): XMLIdent? =
@@ -47,35 +46,35 @@ fun extractLegeHpr(fellesformat: XMLEIFellesformat): String? =
 fun no.nav.helse.dialogmelding.XMLHealthcareProfessional.toBehandler(): Behandler = Behandler(
     fornavn = givenName,
     etternavn = familyName,
-    mellomnavn = middleName?: null
+    mellomnavn = middleName ?: null
 )
 
 fun no.nav.helse.msgHead.XMLHealthcareProfessional.toBehandler(): Behandler = Behandler(
     fornavn = givenName,
     etternavn = familyName,
-    mellomnavn = middleName?: null
+    mellomnavn = middleName ?: null
 )
 
 fun extractBehandler(fellesformat: XMLEIFellesformat): Behandler? {
     val behandlerInMsgHead = fellesformat.get<XMLMsgHead>().msgInfo.sender.organisation?.healthcareProfessional?.toBehandler() ?: null
 
-    return if (behandlerInMsgHead != null) behandlerInMsgHead  else {
+    return if (behandlerInMsgHead != null) behandlerInMsgHead else {
         val rollerListe = extractDialogmelding(fellesformat).notat.first().rollerRelatertNotat
         if (rollerListe.isNullOrEmpty()) null else rollerListe.first().healthcareProfessional?.toBehandler() ?: null
     }
 }
 
 fun extractBehandlerNavn(fellesformat: XMLEIFellesformat): String? {
-    val behandler  = extractBehandler(fellesformat)
+    val behandler = extractBehandler(fellesformat)
     return behandler?.getName()
 }
 
 fun extractPasientNavn(fellesformat: XMLEIFellesformat): String =
     if (fellesformat.get<XMLMsgHead>().msgInfo.patient.middleName == null)
         "${fellesformat.get<XMLMsgHead>().msgInfo.patient.familyName}, " +
-                "${fellesformat.get<XMLMsgHead>().msgInfo.patient.givenName}" else
+            "${fellesformat.get<XMLMsgHead>().msgInfo.patient.givenName}" else
         "${fellesformat.get<XMLMsgHead>().msgInfo.patient.familyName}, " +
-                "${fellesformat.get<XMLMsgHead>().msgInfo.patient.givenName} " +
-                "${fellesformat.get<XMLMsgHead>().msgInfo.patient.middleName}"
+            "${fellesformat.get<XMLMsgHead>().msgInfo.patient.givenName} " +
+            "${fellesformat.get<XMLMsgHead>().msgInfo.patient.middleName}"
 
 inline fun <reified T> XMLEIFellesformat.get() = this.any.find { it is T } as T

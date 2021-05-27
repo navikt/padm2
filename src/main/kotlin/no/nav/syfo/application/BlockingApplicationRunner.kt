@@ -92,7 +92,7 @@ class BlockingApplicationRunner {
                     val behandlerNavn = extractBehandlerNavn(fellesformat)
                     val extractVedlegg = extractVedlegg(fellesformat)
 
-                    if (!extractVedlegg.isEmpty()){
+                    if (!extractVedlegg.isEmpty()) {
                         log.info("Dialogmelding has vedlegg")
                     }
 
@@ -201,8 +201,10 @@ class BlockingApplicationRunner {
                             )
                             continue@loop
                         }
-                        if ((dialogmeldingType == DialogmeldingType.DIALOGMELDING_HENVENDELSE_FRA_LEGE_HENDVENDELSE ||
-                                    dialogmeldingType == DialogmeldingType.DIALOGMELDING_FORESPORSEL_FRA_SAKSBEHANDLER_FORESPORSEL_SVAR) &&
+                        if ((
+                            dialogmeldingType == DialogmeldingType.DIALOGMELDING_HENVENDELSE_FRA_LEGE_HENDVENDELSE ||
+                                dialogmeldingType == DialogmeldingType.DIALOGMELDING_FORESPORSEL_FRA_SAKSBEHANDLER_FORESPORSEL_SVAR
+                            ) &&
                             dialogmeldingXml.notat.first().tekstNotatInnhold.isNullOrEmpty()
                         ) {
                             handleMeldingsTekstMangler(
@@ -293,7 +295,8 @@ class BlockingApplicationRunner {
                             StructuredArguments.keyValue("status", validationResult.status),
                             StructuredArguments.keyValue(
                                 "ruleHits",
-                                validationResult.ruleHits.joinToString(", ", "(", ")") { it.ruleName }),
+                                validationResult.ruleHits.joinToString(", ", "(", ")") { it.ruleName }
+                            ),
                             StructuredArguments.keyValue("latency", currentRequestLatency),
                             StructuredArguments.fields(loggingMeta)
                         )
@@ -306,7 +309,6 @@ class BlockingApplicationRunner {
             }
         }
     }
-
 }
 
 fun XMLDocument.toVedlegg(): Vedlegg {

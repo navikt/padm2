@@ -5,7 +5,6 @@ import java.time.LocalDateTime
 import java.util.UUID
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
-import no.nav.helse.msgHead.XMLHealthcareProfessional
 import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.client.createArenaDialogNotat
 import no.nav.syfo.client.createAvsender
@@ -85,7 +84,7 @@ internal class CreateArenaDialogNotatTest {
 
     @Test
     internal fun `Default to 0 when tss id is empty string`() {
-        val behandler = Behandler(etternavn="Etternavn", fornavn="Fornavn", mellomnavn="Mellomnavn")
+        val behandler = Behandler(etternavn = "Etternavn", fornavn = "Fornavn", mellomnavn = "Mellomnavn")
         val avsender = createAvsender(FASTLEGE_FNR, "", behandler)
         avsender.lege.legeFnr shouldBeEqualTo FASTLEGE_FNR
         avsender.lege.tssId shouldEqual BigInteger("0")
@@ -98,7 +97,6 @@ internal class CreateArenaDialogNotatTest {
         avsender.lege.legeFnr shouldBeEqualTo FASTLEGE_FNR
         avsender.lege.tssId shouldEqual BigInteger("0")
     }
-
 
     @Test
     internal fun `Tester mapping fra fellesformat til ArenaDialogNotat svar innkalling dialogmote`() {
