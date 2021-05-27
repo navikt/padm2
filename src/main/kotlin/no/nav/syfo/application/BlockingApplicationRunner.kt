@@ -22,6 +22,7 @@ import no.nav.syfo.log
 import no.nav.syfo.metrics.INCOMING_MESSAGE_COUNTER
 import no.nav.syfo.metrics.MESSAGES_SENT_TO_BOQ
 import no.nav.syfo.metrics.REQUEST_TIME
+import no.nav.syfo.metrics.SAR_TSS_MISS_COUNTER
 import no.nav.syfo.model.*
 import no.nav.syfo.services.*
 import no.nav.syfo.util.*
@@ -140,11 +141,15 @@ class BlockingApplicationRunner {
                                 StructuredArguments.fields(loggingMeta)
                             )
                         } else {
+
                             when (samhandlerPraksis) {
-                                null -> log.info(
-                                    "SamhandlerPraksis is Not found, {}",
-                                    StructuredArguments.fields(loggingMeta)
-                                )
+                                null -> {
+                                    log.info(
+                                        "SamhandlerPraksis is Not found, {}",
+                                        StructuredArguments.fields(loggingMeta)
+                                    )
+                                    SAR_TSS_MISS_COUNTER.inc()
+                                }
                                 else -> if (!samhandlerParksisisLegevakt(samhandlerPraksis) &&
                                     !receiverBlock.partnerReferanse.isNullOrEmpty() &&
                                     receiverBlock.partnerReferanse.isNotBlank()
