@@ -18,11 +18,9 @@ import no.nav.syfo.model.Vedlegg
 import no.nav.syfo.persistering.handleRecivedMessage
 import no.nav.syfo.services.JournalService
 import no.nav.syfo.services.sendReceipt
-import no.nav.syfo.services.updateRedis
 import no.nav.syfo.util.LogType
 import no.nav.syfo.util.LoggingMeta
 import no.nav.syfo.util.createLogEntry
-import redis.clients.jedis.Jedis
 import javax.jms.MessageProducer
 import javax.jms.Session
 
@@ -93,9 +91,6 @@ fun handlePatientNotFoundInAktorRegister(
     session: Session,
     receiptProducer: MessageProducer,
     fellesformat: XMLEIFellesformat,
-    ediLoggId: String,
-    jedis: Jedis,
-    sha256String: String,
     env: Environment,
     loggingMeta: LoggingMeta
 ) {
@@ -117,7 +112,6 @@ fun handlePatientNotFoundInAktorRegister(
     log.info("Apprec Receipt sent to {}, {}", env.apprecQueueName, fields(loggingMeta))
 
     INVALID_MESSAGE_NO_NOTICE.inc()
-    updateRedis(jedis, ediLoggId, sha256String)
 }
 
 fun handlePatientNotFound(
@@ -151,9 +145,6 @@ fun handleDoctorNotFoundInAktorRegister(
     session: Session,
     receiptProducer: MessageProducer,
     fellesformat: XMLEIFellesformat,
-    ediLoggId: String,
-    jedis: Jedis,
-    sha256String: String,
     env: Environment,
     loggingMeta: LoggingMeta
 ) {
@@ -178,16 +169,12 @@ fun handleDoctorNotFoundInAktorRegister(
     log.info("Apprec Receipt sent to {}, {}", env.apprecQueueName, fields(loggingMeta))
 
     INVALID_MESSAGE_NO_NOTICE.inc()
-    updateRedis(jedis, ediLoggId, sha256String)
 }
 
 fun handleTestFnrInProd(
     session: Session,
     receiptProducer: MessageProducer,
     fellesformat: XMLEIFellesformat,
-    ediLoggId: String,
-    jedis: Jedis,
-    sha256String: String,
     env: Environment,
     loggingMeta: LoggingMeta
 ) {
@@ -219,16 +206,12 @@ fun handleTestFnrInProd(
 
     INVALID_MESSAGE_NO_NOTICE.inc()
     TEST_FNR_IN_PROD.inc()
-    updateRedis(jedis, ediLoggId, sha256String)
 }
 
 fun handleMeldingsTekstMangler(
     session: Session,
     receiptProducer: MessageProducer,
     fellesformat: XMLEIFellesformat,
-    ediLoggId: String,
-    jedis: Jedis,
-    sha256String: String,
     env: Environment,
     loggingMeta: LoggingMeta
 ) {
@@ -252,16 +235,12 @@ fun handleMeldingsTekstMangler(
     log.info("Apprec Receipt sent to {}, {}", env.apprecQueueName, fields(loggingMeta))
 
     INVALID_MESSAGE_NO_NOTICE.inc()
-    updateRedis(jedis, ediLoggId, sha256String)
 }
 
 fun handleInvalidDialogMeldingKodeverk(
     session: Session,
     receiptProducer: MessageProducer,
     fellesformat: XMLEIFellesformat,
-    ediLoggId: String,
-    jedis: Jedis,
-    sha256String: String,
     env: Environment,
     loggingMeta: LoggingMeta
 ) {
@@ -285,7 +264,6 @@ fun handleInvalidDialogMeldingKodeverk(
     log.info("Apprec Receipt sent to {}, {}", env.apprecQueueName, fields(loggingMeta))
 
     INVALID_MESSAGE_NO_NOTICE.inc()
-    updateRedis(jedis, ediLoggId, sha256String)
 }
 
 fun createApprecError(textToTreater: String): XMLCV = XMLCV().apply {
