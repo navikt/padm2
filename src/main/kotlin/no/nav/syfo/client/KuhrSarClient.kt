@@ -160,10 +160,20 @@ fun findBestSamhandlerPraksis(
         )
     }
 
-    return aktiveSamhandlereMedNavn
+    return aktivSamhandlerByName(aktiveSamhandlereMedNavn, orgName, loggingMeta)
+}
+
+fun aktivSamhandlerByName(aktiveSamhandlereMedNavn: List<SamhandlerPraksis>, orgName: String, loggingMeta: LoggingMeta): SamhandlerPraksisMatch? {
+    val samhandlerMatchByName =  aktiveSamhandlereMedNavn
         .map { samhandlerPraksis ->
             SamhandlerPraksisMatch(samhandlerPraksis, calculatePercentageStringMatch(samhandlerPraksis.navn, orgName) * 100)
         }.maxBy { it.percentageMatch }
+    return filtererBortSamhanlderPraksiserPaaProsentMatch(
+        samhandlerMatchByName,
+        70.0,
+        orgName,
+        loggingMeta
+    )
 }
 
 private fun harSarLegeKontorHerId(
