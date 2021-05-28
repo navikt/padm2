@@ -39,6 +39,8 @@ fun isLegevakt(samhandlerPraksis: SamhandlerPraksis): Boolean =
         !samhandlerPraksis.samh_praksis_type_kode.isNullOrEmpty() && (samhandlerPraksis.samh_praksis_type_kode == "LEVA" ||
                 samhandlerPraksis.samh_praksis_type_kode == "LEKO")
 
+fun isNotLegevakt(samhandlerPraksis: SamhandlerPraksis): Boolean = !isLegevakt(samhandlerPraksis)
+
 fun convertSenderToBase64(sender: XMLSender): ByteArray =
         ByteArrayOutputStream().use {
             senderMarshaller.marshal(sender, it)
