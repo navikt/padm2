@@ -11,7 +11,7 @@ import no.nav.helse.msgHead.XMLDocument
 import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.Environment
 import no.nav.syfo.VaultSecrets
-import no.nav.syfo.application.services.samhandlerParksisisLegevakt
+import no.nav.syfo.application.services.isLegevakt
 import no.nav.syfo.application.services.startSubscription
 import no.nav.syfo.client.AktoerIdClient
 import no.nav.syfo.client.SarClient
@@ -150,7 +150,7 @@ class BlockingApplicationRunner {
                                     )
                                     SAR_TSS_MISS_COUNTER.inc()
                                 }
-                                else -> if (!samhandlerParksisisLegevakt(samhandlerPraksis) &&
+                                else -> if (!isLegevakt(samhandlerPraksis) &&
                                     !receiverBlock.partnerReferanse.isNullOrEmpty() &&
                                     receiverBlock.partnerReferanse.isNotBlank()
                                 ) {
