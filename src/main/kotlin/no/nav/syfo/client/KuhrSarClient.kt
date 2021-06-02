@@ -125,17 +125,13 @@ fun findBestSamhandlerPraksis(
         )
     }
 
-    if (harSarLegeKontorHerId(legekontorHerId, aktiveSamhandlere)) {
-        val samhandlerByHerId = aktiveSamhandlere.find {
-            it.her_id == legekontorHerId
-        }
-        if (samhandlerByHerId != null) {
-            log.info("Fant samhandler basert på herid. herid: $legekontorHerId, {}, {}",
-                keyValue("praksisinformasjon", samhandlere.formaterPraksis()),
-                StructuredArguments.fields(loggingMeta)
-            )
-            return SamhandlerPraksisMatch(samhandlerByHerId, 100.0)
-        }
+    var samhandlerPraksisByHerId = getSamhandlerPraksisByHerId(legekontorHerId, aktiveSamhandlere)
+    if (samhandlerPraksisByHerId != null) {
+        log.info("Fant samhandler basert på herid. herid: $legekontorHerId, {}, {}",
+            keyValue("praksisinformasjon", samhandlere.formaterPraksis()),
+            StructuredArguments.fields(loggingMeta)
+        )
+        return SamhandlerPraksisMatch(samhandlerPraksisByHerId, 100.0)
     }
 
     val aktiveSamhandlereMedNavn = samhandlere.flatMap { it.samh_praksis }
@@ -151,42 +147,50 @@ fun findBestSamhandlerPraksis(
             return SamhandlerPraksisMatch(samhandlerFALEOrFALO, 999.0)
         }
     } else if (aktiveSamhandlere.isNullOrEmpty()) {
-        val inaktiveSamhandlerMatchingPaaOrganisjonsNavn = samhandlerMatchingPaaOrganisjonsNavn(samhandlere, orgName)
-        return filtererBortSamhanlderPraksiserPaaProsentMatch(
-            inaktiveSamhandlerMatchingPaaOrganisjonsNavn,
+        val samhandlerPraksisByOrgName = getInactiveSamhandlerPraksisByOrgName(samhandlere, orgName)
+        return samhandlerPraksisMatchTest(
+            samhandlerPraksisByOrgName,
             70.0,
             orgName,
             loggingMeta
         )
     }
 
-    return aktivSamhandlerByName(aktiveSamhandlereMedNavn, orgName, loggingMeta)
+    return getSamhandlerPraksisByOrgName(aktiveSamhandlereMedNavn, orgName, loggingMeta)
 }
 
-fun aktivSamhandlerByName(aktiveSamhandlereMedNavn: List<SamhandlerPraksis>, orgName: String, loggingMeta: LoggingMeta): SamhandlerPraksisMatch? {
-    val samhandlerMatchByName =  aktiveSamhandlereMedNavn
+fun getSamhandlerPraksisByHerId(legekontorHerId: String?, aktiveSamhandlere: List<SamhandlerPraksis>): SamhandlerPraksis? {
+    val hasLegekontorHerID = !legekontorHerId.isNullOrEmpty()
+    val hasAktivSamhandler = aktiveSamhandlere.isNotEmpty()
+
+    return if (hasLegekontorHerID && hasAktivSamhandler) {
+        aktiveSamhandlere.find {
+            it.her_id == legekontorHerId
+        }
+    } else {
+        null
+    }
+}
+
+fun getSamhandlerPraksisByOrgName(aktivePraksiserWithOrgName: List<SamhandlerPraksis>, orgName: String, loggingMeta: LoggingMeta): SamhandlerPraksisMatch? {
+    val praksisWithMostSimilarOrgName =  aktivePraksiserWithOrgName
         .map { samhandlerPraksis ->
             SamhandlerPraksisMatch(samhandlerPraksis, calculatePercentageStringMatch(samhandlerPraksis.navn, orgName) * 100)
         }.maxBy { it.percentageMatch }
-    return filtererBortSamhanlderPraksiserPaaProsentMatch(
-        samhandlerMatchByName,
+    return samhandlerPraksisMatchTest(
+        praksisWithMostSimilarOrgName,
         70.0,
         orgName,
         loggingMeta
     )
 }
 
-private fun harSarLegeKontorHerId(
-    legekontorHerId: String?,
-    aktiveSamhandlere: List<SamhandlerPraksis>
-) = !legekontorHerId.isNullOrEmpty() && aktiveSamhandlere.isNotEmpty()
-
 private fun erAlleAktiveSamhandlereUtenNavn(
     aktiveSamhandlereMedNavn: List<SamhandlerPraksis>,
     aktiveSamhandlere: List<SamhandlerPraksis>
 ) = aktiveSamhandlereMedNavn.isNullOrEmpty() && !aktiveSamhandlere.isNullOrEmpty()
 
-fun samhandlerMatchingPaaOrganisjonsNavn(samhandlere: List<Samhandler>, orgName: String): SamhandlerPraksisMatch? {
+fun getInactiveSamhandlerPraksisByOrgName(samhandlere: List<Samhandler>, orgName: String): SamhandlerPraksisMatch? {
     val inaktiveSamhandlereMedNavn = samhandlere.flatMap { it.samh_praksis }
         .filter { samhandlerPraksis -> samhandlerPraksis.samh_praksis_status_kode == "inaktiv" }
         .filter { samhandlerPraksis -> !samhandlerPraksis.navn.isNullOrEmpty() }
@@ -200,13 +204,13 @@ fun samhandlerMatchingPaaOrganisjonsNavn(samhandlere: List<Samhandler>, orgName:
     }
 }
 
-fun filtererBortSamhanlderPraksiserPaaProsentMatch(
+fun samhandlerPraksisMatchTest(
     samhandlerPraksis: SamhandlerPraksisMatch?,
-    prosentMatch: Double,
+    percentageMatchLimit: Double,
     orgName: String,
     loggingMeta: LoggingMeta
 ): SamhandlerPraksisMatch? {
-    return if (samhandlerPraksis != null && samhandlerPraksis.percentageMatch >= prosentMatch) {
+    return if (samhandlerPraksis != null && samhandlerPraksis.percentageMatch >= percentageMatchLimit) {
         log.info("Beste match ble samhandler praksis: " +
                 "Orgnumer: ${samhandlerPraksis.samhandlerPraksis.org_id} " +
                 "Navn: ${samhandlerPraksis.samhandlerPraksis.navn} " +
