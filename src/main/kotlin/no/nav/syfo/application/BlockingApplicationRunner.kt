@@ -25,7 +25,7 @@ import no.nav.syfo.metrics.REQUEST_TIME
 import no.nav.syfo.model.*
 import no.nav.syfo.services.*
 import no.nav.syfo.util.*
-import no.nav.syfo.validation.validateDialogMeldingKodeverk
+import no.nav.syfo.validation.isKodeverkValid
 import java.io.StringReader
 import java.time.ZoneOffset
 import java.util.*
@@ -206,7 +206,7 @@ class BlockingApplicationRunner {
                             continue@loop
                         }
 
-                        if (!validateDialogMeldingKodeverk(dialogmeldingXml, dialogmeldingType)) {
+                        if (!isKodeverkValid(dialogmeldingXml, dialogmeldingType)) {
                             handleInvalidDialogMeldingKodeverk(
                                 session, receiptProducer, fellesformat, env, loggingMeta
                             )

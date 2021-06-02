@@ -71,7 +71,7 @@ fun XMLNotat.toHenvendelseFraLegeHenvendelse(): HenvendelseFraLegeHenvendelse {
 }
 
 fun CV.toTeamakode(): TemaKode {
-    return findDialogmeldingKodeverk(s, v).toTypeMelding()
+    return findDialogmeldingKodeverk(s, v)!!.toTypeMelding()
 }
 
 fun DialogmeldingKodeverk.toTypeMelding(): TemaKode {

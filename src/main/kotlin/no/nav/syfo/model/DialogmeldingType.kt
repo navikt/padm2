@@ -1,5 +1,7 @@
 package no.nav.syfo.model
 
+import no.nav.syfo.log
+
 enum class DialogmeldingType(val ebxmlService: String, val ebxmlAction: String, val dialogmeldingKodeverk: List<DialogmeldingKodeverk>, val brevkode: String) {
     DIALOGMELDING_DIALOGMOTE_INNKALLING_MOTERESPONS("DialogmoteInnkalling", "MoteRespons", listOf(
         DialogmeldingKodeverk.SVAR_PAA_INNKALLING_DIALOGMOTE_JA_JEG_KOMMER,
@@ -19,6 +21,12 @@ fun findDialogmeldingType(ebxmlService: String, ebxmlAction: String): Dialogmeld
     return DialogmeldingType.values().first { it.ebxmlService == ebxmlService && it.ebxmlAction == ebxmlAction }
 }
 
-fun findDialogmeldingKodeverk(kodeverkOID: String, v: String): DialogmeldingKodeverk {
-    return DialogmeldingKodeverk.values().first { it.kodeverkOID == kodeverkOID && it.v == v }
+fun findDialogmeldingKodeverk(kodeverkOID: String, v: String): DialogmeldingKodeverk? {
+    val kodeverk = DialogmeldingKodeverk.values().firstOrNull { it.kodeverkOID == kodeverkOID && it.v == v }
+
+    if (kodeverk == null) {
+        log.warn("Fant ikke kodeverk som matcher dialogmeldingen. kodeverkOID: $kodeverkOID, v: $v")
+    }
+
+    return kodeverk
 }

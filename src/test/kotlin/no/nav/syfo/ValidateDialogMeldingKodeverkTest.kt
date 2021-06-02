@@ -8,7 +8,7 @@ import no.nav.syfo.util.extractDialogmelding
 import no.nav.syfo.util.fellesformatUnmarshaller
 import no.nav.syfo.util.get
 import no.nav.syfo.util.getFileAsString
-import no.nav.syfo.validation.validateDialogMeldingKodeverk
+import no.nav.syfo.validation.isKodeverkValid
 import org.amshove.kluent.shouldBe
 import org.junit.Test
 
@@ -25,7 +25,7 @@ internal class ValidateDialogMeldingKodeverkTest {
 
         val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
 
-        val validateDialogMeldingKodeverk = validateDialogMeldingKodeverk(dialomeldingxml, dialogmeldingType)
+        val validateDialogMeldingKodeverk = isKodeverkValid(dialomeldingxml, dialogmeldingType)
 
         validateDialogMeldingKodeverk shouldBe false
     }
@@ -41,8 +41,26 @@ internal class ValidateDialogMeldingKodeverkTest {
 
         val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
 
-        val validateDialogMeldingKodeverk = validateDialogMeldingKodeverk(dialomeldingxml, dialogmeldingType)
+        val validateDialogMeldingKodeverk = isKodeverkValid(dialomeldingxml, dialogmeldingType)
 
         validateDialogMeldingKodeverk shouldBe true
+    }
+
+    @Test
+    internal fun `Should be invalid if temakodet is not found in Kodeverklist`() {
+        val fellesformatDm = fellesformatUnmarshaller.unmarshal(
+            StringReader(getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml"))
+        ) as XMLEIFellesformat
+
+        val dialogmeldingxml = extractDialogmelding(fellesformatDm)
+        dialogmeldingxml.notat.first().temaKodet.v = "INVALID"
+
+        val receiverBlock = fellesformatDm.get<XMLMottakenhetBlokk>()
+
+        val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
+
+        val validateDialogMeldingKodeverk = isKodeverkValid(dialogmeldingxml, dialogmeldingType)
+
+        validateDialogMeldingKodeverk shouldBe false
     }
 }

@@ -4,7 +4,7 @@ import no.nav.helse.dialogmelding.XMLDialogmelding
 import no.nav.syfo.model.DialogmeldingType
 import no.nav.syfo.model.findDialogmeldingKodeverk
 
-fun validateDialogMeldingKodeverk(xmlDialogmelding: XMLDialogmelding, dialogmeldingType: DialogmeldingType): Boolean {
+fun isKodeverkValid(xmlDialogmelding: XMLDialogmelding, dialogmeldingType: DialogmeldingType): Boolean {
 
     when (dialogmeldingType) {
         DialogmeldingType.DIALOGMELDING_DIALOGMOTE_INNKALLING_MOTERESPONS -> {
