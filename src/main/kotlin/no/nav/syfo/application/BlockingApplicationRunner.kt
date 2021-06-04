@@ -11,7 +11,7 @@ import no.nav.helse.msgHead.XMLDocument
 import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.Environment
 import no.nav.syfo.VaultSecrets
-import no.nav.syfo.application.services.samhandlerParksisisLegevakt
+import no.nav.syfo.application.services.isNotLegevakt
 import no.nav.syfo.application.services.startSubscription
 import no.nav.syfo.client.AktoerIdClient
 import no.nav.syfo.client.SarClient
@@ -22,6 +22,7 @@ import no.nav.syfo.log
 import no.nav.syfo.metrics.INCOMING_MESSAGE_COUNTER
 import no.nav.syfo.metrics.MESSAGES_SENT_TO_BOQ
 import no.nav.syfo.metrics.REQUEST_TIME
+import no.nav.syfo.metrics.SAR_TSS_MISS_COUNTER
 import no.nav.syfo.model.*
 import no.nav.syfo.services.*
 import no.nav.syfo.util.*
@@ -140,12 +141,16 @@ class BlockingApplicationRunner {
                                 StructuredArguments.fields(loggingMeta)
                             )
                         } else {
+
                             when (samhandlerPraksis) {
-                                null -> log.info(
-                                    "SamhandlerPraksis is Not found, {}",
-                                    StructuredArguments.fields(loggingMeta)
-                                )
-                                else -> if (!samhandlerParksisisLegevakt(samhandlerPraksis) &&
+                                null -> {
+                                    log.info(
+                                        "SamhandlerPraksis is Not found, {}",
+                                        StructuredArguments.fields(loggingMeta)
+                                    )
+                                    SAR_TSS_MISS_COUNTER.inc()
+                                }
+                                else -> if (isNotLegevakt(samhandlerPraksis) &&
                                     !receiverBlock.partnerReferanse.isNullOrEmpty() &&
                                     receiverBlock.partnerReferanse.isNotBlank()
                                 ) {

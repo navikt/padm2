@@ -35,9 +35,12 @@ suspend fun startSubscription(
     }
 }
 
-fun samhandlerParksisisLegevakt(samhandlerPraksis: SamhandlerPraksis): Boolean =
-        !samhandlerPraksis.samh_praksis_type_kode.isNullOrEmpty() && (samhandlerPraksis.samh_praksis_type_kode == "LEVA" ||
-                samhandlerPraksis.samh_praksis_type_kode == "LEKO")
+fun isLegevakt(samhandlerPraksis: SamhandlerPraksis): Boolean {
+    val kode = samhandlerPraksis.samh_praksis_type_kode
+    return !kode.isNullOrEmpty() && (kode == "LEVA" || kode == "LEKO")
+}
+
+fun isNotLegevakt(samhandlerPraksis: SamhandlerPraksis): Boolean = !isLegevakt(samhandlerPraksis)
 
 fun convertSenderToBase64(sender: XMLSender): ByteArray =
         ByteArrayOutputStream().use {
