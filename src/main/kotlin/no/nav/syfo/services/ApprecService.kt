@@ -20,10 +20,12 @@ fun sendReceipt(
     apprecErrors: List<XMLCV> = listOf()
 ) {
 
-    receiptProducer.send(session.createTextMessage().apply {
-        val apprec = createApprec(fellesformat, apprecStatus)
-        apprec.get<XMLAppRec>().error.addAll(apprecErrors)
-        text = apprecMarshaller.toString(apprec)
-    })
+    receiptProducer.send(
+        session.createTextMessage().apply {
+            val apprec = createApprec(fellesformat, apprecStatus)
+            apprec.get<XMLAppRec>().error.addAll(apprecErrors)
+            text = apprecMarshaller.toString(apprec)
+        }
+    )
     APPREC_COUNTER.inc()
 }

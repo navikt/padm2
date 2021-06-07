@@ -98,12 +98,14 @@ internal class PdfModelTest {
                 )
             ),
             foresporselFraSaksbehandlerForesporselSvar = ForesporselFraSaksbehandlerForesporselSvar(
-                teamakode = TemaKode("2.16.578.1.12.4.1.1.8129",
+                teamakode = TemaKode(
+                    "2.16.578.1.12.4.1.1.8129",
                     "Forespørsel om pasient",
                     "1",
                     "",
                     "",
-                    ""),
+                    ""
+                ),
                 tekstNotatInnhold = "Pasieten har masse info her",
                 dokIdNotat = "OD1812186729156",
                 datoNotat = LocalDateTime.now()
@@ -114,7 +116,8 @@ internal class PdfModelTest {
         val pdfPayload = PdfModel(
             dialogmelding = dialogmelding,
             validationResult = ValidationResult(
-                status = Status.INVALID, ruleHits = listOf(
+                status = Status.INVALID,
+                ruleHits = listOf(
                     RuleInfo(
                         ruleName = "PASIENT_YNGRE_ENN_13",
                         messageForUser = "Pasienten er under 13 år. Sykmelding kan ikke benyttes.",

@@ -27,18 +27,20 @@ class Database(private val env: Environment, private val vaultCredentialService:
             databaseName = env.databaseName,
             role = Role.USER
         )
-        dataSource = HikariDataSource(HikariConfig().apply {
-            jdbcUrl = env.padm2DBURL
-            username = initialCredentials.username
-            password = initialCredentials.password
-            maximumPoolSize = 3
-            minimumIdle = 1
-            idleTimeout = 10001
-            maxLifetime = 300000
-            isAutoCommit = false
-            transactionIsolation = "TRANSACTION_REPEATABLE_READ"
-            validate()
-        })
+        dataSource = HikariDataSource(
+            HikariConfig().apply {
+                jdbcUrl = env.padm2DBURL
+                username = initialCredentials.username
+                password = initialCredentials.password
+                maximumPoolSize = 3
+                minimumIdle = 1
+                idleTimeout = 10001
+                maxLifetime = 300000
+                isAutoCommit = false
+                transactionIsolation = "TRANSACTION_REPEATABLE_READ"
+                validate()
+            }
+        )
 
         vaultCredentialService.renewCredentialsTaskData = RenewCredentialsTaskData(
             dataSource = dataSource,

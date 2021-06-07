@@ -34,6 +34,12 @@ jobs:
           ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
         run: |
           ./gradlew test
+      - name: Run lint
+        env:
+          ORG_GRADLE_PROJECT_githubUser: x-access-token
+          ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ./gradlew lintKotlin
       - name: Build jar
         env:
           ORG_GRADLE_PROJECT_githubUser: x-access-token

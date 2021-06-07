@@ -110,6 +110,10 @@ https://confluence.adeo.no/display/KES/SyfoSmMottak.
 To build locally and run the integration tests you can simply run `./gradlew shadowJar` or on windows 
 `gradlew.bat shadowJar`
 
+#### Lint
+To check lint, run `./gradlew lintKotlin`   
+To format code, run `./gradlew formatKotlin` 
+
 #### Creating a docker image
 Creating a docker image should be as simple as `docker build -t padm2 .`
 

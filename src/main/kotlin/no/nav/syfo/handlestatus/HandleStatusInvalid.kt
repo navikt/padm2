@@ -52,8 +52,10 @@ suspend fun handleStatusINVALID(
 
     handleRecivedMessage(receivedDialogmelding, validationResult, sha256String, loggingMeta, database)
 
-    sendReceipt(session, receiptProducer, fellesformat, ApprecStatus.avvist,
-        validationResult.ruleHits.map { it.toApprecCV() })
+    sendReceipt(
+        session, receiptProducer, fellesformat, ApprecStatus.avvist,
+        validationResult.ruleHits.map { it.toApprecCV() }
+    )
     log.info("Apprec Receipt sent to {}, {}", apprecQueueName, fields(loggingMeta))
 }
 
@@ -75,10 +77,11 @@ fun handleDuplicateDialogmeldingContent(
     )
 
     sendReceipt(
-        session, receiptProducer, fellesformat, ApprecStatus.avvist, listOf(
+        session, receiptProducer, fellesformat, ApprecStatus.avvist,
+        listOf(
             createApprecError(
                 "Duplikat! - Denne dialogmeldingen er mottatt tidligere. " +
-                        "Skal ikke sendes på nytt."
+                    "Skal ikke sendes på nytt."
             )
         )
     )
@@ -104,7 +107,8 @@ fun handlePatientNotFoundInAktorRegister(
     )
 
     sendReceipt(
-        session, receiptProducer, fellesformat, ApprecStatus.avvist, listOf(
+        session, receiptProducer, fellesformat, ApprecStatus.avvist,
+        listOf(
             createApprecError("Pasienten er ikke registrert i folkeregisteret")
         )
     )
@@ -130,7 +134,8 @@ fun handlePatientNotFound(
     )
 
     sendReceipt(
-        session, receiptProducer, fellesformat, ApprecStatus.avvist, listOf(
+        session, receiptProducer, fellesformat, ApprecStatus.avvist,
+        listOf(
             createApprecError("Pasienten er ikke funnet i dialogmeldingen")
         )
     )
@@ -158,10 +163,11 @@ fun handleDoctorNotFoundInAktorRegister(
     )
 
     sendReceipt(
-        session, receiptProducer, fellesformat, ApprecStatus.avvist, listOf(
+        session, receiptProducer, fellesformat, ApprecStatus.avvist,
+        listOf(
             createApprecError(
                 "Dialogmelding kan ikke rettes, det må skrives en ny. Grunnet følgende:" +
-                        " Behandler er ikke registrert i folkeregisteret"
+                    " Behandler er ikke registrert i folkeregisteret"
             )
         )
     )
@@ -195,10 +201,11 @@ fun handleTestFnrInProd(
     )
 
     sendReceipt(
-        session, receiptProducer, fellesformat, ApprecStatus.avvist, listOf(
+        session, receiptProducer, fellesformat, ApprecStatus.avvist,
+        listOf(
             createApprecError(
                 "Dialogmelding kan ikke rettes, test fødselsnummer er kommet inn i produksjon." +
-                        "Kontakt din EPJ-leverandør)"
+                    "Kontakt din EPJ-leverandør)"
             )
         )
     )
@@ -225,10 +232,11 @@ fun handleMeldingsTekstMangler(
     )
 
     sendReceipt(
-        session, receiptProducer, fellesformat, ApprecStatus.avvist, listOf(
+        session, receiptProducer, fellesformat, ApprecStatus.avvist,
+        listOf(
             createApprecError(
                 "Dialogmelding kan ikke rettes, meldingstekst (tekstNotatInnhold) mangler, " +
-                        "Kontakt din EPJ-leverandør)"
+                    "Kontakt din EPJ-leverandør)"
             )
         )
     )
@@ -254,10 +262,11 @@ fun handleInvalidDialogMeldingKodeverk(
     )
 
     sendReceipt(
-        session, receiptProducer, fellesformat, ApprecStatus.avvist, listOf(
+        session, receiptProducer, fellesformat, ApprecStatus.avvist,
+        listOf(
             createApprecError(
                 "Dialogmelding kan ikke rettes, det er brukt ein ugyldig dialogmelding kodeverk kombinasjon, " +
-                        "Kontakt din EPJ-leverandør)"
+                    "Kontakt din EPJ-leverandør)"
             )
         )
     )

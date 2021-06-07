@@ -23,43 +23,45 @@ fun createApprec(fellesformat: XMLEIFellesformat, apprecStatus: ApprecStatus): X
     val xmlMottakenhetBlokk = fellesformat.get<XMLMottakenhetBlokk>()
     val xmlMsgHead = fellesformat.get<XMLMsgHead>()
     val fellesformatApprec = XMLEIFellesformat().apply {
-        any.add(XMLMottakenhetBlokk().apply {
-            ediLoggId = xmlMottakenhetBlokk.ediLoggId
-            ebRole = ApprecConstant.ebRoleSaksbehandler.string
-            ebService = xmlMottakenhetBlokk.ebService
-            ebAction = ApprecConstant.ebActionBekreftelse.string
-        }
+        any.add(
+            XMLMottakenhetBlokk().apply {
+                ediLoggId = xmlMottakenhetBlokk.ediLoggId
+                ebRole = ApprecConstant.ebRoleSaksbehandler.string
+                ebService = xmlMottakenhetBlokk.ebService
+                ebAction = ApprecConstant.ebActionBekreftelse.string
+            }
         )
-        any.add(XMLAppRec().apply {
-            msgType = XMLCS().apply {
-                v = ApprecConstant.apprec.string
-            }
-            miGversion = ApprecConstant.apprecVersionV1_0.string
-            genDate = LocalDateTime.now()
-            id = xmlMottakenhetBlokk.ediLoggId
-
-            sender = XMLAppRec.Sender().apply {
-                hcp = xmlMsgHead.msgInfo.receiver.organisation.intoHCP()
-            }
-
-            receiver = XMLAppRec.Receiver().apply {
-                hcp = xmlMsgHead.msgInfo.sender.organisation.intoHCP()
-            }
-
-            status = XMLCS().apply {
-                v = apprecStatus.v
-                dn = apprecStatus.dn
-            }
-
-            originalMsgId = XMLOriginalMsgId().apply {
+        any.add(
+            XMLAppRec().apply {
                 msgType = XMLCS().apply {
-                    v = xmlMsgHead.msgInfo.type.v
-                    dn = xmlMsgHead.msgInfo.type.dn
+                    v = ApprecConstant.apprec.string
                 }
-                issueDate = xmlMsgHead.msgInfo.genDate
-                id = xmlMsgHead.msgInfo.msgId
+                miGversion = ApprecConstant.apprecVersionV1_0.string
+                genDate = LocalDateTime.now()
+                id = xmlMottakenhetBlokk.ediLoggId
+
+                sender = XMLAppRec.Sender().apply {
+                    hcp = xmlMsgHead.msgInfo.receiver.organisation.intoHCP()
+                }
+
+                receiver = XMLAppRec.Receiver().apply {
+                    hcp = xmlMsgHead.msgInfo.sender.organisation.intoHCP()
+                }
+
+                status = XMLCS().apply {
+                    v = apprecStatus.v
+                    dn = apprecStatus.dn
+                }
+
+                originalMsgId = XMLOriginalMsgId().apply {
+                    msgType = XMLCS().apply {
+                        v = xmlMsgHead.msgInfo.type.v
+                        dn = xmlMsgHead.msgInfo.type.dn
+                    }
+                    issueDate = xmlMsgHead.msgInfo.genDate
+                    id = xmlMsgHead.msgInfo.msgId
+                }
             }
-        }
         )
     }
 

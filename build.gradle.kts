@@ -36,9 +36,9 @@ val hikariVersion = "3.3.0"
 plugins {
     java
     id("no.nils.wsdl2java") version "0.10"
-    kotlin("jvm") version "1.4.21"
+    kotlin("jvm") version "1.5.10"
     id("com.github.johnrengelman.shadow") version "6.1.0"
-    id("org.jmailen.kotlinter") version "2.2.0"
+    id("org.jmailen.kotlinter") version "3.4.4"
 }
 
 buildscript {
@@ -167,6 +167,9 @@ tasks {
     }
 
     withType<ShadowJar> {
+        archiveBaseName.set("app")
+        archiveClassifier.set("")
+        archiveVersion.set("")
         transform(ServiceFileTransformer::class.java) {
             setPath("META-INF/cxf")
             include("bus-extensions.txt")
