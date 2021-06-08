@@ -170,20 +170,27 @@ fun findFiltype(vedlegg: Vedlegg): String =
         else -> throw RuntimeException("Vedlegget er av av ukjent mimeType ${vedlegg.mimeType}")
     }
 
-fun createAvsenderMottakerValidFnr(avsenderFnr: String, dialogmelding: Dialogmelding):
-    AvsenderMottaker = AvsenderMottaker(
+fun createAvsenderMottakerValidFnr(
+    avsenderFnr: String,
+    dialogmelding: Dialogmelding
+): AvsenderMottaker = AvsenderMottaker(
     id = avsenderFnr,
     idType = "FNR",
     land = "Norge",
     navn = dialogmelding.navnHelsepersonell
 )
 
-fun createAvsenderMottakerNotValidFnr(dialogmelding: Dialogmelding): AvsenderMottaker = AvsenderMottaker(
+fun createAvsenderMottakerNotValidFnr(
+    dialogmelding: Dialogmelding
+): AvsenderMottaker = AvsenderMottaker(
     land = "Norge",
     navn = dialogmelding.navnHelsepersonell
 )
 
-fun createTitleJournalpost(validationResult: ValidationResult, signaturDato: LocalDateTime): String {
+fun createTitleJournalpost(
+    validationResult: ValidationResult,
+    signaturDato: LocalDateTime
+): String {
     return if (validationResult.status == Status.INVALID) {
         "Avvist Dialogmelding ${formaterDato(signaturDato)}"
     } else {

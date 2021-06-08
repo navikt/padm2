@@ -22,8 +22,7 @@ fun createArenaDialogNotat(
     msgHead: XMLMsgHead,
     receiverBlock: XMLMottakenhetBlokk,
     dialogmelding: Dialogmelding
-):
-    ArenaDialogNotat =
+): ArenaDialogNotat =
     ArenaDialogNotat().apply {
         val org = msgHead.msgInfo.sender.organisation
         val dialogmeldingXml = extractDialogmelding(fellesformat)
@@ -87,45 +86,45 @@ fun createAvsender(
 }
 
 fun findArenaNotatKategori(dialogmelding: Dialogmelding): String {
-    when {
+    return when {
         dialogmelding.foresporselFraSaksbehandlerForesporselSvar != null -> {
-            return dialogmelding.foresporselFraSaksbehandlerForesporselSvar!!.teamakode.arenaNotatKategori
+            dialogmelding.foresporselFraSaksbehandlerForesporselSvar!!.teamakode.arenaNotatKategori
         }
         dialogmelding.henvendelseFraLegeHenvendelse != null -> {
-            return dialogmelding.henvendelseFraLegeHenvendelse!!.teamakode.arenaNotatKategori
+            dialogmelding.henvendelseFraLegeHenvendelse!!.teamakode.arenaNotatKategori
         }
         dialogmelding.innkallingMoterespons != null -> {
-            return dialogmelding.innkallingMoterespons!!.teamakode.arenaNotatKategori
+            dialogmelding.innkallingMoterespons!!.teamakode.arenaNotatKategori
         }
         else -> throw RuntimeException("Ugyldig dialogmeldingtype")
     }
 }
 
 fun findArenaNotatKode(dialogmelding: Dialogmelding): String {
-    when {
+    return when {
         dialogmelding.foresporselFraSaksbehandlerForesporselSvar != null -> {
-            return dialogmelding.foresporselFraSaksbehandlerForesporselSvar!!.teamakode.arenaNotatKode
+            dialogmelding.foresporselFraSaksbehandlerForesporselSvar!!.teamakode.arenaNotatKode
         }
         dialogmelding.henvendelseFraLegeHenvendelse != null -> {
-            return dialogmelding.henvendelseFraLegeHenvendelse!!.teamakode.arenaNotatKode
+            dialogmelding.henvendelseFraLegeHenvendelse!!.teamakode.arenaNotatKode
         }
         dialogmelding.innkallingMoterespons != null -> {
-            return dialogmelding.innkallingMoterespons!!.teamakode.arenaNotatKode
+            dialogmelding.innkallingMoterespons!!.teamakode.arenaNotatKode
         }
         else -> throw RuntimeException("Ugyldig dialogmeldingtype")
     }
 }
 
 fun findArenaNotatTittel(dialogmelding: Dialogmelding): String {
-    when {
+    return when {
         dialogmelding.foresporselFraSaksbehandlerForesporselSvar != null -> {
-            return dialogmelding.foresporselFraSaksbehandlerForesporselSvar!!.teamakode.arenaNotatTittel
+            dialogmelding.foresporselFraSaksbehandlerForesporselSvar!!.teamakode.arenaNotatTittel
         }
         dialogmelding.henvendelseFraLegeHenvendelse != null -> {
-            return dialogmelding.henvendelseFraLegeHenvendelse!!.teamakode.arenaNotatTittel
+            dialogmelding.henvendelseFraLegeHenvendelse!!.teamakode.arenaNotatTittel
         }
         dialogmelding.innkallingMoterespons != null -> {
-            return dialogmelding.innkallingMoterespons!!.teamakode.arenaNotatTittel
+            dialogmelding.innkallingMoterespons!!.teamakode.arenaNotatTittel
         }
         else -> throw RuntimeException("Ugyldig dialogmeldingtype")
     }

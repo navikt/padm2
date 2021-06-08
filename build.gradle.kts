@@ -38,7 +38,7 @@ plugins {
     id("no.nils.wsdl2java") version "0.10"
     kotlin("jvm") version "1.5.10"
     id("com.github.johnrengelman.shadow") version "6.1.0"
-    id("org.jmailen.kotlinter") version "3.4.4"
+    id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
 }
 
 buildscript {
@@ -79,8 +79,8 @@ dependencies {
     wsdl2java("javax.activation:activation:$javaxActivationVersion")
     wsdl2java("org.glassfish.jaxb:jaxb-runtime:$jaxbRuntimeVersion")
     wsdl2java("javax.xml.bind:jaxb-api:$jaxbApiVersion")
-    wsdl2java ("javax.xml.ws:jaxws-api:$jaxwsApiVersion")
-    wsdl2java ("com.sun.xml.ws:jaxws-tools:$jaxwsToolsVersion") {
+    wsdl2java("javax.xml.ws:jaxws-api:$jaxwsApiVersion")
+    wsdl2java("com.sun.xml.ws:jaxws-tools:$jaxwsToolsVersion") {
         exclude(group = "com.sun.xml.ws", module = "policy")
     }
 
@@ -89,7 +89,6 @@ dependencies {
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-client-apache:$ktorVersion")
     implementation("io.ktor:ktor-client-jackson:$ktorVersion")
-
 
     implementation("io.prometheus:simpleclient_hotspot:$prometheusVersion")
     implementation("io.prometheus:simpleclient_common:$prometheusVersion")
@@ -139,7 +138,6 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("io.ktor:ktor-client-mock:$ktorVersion")
-
 }
 
 tasks {
