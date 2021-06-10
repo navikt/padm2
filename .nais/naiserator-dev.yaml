@@ -36,8 +36,6 @@ spec:
   vault:
     enabled: true
     paths:
-      - kvPath: /kv/preprod/fss/padm2/default
-        mountPath: /secrets/default
       - kvPath: serviceuser/data/dev/srvpadm2
         mountPath: /secrets/serviceuser
       - kvPath: /azuread/data/dev/creds/padm2
@@ -49,11 +47,11 @@ spec:
     - name: MQ_INPUT_QUEUE_NAME
       value: QA.Q1_PADM.INPUT
     - name: MQ_HOST_NAME
-      value: b27apvl177.preprod.local
+      value: b27apvl222.preprod.local
     - name: MQ_PORT
       value: '1413'
     - name: MQ_GATEWAY_NAME
-      value: MQ1LSC04
+      value: MQLS04
     - name: MQ_CHANNEL_NAME
       value: Q1_PADM
     - name: AKTOR_REGISTER_V1_URL
