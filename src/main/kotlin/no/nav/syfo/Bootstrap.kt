@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import com.ibm.msg.client.jms.JmsConstants.USER_AUTHENTICATION_MQCSP
 import io.ktor.client.*
 import io.ktor.client.engine.apache.*
 import io.ktor.client.features.json.*
@@ -59,10 +60,8 @@ fun main() {
     val vaultSecrets = VaultSecrets(
         serviceuserPassword = getFileAsString("/secrets/serviceuser/password"),
         serviceuserUsername = getFileAsString("/secrets/serviceuser/username"),
-        mqUsername = getFileAsString("/secrets/default/mqUsername"),
-        mqPassword = getFileAsString("/secrets/default/mqPassword"),
         clientId = getFileAsString("/secrets/azuread/padm2/client_id"),
-        clientsecret = getFileAsString("/secrets/azuread/padm2/client_secret")
+        clientsecret = getFileAsString("/secrets/azuread/padm2/client_secret"),
     )
 
     val applicationServer = ApplicationServer(applicationEngine, applicationState)
@@ -162,7 +161,10 @@ fun launchListeners(
     signerendeLegeService: SignerendeLegeService
 ) {
     createListener(applicationState) {
-        connectionFactory(env).createConnection(secrets.mqUsername, secrets.mqPassword).use { connection ->
+        val factory = connectionFactory(env)
+        factory.setBooleanProperty(USER_AUTHENTICATION_MQCSP, true)
+
+        factory.createConnection(secrets.serviceuserUsername, secrets.serviceuserPassword).use { connection ->
             connection.start()
             val session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE)
 
