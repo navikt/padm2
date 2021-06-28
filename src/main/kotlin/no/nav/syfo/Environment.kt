@@ -15,7 +15,6 @@ data class Environment(
     val kuhrSarApiUrl: String = getEnvVar("KUHR_SAR_API_URL", "http://kuhr-sar-api.teamkuhr.svc.nais.local"),
     val subscriptionEndpointURL: String = getEnvVar("SUBSCRIPTION_ENDPOINT_URL"),
     val cluster: String = getEnvVar("NAIS_CLUSTER_NAME"),
-    val padm2ReglerEndpointURL: String = getEnvVar("PADM2REGLER_ENDPOINT_URL", "http://padm2regler"),
     val inputBackoutQueueName: String = getEnvVar("MQ_INPUT_BOQ_QUEUE_NAME"),
     val opprettSakUrl: String = getEnvVar("OPPRETT_SAK_URL", "http://sak/api/v1/saker"),
     val dokArkivUrl: String = getEnvVar("DOK_ARKIV_URL"),
