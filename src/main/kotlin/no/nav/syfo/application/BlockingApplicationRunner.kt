@@ -24,6 +24,7 @@ import no.nav.syfo.metrics.MESSAGES_SENT_TO_BOQ
 import no.nav.syfo.metrics.REQUEST_TIME
 import no.nav.syfo.metrics.SAR_TSS_MISS_COUNTER
 import no.nav.syfo.model.*
+import no.nav.syfo.persistering.db.hentMottattTidspunkt
 import no.nav.syfo.services.*
 import no.nav.syfo.util.*
 import no.nav.syfo.validation.isKodeverkValid
@@ -171,9 +172,10 @@ class BlockingApplicationRunner {
                         }
 
                         if (dialogmeldingDokumentWithShaExists(sha256String, database)) {
+                            val tidMottattOpprinneligMelding = database.connection.hentMottattTidspunkt(sha256String)
                             handleDuplicateDialogmeldingContent(
                                 session, receiptProducer,
-                                fellesformat, loggingMeta, env, sha256String
+                                fellesformat, loggingMeta, env, sha256String, tidMottattOpprinneligMelding
                             )
                             continue@loop
                         }
@@ -303,7 +305,7 @@ class BlockingApplicationRunner {
                     }
                 } catch (e: Exception) {
                     MESSAGES_SENT_TO_BOQ.inc()
-                    log.error("Exception caught while handling message, sending to backout, {}", e)
+                    log.error("Exception caught while handling message, sending to backout", e)
                     backoutProducer.send(message)
                 }
             }
