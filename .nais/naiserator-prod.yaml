@@ -80,3 +80,5 @@ spec:
       value: b813133d-82b8-46ef-be96-3b903ea6c048
     - name: AADACCESSTOKEN_URL
       value: https://login.microsoftonline.com/navno.onmicrosoft.com/oauth2/token
+    - name: HELSENETT_ENDPOINT_URL
+      value: https://syfohelsenettproxy.nais.adeo.no
