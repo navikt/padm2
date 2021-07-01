@@ -1,13 +1,16 @@
 package no.nav.syfo.persistering.db
 
-import java.sql.Connection
-import java.sql.Timestamp
 import no.nav.syfo.db.DatabaseInterface
+import no.nav.syfo.db.toList
 import no.nav.syfo.model.Dialogmelding
 import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.model.ValidationResult
 import no.nav.syfo.objectMapper
+import no.nav.syfo.persistering.db.domain.DialogmeldingTidspunkt
 import org.postgresql.util.PGobject
+import java.sql.Connection
+import java.sql.ResultSet
+import java.sql.Timestamp
 
 fun DatabaseInterface.lagreMottattDialogmelding(
     receivedDialogmelding: ReceivedDialogmelding,
@@ -23,6 +26,11 @@ fun DatabaseInterface.lagreMottattDialogmelding(
         connection.commit()
     }
 }
+fun ResultSet.toDialogmeldingTidspunkt(): DialogmeldingTidspunkt =
+    DialogmeldingTidspunkt(
+        signaturDato = getString("signaturDato"),
+        mottattTidspunkt = getTimestamp("mottatt_tidspunkt").toLocalDateTime(),
+    )
 
 private fun Connection.opprettDialogmeldingOpplysninger(receivedDialogmelding: ReceivedDialogmelding) {
     this.prepareStatement(
@@ -96,6 +104,21 @@ fun Connection.erDialogmeldingOpplysningerLagret(dialogmeldingid: String) =
         ).use {
             it.setString(1, dialogmeldingid)
             it.executeQuery().next()
+        }
+    }
+
+fun Connection.hentMottattTidspunkt(shaString: String) =
+    use { connection ->
+        connection.prepareStatement(
+            """
+                SELECT dok.dialogmelding -> 'signaturDato' AS signaturDato, o.mottatt_tidspunkt
+                FROM dialogmeldingdokument dok
+                INNER JOIN dialogmeldingopplysninger o ON o.id = dok.id
+                WHERE dok.sha_string=?
+                """
+        ).use {
+            it.setString(1, shaString)
+            it.executeQuery().toList { toDialogmeldingTidspunkt() }.first()
         }
     }
 

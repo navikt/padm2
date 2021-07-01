@@ -15,12 +15,15 @@ import no.nav.syfo.metrics.TEST_FNR_IN_PROD
 import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.model.ValidationResult
 import no.nav.syfo.model.Vedlegg
+import no.nav.syfo.persistering.db.domain.DialogmeldingTidspunkt
 import no.nav.syfo.persistering.handleRecivedMessage
 import no.nav.syfo.services.JournalService
 import no.nav.syfo.services.sendReceipt
 import no.nav.syfo.util.LogType
 import no.nav.syfo.util.LoggingMeta
 import no.nav.syfo.util.createLogEntry
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import javax.jms.MessageProducer
 import javax.jms.Session
 
@@ -66,13 +69,21 @@ fun handleDuplicateDialogmeldingContent(
     loggingMeta: LoggingMeta,
     env: Environment,
     sha256String: String,
+    opprinneligMeldingTidspunkt: DialogmeldingTidspunkt,
 ) {
+    val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")
+    val tidMottattOpprinneligMelding = opprinneligMeldingTidspunkt.mottattTidspunkt.format(formatter)
+    val tidMottattNyMelding = LocalDateTime.now().format(formatter)
+
     log.warn(
         "Duplicate message: Same sha256String {}",
         createLogEntry(
             LogType.INVALID_MESSAGE,
             loggingMeta,
             "shaString" to sha256String,
+            "tidSignertOpprinneligMelding" to opprinneligMeldingTidspunkt.signaturDato,
+            "tidMottattOpprinneligMelding" to tidMottattOpprinneligMelding,
+            "tidMottattNyMelding" to tidMottattNyMelding
         )
     )
 
@@ -80,8 +91,7 @@ fun handleDuplicateDialogmeldingContent(
         session, receiptProducer, fellesformat, ApprecStatus.avvist,
         listOf(
             createApprecError(
-                "Duplikat! - Denne dialogmeldingen er mottatt tidligere. " +
-                    "Skal ikke sendes på nytt."
+                "Duplikat! - Dialogmeldingen fra $tidMottattNyMelding har vi tidligere mottatt den $tidMottattOpprinneligMelding. Skal ikke sendes på nytt."
             )
         )
     )
