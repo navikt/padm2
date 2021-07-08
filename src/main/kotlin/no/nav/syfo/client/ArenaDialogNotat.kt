@@ -135,9 +135,11 @@ fun sendArenaDialogNotat(
     session: Session,
     arenaDialogNotat: ArenaDialogNotat,
     loggingMeta: LoggingMeta
-) = producer.send(
-    session.createTextMessage().apply {
-        text = arenaDialogNotatMarshaller.toString(arenaDialogNotat)
-        log.info("Message is sendt to arena {}", fields(loggingMeta))
-    }
-)
+) {
+    producer.send(
+        session.createTextMessage().apply {
+            text = arenaDialogNotatMarshaller.toString(arenaDialogNotat)
+        }
+    )
+    log.info("Message is sent to arena {}", fields(loggingMeta))
+}
