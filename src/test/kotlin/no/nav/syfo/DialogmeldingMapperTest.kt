@@ -5,8 +5,7 @@ import java.time.LocalDateTime
 import java.util.UUID
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
-import no.nav.syfo.model.findDialogmeldingType
-import no.nav.syfo.model.toDialogmelding
+import no.nav.syfo.model.*
 import no.nav.syfo.util.extractDialogmelding
 import no.nav.syfo.util.extractVedlegg
 import no.nav.syfo.util.fellesformatUnmarshaller
@@ -111,8 +110,40 @@ internal class DialogmeldingMapperTest {
             navnHelsePersonellNavn = navnHelsePersonellNavn
         )
         val extractVedlegg = extractVedlegg(felleformatDm)
+        val vedleggListe = extractVedlegg.map { it.toVedlegg() }
 
         dialogmelding.id shouldBeEqualTo dialogmeldingId
-        extractVedlegg.size.shouldBe(2)
+        vedleggListe.size.shouldBe(2)
+        vedleggListe[0].beskrivelse shouldBeEqualTo "Et vedlegg fra lege"
+        vedleggListe[1].beskrivelse shouldBeEqualTo "Et bilde fra lege"
+    }
+
+    @Test
+    internal fun `Tester mapping fra fellesformat til dialogmelding notat med vedlegg der description mangler`() {
+        val felleformatDm = fellesformatUnmarshaller.unmarshal(
+            StringReader(getFileAsString("src/test/resources/dialogmelding_dialog_notat_vedlegg_missing_description.xml"))
+        ) as XMLEIFellesformat
+
+        val dialomeldingxml = extractDialogmelding(felleformatDm)
+        val dialogmeldingId = UUID.randomUUID().toString()
+        val signaturDato = LocalDateTime.of(2017, 11, 5, 0, 0, 0)
+        val navnHelsePersonellNavn = "Per Hansen"
+        val receiverBlock = felleformatDm.get<XMLMottakenhetBlokk>()
+
+        val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
+
+        val dialogmelding = dialomeldingxml.toDialogmelding(
+            dialogmeldingId = dialogmeldingId,
+            dialogmeldingType = dialogmeldingType,
+            signaturDato = signaturDato,
+            navnHelsePersonellNavn = navnHelsePersonellNavn
+        )
+        val extractVedlegg = extractVedlegg(felleformatDm)
+        val vedleggListe = extractVedlegg.map { it.toVedlegg() }
+
+        dialogmelding.id shouldBeEqualTo dialogmeldingId
+        vedleggListe.size.shouldBe(2)
+        vedleggListe[0].beskrivelse shouldBeEqualTo ""
+        vedleggListe[1].beskrivelse shouldBeEqualTo "Et bilde fra lege"
     }
 }
