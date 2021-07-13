@@ -4,10 +4,8 @@ import io.ktor.util.*
 import kotlinx.coroutines.delay
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.emottak.subscription.SubscriptionPort
-import no.nav.helse.base64container.Base64Container
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
-import no.nav.helse.msgHead.XMLDocument
 import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.Environment
 import no.nav.syfo.VaultSecrets
@@ -311,15 +309,4 @@ class BlockingApplicationRunner {
             }
         }
     }
-}
-
-fun XMLDocument.toVedlegg(): Vedlegg {
-
-    val base64Container = refDoc.content.any[0] as Base64Container
-
-    return Vedlegg(
-        mimeType = refDoc.mimeType,
-        beskrivelse = refDoc.description,
-        contentBase64 = base64Container.value
-    )
 }
