@@ -27,7 +27,8 @@ data class Environment(
     val syfohelsenettproxyEndpointURL: String = getEnvVar("HELSENETT_ENDPOINT_URL"),
     val legeSuspensjonEndpointURL: String = getEnvVar("LEGE_SUSPENSJON_ENDPOINT_URL"),
     val helsenettproxyId: String = getEnvVar("HELSENETTPROXY_ID"),
-    val aadAccessTokenUrl: String = getEnvVar("AADACCESSTOKEN_URL")
+    val aadAccessTokenUrl: String = getEnvVar("AADACCESSTOKEN_URL"),
+    val stsUrl: String = getEnvVar("STS_URL")
 ) : MqConfig
 
 data class VaultSecrets(

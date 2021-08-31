@@ -2,7 +2,7 @@ apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
   name: padm2
-  namespace: default
+  namespace: teamsykefravr
   labels:
     team: teamsykefravr
 spec:
@@ -88,3 +88,5 @@ spec:
       value: https://sak.nais.adeo.no/api/v1/saker
     - name: KUHR_SAR_API_URL
       value: https://kuhr-sar-api.nais.adeo.no
+    - name: STS_URL
+      value: https://security-token-service.nais.adeo.no/rest/v1/sts/token

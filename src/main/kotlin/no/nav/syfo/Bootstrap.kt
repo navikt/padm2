@@ -93,11 +93,11 @@ fun main() {
     val httpClient = HttpClient(Apache, config)
     val httpClientWithProxy = HttpClient(Apache, proxyConfig)
 
-    val oidcClient = StsOidcClient(vaultSecrets.serviceuserUsername, vaultSecrets.serviceuserPassword)
+    val oidcClient = StsOidcClient(vaultSecrets.serviceuserUsername, vaultSecrets.serviceuserPassword, env.stsUrl)
     val aktoerIdClient = AktoerIdClient(env.aktoerregisterV1Url, oidcClient, httpClient)
     val sarClient = SarClient(env.kuhrSarApiUrl, httpClient)
 
-    val stsClient = StsOidcClient(vaultSecrets.serviceuserUsername, vaultSecrets.serviceuserPassword)
+    val stsClient = StsOidcClient(vaultSecrets.serviceuserUsername, vaultSecrets.serviceuserPassword, env.stsUrl)
     val sakClient = SakClient(env.opprettSakUrl, stsClient, httpClient)
     val dokArkivClient = DokArkivClient(env.dokArkivUrl, stsClient, httpClient)
     val pdfgenClient = PdfgenClient(env.syfopdfgen, httpClient)
