@@ -2,7 +2,7 @@ apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
   name: padm2
-  namespace: default
+  namespace: teamsykefravr
   labels:
     team: teamsykefravr
 spec:
@@ -62,8 +62,6 @@ spec:
       value: QA.Q414.IU03_UTSENDING
     - name: MQ_INPUT_BOQ_QUEUE_NAME
       value: QA.Q1_PADM.INPUT_BOQ
-    - name: SECURITY_TOKEN_SERVICE_URL
-      value: https://sts-q1.preprod.local/SecurityTokenServiceProvider/
     - name: DOK_ARKIV_URL
       value: https://dokarkiv-q1.nais.preprod.local/rest/journalpostapi/v1/journalpost
     - name: ARENA_OUTBOUND_QUEUENAME
@@ -88,3 +86,5 @@ spec:
       value: https://sak-q1.nais.preprod.local/api/v1/saker
     - name: KUHR_SAR_API_URL
       value: https://kuhr-sar-api.nais.preprod.local
+    - name: STS_URL
+      value: https://security-token-service.nais.preprod.local/rest/v1/sts/token
