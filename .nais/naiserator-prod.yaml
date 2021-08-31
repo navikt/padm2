@@ -65,7 +65,7 @@ spec:
     - name: SECURITY_TOKEN_SERVICE_URL
       value: https://sts.adeo.no/SecurityTokenServiceProvider/
     - name: DOK_ARKIV_URL
-      value: http://dokarkiv/rest/journalpostapi/v1/journalpost
+      value: https://dokarkiv.nais.adeo.no/rest/journalpostapi/v1/journalpost
     - name: ARENA_OUTBOUND_QUEUENAME
       value: QA.P414.AO01_SKJEMA_MOTTAK
     - name: PADM2_DB_URL
@@ -82,3 +82,9 @@ spec:
       value: https://login.microsoftonline.com/navno.onmicrosoft.com/oauth2/token
     - name: HELSENETT_ENDPOINT_URL
       value: https://syfohelsenettproxy.nais.adeo.no
+    - name: LEGE_SUSPENSJON_ENDPOINT_URL
+      value: https://btsys.nais.adeo.no
+    - name: OPPRETT_SAK_URL
+      value: https://sak.nais.adeo.no/api/v1/saker
+    - name: KUHR_SAR_API_URL
+      value: https://kuhr-sar-api.nais.adeo.no
