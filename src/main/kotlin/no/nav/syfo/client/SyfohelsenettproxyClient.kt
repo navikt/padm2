@@ -11,16 +11,17 @@ import io.ktor.http.HttpStatusCode.Companion.InternalServerError
 import io.ktor.http.HttpStatusCode.Companion.NotFound
 import io.ktor.util.*
 import net.logstash.logback.argument.StructuredArguments.fields
+import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.log
 import no.nav.syfo.util.LoggingMeta
 import java.io.IOException
 
 @KtorExperimentalAPI
 class SyfohelsenettproxyClient(
+    private val azureAdV2Client: AzureAdV2Client,
     private val endpointUrl: String,
-    private val accessTokenClient: AccessTokenClient,
-    private val resourceId: String,
-    private val httpClient: HttpClient
+    private val httpClient: HttpClient,
+    private val helsenettClientId: String
 ) {
 
     suspend fun finnBehandler(
@@ -29,9 +30,9 @@ class SyfohelsenettproxyClient(
         loggingMeta: LoggingMeta
     ): HelsenettProxyBehandler? = retry("finn_behandler") {
         log.info("Henter behandler fra syfohelsenettproxy for msgId {}", msgId)
-        val httpStatement = httpClient.get<HttpStatement>("$endpointUrl/api/behandler") {
+        val httpStatement = httpClient.get<HttpStatement>("$endpointUrl/api/v2/behandler") {
             accept(ContentType.Application.Json)
-            val accessToken = accessTokenClient.hentAccessToken(resourceId)
+            val accessToken = azureAdV2Client.getSystemToken(helsenettClientId)?.accessToken
             headers {
                 append("Authorization", "Bearer $accessToken")
                 append("Nav-CallId", msgId)

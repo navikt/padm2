@@ -3,6 +3,9 @@ package no.nav.syfo
 import no.nav.syfo.util.MqConfig
 
 data class Environment(
+    val aadAppClient: String = getEnvVar("AZURE_APP_CLIENT_ID"),
+    val aadAppSecret: String = getEnvVar("AZURE_APP_CLIENT_SECRET"),
+    val aadTokenEndpoint: String = getEnvVar("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"),
     val applicationName: String = getEnvVar("NAIS_APP_NAME", "padm2"),
     val applicationPort: Int = getEnvVar("APPLICATION_PORT", "8080").toInt(),
     override val mqHostname: String = getEnvVar("MQ_HOST_NAME"),
@@ -27,15 +30,13 @@ data class Environment(
     val syfohelsenettproxyEndpointURL: String = getEnvVar("HELSENETT_ENDPOINT_URL"),
     val legeSuspensjonEndpointURL: String = getEnvVar("LEGE_SUSPENSJON_ENDPOINT_URL"),
     val helsenettproxyId: String = getEnvVar("HELSENETTPROXY_ID"),
-    val aadAccessTokenUrl: String = getEnvVar("AADACCESSTOKEN_URL"),
+    val helsenettClientId: String = getEnvVar("HELSENETT_CLIENT_ID"),
     val stsUrl: String = getEnvVar("STS_URL")
 ) : MqConfig
 
 data class VaultSecrets(
     val serviceuserUsername: String,
     val serviceuserPassword: String,
-    val clientId: String,
-    val clientsecret: String
 )
 
 fun getEnvVar(varName: String, defaultValue: String? = null) =
