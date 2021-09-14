@@ -5,7 +5,7 @@ Repository for PADM. Application written in Kotlin used to receive dialogmelding
 More information on dialogmeldinger can be found here: https://www.nhn.no/veileder-for-elektronisk-meldingsutveksling/del-1-elektronisk-meldingsutveksling/elektronisk-meldingsutveksling/#kap-dialogmeldinger
 
 
-<img src="./src/svg/flyttdiagram.svg" alt="Image of the flow of the padm2 application">
+<img src="src/svg/dialogmeldingflyt_2021_09_14.svg" alt="Image of the flow of the padm2 application">
 
 ## Technologies used
 * Kotlin
