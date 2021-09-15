@@ -9,10 +9,11 @@ val ktorVersion = "1.5.1"
 val logbackVersion = "1.2.3"
 val logstashEncoderVersion = "5.1"
 val prometheusVersion = "0.6.0"
-val padmCommonVersion = "1.440c0ed"
 val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
 val fellesformat2Version = "1.0329dd1"
 val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
+val ibmMqVersion = "9.1.2.0"
+val cxfVersion = "3.3.1"
 val jaxwsApiVersion = "2.3.1"
 val javaxAnnotationApiVersion = "1.3.2"
 val jaxbRuntimeVersion = "2.4.0-b180830.0438"
@@ -89,6 +90,7 @@ dependencies {
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-client-apache:$ktorVersion")
     implementation("io.ktor:ktor-client-jackson:$ktorVersion")
+    implementation("io.ktor:ktor-client-auth-jvm:$ktorVersion")
 
     implementation("io.prometheus:simpleclient_hotspot:$prometheusVersion")
     implementation("io.prometheus:simpleclient_common:$prometheusVersion")
@@ -100,12 +102,6 @@ dependencies {
 
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashEncoderVersion")
-
-    implementation("no.nav.syfo:padm-common-mq:$padmCommonVersion")
-    implementation("no.nav.syfo:padm-common-models:$padmCommonVersion")
-    implementation("no.nav.syfo:padm-common-networking:$padmCommonVersion")
-    implementation("no.nav.syfo:padm-common-rest-sts:$padmCommonVersion")
-    implementation("no.nav.syfo:padm-common-ws:$padmCommonVersion")
 
     implementation("no.nav.helse.xml:xmlfellesformat2:$fellesformat2Version")
     implementation("no.nav.helse.xml:kith-hodemelding:$kithHodemeldingVersion")
@@ -128,6 +124,13 @@ dependencies {
         exclude(group = "com.sun.xml.ws", module = "policy")
     }
     implementation("com.migesok:jaxb-java-time-adapters:$javaTimeAdapterVersion")
+
+    implementation("com.ibm.mq:com.ibm.mq.allclient:$ibmMqVersion")
+
+    implementation("org.apache.cxf:cxf-rt-frontend-jaxws:$cxfVersion")
+    implementation("org.apache.cxf:cxf-rt-features-logging:$cxfVersion")
+    implementation("org.apache.cxf:cxf-rt-transports-http:$cxfVersion")
+    implementation("org.apache.cxf:cxf-rt-ws-security:$cxfVersion")
 
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion") {
         exclude(group = "org.eclipse.jetty")

@@ -10,7 +10,7 @@ import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.helse.msgHead.XMLSender
 import no.nav.syfo.client.SamhandlerPraksis
-import no.nav.syfo.helpers.retry
+import no.nav.syfo.util.retry
 import no.nav.syfo.log
 import no.nav.syfo.util.LoggingMeta
 import no.nav.syfo.util.senderMarshaller
