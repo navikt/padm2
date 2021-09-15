@@ -47,9 +47,10 @@ private fun Connection.opprettDialogmeldingOpplysninger(receivedDialogmelding: R
                 legekontor_her_id,
                 legekontor_resh_id,
                 mottatt_tidspunkt,
-                tss_id
+                tss_id,
+                fellesformat
                 )
-            VALUES  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """
     ).use {
         it.setString(1, receivedDialogmelding.dialogmelding.id)
@@ -64,6 +65,7 @@ private fun Connection.opprettDialogmeldingOpplysninger(receivedDialogmelding: R
         it.setString(10, receivedDialogmelding.legekontorReshId)
         it.setTimestamp(11, Timestamp.valueOf(receivedDialogmelding.mottattDato))
         it.setString(12, receivedDialogmelding.tssid)
+        it.setString(13, receivedDialogmelding.fellesformat)
         it.executeUpdate()
     }
 }
