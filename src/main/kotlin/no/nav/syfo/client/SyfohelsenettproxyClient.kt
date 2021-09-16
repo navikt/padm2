@@ -1,6 +1,6 @@
 package no.nav.syfo.client
 
-import no.nav.syfo.helpers.retry
+import no.nav.syfo.util.retry
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*

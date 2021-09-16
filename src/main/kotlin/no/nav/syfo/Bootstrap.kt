@@ -23,14 +23,10 @@ import no.nav.syfo.application.createApplicationEngine
 import no.nav.syfo.client.*
 import no.nav.syfo.db.Database
 import no.nav.syfo.db.VaultCredentialService
-import no.nav.syfo.mq.connectionFactory
-import no.nav.syfo.mq.consumerForQueue
-import no.nav.syfo.mq.producerForQueue
 import no.nav.syfo.services.JournalService
 import no.nav.syfo.services.RuleService
 import no.nav.syfo.services.SignerendeLegeService
-import no.nav.syfo.util.TrackableException
-import no.nav.syfo.util.getFileAsString
+import no.nav.syfo.util.*
 import no.nav.syfo.vault.RenewVaultService
 import no.nav.syfo.ws.createPort
 import org.apache.cxf.ws.addressing.WSAddressingFeature

@@ -7,7 +7,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.util.*
 import net.logstash.logback.argument.StructuredArguments.fields
-import no.nav.syfo.helpers.retry
+import no.nav.syfo.util.retry
 import no.nav.syfo.log
 import no.nav.syfo.model.*
 import no.nav.syfo.objectMapper

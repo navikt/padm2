@@ -7,7 +7,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.util.*
 import no.nav.syfo.VaultSecrets
-import no.nav.syfo.helpers.retry
+import no.nav.syfo.util.retry
 import no.nav.syfo.log
 import java.io.IOException
 

@@ -1,6 +1,6 @@
 package no.nav.syfo
 
-import no.nav.syfo.mq.MqConfig
+import no.nav.syfo.util.MqConfig
 
 data class Environment(
     val applicationName: String = getEnvVar("NAIS_APP_NAME", "padm2"),
