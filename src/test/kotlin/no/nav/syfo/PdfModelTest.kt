@@ -134,7 +134,8 @@ internal class PdfModelTest {
             ),
             pasientFnr = "3214141414",
             pasientNavn = "Koronasen, Kovid Nitten",
-            navnSignerendeLege = "Legesen, Leg E."
+            navnSignerendeLege = "Legesen, Leg E.",
+            antallVedlegg = 1,
         )
         println(objectMapper.writeValueAsString(pdfPayload))
     }

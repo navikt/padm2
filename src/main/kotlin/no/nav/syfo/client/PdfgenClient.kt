@@ -30,11 +30,13 @@ fun createPdfPayload(
     validationResult: ValidationResult,
     pasientFnr: String,
     pasientNavn: String,
-    navnSignerendeLege: String
+    navnSignerendeLege: String,
+    antallVedlegg: Int,
 ): PdfModel = PdfModel(
     dialogmelding = dialogmelding,
     validationResult = validationResult,
     pasientFnr = pasientFnr,
     pasientNavn = pasientNavn,
-    navnSignerendeLege = navnSignerendeLege
+    navnSignerendeLege = navnSignerendeLege,
+    antallVedlegg,
 )

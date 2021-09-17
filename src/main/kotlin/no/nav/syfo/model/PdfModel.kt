@@ -5,5 +5,6 @@ data class PdfModel(
     val validationResult: ValidationResult,
     val pasientFnr: String,
     val pasientNavn: String,
-    val navnSignerendeLege: String
+    val navnSignerendeLege: String,
+    val antallVedlegg: Int,
 )
