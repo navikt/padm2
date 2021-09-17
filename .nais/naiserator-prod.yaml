@@ -38,11 +38,13 @@ spec:
     paths:
       - kvPath: serviceuser/data/prod/srvpadm2
         mountPath: /secrets/serviceuser
-      - kvPath: /azuread/data/prod/creds/padm2
-        mountPath: /secrets/azuread/padm2
   webproxy: true
   ingresses:
     - "https://padm2.nais.adeo.no"
+  azure:
+    application:
+      enabled: true
+      tenant: nav.no
   env:
     - name: MQ_INPUT_QUEUE_NAME
       value: QA.P_PADM.INPUT
@@ -82,6 +84,8 @@ spec:
       value: https://login.microsoftonline.com/navno.onmicrosoft.com/oauth2/token
     - name: HELSENETT_ENDPOINT_URL
       value: https://syfohelsenettproxy.nais.adeo.no
+    - name: HELSENETT_CLIENT_ID
+      value: prod-fss.teamsykmelding.syfohelsenettproxy
     - name: LEGE_SUSPENSJON_ENDPOINT_URL
       value: https://btsys.nais.adeo.no
     - name: OPPRETT_SAK_URL

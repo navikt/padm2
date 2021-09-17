@@ -21,6 +21,7 @@ import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.BlockingApplicationRunner
 import no.nav.syfo.application.createApplicationEngine
 import no.nav.syfo.client.*
+import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.db.Database
 import no.nav.syfo.db.VaultCredentialService
 import no.nav.syfo.services.JournalService
@@ -56,8 +57,6 @@ fun main() {
     val vaultSecrets = VaultSecrets(
         serviceuserPassword = getFileAsString("/secrets/serviceuser/password"),
         serviceuserUsername = getFileAsString("/secrets/serviceuser/username"),
-        clientId = getFileAsString("/secrets/azuread/padm2/client_id"),
-        clientsecret = getFileAsString("/secrets/azuread/padm2/client_secret"),
     )
 
     val applicationServer = ApplicationServer(applicationEngine, applicationState)
@@ -97,14 +96,19 @@ fun main() {
     val sakClient = SakClient(env.opprettSakUrl, stsClient, httpClient)
     val dokArkivClient = DokArkivClient(env.dokArkivUrl, stsClient, httpClient)
     val pdfgenClient = PdfgenClient(env.syfopdfgen, httpClient)
-    val accessTokenClient =
-        AccessTokenClient(env.aadAccessTokenUrl, vaultSecrets.clientId, vaultSecrets.clientsecret, httpClientWithProxy)
+
+    val azureAdV2Client = AzureAdV2Client(
+        aadAppClient = env.aadAppClient,
+        aadAppSecret = env.aadAppSecret,
+        aadTokenEndpoint = env.aadTokenEndpoint,
+        httpClient = httpClientWithProxy,
+    )
 
     val syfohelsenettproxyClient = SyfohelsenettproxyClient(
+        azureAdV2Client,
         env.syfohelsenettproxyEndpointURL,
-        accessTokenClient,
-        env.helsenettproxyId,
-        httpClient
+        httpClient,
+        env.helsenettClientId,
     )
 
     val ruleService = RuleService(
