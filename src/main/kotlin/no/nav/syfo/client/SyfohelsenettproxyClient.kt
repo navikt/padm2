@@ -1,6 +1,5 @@
 package no.nav.syfo.client
 
-import no.nav.syfo.util.retry
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -14,6 +13,7 @@ import net.logstash.logback.argument.StructuredArguments.fields
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.log
 import no.nav.syfo.util.LoggingMeta
+import no.nav.syfo.util.retry
 import java.io.IOException
 
 @KtorExperimentalAPI
@@ -30,19 +30,23 @@ class SyfohelsenettproxyClient(
         loggingMeta: LoggingMeta
     ): HelsenettProxyBehandler? = retry("finn_behandler") {
         log.info("Henter behandler fra syfohelsenettproxy for msgId {}", msgId)
-        val httpStatement = httpClient.get<HttpStatement>("$endpointUrl/api/v2/behandler") {
+
+        val accessToken = azureAdV2Client.getSystemToken(helsenettClientId)?.accessToken
+            ?: run {
+                log.error("Syfohelsenettproxy kunne ikke hente AzureAdV2 token for msgID {}, {}", msgId, fields(loggingMeta))
+                return@retry null
+            }
+
+        val response: HttpResponse = httpClient.get("$endpointUrl/api/v2/behandler") {
             accept(ContentType.Application.Json)
-            val accessToken = azureAdV2Client.getSystemToken(helsenettClientId)?.accessToken
             headers {
-                append("Authorization", "Bearer $accessToken")
+                append(HttpHeaders.Authorization, "Bearer $accessToken")
                 append("Nav-CallId", msgId)
                 append("behandlerFnr", behandlerFnr)
             }
         }
 
-        val httpResponse = httpStatement.execute()
-
-        when (httpResponse.status) {
+        when (response.status) {
             InternalServerError -> {
                 log.error("Syfohelsenettproxy svarte med feilmelding for msgId {}, {}", msgId, fields(loggingMeta))
                 throw IOException("Syfohelsenettproxy svarte med feilmelding for $msgId")
@@ -59,7 +63,7 @@ class SyfohelsenettproxyClient(
             }
             else -> {
                 log.info("Hentet behandler for msgId {}, {}", msgId, fields(loggingMeta))
-                httpResponse.call.response.receive<HelsenettProxyBehandler>()
+                response.receive<HelsenettProxyBehandler>()
             }
         }
     }
