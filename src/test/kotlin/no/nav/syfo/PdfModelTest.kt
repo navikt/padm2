@@ -5,7 +5,6 @@ import org.amshove.kluent.shouldBeEqualTo
 import java.time.LocalDateTime
 import java.util.UUID
 import org.junit.Test
-import kotlin.test.assertEquals
 
 internal class PdfModelTest {
 
@@ -126,6 +125,6 @@ internal class PdfModelTest {
             antallVedlegg = 1,
         )
         println(objectMapper.writeValueAsString(pdfPayload))
-        objectMapper.writeValueAsString(pdfPayload) shouldBeEqualTo  objectMapper.writeValueAsString(pdfPayload.sanitizeForPdfGen())
+        objectMapper.writeValueAsString(pdfPayload) shouldBeEqualTo objectMapper.writeValueAsString(pdfPayload.sanitizeForPdfGen())
     }
 }

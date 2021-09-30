@@ -24,14 +24,14 @@ fun PdfModel.sanitizeForPdfGen(): PdfModel {
     val pdfModelJsonString = objectMapper.writeValueAsString(this)
 
     val sanitizedJson = pdfModelJsonString.toCharArray().filter {
-            if (it in illegalCharacters || it < NUL) {
-                SANITIZE_INVALID_CHAR_COUNTER.inc()
-                log.warn("Illegal character in PdfModel: %x".format(it.code))
-                false
-            } else {
-                true
-            }
-        }.joinToString("")
+        if (it in illegalCharacters || it < NUL) {
+            SANITIZE_INVALID_CHAR_COUNTER.inc()
+            log.warn("Illegal character in PdfModel: %x".format(it.code))
+            false
+        } else {
+            true
+        }
+    }.joinToString("")
 
     return objectMapper.readValue(sanitizedJson)
 }
