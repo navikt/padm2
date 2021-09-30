@@ -31,7 +31,7 @@ fun PdfModel.sanitizeForPdfGen(): PdfModel {
         } else {
             true
         }
-    }.toString()
+    }.joinToString("")
 
     return objectMapper.readValue(sanitizedJson)
 }
