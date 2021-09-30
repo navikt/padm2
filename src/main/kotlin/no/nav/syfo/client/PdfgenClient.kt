@@ -10,6 +10,7 @@ import no.nav.syfo.util.retry
 import no.nav.syfo.model.Dialogmelding
 import no.nav.syfo.model.PdfModel
 import no.nav.syfo.model.ValidationResult
+import no.nav.syfo.model.sanitizeForPdfGen
 
 @KtorExperimentalAPI
 class PdfgenClient constructor(
@@ -17,10 +18,10 @@ class PdfgenClient constructor(
     private val httpClient: HttpClient
 ) {
     suspend fun createPdf(payload: PdfModel): ByteArray = retry("pdfgen") {
-        httpClient.get<ByteArray>(url) {
+        httpClient.get(url) {
             contentType(ContentType.Application.Json)
             method = HttpMethod.Post
-            body = payload
+            body = payload.sanitizeForPdfGen()
         }
     }
 }
