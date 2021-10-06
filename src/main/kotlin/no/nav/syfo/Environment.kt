@@ -19,7 +19,7 @@ data class Environment(
     val subscriptionEndpointURL: String = getEnvVar("SUBSCRIPTION_ENDPOINT_URL"),
     val cluster: String = getEnvVar("NAIS_CLUSTER_NAME"),
     val inputBackoutQueueName: String = getEnvVar("MQ_INPUT_BOQ_QUEUE_NAME"),
-    val opprettSakUrl: String = getEnvVar("OPPRETT_SAK_URL"),
+    val dokArkivClientId: String = getEnvVar("DOKARKIV_CLIENT_ID"),
     val dokArkivUrl: String = getEnvVar("DOK_ARKIV_URL"),
     val syfopdfgen: String = getEnvVar("PDF_GEN_URL"),
     val arenaQueueName: String = getEnvVar("ARENA_OUTBOUND_QUEUENAME"),

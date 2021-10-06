@@ -12,7 +12,6 @@ import no.nav.syfo.util.LoggingMeta
 
 @KtorExperimentalAPI
 class JournalService(
-    private val sakClient: SakClient,
     private val dokArkivClient: DokArkivClient,
     private val pdfgenClient: PdfgenClient
 ) {
@@ -25,11 +24,6 @@ class JournalService(
         navnSignerendeLege: String,
     ) {
         log.info("Prover aa lagre i Joark {}", StructuredArguments.fields(loggingMeta))
-
-        val sak = sakClient.findOrCreateSak(
-            receivedDialogmelding.pasientAktoerId, receivedDialogmelding.msgId,
-            loggingMeta
-        )
 
         val antallVedlegg = vedleggListe?.size ?: 0
 
@@ -46,7 +40,6 @@ class JournalService(
 
         val journalpostPayload = createJournalpostPayload(
             receivedDialogmelding.dialogmelding,
-            sak.id.toString(),
             pdf,
             receivedDialogmelding.personNrLege,
             receivedDialogmelding.navLogId,

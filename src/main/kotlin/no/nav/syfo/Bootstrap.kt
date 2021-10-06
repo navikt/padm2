@@ -92,9 +92,6 @@ fun main() {
     val aktoerIdClient = AktoerIdClient(env.aktoerregisterV1Url, oidcClient, httpClient)
     val sarClient = SarClient(env.kuhrSarApiUrl, httpClient)
 
-    val stsClient = StsOidcClient(vaultSecrets.serviceuserUsername, vaultSecrets.serviceuserPassword, env.stsUrl)
-    val sakClient = SakClient(env.opprettSakUrl, stsClient, httpClient)
-    val dokArkivClient = DokArkivClient(env.dokArkivUrl, stsClient, httpClient)
     val pdfgenClient = PdfgenClient(env.syfopdfgen, httpClient)
 
     val azureAdV2Client = AzureAdV2Client(
@@ -102,6 +99,13 @@ fun main() {
         aadAppSecret = env.aadAppSecret,
         aadTokenEndpoint = env.aadTokenEndpoint,
         httpClient = httpClientWithProxy,
+    )
+
+    val dokArkivClient = DokArkivClient(
+        azureAdV2Client,
+        env.dokArkivClientId,
+        env.dokArkivUrl,
+        httpClientWithProxy,
     )
 
     val syfohelsenettproxyClient = SyfohelsenettproxyClient(
@@ -116,7 +120,7 @@ fun main() {
         syfohelsenettproxyClient
     )
 
-    val journalService = JournalService(sakClient, dokArkivClient, pdfgenClient)
+    val journalService = JournalService(dokArkivClient, pdfgenClient)
     val signerendeLegeService = SignerendeLegeService(syfohelsenettproxyClient)
 
     val subscriptionEmottak = createPort<SubscriptionPort>(env.subscriptionEndpointURL) {
