@@ -12,11 +12,7 @@ import no.nav.syfo.model.Behandler
 import no.nav.syfo.model.DialogmeldingKodeverk
 import no.nav.syfo.model.findDialogmeldingType
 import no.nav.syfo.model.toDialogmelding
-import no.nav.syfo.util.extractDialogmelding
-import no.nav.syfo.util.fellesformatUnmarshaller
-import no.nav.syfo.util.get
-import no.nav.syfo.util.getFileAsString
-import no.nav.syfo.util.getFileAsStringISO88591
+import no.nav.syfo.util.*
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldEqual
 import org.junit.Test
@@ -34,7 +30,7 @@ internal class CreateArenaDialogNotatTest {
 
         val msgHead: XMLMsgHead = felleformatDm.get()
         val receiverBlock = felleformatDm.get<XMLMottakenhetBlokk>()
-        val personNumberPatient = msgHead.msgInfo.patient.ident.find { it.typeId.v == "FNR" }?.id ?: ""
+        val personNumberPatient = extractInnbyggerident(felleformatDm) ?: ""
         val personNumberDoctor = receiverBlock.avsenderFnrFraDigSignatur
         val tssid = "1321415"
 
@@ -106,7 +102,7 @@ internal class CreateArenaDialogNotatTest {
 
         val msgHead: XMLMsgHead = felleformatDm.get()
         val receiverBlock = felleformatDm.get<XMLMottakenhetBlokk>()
-        val personNumberPatient = msgHead.msgInfo.patient.ident.find { it.typeId.v == "FNR" }?.id ?: ""
+        val personNumberPatient = extractInnbyggerident(felleformatDm) ?: ""
         val personNumberDoctor = receiverBlock.avsenderFnrFraDigSignatur
         val tssid = "1321415"
 
@@ -168,7 +164,7 @@ internal class CreateArenaDialogNotatTest {
 
         val msgHead: XMLMsgHead = felleformatDm.get()
         val receiverBlock = felleformatDm.get<XMLMottakenhetBlokk>()
-        val personNumberPatient = msgHead.msgInfo.patient.ident.find { it.typeId.v == "FNR" }?.id ?: ""
+        val personNumberPatient = extractInnbyggerident(felleformatDm) ?: ""
         val personNumberDoctor = receiverBlock.avsenderFnrFraDigSignatur
         val tssid = "1321415"
 
@@ -219,6 +215,45 @@ internal class CreateArenaDialogNotatTest {
     }
 
     @Test
+    internal fun `Tester mapping fra fellesformat til ArenaDialogNotat notat, med dnr for pasient i stedet for fnr`() {
+        val felleformatDm = fellesformatUnmarshaller.unmarshal(
+            StringReader(getFileAsStringISO88591("src/test/resources/dialogmelding_dialog_notat_dnr.xml"))
+        ) as XMLEIFellesformat
+
+        val msgHead: XMLMsgHead = felleformatDm.get()
+        val receiverBlock = felleformatDm.get<XMLMottakenhetBlokk>()
+        val personNumberPatient = extractInnbyggerident(felleformatDm) ?: ""
+        val personNumberDoctor = receiverBlock.avsenderFnrFraDigSignatur
+        val tssid = "1321415"
+
+        val dialomeldingxml = extractDialogmelding(felleformatDm)
+        val dialogmeldingId = UUID.randomUUID().toString()
+        val signaturDato = LocalDateTime.of(2017, 11, 5, 0, 0, 0)
+        val navnHelsePersonellNavn = "Per Hansen"
+
+        val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
+
+        val dialogmelding = dialomeldingxml.toDialogmelding(
+            dialogmeldingId = dialogmeldingId,
+            dialogmeldingType = dialogmeldingType,
+            signaturDato = signaturDato,
+            navnHelsePersonellNavn = navnHelsePersonellNavn
+        )
+
+        val arenaDialogNotat = createArenaDialogNotat(
+            felleformatDm,
+            tssid,
+            personNumberDoctor,
+            personNumberPatient,
+            msgHead,
+            receiverBlock,
+            dialogmelding
+        )
+
+        arenaDialogNotat.pasientData.person.personFnr shouldBeEqualTo "45088649080"
+    }
+
+    @Test
     internal fun `Tester mapping av arena biten`() {
         val felleformatDm = fellesformatUnmarshaller.unmarshal(
             StringReader(getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml"))
@@ -226,7 +261,7 @@ internal class CreateArenaDialogNotatTest {
 
         val msgHead: XMLMsgHead = felleformatDm.get()
         val receiverBlock = felleformatDm.get<XMLMottakenhetBlokk>()
-        val personNumberPatient = msgHead.msgInfo.patient.ident.find { it.typeId.v == "FNR" }?.id ?: ""
+        val personNumberPatient = extractInnbyggerident(felleformatDm) ?: ""
         val personNumberDoctor = receiverBlock.avsenderFnrFraDigSignatur
         val tssid = "1321415"
 
@@ -267,7 +302,7 @@ internal class CreateArenaDialogNotatTest {
 
         val msgHead: XMLMsgHead = felleformatDm.get()
         val receiverBlock = felleformatDm.get<XMLMottakenhetBlokk>()
-        val personNumberPatient = msgHead.msgInfo.patient.ident.find { it.typeId.v == "FNR" }?.id ?: ""
+        val personNumberPatient = extractInnbyggerident(felleformatDm) ?: ""
         val personNumberDoctor = receiverBlock.avsenderFnrFraDigSignatur
         val tssid = "1321415"
 

@@ -73,7 +73,7 @@ class RuleService(
                     RuleMetadata(
                         receivedDate = receivedDialogmelding.mottattDato,
                         signatureDate = receivedDialogmelding.mottattDato,
-                        patientPersonNumber = receivedDialogmelding.personNrPasient,
+                        innbyggerident = receivedDialogmelding.personNrPasient,
                         legekontorOrgnr = receivedDialogmelding.legekontorOrgNr,
                         tssid = receivedDialogmelding.tssid,
                         avsenderfnr = receivedDialogmelding.personNrLege

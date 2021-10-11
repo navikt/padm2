@@ -18,7 +18,7 @@ fun createArenaDialogNotat(
     fellesformat: XMLEIFellesformat,
     tssid: String?,
     legefnr: String,
-    pasientFnr: String,
+    innbyggerident: String,
     msgHead: XMLMsgHead,
     receiverBlock: XMLMottakenhetBlokk,
     dialogmelding: Dialogmelding
@@ -44,7 +44,7 @@ fun createArenaDialogNotat(
         }
         pasientData = PasientDataType().apply {
             person = PersonType().apply {
-                personFnr = pasientFnr
+                personFnr = innbyggerident
                 personNavn = NavnType().apply {
                     fornavn = msgHead.msgInfo.patient.givenName
                     mellomnavn = msgHead.msgInfo.patient?.middleName ?: ""

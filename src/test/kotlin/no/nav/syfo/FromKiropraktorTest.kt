@@ -60,7 +60,7 @@ class FromKiropraktorTest {
             fellesformat = fellesformat,
             tssid = TSS_ID,
             legefnr = receiverBlock.avsenderFnrFraDigSignatur,
-            pasientFnr = msgHead.msgInfo.patient.ident.find { it.typeId.v == "FNR" }?.id ?: "",
+            innbyggerident = extractInnbyggerident(fellesformat) ?: "",
             msgHead = msgHead,
             receiverBlock = receiverBlock,
             dialogmelding = dialogmelding
