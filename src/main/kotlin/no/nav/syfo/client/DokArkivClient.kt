@@ -7,6 +7,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.util.*
 import net.logstash.logback.argument.StructuredArguments.fields
+import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.util.retry
 import no.nav.syfo.log
 import no.nav.syfo.model.*
@@ -21,8 +22,9 @@ import java.util.*
 
 @KtorExperimentalAPI
 class DokArkivClient(
+    private val azureAdV2Client: AzureAdV2Client,
+    private val dokArkivClientId: String,
     private val url: String,
-    private val stsClient: StsOidcClient,
     private val httpClient: HttpClient
 ) {
     suspend fun createJournalpost(
@@ -35,8 +37,10 @@ class DokArkivClient(
         try {
             log.info("Kall til dokarkiv Nav-Callid {}, {}", journalpostRequest.eksternReferanseId, fields(loggingMeta))
 
+            val accessToken = azureAdV2Client.getSystemToken(dokArkivClientId)?.accessToken
+
             val response: HttpResponse = httpClient.post(url) {
-                header("Authorization", "Bearer ${stsClient.oidcToken().access_token}")
+                header("Authorization", "Bearer $accessToken")
                 header("Nav-Callid", journalpostRequest.eksternReferanseId)
                 body = journalpostRequest
                 contentType(ContentType.Application.Json)
@@ -56,7 +60,6 @@ class DokArkivClient(
 
 fun createJournalpostPayload(
     dialogmelding: Dialogmelding,
-    caseId: String,
     pdf: ByteArray,
     avsenderFnr: String,
     ediLoggId: String,
@@ -71,19 +74,18 @@ fun createJournalpostPayload(
     },
     bruker = Bruker(
         id = pasientFnr,
-        idType = "FNR"
+        idType = IdType.PERSON_IDENT.value
     ),
     dokumenter = leggtilDokument(ediLoggId, dialogmelding, pdf, validationResult, signaturDato, vedleggListe),
     eksternReferanseId = ediLoggId,
     journalfoerendeEnhet = "9999",
-    journalpostType = "INNGAAENDE",
+    journalpostType = JournalpostType.INNGAAENDE.value,
     kanal = "HELSENETTET",
     sak = Sak(
-        arkivsaksnummer = caseId,
-        arkivsaksystem = "GSAK"
+        sakstype = SaksType.GENERELL.value,
     ),
     tema = "OPP",
-    tittel = createTitleJournalpost(validationResult, signaturDato)
+    tittel = createTitleJournalpost(validationResult, signaturDato),
 )
 
 fun leggtilDokument(
@@ -175,16 +177,14 @@ fun createAvsenderMottakerValidFnr(
     dialogmelding: Dialogmelding
 ): AvsenderMottaker = AvsenderMottaker(
     id = avsenderFnr,
-    idType = "FNR",
-    land = "Norge",
-    navn = dialogmelding.navnHelsepersonell
+    idType = IdType.PERSON_IDENT.value,
+    navn = dialogmelding.navnHelsepersonell,
 )
 
 fun createAvsenderMottakerNotValidFnr(
     dialogmelding: Dialogmelding
 ): AvsenderMottaker = AvsenderMottaker(
-    land = "Norge",
-    navn = dialogmelding.navnHelsepersonell
+    navn = dialogmelding.navnHelsepersonell,
 )
 
 fun createTitleJournalpost(

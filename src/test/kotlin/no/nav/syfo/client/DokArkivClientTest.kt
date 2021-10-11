@@ -15,17 +15,26 @@ import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.runBlocking
+import no.nav.syfo.client.azuread.v2.AzureAdV2Client
+import no.nav.syfo.client.azuread.v2.AzureAdV2Token
 import no.nav.syfo.model.DokumentInfo
 import no.nav.syfo.model.JournalpostRequest
 import no.nav.syfo.model.JournalpostResponse
+import no.nav.syfo.model.JournalpostType
 import no.nav.syfo.util.LoggingMeta
 import org.amshove.kluent.shouldEqual
 import org.junit.Before
 import org.junit.Test
+import java.time.LocalDateTime
 import kotlin.test.assertFailsWith
 
 @KtorExperimentalAPI
 internal class DokArkivClientTest {
+
+    @MockK
+    lateinit var azureAdV2Client: AzureAdV2Client
+
+    val dokarkivClientId = "dokarkivClientId"
 
     @MockK
     lateinit var httpClient: HttpClient
@@ -36,13 +45,15 @@ internal class DokArkivClientTest {
     @MockK
     lateinit var httpResponse: HttpResponse
 
-    @MockK
-    lateinit var stsClient: StsOidcClient
-
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxUnitFun = true)
-        coEvery { stsClient.oidcToken() } returns OidcToken("test", "test", 9999L)
+        coEvery {
+            azureAdV2Client.getSystemToken(dokarkivClientId)
+        } returns AzureAdV2Token(
+            accessToken = "anyToken",
+            expires = LocalDateTime.now().plusDays(1)
+        )
     }
 
     fun createClient(statusCode: HttpStatusCode): HttpClient {
@@ -83,8 +94,9 @@ internal class DokArkivClientTest {
             block = {
                 val dokArkivClient =
                     DokArkivClient(
+                        azureAdV2Client,
+                        dokarkivClientId,
                         "Test",
-                        stsClient,
                         createClient(HttpStatusCode.InternalServerError)
                     )
                 runBlocking {
@@ -99,8 +111,9 @@ internal class DokArkivClientTest {
     fun `HTTP 200 fra journalpostoppretting returnerer JournalpostResponse`() {
         val dokArkivClient =
             DokArkivClient(
+                azureAdV2Client,
+                dokarkivClientId,
                 "Test",
-                stsClient,
                 createClient(HttpStatusCode.OK)
             )
         val response = runBlocking {
@@ -115,8 +128,9 @@ internal class DokArkivClientTest {
     fun `HTTP 201 fra journalpostoppretting returnerer JournalpostResponse`() {
         val dokArkivClient =
             DokArkivClient(
+                azureAdV2Client,
+                dokarkivClientId,
                 "Test",
-                stsClient,
                 createClient(HttpStatusCode.Created)
             )
         val response = runBlocking {
@@ -127,7 +141,10 @@ internal class DokArkivClientTest {
         response.journalpostId shouldEqual journalpostOKResponse.journalpostId
     }
 
-    val journalpostRequest = JournalpostRequest(dokumenter = emptyList())
+    val journalpostRequest = JournalpostRequest(
+        dokumenter = emptyList(),
+        journalpostType = JournalpostType.INNGAAENDE.value,
+    )
 
     val journalpostOKResponse = JournalpostResponse(
         listOf(DokumentInfo("1", "2", "Et dokument")),
