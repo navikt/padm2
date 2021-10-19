@@ -78,3 +78,8 @@ fun extractPasientNavn(fellesformat: XMLEIFellesformat): String =
             "${fellesformat.get<XMLMsgHead>().msgInfo.patient.middleName}"
 
 inline fun <reified T> XMLEIFellesformat.get() = this.any.find { it is T } as T
+
+fun extractInnbyggerident(fellesformat: XMLEIFellesformat): String? =
+    fellesformat.get<XMLMsgHead>().msgInfo.patient.ident.find {
+        it.typeId.v == "FNR" || it.typeId.v == "DNR"
+    }?.id

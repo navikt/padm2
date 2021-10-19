@@ -77,7 +77,7 @@ class BlockingApplicationRunner {
                     log.info("Processing message with ediLoggId $ediLoggId, and msgId $msgId")
 
                     val legekontorOrgNr = extractOrganisationNumberFromSender(fellesformat)?.id
-                    val personNumberPatient = msgHead.msgInfo.patient.ident.find { it.typeId.v == "FNR" }?.id
+                    val innbyggerident = extractInnbyggerident(fellesformat)
                     val personNumberDoctor = receiverBlock.avsenderFnrFraDigSignatur
 
                     val legekontorOrgName = extractSenderOrganisationName(fellesformat)
@@ -112,7 +112,7 @@ class BlockingApplicationRunner {
 
                     INCOMING_MESSAGE_COUNTER.inc()
 
-                    if (personNumberPatient.isNullOrEmpty()) {
+                    if (innbyggerident.isNullOrEmpty()) {
                         handlePatientNotFound(
                             session, receiptProducer, fellesformat, env, loggingMeta
                         )
@@ -120,7 +120,7 @@ class BlockingApplicationRunner {
                     } else {
 
                         val aktoerIds = aktoerIdClient.getAktoerIds(
-                            listOf(personNumberDoctor, personNumberPatient),
+                            listOf(personNumberDoctor, innbyggerident),
                             secrets.serviceuserUsername, loggingMeta
                         )
 
@@ -178,12 +178,12 @@ class BlockingApplicationRunner {
                             continue@loop
                         }
 
-                        val patientIdents = aktoerIds[personNumberPatient]
+                        val innbyggerIdents = aktoerIds[innbyggerident]
                         val doctorIdents = aktoerIds[personNumberDoctor]
 
-                        if (patientIdents == null || patientIdents.feilmelding != null) {
+                        if (innbyggerIdents == null || innbyggerIdents.feilmelding != null) {
                             handlePatientNotFoundInAktorRegister(
-                                patientIdents, session,
+                                innbyggerIdents, session,
                                 receiptProducer, fellesformat, env, loggingMeta
                             )
                             continue@loop
@@ -195,7 +195,7 @@ class BlockingApplicationRunner {
                             )
                             continue@loop
                         }
-                        if (erTestFnr(personNumberPatient) && env.cluster == "prod-fss") {
+                        if (erTestFnr(innbyggerident) && env.cluster == "prod-fss") {
                             handleTestFnrInProd(
                                 session, receiptProducer, fellesformat, env, loggingMeta
                             )
@@ -229,8 +229,8 @@ class BlockingApplicationRunner {
 
                         val receivedDialogmelding = ReceivedDialogmelding(
                             dialogmelding = dialogmelding,
-                            personNrPasient = personNumberPatient,
-                            pasientAktoerId = patientIdents.identer!!.first().ident,
+                            personNrPasient = innbyggerident,
+                            pasientAktoerId = innbyggerIdents.identer!!.first().ident,
                             personNrLege = personNumberDoctor,
                             legeAktoerId = doctorIdents.identer!!.first().ident,
                             navLogId = ediLoggId,

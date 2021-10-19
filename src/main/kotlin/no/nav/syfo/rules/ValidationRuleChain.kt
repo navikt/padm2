@@ -13,23 +13,23 @@ enum class ValidationRuleChain(
     override val predicate: (RuleData<RuleMetadata>) -> Boolean
 ) : Rule<RuleData<RuleMetadata>> {
 
-    UGYLDIG_FNR_LENGDE_PASIENT(
+    UGYLDIG_INNBYGGERIDENT_LENGDE(
         1002,
         Status.INVALID,
         "Pasienten sitt fødselsnummer eller D-nummer er ikke 11 tegn.",
         "Pasienten sitt fødselsnummer eller D-nummer er ikke 11 tegn.",
         { (_, metadata) ->
-            !validatePersonAndDNumber11Digits(metadata.patientPersonNumber)
+            !validatePersonAndDNumber11Digits(metadata.innbyggerident)
         }
     ),
 
-    UGYLDIG_FNR_PASIENT(
+    UGYLDIG_INNBYGGERIDENT(
         1006,
         Status.INVALID,
-        "Fødselsnummer/D-nummer kan passerer ikke modulus 11",
+        "Fødselsnummer/D-nummer er ikke gyldig",
         "Pasientens fødselsnummer/D-nummer er ikke gyldig",
         { (_, metadata) ->
-            !validatePersonAndDNumber(metadata.patientPersonNumber)
+            !validatePersonAndDNumber(metadata.innbyggerident)
         }
     ),
 
@@ -43,13 +43,13 @@ enum class ValidationRuleChain(
         }
     ),
 
-    AVSENDER_FNR_ER_SAMME_SOM_PASIENT_FNR(
+    AVSENDER_FNR_ER_SAMME_SOM_INNBYGGER_FNR(
         9999,
         Status.INVALID,
         "Den som signert dialogmeldingen er også pasient.",
         "Avsender fnr er det samme som pasient fnr",
         { (_, metadata) ->
-            metadata.avsenderfnr.equals(metadata.patientPersonNumber)
+            metadata.avsenderfnr.equals(metadata.innbyggerident)
         }
     ),
 }
