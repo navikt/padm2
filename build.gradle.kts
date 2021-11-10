@@ -5,14 +5,14 @@ import no.nils.wsdl2java.Wsdl2JavaTask
 group = "no.nav.syfo"
 version = "1.0.0"
 
-val ktorVersion = "1.5.1"
+val ktorVersion = "1.6.5"
 val logbackVersion = "1.2.3"
-val logstashEncoderVersion = "5.1"
+val logstashEncoderVersion = "6.4"
 val prometheusVersion = "0.6.0"
 val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
 val fellesformat2Version = "1.0329dd1"
 val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
-val ibmMqVersion = "9.1.2.0"
+val ibmMqVersion = "9.2.0.2"
 val cxfVersion = "3.4.5"
 val jaxwsApiVersion = "2.3.1"
 val javaxAnnotationApiVersion = "1.3.2"
@@ -30,9 +30,10 @@ val commonsTextVersion = "1.4"
 val arenaDialogNotatVersion = "1.e1999cf"
 val javaTimeAdapterVersion = "1.1.3"
 val vaultJavaDriveVersion = "3.1.0"
-val postgresVersion = "42.2.5"
+val postgresVersion = "42.3.1"
 val flywayVersion = "5.2.4"
 val hikariVersion = "3.3.0"
+val pdfboxVersion = "2.0.24"
 
 plugins {
     java
@@ -98,7 +99,7 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
 
     implementation("org.apache.commons:commons-text:$commonsTextVersion")
-    implementation("org.apache.pdfbox:pdfbox:2.0.22")
+    implementation("org.apache.pdfbox:pdfbox:$pdfboxVersion")
 
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashEncoderVersion")
@@ -132,6 +133,7 @@ dependencies {
     implementation("org.apache.cxf:cxf-rt-transports-http:$cxfVersion")
     implementation("org.apache.cxf:cxf-rt-ws-security:$cxfVersion")
 
+    testImplementation(kotlin("test"))
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion") {
         exclude(group = "org.eclipse.jetty")
     }

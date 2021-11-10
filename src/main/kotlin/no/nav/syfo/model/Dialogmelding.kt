@@ -45,7 +45,7 @@ data class ForesporselFraSaksbehandlerForesporselSvar(
 data class Foresporsel(
     val typeForesp: TypeForesp,
     val sporsmal: String,
-    val dokIdForesp: String,
+    val dokIdForesp: String?,
     val rollerRelatertNotat: RollerRelatertNotat?
 )
 
