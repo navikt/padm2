@@ -31,8 +31,8 @@ val arenaDialogNotatVersion = "1.e1999cf"
 val javaTimeAdapterVersion = "1.1.3"
 val vaultJavaDriveVersion = "3.1.0"
 val postgresVersion = "42.3.1"
-val flywayVersion = "5.2.4"
-val hikariVersion = "3.3.0"
+val flywayVersion = "8.0.4"
+val hikariVersion = "5.0.0"
 val pdfboxVersion = "2.0.24"
 
 plugins {
