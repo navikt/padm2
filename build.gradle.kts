@@ -23,6 +23,8 @@ val jaxwsToolsVersion = "2.3.1"
 val dialogmeldingVersion = "1.5d21db9"
 val base64containerVersion = "1.5ac2176"
 val junitJupiterVersion = "5.6.0"
+val kafkaVersion = "2.8.0"
+val kafkaEmbeddedVersion = "2.8.0"
 val kluentVersion = "1.39"
 val mockkVersion = "1.9.3"
 val jacksonVersion = "2.9.8"
@@ -60,6 +62,8 @@ val githubPassword: String by project
 repositories {
     mavenCentral()
     jcenter()
+    maven(url = "https://packages.confluent.io/maven/")
+    maven(url = "https://jitpack.io")
     maven {
         url = uri("https://maven.pkg.github.com/navikt/padm-common")
         credentials {
@@ -132,6 +136,9 @@ dependencies {
     implementation("org.apache.cxf:cxf-rt-features-logging:$cxfVersion")
     implementation("org.apache.cxf:cxf-rt-transports-http:$cxfVersion")
     implementation("org.apache.cxf:cxf-rt-ws-security:$cxfVersion")
+
+    implementation("org.apache.kafka:kafka_2.13:$kafkaVersion")
+    testImplementation("no.nav:kafka-embedded-env:$kafkaEmbeddedVersion")
 
     testImplementation(kotlin("test"))
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion") {

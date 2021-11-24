@@ -11,6 +11,7 @@ import no.nav.syfo.Environment
 import no.nav.syfo.VaultSecrets
 import no.nav.syfo.application.services.isNotLegevakt
 import no.nav.syfo.application.services.startSubscription
+import no.nav.syfo.kafka.DialogmeldingProducer
 import no.nav.syfo.client.AktoerIdClient
 import no.nav.syfo.client.SarClient
 import no.nav.syfo.client.findBestSamhandlerPraksis
@@ -52,7 +53,8 @@ class BlockingApplicationRunner {
         journalService: JournalService,
         arenaProducer: MessageProducer,
         database: Database,
-        signerendeLegeService: SignerendeLegeService
+        signerendeLegeService: SignerendeLegeService,
+        dialogmeldingProducer: DialogmeldingProducer,
     ) {
         wrapExceptions {
             loop@ while (applicationState.ready) {
@@ -258,6 +260,7 @@ class BlockingApplicationRunner {
                                 loggingMeta,
                                 env.apprecQueueName,
                                 journalService,
+                                dialogmeldingProducer,
                                 receivedDialogmelding,
                                 validationResult,
                                 vedleggListe,

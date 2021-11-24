@@ -14,6 +14,7 @@ More information on dialogmeldinger can be found here: https://www.nhn.no/veiled
 * JDK 14
 * Spek
 * Jackson
+* Kafka
 
 #### Requirements
 
@@ -80,6 +81,11 @@ Prod credentials:
 read postgresql/prod-fss/creds/padm2-readonly
 
 ```
+### Kafka
+
+This application owns and produces to the following topic:
+
+* teamsykefravr.dialogmelding
 
 ### Importing flowchart from gliffy confluence
 1. Open a web browser and go the confluence site that has the gliffy diagram you want to import, example site:

@@ -45,6 +45,8 @@ spec:
     application:
       enabled: true
       tenant: nav.no
+  kafka:
+    pool: nav-prod
   env:
     - name: MQ_INPUT_QUEUE_NAME
       value: QA.P_PADM.INPUT
@@ -78,6 +80,8 @@ spec:
       value: /postgresql/prod-fss
     - name: EIA_INBOUND_MOTTAK_QUEUE_NAME
       value: QA.P414.FS06_EIA_MELDINGER_FROM_PADM
+    - name: TOGGLE_DIALOGMELDINGER_TIL_KAFKA
+      value: "false"
     - name: PDF_GEN_URL
       value: https://padm2pdfgen.intern.nav.no/api/v1/genpdf/padm2/padm2
     - name: HELSENETTPROXY_ID

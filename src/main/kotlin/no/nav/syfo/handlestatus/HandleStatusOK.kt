@@ -8,6 +8,7 @@ import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.apprec.ApprecStatus
+import no.nav.syfo.kafka.DialogmeldingProducer
 import no.nav.syfo.client.createArenaDialogNotat
 import no.nav.syfo.client.sendArenaDialogNotat
 import no.nav.syfo.db.Database
@@ -29,6 +30,7 @@ suspend fun handleStatusOK(
     loggingMeta: LoggingMeta,
     apprecQueueName: String,
     journalService: JournalService,
+    dialogmeldingProducer: DialogmeldingProducer,
     receivedDialogmelding: ReceivedDialogmelding,
     validationResult: ValidationResult,
     vedleggListe: List<Vedlegg>?,
@@ -42,7 +44,7 @@ suspend fun handleStatusOK(
     sha256String: String,
 ) {
 
-    journalService.onJournalRequest(
+    val journalpostResponse = journalService.onJournalRequest(
         receivedDialogmelding,
         validationResult,
         vedleggListe,
@@ -63,6 +65,13 @@ suspend fun handleStatusOK(
             dialogmelding
         ),
         loggingMeta
+    )
+
+    dialogmeldingProducer.sendDialogmelding(
+        receivedDialogmelding = receivedDialogmelding,
+        msgHead = msgHead,
+        journalpostResponse = journalpostResponse,
+        antallVedlegg = vedleggListe?.size ?: 0,
     )
 
     handleRecivedMessage(receivedDialogmelding, validationResult, sha256String, loggingMeta, database)

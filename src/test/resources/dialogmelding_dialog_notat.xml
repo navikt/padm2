@@ -7,6 +7,10 @@
             <MIGversion>v1.2 2006-05-24</MIGversion>
             <GenDate>2019-01-16T22:51:35.5317672+01:00</GenDate>
             <MsgId>37340D30-FE14-42B5-985F-A8FF8FFA0CB5</MsgId>
+            <ConversationRef>
+                <RefToConversation>37340D30-FE14-42B5-985F-A8FF8FFA0C99</RefToConversation>
+                <RefToParent>37340D30-FE14-42B5-985F-A8FF8FFA0CB5</RefToParent>
+            </ConversationRef>
             <Ack DN="Ja" V="J" />
             <Sender>
                 <Organisation>
