@@ -31,7 +31,12 @@ data class Environment(
     val legeSuspensjonEndpointURL: String = getEnvVar("LEGE_SUSPENSJON_ENDPOINT_URL"),
     val helsenettproxyId: String = getEnvVar("HELSENETTPROXY_ID"),
     val helsenettClientId: String = getEnvVar("HELSENETT_CLIENT_ID"),
-    val stsUrl: String = getEnvVar("STS_URL")
+    val stsUrl: String = getEnvVar("STS_URL"),
+    val KafkaAivenBootstrapServers: String = getEnvVar("KAFKA_BROKERS"),
+    val KafkaAivenCredstorePassword: String = getEnvVar("KAFKA_CREDSTORE_PASSWORD"),
+    val KafkaAivenTruststoreLocation: String = getEnvVar("KAFKA_TRUSTSTORE_PATH"),
+    val KafkaAivenKeystoreLocation: String = getEnvVar("KAFKA_KEYSTORE_PATH"),
+    val toggleDialogmeldingerTilKafka: Boolean = getEnvVar("TOGGLE_DIALOGMELDINGER_TIL_KAFKA").toBoolean(),
 ) : MqConfig
 
 data class VaultSecrets(

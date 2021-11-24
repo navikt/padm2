@@ -2,8 +2,7 @@ package no.nav.syfo.util
 
 import no.nav.helse.dialogmelding.XMLDialogmelding
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
-import no.nav.helse.msgHead.XMLIdent
-import no.nav.helse.msgHead.XMLMsgHead
+import no.nav.helse.msgHead.*
 import no.nav.syfo.model.Behandler
 import no.nav.syfo.model.getName
 
@@ -13,11 +12,12 @@ fun extractDialogmelding(fellesformat: XMLEIFellesformat): XMLDialogmelding =
     }.refDoc.content.any[0] as XMLDialogmelding
 
 fun extractVedlegg(fellesformat: XMLEIFellesformat) = fellesformat.get<XMLMsgHead>().document.filter {
-    it.refDoc.msgType.v == "A" &&
-        it.refDoc.mimeType == "application/pdf" ||
-        it.refDoc.mimeType == "image/tiff" ||
-        it.refDoc.mimeType == "image/png" ||
-        it.refDoc.mimeType == "image/jpeg"
+    it.isVedlegg()
+}
+
+fun XMLDocument.isVedlegg(): Boolean {
+    return this.refDoc.msgType.v == "A" &&
+        listOf("application/pdf", "image/tiff", "image/png", "image/jpeg").contains(this.refDoc.mimeType)
 }
 
 fun extractOrganisationNumberFromSender(fellesformat: XMLEIFellesformat): XMLIdent? =

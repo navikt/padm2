@@ -24,6 +24,7 @@ import no.nav.syfo.client.*
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.db.Database
 import no.nav.syfo.db.VaultCredentialService
+import no.nav.syfo.kafka.*
 import no.nav.syfo.services.JournalService
 import no.nav.syfo.services.RuleService
 import no.nav.syfo.services.SignerendeLegeService
@@ -32,6 +33,7 @@ import no.nav.syfo.vault.RenewVaultService
 import no.nav.syfo.ws.createPort
 import org.apache.cxf.ws.addressing.WSAddressingFeature
 import org.apache.http.impl.conn.SystemDefaultRoutePlanner
+import org.apache.kafka.clients.producer.KafkaProducer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.ProxySelector
@@ -176,7 +178,12 @@ fun launchListeners(
             val receiptProducer = session.producerForQueue(env.apprecQueueName)
             val backoutProducer = session.producerForQueue(env.inputBackoutQueueName)
             val arenaProducer = session.producerForQueue(env.arenaQueueName)
-
+            val dialogmeldingProducer = DialogmeldingProducer(
+                kafkaProducerDialogmelding = KafkaProducer<String, DialogmeldingForKafka>(
+                    kafkaDialogmeldingProducerConfig(env)
+                ),
+                enabled = env.toggleDialogmeldingerTilKafka,
+            )
             applicationState.ready = true
 
             BlockingApplicationRunner().run(
@@ -184,7 +191,8 @@ fun launchListeners(
                 session, env, secrets, aktoerIdClient,
                 kuhrSarClient, subscriptionEmottak, receiptProducer,
                 padm2ReglerService, backoutProducer, journalService,
-                arenaProducer, database, signerendeLegeService
+                arenaProducer, database, signerendeLegeService,
+                dialogmeldingProducer,
             )
         }
     }
