@@ -10,19 +10,19 @@ on:
 
 jobs:
   deploy-kafka-dev:
-    name: Deploy Kafka topic to NAIS dev-fss
+    name: Deploy Kafka topic to NAIS dev-gcp
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
       - uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: dev-fss
+          CLUSTER: dev-gcp
           RESOURCE: .nais/kafka/dialogmelding.yaml
           VARS: .nais/kafka/dev.json
 
   deploy-kafka-prod:
-    name: Deploy Kafka topic to NAIS prod-fss
+    name: Deploy Kafka topic to NAIS prod-gcp
     needs: deploy-kafka-dev
     runs-on: ubuntu-latest
     steps:
@@ -30,7 +30,7 @@ jobs:
       - uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: prod-fss
+          CLUSTER: prod-gcp
           RESOURCE: .nais/kafka/dialogmelding.yaml
           VARS: .nais/kafka/prod.json
 
