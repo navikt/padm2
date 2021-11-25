@@ -12,7 +12,7 @@ data class Dialogmelding(
 )
 
 data class HenvendelseFraLegeHenvendelse(
-    val teamakode: TemaKode,
+    val temaKode: TemaKode,
     val tekstNotatInnhold: String,
     val dokIdNotat: String?,
     val foresporsel: Foresporsel?,
@@ -20,7 +20,7 @@ data class HenvendelseFraLegeHenvendelse(
 )
 
 data class InnkallingMoterespons(
-    val teamakode: TemaKode,
+    val temaKode: TemaKode,
     val tekstNotatInnhold: String?,
     val dokIdNotat: String?,
     val foresporsel: Foresporsel?
@@ -36,7 +36,7 @@ data class TemaKode(
 )
 
 data class ForesporselFraSaksbehandlerForesporselSvar(
-    val teamakode: TemaKode,
+    val temaKode: TemaKode,
     val tekstNotatInnhold: String,
     val dokIdNotat: String?,
     val datoNotat: LocalDateTime?

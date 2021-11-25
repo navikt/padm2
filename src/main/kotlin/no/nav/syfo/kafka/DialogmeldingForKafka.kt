@@ -5,6 +5,7 @@ import java.time.LocalDateTime
 
 data class DialogmeldingForKafka(
     val msgId: String,
+    val msgType: String,
     val navLogId: String,
     val mottattTidspunkt: LocalDateTime,
     val conversationRef: String?,
