@@ -17,3 +17,9 @@ spec:
       description: "Det er ingen pods for app kjørende i namespace og dermed er appen nede"
       action: "Undersøk hvorfor pods er nede og få den kjørende igjen!"
       severity: danger
+    - alert: PADM2 sendte melding til backout-queue
+      expr: sum(increase(padm2_message_sent_to_boq{app="padm2"} [1h])) > 0
+      for: 5m
+      description: "Prosessering av minst 1 melding feilet og ble sendt til MQ backout queue"
+      action: "Undersøk om det er noen feil og send melding fra backout-queue for retry."
+      severity: danger
