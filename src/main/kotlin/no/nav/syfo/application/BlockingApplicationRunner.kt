@@ -308,6 +308,14 @@ class BlockingApplicationRunner {
                     MESSAGES_SENT_TO_BOQ.inc()
                     log.error("Exception caught while handling message, sending to backout", e)
                     backoutProducer.send(message)
+                } catch (t: Throwable) {
+                    try {
+                        backoutProducer.send(message)
+                        MESSAGES_SENT_TO_BOQ.inc()
+                        log.error("Error caught while handling message, sent to backout", t)
+                    } finally {
+                        throw t
+                    }
                 }
             }
         }
