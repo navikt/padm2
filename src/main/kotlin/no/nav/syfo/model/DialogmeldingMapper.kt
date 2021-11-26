@@ -36,7 +36,7 @@ fun XMLDialogmelding.toDialogmelding(
 fun XMLNotat.toHenvendelseFraLegeHenvendelse(): HenvendelseFraLegeHenvendelse {
 
     return HenvendelseFraLegeHenvendelse(
-        teamakode = temaKodet.toTeamakode(),
+        temaKode = temaKodet.toTemaKode(),
         tekstNotatInnhold = tekstNotatInnhold.toString(),
         dokIdNotat = dokIdNotat,
         foresporsel = null, // Ignore because EPJ send incorrect data and we don't use it
@@ -70,7 +70,7 @@ fun XMLNotat.toHenvendelseFraLegeHenvendelse(): HenvendelseFraLegeHenvendelse {
     )
 }
 
-fun CV.toTeamakode(): TemaKode {
+fun CV.toTemaKode(): TemaKode {
     return findDialogmeldingKodeverk(s, v)!!.toTypeMelding()
 }
 
@@ -81,7 +81,7 @@ fun DialogmeldingKodeverk.toTypeMelding(): TemaKode {
 fun XMLNotat.toInnkallingMoterespons(): InnkallingMoterespons {
 
     return InnkallingMoterespons(
-        teamakode = temaKodet.toTeamakode(),
+        temaKode = temaKodet.toTemaKode(),
         tekstNotatInnhold = tekstNotatInnhold?.toString(),
         dokIdNotat = dokIdNotat,
         foresporsel = foresporsel?.toForesporsel()
@@ -91,7 +91,7 @@ fun XMLNotat.toInnkallingMoterespons(): InnkallingMoterespons {
 fun XMLNotat.toForesporselFraSaksbehandlerForesporselSvar(): ForesporselFraSaksbehandlerForesporselSvar {
 
     return ForesporselFraSaksbehandlerForesporselSvar(
-        teamakode = temaKodet.toTeamakode(),
+        temaKode = temaKodet.toTemaKode(),
         tekstNotatInnhold = tekstNotatInnhold.toString(),
         dokIdNotat = dokIdNotat,
         datoNotat = datoNotat?.toGregorianCalendar()?.toZonedDateTime()?.toLocalDateTime()

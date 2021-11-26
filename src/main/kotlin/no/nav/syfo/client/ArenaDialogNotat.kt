@@ -88,13 +88,13 @@ fun createAvsender(
 fun findArenaNotatKategori(dialogmelding: Dialogmelding): String {
     return when {
         dialogmelding.foresporselFraSaksbehandlerForesporselSvar != null -> {
-            dialogmelding.foresporselFraSaksbehandlerForesporselSvar!!.teamakode.arenaNotatKategori
+            dialogmelding.foresporselFraSaksbehandlerForesporselSvar!!.temaKode.arenaNotatKategori
         }
         dialogmelding.henvendelseFraLegeHenvendelse != null -> {
-            dialogmelding.henvendelseFraLegeHenvendelse!!.teamakode.arenaNotatKategori
+            dialogmelding.henvendelseFraLegeHenvendelse!!.temaKode.arenaNotatKategori
         }
         dialogmelding.innkallingMoterespons != null -> {
-            dialogmelding.innkallingMoterespons!!.teamakode.arenaNotatKategori
+            dialogmelding.innkallingMoterespons!!.temaKode.arenaNotatKategori
         }
         else -> throw RuntimeException("Ugyldig dialogmeldingtype")
     }
@@ -103,13 +103,13 @@ fun findArenaNotatKategori(dialogmelding: Dialogmelding): String {
 fun findArenaNotatKode(dialogmelding: Dialogmelding): String {
     return when {
         dialogmelding.foresporselFraSaksbehandlerForesporselSvar != null -> {
-            dialogmelding.foresporselFraSaksbehandlerForesporselSvar!!.teamakode.arenaNotatKode
+            dialogmelding.foresporselFraSaksbehandlerForesporselSvar!!.temaKode.arenaNotatKode
         }
         dialogmelding.henvendelseFraLegeHenvendelse != null -> {
-            dialogmelding.henvendelseFraLegeHenvendelse!!.teamakode.arenaNotatKode
+            dialogmelding.henvendelseFraLegeHenvendelse!!.temaKode.arenaNotatKode
         }
         dialogmelding.innkallingMoterespons != null -> {
-            dialogmelding.innkallingMoterespons!!.teamakode.arenaNotatKode
+            dialogmelding.innkallingMoterespons!!.temaKode.arenaNotatKode
         }
         else -> throw RuntimeException("Ugyldig dialogmeldingtype")
     }
@@ -118,13 +118,13 @@ fun findArenaNotatKode(dialogmelding: Dialogmelding): String {
 fun findArenaNotatTittel(dialogmelding: Dialogmelding): String {
     return when {
         dialogmelding.foresporselFraSaksbehandlerForesporselSvar != null -> {
-            dialogmelding.foresporselFraSaksbehandlerForesporselSvar!!.teamakode.arenaNotatTittel
+            dialogmelding.foresporselFraSaksbehandlerForesporselSvar!!.temaKode.arenaNotatTittel
         }
         dialogmelding.henvendelseFraLegeHenvendelse != null -> {
-            dialogmelding.henvendelseFraLegeHenvendelse!!.teamakode.arenaNotatTittel
+            dialogmelding.henvendelseFraLegeHenvendelse!!.temaKode.arenaNotatTittel
         }
         dialogmelding.innkallingMoterespons != null -> {
-            dialogmelding.innkallingMoterespons!!.teamakode.arenaNotatTittel
+            dialogmelding.innkallingMoterespons!!.temaKode.arenaNotatTittel
         }
         else -> throw RuntimeException("Ugyldig dialogmeldingtype")
     }

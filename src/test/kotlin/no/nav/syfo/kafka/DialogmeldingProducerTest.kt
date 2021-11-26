@@ -51,6 +51,8 @@ internal class DialogmeldingProducerTest {
         producerRecord.topic() shouldBeEqualTo "teamsykefravr.dialogmelding"
         producerRecord.key() as String shouldBeEqualTo msgHead.msgInfo.msgId
         val dialogmeldingForKafka = producerRecord.value()
+        dialogmeldingForKafka.msgId shouldBeEqualTo msgHead.msgInfo.msgId
+        dialogmeldingForKafka.msgType shouldBeEqualTo "DIALOG_NOTAT"
         dialogmeldingForKafka.antallVedlegg shouldBe 0
         dialogmeldingForKafka.conversationRef shouldBe msgHead.msgInfo.conversationRef.refToConversation
         dialogmeldingForKafka.parentRef shouldBe msgHead.msgInfo.conversationRef.refToParent
@@ -74,6 +76,8 @@ internal class DialogmeldingProducerTest {
         producerRecord.topic() shouldBeEqualTo "teamsykefravr.dialogmelding"
         producerRecord.key() as String shouldBeEqualTo msgHead.msgInfo.msgId
         val dialogmeldingForKafka = producerRecord.value()
+        dialogmeldingForKafka.msgId shouldBeEqualTo msgHead.msgInfo.msgId
+        dialogmeldingForKafka.msgType shouldBeEqualTo "DIALOG_NOTAT"
         dialogmeldingForKafka.antallVedlegg shouldBe 0
         dialogmeldingForKafka.conversationRef shouldBe null
         dialogmeldingForKafka.parentRef shouldBe null
@@ -97,10 +101,36 @@ internal class DialogmeldingProducerTest {
         producerRecord.topic() shouldBeEqualTo "teamsykefravr.dialogmelding"
         producerRecord.key() as String shouldBeEqualTo msgHead.msgInfo.msgId
         val dialogmeldingForKafka = producerRecord.value()
+        dialogmeldingForKafka.msgId shouldBeEqualTo msgHead.msgInfo.msgId
+        dialogmeldingForKafka.msgType shouldBeEqualTo "DIALOG_NOTAT"
         dialogmeldingForKafka.antallVedlegg shouldBe 2
 
         val fellesformatFromKafkaMessage = fellesformatUnmarshaller.unmarshal(StringReader(dialogmeldingForKafka.fellesformatXML)) as XMLEIFellesformat
         fellesformatFromKafkaMessage.calculateNumberOfVedlegg() shouldBe 0
+    }
+
+    @Test
+    internal fun `Tester mapping fra fellesformat til Kafka topic for svar dialogmote`() {
+        setupTestData(getFileAsStringISO88591("src/test/resources/dialogmelding_dialog_svar_innkalling_dialogmote.xml"))
+
+        dialogmeldingProducer.sendDialogmelding(
+            receivedDialogmelding = receivedDialogmelding,
+            msgHead = msgHead,
+            journalpostResponse = journalpostResponse,
+            antallVedlegg = fellesformat.calculateNumberOfVedlegg(),
+        )
+        val slot = slot<ProducerRecord<String, DialogmeldingForKafka>>()
+
+        verify { kafkaProducerMock.send(capture(slot)) }
+
+        val producerRecord = slot.captured
+        producerRecord.topic() shouldBeEqualTo "teamsykefravr.dialogmelding"
+        producerRecord.key() as String shouldBeEqualTo msgHead.msgInfo.msgId
+        val dialogmeldingForKafka = producerRecord.value()
+        dialogmeldingForKafka.msgId shouldBeEqualTo msgHead.msgInfo.msgId
+        dialogmeldingForKafka.msgType shouldBeEqualTo "DIALOG_SVAR"
+        dialogmeldingForKafka.antallVedlegg shouldBe 0
+        dialogmeldingForKafka.dialogmelding.innkallingMoterespons!!.temaKode.v shouldBeEqualTo "1"
     }
 
     fun setupTestData(inputMessageText: String) {

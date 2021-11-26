@@ -57,6 +57,7 @@ class DialogmeldingProducer(
         val xmlMsgInfo = msgHead.msgInfo
         return DialogmeldingForKafka(
             msgId = xmlMsgInfo.msgId,
+            msgType = xmlMsgInfo.type.v,
             navLogId = receivedDialogmelding.navLogId,
             mottattTidspunkt = receivedDialogmelding.mottattDato,
             conversationRef = xmlMsgInfo.conversationRef?.refToConversation,

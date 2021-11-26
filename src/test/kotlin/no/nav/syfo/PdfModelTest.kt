@@ -18,7 +18,7 @@ internal class PdfModelTest {
         val dialogmelding = Dialogmelding(
             id = dialogmeldingId,
             henvendelseFraLegeHenvendelse = HenvendelseFraLegeHenvendelse(
-                teamakode = TemaKode(
+                temaKode = TemaKode(
                     "2.16.578.1.12.4.1.1.8128",
                     "Henvendelse om pasient som ikke er sykmeldt",
                     "2",
@@ -54,7 +54,7 @@ internal class PdfModelTest {
                 rollerRelatertNotat = null
             ),
             innkallingMoterespons = InnkallingMoterespons(
-                teamakode = TemaKode(
+                temaKode = TemaKode(
                     "2.16.578.1.12.4.1.1.8126",
                     "Ja, jeg kommer",
                     "1",
@@ -85,7 +85,7 @@ internal class PdfModelTest {
                 )
             ),
             foresporselFraSaksbehandlerForesporselSvar = ForesporselFraSaksbehandlerForesporselSvar(
-                teamakode = TemaKode(
+                temaKode = TemaKode(
                     "2.16.578.1.12.4.1.1.8129",
                     "Forespørsel om pasient",
                     "1",
