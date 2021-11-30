@@ -24,7 +24,7 @@ suspend inline fun <reified T> retry(
             if (!isCausedBy(e, exceptionCausedByDepth, legalExceptions)) {
                 throw e
             }
-            log.warn("Failed to execute {}, retrying in $interval ms", keyValue("callName", callName), e)
+            log.warn("Failed to execute {}, retrying in $interval ms", keyValue("callName", callName), e.message)
         }
         delay(interval)
     }
