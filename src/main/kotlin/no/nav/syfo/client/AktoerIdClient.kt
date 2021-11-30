@@ -7,7 +7,7 @@ import io.ktor.client.request.headers
 import io.ktor.client.request.parameter
 import io.ktor.http.ContentType
 import io.ktor.util.KtorExperimentalAPI
-import no.nav.syfo.util.retry
+import no.nav.syfo.util.timed
 import no.nav.syfo.util.LoggingMeta
 
 @KtorExperimentalAPI
@@ -21,7 +21,7 @@ class AktoerIdClient(
         username: String,
         loggingMeta: LoggingMeta
     ): Map<String, IdentInfoResult> =
-        retry("get_aktoerids") {
+        timed("get_aktoerids") {
             httpClient.get<Map<String, IdentInfoResult>>("$endpointUrl/identer") {
                 accept(ContentType.Application.Json)
                 val oidcToken = stsClient.oidcToken()

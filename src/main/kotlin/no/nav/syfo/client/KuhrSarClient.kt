@@ -12,7 +12,7 @@ import java.util.Date
 import kotlin.math.max
 import net.logstash.logback.argument.StructuredArguments
 import net.logstash.logback.argument.StructuredArguments.keyValue
-import no.nav.syfo.util.retry
+import no.nav.syfo.util.timed
 import no.nav.syfo.log
 import no.nav.syfo.model.SamhandlerPraksisType
 import no.nav.syfo.util.LoggingMeta
@@ -24,7 +24,7 @@ class SarClient(
     private val endpointUrl: String,
     private val httpClient: HttpClient
 ) {
-    suspend fun getSamhandler(ident: String): List<Samhandler> = retry("get_samhandler") {
+    suspend fun getSamhandler(ident: String): List<Samhandler> = timed("get_samhandler") {
         val response: HttpResponse = httpClient.get("$endpointUrl/rest/sar/samh") {
             accept(ContentType.Application.Json)
             parameter("ident", ident)

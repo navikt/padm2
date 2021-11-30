@@ -13,7 +13,7 @@ import net.logstash.logback.argument.StructuredArguments.fields
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.log
 import no.nav.syfo.util.LoggingMeta
-import no.nav.syfo.util.retry
+import no.nav.syfo.util.timed
 import java.io.IOException
 
 @KtorExperimentalAPI
@@ -28,13 +28,13 @@ class SyfohelsenettproxyClient(
         behandlerFnr: String,
         msgId: String,
         loggingMeta: LoggingMeta
-    ): HelsenettProxyBehandler? = retry("finn_behandler") {
+    ): HelsenettProxyBehandler? = timed("finn_behandler") {
         log.info("Henter behandler fra syfohelsenettproxy for msgId {}", msgId)
 
         val accessToken = azureAdV2Client.getSystemToken(helsenettClientId)?.accessToken
             ?: run {
                 log.error("Syfohelsenettproxy kunne ikke hente AzureAdV2 token for msgID {}, {}", msgId, fields(loggingMeta))
-                return@retry null
+                return@timed null
             }
 
         val response: HttpResponse = httpClient.get("$endpointUrl/api/v2/behandler") {

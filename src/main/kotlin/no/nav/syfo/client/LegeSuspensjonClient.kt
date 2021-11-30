@@ -7,7 +7,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.util.*
 import no.nav.syfo.VaultSecrets
-import no.nav.syfo.util.retry
+import no.nav.syfo.util.timed
 import no.nav.syfo.log
 import java.io.IOException
 
@@ -19,7 +19,7 @@ class LegeSuspensjonClient(
     private val httpClient: HttpClient
 ) {
 
-    suspend fun checkTherapist(therapistId: String, ediloggid: String, oppslagsdato: String): Suspendert = retry(callName = "check_therapist") {
+    suspend fun checkTherapist(therapistId: String, ediloggid: String, oppslagsdato: String): Suspendert = timed(callName = "check_therapist") {
         val httpStatement = httpClient.get<HttpStatement>("$endpointUrl/api/v1/suspensjon/status") {
             accept(ContentType.Application.Json)
             val oidcToken = stsClient.oidcToken()

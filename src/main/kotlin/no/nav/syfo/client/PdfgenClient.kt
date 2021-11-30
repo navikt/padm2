@@ -6,7 +6,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
 import io.ktor.http.contentType
 import io.ktor.util.KtorExperimentalAPI
-import no.nav.syfo.util.retry
+import no.nav.syfo.util.timed
 import no.nav.syfo.model.Dialogmelding
 import no.nav.syfo.model.PdfModel
 import no.nav.syfo.model.ValidationResult
@@ -17,7 +17,7 @@ class PdfgenClient constructor(
     private val url: String,
     private val httpClient: HttpClient
 ) {
-    suspend fun createPdf(payload: PdfModel): ByteArray = retry("pdfgen") {
+    suspend fun createPdf(payload: PdfModel): ByteArray = timed("pdfgen") {
         httpClient.get(url) {
             contentType(ContentType.Application.Json)
             method = HttpMethod.Post

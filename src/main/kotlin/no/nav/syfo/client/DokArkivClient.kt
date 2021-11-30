@@ -8,7 +8,7 @@ import io.ktor.http.*
 import io.ktor.util.*
 import net.logstash.logback.argument.StructuredArguments.fields
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
-import no.nav.syfo.util.retry
+import no.nav.syfo.util.timed
 import no.nav.syfo.log
 import no.nav.syfo.model.*
 import no.nav.syfo.objectMapper
@@ -30,9 +30,8 @@ class DokArkivClient(
     suspend fun createJournalpost(
         journalpostRequest: JournalpostRequest,
         loggingMeta: LoggingMeta
-    ): JournalpostResponse = retry(
+    ): JournalpostResponse = timed(
         callName = "dokarkiv",
-        retryIntervals = arrayOf(500L, 1000L, 3000L, 5000L, 10000L)
     ) {
         try {
             log.info("Kall til dokarkiv Nav-Callid {}, {}", journalpostRequest.eksternReferanseId, fields(loggingMeta))
