@@ -149,7 +149,7 @@ fun createListener(applicationState: ApplicationState, action: suspend Coroutine
         } catch (e: TrackableException) {
             log.error("En uhåndtert feil oppstod, applikasjonen restarter {}", e.cause)
         } catch (t: Throwable) {
-            log.error("En uhåndtert systemfeil oppstod, applikasjonen restarter {}", t.cause)
+            log.error("En uhåndtert systemfeil oppstod, applikasjonen restarter {}", t.message)
             throw t
         } finally {
             applicationState.alive = false
