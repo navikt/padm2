@@ -5,13 +5,11 @@ import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.util.*
 import no.nav.syfo.VaultSecrets
 import no.nav.syfo.util.retry
-import no.nav.syfo.log
+import no.nav.syfo.logger
 import java.io.IOException
 
-@KtorExperimentalAPI
 class LegeSuspensjonClient(
     private val endpointUrl: String,
     private val secrets: VaultSecrets,
@@ -36,7 +34,7 @@ class LegeSuspensjonClient(
         val httpResponse = httpStatement.execute()
 
         if (httpResponse.status != HttpStatusCode.OK) {
-            log.error("Btsys svarte med kode {} for ediloggId {}, {}", httpResponse.status, ediloggid)
+            logger.error("Btsys svarte med kode {} for ediloggId {}, {}", httpResponse.status, ediloggid)
             throw IOException("Btsys svarte med uventet kode ${httpResponse.status} for $ediloggid")
         }
 

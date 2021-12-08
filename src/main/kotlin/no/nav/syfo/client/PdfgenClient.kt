@@ -5,14 +5,12 @@ import io.ktor.client.request.get
 import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
 import io.ktor.http.contentType
-import io.ktor.util.KtorExperimentalAPI
 import no.nav.syfo.util.retry
 import no.nav.syfo.model.Dialogmelding
 import no.nav.syfo.model.PdfModel
 import no.nav.syfo.model.ValidationResult
 import no.nav.syfo.model.sanitizeForPdfGen
 
-@KtorExperimentalAPI
 class PdfgenClient constructor(
     private val url: String,
     private val httpClient: HttpClient

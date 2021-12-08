@@ -1,6 +1,7 @@
 package no.nav.syfo.util
 
 import com.ibm.mq.jms.MQConnectionFactory
+import com.ibm.msg.client.jms.JmsConstants
 import com.ibm.msg.client.wmq.WMQConstants
 import com.ibm.msg.client.wmq.compat.base.internal.MQC
 import javax.jms.MessageConsumer
@@ -24,6 +25,7 @@ fun connectionFactory(config: MqConfig) = MQConnectionFactory().apply {
     ccsid = 1208
     setIntProperty(WMQConstants.JMS_IBM_ENCODING, MQC.MQENC_NATIVE)
     setIntProperty(WMQConstants.JMS_IBM_CHARACTER_SET, 1208)
+    setBooleanProperty(JmsConstants.USER_AUTHENTICATION_MQCSP, true)
 }
 
 fun Session.consumerForQueue(queueName: String): MessageConsumer = createConsumer(createQueue(queueName))

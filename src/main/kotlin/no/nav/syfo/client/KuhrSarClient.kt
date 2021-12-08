@@ -7,19 +7,17 @@ import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.util.KtorExperimentalAPI
 import java.util.Date
 import kotlin.math.max
 import net.logstash.logback.argument.StructuredArguments
 import net.logstash.logback.argument.StructuredArguments.keyValue
 import no.nav.syfo.util.retry
-import no.nav.syfo.log
+import no.nav.syfo.logger
 import no.nav.syfo.model.SamhandlerPraksisType
 import no.nav.syfo.util.LoggingMeta
 import org.apache.commons.text.similarity.LevenshteinDistance
 import java.io.IOException
 
-@KtorExperimentalAPI
 class SarClient(
     private val endpointUrl: String,
     private val httpClient: HttpClient
@@ -118,7 +116,7 @@ fun findBestSamhandlerPraksis(
         .filter { praksis -> praksis.samh_praksis_status_kode == "aktiv" }
 
     if (aktiveSamhandlere.isEmpty()) {
-        log.info(
+        logger.info(
             "Fant ingen aktive samhandlere. {}  Meta: {}, {} ",
             keyValue("praksis Informasjo", samhandlere.formaterPraksis()),
             keyValue("antall praksiser", samhandlere.size),
@@ -128,7 +126,7 @@ fun findBestSamhandlerPraksis(
 
     val samhandlerPraksisByHerId = getSamhandlerPraksisByHerId(legekontorHerId, aktiveSamhandlere)
     if (samhandlerPraksisByHerId != null) {
-        log.info(
+        logger.info(
             "Fant samhandler basert på herid. herid: $legekontorHerId, {}, {}",
             keyValue("praksisinformasjon", samhandlere.formaterPraksis()),
             StructuredArguments.fields(loggingMeta)
@@ -213,7 +211,7 @@ fun samhandlerPraksisMatchTest(
     loggingMeta: LoggingMeta
 ): SamhandlerPraksisMatch? {
     return if (samhandlerPraksis != null && samhandlerPraksis.percentageMatch >= percentageMatchLimit) {
-        log.info(
+        logger.info(
             "Beste match ble samhandler praksis: " +
                 "Orgnumer: ${samhandlerPraksis.samhandlerPraksis.org_id} " +
                 "Navn: ${samhandlerPraksis.samhandlerPraksis.navn} " +

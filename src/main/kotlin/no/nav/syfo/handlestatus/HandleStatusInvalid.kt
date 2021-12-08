@@ -1,6 +1,5 @@
 package no.nav.syfo.handlestatus
 
-import io.ktor.util.*
 import net.logstash.logback.argument.StructuredArguments.fields
 import no.nav.helse.apprecV1.XMLCV
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
@@ -9,7 +8,7 @@ import no.nav.syfo.apprec.ApprecStatus
 import no.nav.syfo.apprec.toApprecCV
 import no.nav.syfo.client.IdentInfoResult
 import no.nav.syfo.db.Database
-import no.nav.syfo.log
+import no.nav.syfo.logger
 import no.nav.syfo.metrics.INVALID_MESSAGE_NO_NOTICE
 import no.nav.syfo.metrics.TEST_FNR_IN_PROD
 import no.nav.syfo.model.ReceivedDialogmelding
@@ -27,7 +26,6 @@ import java.time.format.DateTimeFormatter
 import javax.jms.MessageProducer
 import javax.jms.Session
 
-@KtorExperimentalAPI
 suspend fun handleStatusINVALID(
     validationResult: ValidationResult,
     session: Session,
@@ -59,7 +57,7 @@ suspend fun handleStatusINVALID(
         session, receiptProducer, fellesformat, ApprecStatus.avvist,
         validationResult.ruleHits.map { it.toApprecCV() }
     )
-    log.info("Apprec Receipt sent to {}, {}", apprecQueueName, fields(loggingMeta))
+    logger.info("Apprec Receipt sent to {}, {}", apprecQueueName, fields(loggingMeta))
 }
 
 fun handleDuplicateDialogmeldingContent(
@@ -75,7 +73,7 @@ fun handleDuplicateDialogmeldingContent(
     val tidMottattOpprinneligMelding = opprinneligMeldingTidspunkt.mottattTidspunkt.format(formatter)
     val tidMottattNyMelding = LocalDateTime.now().format(formatter)
 
-    log.warn(
+    logger.warn(
         "Duplicate message: Same sha256String {}",
         createLogEntry(
             LogType.INVALID_MESSAGE,
@@ -95,7 +93,7 @@ fun handleDuplicateDialogmeldingContent(
             )
         )
     )
-    log.info("Apprec Receipt sent to {}, {}", env.apprecQueueName, fields(loggingMeta))
+    logger.info("Apprec Receipt sent to {}, {}", env.apprecQueueName, fields(loggingMeta))
     INVALID_MESSAGE_NO_NOTICE.inc()
 }
 
@@ -107,7 +105,7 @@ fun handlePatientNotFoundInAktorRegister(
     env: Environment,
     loggingMeta: LoggingMeta
 ) {
-    log.warn(
+    logger.warn(
         "Patient not found i aktorRegister error {}",
         createLogEntry(
             LogType.INVALID_MESSAGE,
@@ -123,7 +121,7 @@ fun handlePatientNotFoundInAktorRegister(
         )
     )
 
-    log.info("Apprec Receipt sent to {}, {}", env.apprecQueueName, fields(loggingMeta))
+    logger.info("Apprec Receipt sent to {}, {}", env.apprecQueueName, fields(loggingMeta))
 
     INVALID_MESSAGE_NO_NOTICE.inc()
 }
@@ -135,7 +133,7 @@ fun handlePatientNotFound(
     env: Environment,
     loggingMeta: LoggingMeta
 ) {
-    log.warn(
+    logger.warn(
         "Pasienten er ikke funnet i dialogmeldingen {}",
         createLogEntry(
             LogType.INVALID_MESSAGE,
@@ -150,7 +148,7 @@ fun handlePatientNotFound(
         )
     )
 
-    log.info("Apprec Receipt sent to {}, {}", env.apprecQueueName, fields(loggingMeta))
+    logger.info("Apprec Receipt sent to {}, {}", env.apprecQueueName, fields(loggingMeta))
 
     INVALID_MESSAGE_NO_NOTICE.inc()
 }
@@ -163,7 +161,7 @@ fun handleDoctorNotFoundInAktorRegister(
     env: Environment,
     loggingMeta: LoggingMeta
 ) {
-    log.warn(
+    logger.warn(
         "Behandler er ikke registrert i folkeregisteret {}",
         createLogEntry(
             LogType.INVALID_MESSAGE,
@@ -182,7 +180,7 @@ fun handleDoctorNotFoundInAktorRegister(
         )
     )
 
-    log.info("Apprec Receipt sent to {}, {}", env.apprecQueueName, fields(loggingMeta))
+    logger.info("Apprec Receipt sent to {}, {}", env.apprecQueueName, fields(loggingMeta))
 
     INVALID_MESSAGE_NO_NOTICE.inc()
 }
@@ -194,7 +192,7 @@ fun handleTestFnrInProd(
     env: Environment,
     loggingMeta: LoggingMeta
 ) {
-    log.warn(
+    logger.warn(
         "Test fødselsnummer er kommet inn i produksjon {}",
         createLogEntry(
             LogType.TEST_FNR_IN_PRODUCTION,
@@ -202,7 +200,7 @@ fun handleTestFnrInProd(
         )
     )
 
-    log.warn(
+    logger.warn(
         "Avsender fodselsnummer er registert i Helsepersonellregisteret (HPR) {}",
         createLogEntry(
             LogType.INVALID_MESSAGE,
@@ -219,7 +217,7 @@ fun handleTestFnrInProd(
             )
         )
     )
-    log.info("Apprec Receipt sent to {}, {}", env.apprecQueueName, fields(loggingMeta))
+    logger.info("Apprec Receipt sent to {}, {}", env.apprecQueueName, fields(loggingMeta))
 
     INVALID_MESSAGE_NO_NOTICE.inc()
     TEST_FNR_IN_PROD.inc()
@@ -233,7 +231,7 @@ fun handleMeldingsTekstMangler(
     loggingMeta: LoggingMeta
 ) {
 
-    log.warn(
+    logger.warn(
         "TekstNotatInnhold mangler {}",
         createLogEntry(
             LogType.INVALID_MESSAGE,
@@ -250,7 +248,7 @@ fun handleMeldingsTekstMangler(
             )
         )
     )
-    log.info("Apprec Receipt sent to {}, {}", env.apprecQueueName, fields(loggingMeta))
+    logger.info("Apprec Receipt sent to {}, {}", env.apprecQueueName, fields(loggingMeta))
 
     INVALID_MESSAGE_NO_NOTICE.inc()
 }
@@ -263,7 +261,7 @@ fun handleInvalidDialogMeldingKodeverk(
     loggingMeta: LoggingMeta
 ) {
 
-    log.warn(
+    logger.warn(
         "Det er brukt ein ugyldig kombinasjon av dialogmelding kodeverk {}",
         createLogEntry(
             LogType.INVALID_MESSAGE,
@@ -280,7 +278,7 @@ fun handleInvalidDialogMeldingKodeverk(
             )
         )
     )
-    log.info("Apprec Receipt sent to {}, {}", env.apprecQueueName, fields(loggingMeta))
+    logger.info("Apprec Receipt sent to {}, {}", env.apprecQueueName, fields(loggingMeta))
 
     INVALID_MESSAGE_NO_NOTICE.inc()
 }

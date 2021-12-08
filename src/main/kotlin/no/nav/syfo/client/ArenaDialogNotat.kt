@@ -5,7 +5,7 @@ import no.nav.helse.arenadialognotat.*
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
-import no.nav.syfo.log
+import no.nav.syfo.logger
 import no.nav.syfo.model.Behandler
 import no.nav.syfo.model.Dialogmelding
 import no.nav.syfo.util.*
@@ -141,5 +141,5 @@ fun sendArenaDialogNotat(
             text = arenaDialogNotatMarshaller.toString(arenaDialogNotat)
         }
     )
-    log.info("Message is sent to arena {}", fields(loggingMeta))
+    logger.info("Message is sent to arena {}", fields(loggingMeta))
 }

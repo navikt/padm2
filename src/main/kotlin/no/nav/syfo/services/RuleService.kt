@@ -1,6 +1,5 @@
 package no.nav.syfo.services
 
-import io.ktor.util.KtorExperimentalAPI
 import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.GlobalScope
 import net.logstash.logback.argument.StructuredArguments.fields
@@ -20,7 +19,6 @@ import no.nav.syfo.util.LoggingMeta
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-@KtorExperimentalAPI
 class RuleService(
     val legeSuspensjonClient: LegeSuspensjonClient,
     val syfohelsenettproxyClient: SyfohelsenettproxyClient

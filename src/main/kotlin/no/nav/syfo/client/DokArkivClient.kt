@@ -5,22 +5,17 @@ import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.util.*
 import net.logstash.logback.argument.StructuredArguments.fields
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
-import no.nav.syfo.util.retry
-import no.nav.syfo.log
+import no.nav.syfo.logger
 import no.nav.syfo.model.*
-import no.nav.syfo.objectMapper
-import no.nav.syfo.util.ImageToPDF
-import no.nav.syfo.util.LoggingMeta
+import no.nav.syfo.util.*
 import no.nav.syfo.validation.validatePersonAndDNumber
 import java.io.ByteArrayOutputStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-@KtorExperimentalAPI
 class DokArkivClient(
     private val azureAdV2Client: AzureAdV2Client,
     private val dokArkivClientId: String,
@@ -35,7 +30,7 @@ class DokArkivClient(
         retryIntervals = arrayOf(500L, 1000L, 3000L, 5000L, 10000L)
     ) {
         try {
-            log.info("Kall til dokarkiv Nav-Callid {}, {}", journalpostRequest.eksternReferanseId, fields(loggingMeta))
+            logger.info("Kall til dokarkiv Nav-Callid {}, {}", journalpostRequest.eksternReferanseId, fields(loggingMeta))
 
             val accessToken = azureAdV2Client.getSystemToken(dokArkivClientId)?.accessToken
 
@@ -52,7 +47,7 @@ class DokArkivClient(
                 else -> throw RuntimeException("Http status: ${response.status} Content: ${response.content}")
             }
         } catch (e: Exception) {
-            log.warn("Oppretting av journalpost feilet: ${e.message}, {}", fields(loggingMeta))
+            logger.warn("Oppretting av journalpost feilet: ${e.message}, {}", fields(loggingMeta))
             throw e
         }
     }
@@ -148,7 +143,7 @@ fun leggtilDokument(
 fun vedleggToPDF(vedlegg: Vedlegg): Vedlegg {
     if (findFiltype(vedlegg) == "PDFA") return vedlegg
 
-    log.info("Converting vedlegg of type ${vedlegg.mimeType} to PDFA")
+    logger.info("Converting vedlegg of type ${vedlegg.mimeType} to PDFA")
 
     val image =
         ByteArrayOutputStream().use { outputStream ->

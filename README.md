@@ -2,8 +2,7 @@
 
 # Prosessering av dialogmeldinger (PADM)
 Repository for PADM. Application written in Kotlin used to receive dialogmeldinger from external systems, doing some validation, then pushing it to our internal systems.
-More information on dialogmeldinger can be found here: https://www.nhn.no/veileder-for-elektronisk-meldingsutveksling/del-1-elektronisk-meldingsutveksling/elektronisk-meldingsutveksling/#kap-dialogmeldinger
-
+More information on dialogmeldinger can be found here: https://www.nhn.no/samhandlingsplattform/veileder-for-elektronisk-meldingsutveksling/del-1--elektronisk-meldingsutveksling/elektronisk-meldingsutveksling
 
 <img src="src/svg/dialogmeldingflyt_2021_09_14.svg" alt="Image of the flow of the padm2 application">
 

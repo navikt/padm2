@@ -1,6 +1,5 @@
 package no.nav.syfo.handlestatus
 
-import io.ktor.util.KtorExperimentalAPI
 import javax.jms.MessageProducer
 import javax.jms.Session
 import net.logstash.logback.argument.StructuredArguments
@@ -12,7 +11,7 @@ import no.nav.syfo.kafka.DialogmeldingProducer
 import no.nav.syfo.client.createArenaDialogNotat
 import no.nav.syfo.client.sendArenaDialogNotat
 import no.nav.syfo.db.Database
-import no.nav.syfo.log
+import no.nav.syfo.logger
 import no.nav.syfo.model.Dialogmelding
 import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.model.ValidationResult
@@ -22,7 +21,6 @@ import no.nav.syfo.services.JournalService
 import no.nav.syfo.services.sendReceipt
 import no.nav.syfo.util.LoggingMeta
 
-@KtorExperimentalAPI
 suspend fun handleStatusOK(
     session: Session,
     receiptProducer: MessageProducer,
@@ -77,5 +75,5 @@ suspend fun handleStatusOK(
     handleRecivedMessage(receivedDialogmelding, validationResult, sha256String, loggingMeta, database)
 
     sendReceipt(session, receiptProducer, fellesformat, ApprecStatus.ok)
-    log.info("Apprec Receipt sent to {}, {}", apprecQueueName, StructuredArguments.fields(loggingMeta))
+    logger.info("Apprec Receipt sent to {}, {}", apprecQueueName, StructuredArguments.fields(loggingMeta))
 }

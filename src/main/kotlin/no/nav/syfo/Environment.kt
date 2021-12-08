@@ -1,6 +1,7 @@
 package no.nav.syfo
 
 import no.nav.syfo.util.MqConfig
+import no.nav.syfo.util.getFileAsString
 
 data class Environment(
     val aadAppClient: String = getEnvVar("AZURE_APP_CLIENT_ID"),
@@ -32,12 +33,23 @@ data class Environment(
     val helsenettproxyId: String = getEnvVar("HELSENETTPROXY_ID"),
     val helsenettClientId: String = getEnvVar("HELSENETT_CLIENT_ID"),
     val stsUrl: String = getEnvVar("STS_URL"),
-    val KafkaAivenBootstrapServers: String = getEnvVar("KAFKA_BROKERS"),
-    val KafkaAivenCredstorePassword: String = getEnvVar("KAFKA_CREDSTORE_PASSWORD"),
-    val KafkaAivenTruststoreLocation: String = getEnvVar("KAFKA_TRUSTSTORE_PATH"),
-    val KafkaAivenKeystoreLocation: String = getEnvVar("KAFKA_KEYSTORE_PATH"),
+    val kafka: ApplicationEnvironmentKafka = ApplicationEnvironmentKafka(
+        bootstrapServers = getEnvVar("KAFKA_BROKERS"),
+        aivenCredstorePassword = getEnvVar("KAFKA_CREDSTORE_PASSWORD"),
+        aivenTruststoreLocation = getEnvVar("KAFKA_TRUSTSTORE_PATH"),
+        aivenKeystoreLocation = getEnvVar("KAFKA_KEYSTORE_PATH"),
+    ),
     val toggleDialogmeldingerTilKafka: Boolean = getEnvVar("TOGGLE_DIALOGMELDINGER_TIL_KAFKA").toBoolean(),
+    val serviceuserPassword: String = getFileAsString("/secrets/serviceuser/password"),
+    val serviceuserUsername: String = getFileAsString("/secrets/serviceuser/username"),
 ) : MqConfig
+
+data class ApplicationEnvironmentKafka(
+    val bootstrapServers: String,
+    val aivenCredstorePassword: String,
+    val aivenTruststoreLocation: String,
+    val aivenKeystoreLocation: String,
+)
 
 data class VaultSecrets(
     val serviceuserUsername: String,

@@ -5,8 +5,8 @@ import no.nav.syfo.db.toList
 import no.nav.syfo.model.Dialogmelding
 import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.model.ValidationResult
-import no.nav.syfo.objectMapper
 import no.nav.syfo.persistering.db.domain.DialogmeldingTidspunkt
+import no.nav.syfo.util.objectMapper
 import org.postgresql.util.PGobject
 import java.sql.Connection
 import java.sql.ResultSet
