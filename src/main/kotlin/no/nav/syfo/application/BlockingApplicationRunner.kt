@@ -28,7 +28,7 @@ import no.nav.syfo.services.*
 import no.nav.syfo.util.*
 import no.nav.syfo.validation.isKodeverkValid
 import java.io.StringReader
-import java.time.ZoneOffset
+import java.time.ZoneId
 import java.util.*
 import javax.jms.MessageConsumer
 import javax.jms.MessageProducer
@@ -243,7 +243,7 @@ class BlockingApplicationRunner {
                             legekontorReshId = legekontorReshId,
                             mottattDato = receiverBlock.mottattDatotid.toGregorianCalendar().toZonedDateTime()
                                 .withZoneSameInstant(
-                                    ZoneOffset.UTC
+                                    ZoneId.of("Europe/Oslo")
                                 ).toLocalDateTime(),
                             legehpr = legeHpr,
                             fellesformat = inputMessageText,
