@@ -5,7 +5,6 @@ import no.nav.syfo.client.HelsenettProxyBehandler
 import no.nav.syfo.client.SyfohelsenettproxyClient
 import no.nav.syfo.util.LoggingMeta
 
-@KtorExperimentalAPI
 class SignerendeLegeService(
     private val syfohelsenettproxyClient: SyfohelsenettproxyClient
 ) {

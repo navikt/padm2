@@ -22,20 +22,22 @@ val javaxActivationVersion = "1.1.1"
 val jaxwsToolsVersion = "2.3.1"
 val dialogmeldingVersion = "1.5d21db9"
 val base64containerVersion = "1.5ac2176"
-val junitJupiterVersion = "5.6.0"
+val junitJupiterVersion = "5.8.2"
 val kafkaVersion = "2.8.0"
 val kafkaEmbeddedVersion = "2.8.0"
 val kluentVersion = "1.39"
-val mockkVersion = "1.9.3"
+val mockkVersion = "1.12.1"
 val jacksonVersion = "2.9.8"
 val commonsTextVersion = "1.4"
 val arenaDialogNotatVersion = "1.e1999cf"
 val javaTimeAdapterVersion = "1.1.3"
 val vaultJavaDriveVersion = "3.1.0"
 val postgresVersion = "42.3.1"
+val postgresEmbedded = "0.13.4"
 val flywayVersion = "8.0.4"
 val hikariVersion = "5.0.0"
 val pdfboxVersion = "2.0.24"
+val spek = "2.0.17"
 
 plugins {
     java
@@ -96,6 +98,7 @@ dependencies {
     implementation("io.ktor:ktor-client-apache:$ktorVersion")
     implementation("io.ktor:ktor-client-jackson:$ktorVersion")
     implementation("io.ktor:ktor-client-auth-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-jackson:$ktorVersion")
 
     implementation("io.prometheus:simpleclient_hotspot:$prometheusVersion")
     implementation("io.prometheus:simpleclient_common:$prometheusVersion")
@@ -150,6 +153,15 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("io.ktor:ktor-client-mock:$ktorVersion")
+    testImplementation("com.opentable.components:otj-pg-embedded:$postgresEmbedded")
+    testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
+    testImplementation("org.spekframework.spek2:spek-dsl-jvm:$spek") {
+        exclude(group = "org.jetbrains.kotlin")
+    }
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:$junitJupiterVersion")
+    testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:$spek") {
+        exclude(group = "org.jetbrains.kotlin")
+    }
 }
 
 tasks {
@@ -187,7 +199,9 @@ tasks {
     }
 
     withType<Test> {
-        useJUnit()
+        useJUnitPlatform {
+            includeEngines("spek2", "junit-vintage")
+        }
         testLogging {
             showStandardStreams = true
         }

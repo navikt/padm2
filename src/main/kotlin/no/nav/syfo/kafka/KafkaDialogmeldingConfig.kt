@@ -1,6 +1,6 @@
 package no.nav.syfo.kafka
 
-import no.nav.syfo.Environment
+import no.nav.syfo.ApplicationEnvironmentKafka
 import no.nav.syfo.application.kafka.JacksonKafkaSerializer
 import no.nav.syfo.application.kafka.commonKafkaAivenProducerConfig
 import org.apache.kafka.clients.producer.ProducerConfig
@@ -8,10 +8,10 @@ import org.apache.kafka.common.serialization.StringSerializer
 import java.util.*
 
 fun kafkaDialogmeldingProducerConfig(
-    environment: Environment,
+    kafkaEnvironment: ApplicationEnvironmentKafka,
 ): Properties {
     return Properties().apply {
-        putAll(commonKafkaAivenProducerConfig(environment))
+        putAll(commonKafkaAivenProducerConfig(kafkaEnvironment))
         this[ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG] = StringSerializer::class.java.canonicalName
         this[ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG] = JacksonKafkaSerializer::class.java.canonicalName
     }

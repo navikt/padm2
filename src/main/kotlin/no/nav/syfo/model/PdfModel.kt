@@ -1,9 +1,9 @@
 package no.nav.syfo.model
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import no.nav.syfo.log
+import no.nav.syfo.logger
 import no.nav.syfo.metrics.SANITIZE_INVALID_CHAR_COUNTER
-import no.nav.syfo.objectMapper
+import no.nav.syfo.util.objectMapper
 
 data class PdfModel(
     val dialogmelding: Dialogmelding,
@@ -26,7 +26,7 @@ fun PdfModel.sanitizeForPdfGen(): PdfModel {
     val sanitizedJson = pdfModelJsonString.toCharArray().filter {
         if (it in illegalCharacters || it < NUL) {
             SANITIZE_INVALID_CHAR_COUNTER.inc()
-            log.warn("Illegal character in PdfModel: %x".format(it.code))
+            logger.warn("Illegal character in PdfModel: %x".format(it.code))
             false
         } else {
             true

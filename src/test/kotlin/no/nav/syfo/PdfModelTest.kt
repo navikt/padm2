@@ -1,6 +1,7 @@
 package no.nav.syfo
 
 import no.nav.syfo.model.*
+import no.nav.syfo.util.objectMapper
 import org.amshove.kluent.shouldBeEqualTo
 import java.time.LocalDateTime
 import java.util.UUID

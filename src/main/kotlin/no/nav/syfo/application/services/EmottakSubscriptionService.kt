@@ -11,7 +11,7 @@ import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.helse.msgHead.XMLSender
 import no.nav.syfo.client.SamhandlerPraksis
 import no.nav.syfo.util.retry
-import no.nav.syfo.log
+import no.nav.syfo.logger
 import no.nav.syfo.util.LoggingMeta
 import no.nav.syfo.util.senderMarshaller
 
@@ -23,7 +23,7 @@ suspend fun startSubscription(
     receiverBlock: XMLMottakenhetBlokk,
     loggingMeta: LoggingMeta
 ) {
-    log.info("SamhandlerPraksis is found, name: ${samhandlerPraksis.navn},  {}", StructuredArguments.fields(loggingMeta))
+    logger.info("SamhandlerPraksis is found, name: ${samhandlerPraksis.navn},  {}", StructuredArguments.fields(loggingMeta))
     retry(
         callName = "start_subscription_emottak",
         retryIntervals = arrayOf(500L, 1000L, 3000L, 5000L, 10000L),

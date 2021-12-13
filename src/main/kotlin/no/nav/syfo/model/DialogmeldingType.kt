@@ -1,6 +1,6 @@
 package no.nav.syfo.model
 
-import no.nav.syfo.log
+import no.nav.syfo.logger
 
 enum class DialogmeldingType(val ebxmlService: String, val ebxmlAction: String, val dialogmeldingKodeverk: List<DialogmeldingKodeverk>, val brevkode: String) {
     DIALOGMELDING_DIALOGMOTE_INNKALLING_MOTERESPONS(
@@ -39,8 +39,12 @@ fun findDialogmeldingKodeverk(kodeverkOID: String, v: String): DialogmeldingKode
     val kodeverk = DialogmeldingKodeverk.values().firstOrNull { it.kodeverkOID == kodeverkOID && it.v == v }
 
     if (kodeverk == null) {
-        log.warn("Fant ikke kodeverk som matcher dialogmeldingen. kodeverkOID: $kodeverkOID, v: $v")
+        logger.warn("Fant ikke kodeverk som matcher dialogmeldingen. kodeverkOID: $kodeverkOID, v: $v")
     }
 
     return kodeverk
 }
+
+fun DialogmeldingType.isHenvendelseFraLegeOrForesporselSvar(): Boolean =
+    this == DialogmeldingType.DIALOGMELDING_HENVENDELSE_FRA_LEGE_HENDVENDELSE ||
+        this == DialogmeldingType.DIALOGMELDING_FORESPORSEL_FRA_SAKSBEHANDLER_FORESPORSEL_SVAR

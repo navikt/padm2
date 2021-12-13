@@ -4,7 +4,7 @@ import com.bettercloud.vault.VaultException
 import com.zaxxer.hikari.HikariDataSource
 import kotlinx.coroutines.delay
 import no.nav.syfo.application.ApplicationState
-import no.nav.syfo.log
+import no.nav.syfo.logger
 import no.nav.syfo.vault.Vault
 
 class VaultCredentialService {
@@ -32,18 +32,18 @@ class VaultCredentialService {
 
     fun getNewCredentials(mountPath: String, databaseName: String, role: Role): VaultCredentials {
         val path = "$mountPath/creds/$databaseName-$role"
-        log.debug("Getting database credentials for path '$path'")
+        logger.debug("Getting database credentials for path '$path'")
         try {
             val response = Vault.client.logical().read(path)
             val username = checkNotNull(response.data["username"]) { "Username is not set in response from Vault" }
             val password = checkNotNull(response.data["password"]) { "Password is not set in response from Vault" }
-            log.debug("Got new credentials (username=$username, leaseDuration=${response.leaseDuration})")
+            logger.debug("Got new credentials (username=$username, leaseDuration=${response.leaseDuration})")
             leaseDuration = response.leaseDuration
             return VaultCredentials(response.leaseId, username, password)
         } catch (e: VaultException) {
             when (e.httpStatusCode) {
-                403 -> log.error("Vault denied permission to fetch database credentials for path '$path'", e)
-                else -> log.error("Could not fetch database credentials for path '$path'", e)
+                403 -> logger.error("Vault denied permission to fetch database credentials for path '$path'", e)
+                else -> logger.error("Could not fetch database credentials for path '$path'", e)
             }
             throw e
         }

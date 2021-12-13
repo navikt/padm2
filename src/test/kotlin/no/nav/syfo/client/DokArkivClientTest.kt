@@ -28,7 +28,6 @@ import org.junit.Test
 import java.time.LocalDateTime
 import kotlin.test.assertFailsWith
 
-@KtorExperimentalAPI
 internal class DokArkivClientTest {
 
     @MockK
