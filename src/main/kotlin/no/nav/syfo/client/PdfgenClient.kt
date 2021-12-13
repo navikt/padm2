@@ -1,11 +1,11 @@
 package no.nav.syfo.client
 
 import io.ktor.client.HttpClient
+import io.ktor.client.call.*
 import io.ktor.client.request.get
-import io.ktor.http.ContentType
-import io.ktor.http.HttpMethod
-import io.ktor.http.contentType
-import io.ktor.util.KtorExperimentalAPI
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.*
+import io.ktor.util.*
 import no.nav.syfo.util.retry
 import no.nav.syfo.model.Dialogmelding
 import no.nav.syfo.model.PdfModel
@@ -18,10 +18,15 @@ class PdfgenClient constructor(
     private val httpClient: HttpClient
 ) {
     suspend fun createPdf(payload: PdfModel): ByteArray = retry("pdfgen") {
-        httpClient.get(url) {
+        val response: HttpResponse = httpClient.get(url) {
             contentType(ContentType.Application.Json)
             method = HttpMethod.Post
             body = payload.sanitizeForPdfGen()
+        }
+        if (response.status == HttpStatusCode.OK) {
+            response.receive()
+        } else {
+            throw RuntimeException("Pdfgen returned http status: ${response.status}")
         }
     }
 }
