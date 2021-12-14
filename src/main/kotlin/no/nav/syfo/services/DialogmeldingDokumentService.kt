@@ -1,11 +1,11 @@
 package no.nav.syfo.services
 
-import no.nav.syfo.db.Database
+import no.nav.syfo.db.DatabaseInterface
 import no.nav.syfo.persistering.db.hasSavedDialogmeldingDokument
 
 fun dialogmeldingDokumentWithShaExists(
     sha256String: String,
-    database: Database
+    database: DatabaseInterface,
 ): Boolean {
     return database.connection.hasSavedDialogmeldingDokument(sha256String)
 }

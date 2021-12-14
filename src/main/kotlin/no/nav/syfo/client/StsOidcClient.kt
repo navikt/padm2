@@ -12,10 +12,8 @@ import io.ktor.client.features.json.JacksonSerializer
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
-import io.ktor.util.KtorExperimentalAPI
 import kotlinx.coroutines.runBlocking
 
-@KtorExperimentalAPI
 class StsOidcClient(
     username: String,
     password: String,

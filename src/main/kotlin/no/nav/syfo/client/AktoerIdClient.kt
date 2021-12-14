@@ -6,30 +6,28 @@ import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.request.parameter
 import io.ktor.http.ContentType
-import io.ktor.util.KtorExperimentalAPI
 import no.nav.syfo.util.retry
 import no.nav.syfo.util.LoggingMeta
 
-@KtorExperimentalAPI
 class AktoerIdClient(
     private val endpointUrl: String,
     private val stsClient: StsOidcClient,
-    private val httpClient: HttpClient
+    private val httpClient: HttpClient,
+    private val serviceUsername: String,
 ) {
     suspend fun getAktoerIds(
-        personNumbers: List<String>,
-        username: String,
+        personIdenter: List<String>,
         loggingMeta: LoggingMeta
     ): Map<String, IdentInfoResult> =
         retry("get_aktoerids") {
-            httpClient.get<Map<String, IdentInfoResult>>("$endpointUrl/identer") {
+            httpClient.get("$endpointUrl/identer") {
                 accept(ContentType.Application.Json)
                 val oidcToken = stsClient.oidcToken()
                 headers {
                     append("Authorization", "Bearer ${oidcToken.access_token}")
-                    append("Nav-Consumer-Id", username)
+                    append("Nav-Consumer-Id", serviceUsername)
                     append("Nav-Call-Id", loggingMeta.msgId)
-                    append("Nav-Personidenter", personNumbers.joinToString(","))
+                    append("Nav-Personidenter", personIdenter.joinToString(","))
                 }
                 parameter("gjeldende", "true")
                 parameter("identgruppe", "AktoerId")

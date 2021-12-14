@@ -11,7 +11,7 @@ class RenewVaultService(private val vaultCredentialService: VaultCredentialServi
             try {
                 Vault.renewVaultTokenTask(applicationState)
             } catch (e: Exception) {
-                no.nav.syfo.log.error("Noe gikk galt ved fornying av vault-token", e.message)
+                no.nav.syfo.logger.error("Noe gikk galt ved fornying av vault-token", e.message)
             } finally {
                 applicationState.ready = false
             }
@@ -21,7 +21,7 @@ class RenewVaultService(private val vaultCredentialService: VaultCredentialServi
             try {
                 vaultCredentialService.runRenewCredentialsTask(applicationState)
             } catch (e: Exception) {
-                no.nav.syfo.log.error("Noe gikk galt ved fornying av vault-credentials", e.message)
+                no.nav.syfo.logger.error("Noe gikk galt ved fornying av vault-credentials", e.message)
             } finally {
                 applicationState.ready = false
             }

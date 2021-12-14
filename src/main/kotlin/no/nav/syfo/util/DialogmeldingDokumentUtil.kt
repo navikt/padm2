@@ -1,7 +1,6 @@
 package no.nav.syfo.util
 
 import no.nav.helse.dialogmelding.XMLDialogmelding
-import no.nav.syfo.objectMapper
 import java.security.MessageDigest
 
 fun sha256hashstring(dialogmelding: XMLDialogmelding): String =
