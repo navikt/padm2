@@ -25,7 +25,7 @@ val base64containerVersion = "1.5ac2176"
 val junitJupiterVersion = "5.8.2"
 val kafkaVersion = "2.8.0"
 val kafkaEmbeddedVersion = "2.8.0"
-val kluentVersion = "1.39"
+val kluentVersion = "1.68"
 val mockkVersion = "1.12.1"
 val jacksonVersion = "2.9.8"
 val commonsTextVersion = "1.4"
@@ -63,7 +63,6 @@ val githubPassword: String by project
 
 repositories {
     mavenCentral()
-    jcenter()
     maven(url = "https://packages.confluent.io/maven/")
     maven(url = "https://jitpack.io")
     maven {
