@@ -5,14 +5,14 @@ import no.nils.wsdl2java.Wsdl2JavaTask
 group = "no.nav.syfo"
 version = "1.0.0"
 
-val ktorVersion = "1.6.5"
-val logbackVersion = "1.2.3"
-val logstashEncoderVersion = "6.4"
-val prometheusVersion = "0.6.0"
+val ktorVersion = "1.6.7"
+val logbackVersion = "1.2.8"
+val logstashEncoderVersion = "7.0.1"
+val prometheusVersion = "0.9.0"
 val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
 val fellesformat2Version = "1.0329dd1"
 val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
-val ibmMqVersion = "9.2.0.2"
+val ibmMqVersion = "9.2.4.0"
 val cxfVersion = "3.4.5"
 val jaxwsApiVersion = "2.3.1"
 val javaxAnnotationApiVersion = "1.3.2"
@@ -23,18 +23,18 @@ val jaxwsToolsVersion = "2.3.1"
 val dialogmeldingVersion = "1.5d21db9"
 val base64containerVersion = "1.5ac2176"
 val junitJupiterVersion = "5.8.2"
-val kafkaVersion = "2.8.0"
-val kafkaEmbeddedVersion = "2.8.0"
+val kafkaVersion = "2.8.1"
+val kafkaEmbeddedVersion = "2.8.1"
 val kluentVersion = "1.68"
 val mockkVersion = "1.12.1"
-val jacksonVersion = "2.9.8"
+val jacksonVersion = "2.13.0"
 val commonsTextVersion = "1.4"
 val arenaDialogNotatVersion = "1.e1999cf"
 val javaTimeAdapterVersion = "1.1.3"
 val vaultJavaDriveVersion = "3.1.0"
 val postgresVersion = "42.3.1"
 val postgresEmbedded = "0.13.4"
-val flywayVersion = "8.0.4"
+val flywayVersion = "8.2.2"
 val hikariVersion = "5.0.0"
 val pdfboxVersion = "2.0.24"
 val spek = "2.0.17"
@@ -42,9 +42,9 @@ val spek = "2.0.17"
 plugins {
     java
     id("no.nils.wsdl2java") version "0.10"
-    kotlin("jvm") version "1.5.10"
+    kotlin("jvm") version "1.6.10"
     id("com.github.johnrengelman.shadow") version "6.1.0"
-    id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
+    id("org.jlleitschuh.gradle.ktlint") version "10.2.0"
 }
 
 buildscript {
@@ -84,6 +84,7 @@ dependencies {
         exclude(group = "com.sun.xml.ws", module = "policy")
     }
 
+    implementation(kotlin("reflect"))
     implementation(kotlin("stdlib"))
 
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
