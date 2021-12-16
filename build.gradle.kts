@@ -66,13 +66,6 @@ repositories {
     maven(url = "https://packages.confluent.io/maven/")
     maven(url = "https://jitpack.io")
     maven {
-        url = uri("https://maven.pkg.github.com/navikt/padm-common")
-        credentials {
-            username = githubUser
-            password = githubPassword
-        }
-    }
-    maven {
         url = uri("https://maven.pkg.github.com/navikt/syfo-xml-codegen")
         credentials {
             username = githubUser
