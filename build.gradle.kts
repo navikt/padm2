@@ -6,7 +6,7 @@ group = "no.nav.syfo"
 version = "1.0.0"
 
 val ktorVersion = "1.6.7"
-val logbackVersion = "1.2.8"
+val logbackVersion = "1.2.9"
 val logstashEncoderVersion = "7.0.1"
 val prometheusVersion = "0.9.0"
 val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
