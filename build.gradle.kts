@@ -14,6 +14,7 @@ val fellesformat2Version = "1.0329dd1"
 val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
 val ibmMqVersion = "9.2.4.0"
 val cxfVersion = "3.4.5"
+val commonsCollectionVersion = "3.2.2"
 val jaxwsApiVersion = "2.3.1"
 val javaxAnnotationApiVersion = "1.3.2"
 val jaxbRuntimeVersion = "2.4.0-b180830.0438"
@@ -132,6 +133,11 @@ dependencies {
     implementation("org.apache.cxf:cxf-rt-features-logging:$cxfVersion")
     implementation("org.apache.cxf:cxf-rt-transports-http:$cxfVersion")
     implementation("org.apache.cxf:cxf-rt-ws-security:$cxfVersion")
+    implementation("commons-collections:commons-collections") {
+        version {
+            strictly(commonsCollectionVersion)
+        }
+    }
 
     implementation("org.apache.kafka:kafka_2.13:$kafkaVersion")
     testImplementation("no.nav:kafka-embedded-env:$kafkaEmbeddedVersion")
