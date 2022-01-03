@@ -27,10 +27,7 @@ import no.nav.syfo.validation.isKodeverkValid
 import java.io.StringReader
 import java.time.ZoneId
 import java.util.*
-import javax.jms.MessageConsumer
-import javax.jms.MessageProducer
-import javax.jms.Session
-import javax.jms.TextMessage
+import javax.jms.*
 
 class BlockingApplicationRunner(
     val applicationState: ApplicationState,
@@ -115,26 +112,29 @@ class BlockingApplicationRunner(
                     delay(100)
                     continue
                 }
+                processMessageHandleException(message)
+            }
+        }
+    }
 
-                try {
-                    val inputMessageText = when (message) {
-                        is TextMessage -> message.text
-                        else -> throw RuntimeException("Incoming message needs to be a byte message or text message")
-                    }
-                    processMessage(inputMessageText)
-                } catch (e: Exception) {
-                    backoutProducer.send(message)
-                    MESSAGES_SENT_TO_BOQ.inc()
-                    logger.error("Exception caught while handling message, sent to backout: {}", e.message)
-                } catch (t: Throwable) {
-                    try {
-                        backoutProducer.send(message)
-                        MESSAGES_SENT_TO_BOQ.inc()
-                        logger.error("Error caught while handling message, sent to backout: {}", t.message)
-                    } finally {
-                        throw t
-                    }
-                }
+    suspend fun processMessageHandleException(message: Message) {
+        try {
+            val inputMessageText = when (message) {
+                is TextMessage -> message.text
+                else -> throw RuntimeException("Incoming message needs to be a byte message or text message")
+            }
+            processMessage(inputMessageText)
+        } catch (e: Exception) {
+            backoutProducer.send(message)
+            MESSAGES_SENT_TO_BOQ.inc()
+            logger.error("Exception caught while handling message, sent to backout: {}", e.message)
+        } catch (t: Throwable) {
+            try {
+                backoutProducer.send(message)
+                MESSAGES_SENT_TO_BOQ.inc()
+                logger.error("Error caught while handling message, sent to backout: {}", t.message)
+            } finally {
+                throw t
             }
         }
     }
