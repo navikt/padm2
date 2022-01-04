@@ -18,7 +18,6 @@ import no.nav.syfo.kafka.*
 import no.nav.syfo.util.*
 import no.nav.syfo.vault.RenewVaultService
 import no.nav.syfo.ws.createPort
-import org.apache.cxf.ws.addressing.WSAddressingFeature
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -117,7 +116,6 @@ fun launchListeners(
                 enabled = env.toggleDialogmeldingerTilKafka,
             )
             val subscriptionEmottak = createPort<SubscriptionPort>(env.subscriptionEndpointURL) {
-                proxy { features.add(WSAddressingFeature()) }
                 port { withBasicAuth(env.serviceuserUsername, env.serviceuserPassword) }
             }
 
