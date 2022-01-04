@@ -1,6 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
-import no.nils.wsdl2java.Wsdl2JavaTask
 
 group = "no.nav.syfo"
 version = "1.0.0"
@@ -13,13 +12,13 @@ val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e446
 val fellesformat2Version = "1.0329dd1"
 val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
 val ibmMqVersion = "9.2.4.0"
-val cxfVersion = "3.4.5"
+val cxfFrameworkVersion = "3.4.5"
 val commonsCollectionVersion = "3.2.2"
 val jaxwsApiVersion = "2.3.1"
 val javaxAnnotationApiVersion = "1.3.2"
 val jaxbRuntimeVersion = "2.4.0-b180830.0438"
 val jaxbApiVersion = "2.4.0-b180830.0359"
-val javaxActivationVersion = "1.1.1"
+val javaxActivationVersion = "1.2.0"
 val jaxwsToolsVersion = "2.3.1"
 val dialogmeldingVersion = "1.5d21db9"
 val base64containerVersion = "1.5ac2176"
@@ -42,9 +41,9 @@ val spek = "2.0.17"
 
 plugins {
     java
-    id("no.nils.wsdl2java") version "0.10"
+    id("com.github.bjornvester.wsdl2java") version "1.2"
     kotlin("jvm") version "1.6.10"
-    id("com.github.johnrengelman.shadow") version "6.1.0"
+    id("com.github.johnrengelman.shadow") version "7.1.1"
     id("org.jlleitschuh.gradle.ktlint") version "10.2.0"
 }
 
@@ -76,15 +75,6 @@ repositories {
 }
 
 dependencies {
-    wsdl2java("javax.annotation:javax.annotation-api:$javaxAnnotationApiVersion")
-    wsdl2java("javax.activation:activation:$javaxActivationVersion")
-    wsdl2java("org.glassfish.jaxb:jaxb-runtime:$jaxbRuntimeVersion")
-    wsdl2java("javax.xml.bind:jaxb-api:$jaxbApiVersion")
-    wsdl2java("javax.xml.ws:jaxws-api:$jaxwsApiVersion")
-    wsdl2java("com.sun.xml.ws:jaxws-tools:$jaxwsToolsVersion") {
-        exclude(group = "com.sun.xml.ws", module = "policy")
-    }
-
     implementation(kotlin("reflect"))
     implementation(kotlin("stdlib"))
 
@@ -121,7 +111,7 @@ dependencies {
     implementation("javax.annotation:javax.annotation-api:$javaxAnnotationApiVersion")
     implementation("javax.xml.bind:jaxb-api:$jaxbApiVersion")
     implementation("org.glassfish.jaxb:jaxb-runtime:$jaxbRuntimeVersion")
-    implementation("javax.activation:activation:$javaxActivationVersion")
+    implementation("com.sun.activation:javax.activation:$javaxActivationVersion")
     implementation("com.sun.xml.ws:jaxws-tools:$jaxwsToolsVersion") {
         exclude(group = "com.sun.xml.ws", module = "policy")
     }
@@ -129,10 +119,10 @@ dependencies {
 
     implementation("com.ibm.mq:com.ibm.mq.allclient:$ibmMqVersion")
 
-    implementation("org.apache.cxf:cxf-rt-frontend-jaxws:$cxfVersion")
-    implementation("org.apache.cxf:cxf-rt-features-logging:$cxfVersion")
-    implementation("org.apache.cxf:cxf-rt-transports-http:$cxfVersion")
-    implementation("org.apache.cxf:cxf-rt-ws-security:$cxfVersion")
+    implementation("org.apache.cxf:cxf-rt-frontend-jaxws:$cxfFrameworkVersion")
+    implementation("org.apache.cxf:cxf-rt-features-logging:$cxfFrameworkVersion")
+    implementation("org.apache.cxf:cxf-rt-transports-http:$cxfFrameworkVersion")
+    implementation("org.apache.cxf:cxf-rt-ws-security:$cxfFrameworkVersion")
     implementation("commons-collections:commons-collections") {
         version {
             strictly(commonsCollectionVersion)
@@ -177,14 +167,13 @@ tasks {
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         dependsOn("wsdl2java")
 
-        kotlinOptions.jvmTarget = "12"
+        kotlinOptions.jvmTarget = "17"
     }
 
-    withType<Wsdl2JavaTask> {
-        wsdlDir = file("$projectDir/src/main/resources/wsdl")
-        wsdlsToGenerate = listOf(
-            mutableListOf("-xjc", "-b", "$projectDir/src/main/resources/xjb/binding.xml", "$projectDir/src/main/resources/wsdl/subscription.wsdl")
-        )
+    wsdl2java {
+        cxfVersion.set(cxfFrameworkVersion)
+        wsdlDir.set(layout.projectDirectory.dir("$projectDir/src/main/resources/wsdl"))
+        bindingFile.set(layout.projectDirectory.file("$projectDir/src/main/resources/xjb/binding.xml"))
     }
 
     withType<ShadowJar> {
