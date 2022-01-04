@@ -198,11 +198,11 @@ internal class CreateArenaDialogNotatTest {
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentreferanse shouldBeEqualTo "37340D30-FE14-42B5-985F-A8FF8FFA0CB5"
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.ediLoggId shouldBeEqualTo "1901162157lege21826.1"
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.shouldEqual(LocalDateTime.of(2019, 1, 16, 21, 51, 35, 531000000))
-        arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeFnr shouldBeEqualTo "1231124124"
+        arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeFnr shouldBeEqualTo "01010112377"
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.tssId.shouldEqual(tssid.toBigInteger())
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.fornavn shouldBeEqualTo "Inga"
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.etternavn shouldBeEqualTo "Valda"
-        arenaDialogNotat.pasientData.person.personFnr shouldBeEqualTo "3143242342"
+        arenaDialogNotat.pasientData.person.personFnr shouldBeEqualTo "01010142365"
         arenaDialogNotat.pasientData.person.personNavn.fornavn shouldBeEqualTo "Etternavn"
         arenaDialogNotat.pasientData.person.personNavn.mellomnavn shouldBeEqualTo ""
         arenaDialogNotat.pasientData.person.personNavn.etternavn shouldBeEqualTo "Test"

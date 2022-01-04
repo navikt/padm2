@@ -7,6 +7,7 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import no.nav.syfo.client.*
 import no.nav.syfo.getRandomPort
+import no.nav.syfo.model.HelsepersonellKategori
 
 class SyfohelsenettproxyMock {
     private val port = getRandomPort()
@@ -30,7 +31,20 @@ class SyfohelsenettproxyMock {
                 get(path) {
                     call.respond(
                         HelsenettProxyBehandler(
-                            godkjenninger = emptyList(),
+                            godkjenninger = listOf(
+                                Godkjenning(
+                                    autorisasjon = Kode(
+                                        aktiv = true,
+                                        oid = 7704,
+                                        verdi = "1",
+                                    ),
+                                    helsepersonellkategori = Kode(
+                                        aktiv = true,
+                                        oid = 0,
+                                        verdi = HelsepersonellKategori.LEGE.verdi,
+                                    ),
+                                )
+                            ),
                             fornavn = "fornavn",
                             mellomnavn = null,
                             etternavn = "etternavn",
