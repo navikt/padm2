@@ -28,6 +28,7 @@ import javax.jms.Session
 val logger: Logger = LoggerFactory.getLogger("no.nav.syfo.padm2")
 
 fun main() {
+    logger.info("Padm2 starting with java version: " + Runtime.version())
     val env = Environment()
     val applicationState = ApplicationState()
     val vaultCredentialService = VaultCredentialService()

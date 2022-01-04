@@ -10,14 +10,14 @@ More information on dialogmeldinger can be found here: https://www.nhn.no/samhan
 * Kotlin
 * Ktor
 * Gradle
-* JDK 14
+* JDK 17
 * Spek
 * Jackson
 * Kafka
 
 #### Requirements
 
-* JDK 14
+* JDK 17
 
 ### Getting github-package-registry packages NAV-IT
 Some packages used in this repo is uploaded to the Github Package Registry which requires authentication. It can, for example, be solved like this in Gradle:
