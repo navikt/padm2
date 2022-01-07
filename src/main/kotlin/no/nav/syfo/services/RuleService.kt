@@ -1,7 +1,6 @@
 package no.nav.syfo.services
 
 import java.time.format.DateTimeFormatter
-import kotlinx.coroutines.GlobalScope
 import net.logstash.logback.argument.StructuredArguments.fields
 import no.nav.syfo.client.LegeSuspensjonClient
 import no.nav.syfo.client.SyfohelsenettproxyClient
@@ -25,66 +24,68 @@ class RuleService(
 ) {
 
     private val log: Logger = LoggerFactory.getLogger("ruleservice")
-    suspend fun executeRuleChains(receivedDialogmelding: ReceivedDialogmelding): ValidationResult =
-        with(GlobalScope) {
 
-            val loggingMeta = LoggingMeta(
-                mottakId = receivedDialogmelding.navLogId,
-                orgNr = receivedDialogmelding.legekontorOrgNr,
-                msgId = receivedDialogmelding.msgId,
-                dialogmeldingId = receivedDialogmelding.dialogmelding.id
-            )
+    suspend fun executeRuleChains(
+        receivedDialogmelding: ReceivedDialogmelding,
+    ): ValidationResult {
 
-            log.info("Received a dialogmelding, going to rules, {}", fields(loggingMeta))
+        val loggingMeta = LoggingMeta(
+            mottakId = receivedDialogmelding.navLogId,
+            orgNr = receivedDialogmelding.legekontorOrgNr,
+            msgId = receivedDialogmelding.msgId,
+            dialogmeldingId = receivedDialogmelding.dialogmelding.id
+        )
 
-            val dialogmelding = receivedDialogmelding.dialogmelding
+        log.info("Received a dialogmelding, going to rules, {}", fields(loggingMeta))
 
-            val doctorSuspend = legeSuspensjonClient.checkTherapist(
-                receivedDialogmelding.personNrLege,
-                receivedDialogmelding.msgId,
-                DateTimeFormatter.ISO_DATE.format(receivedDialogmelding.mottattDato)
-            ).suspendert
+        val dialogmelding = receivedDialogmelding.dialogmelding
 
-            val avsenderBehandler = syfohelsenettproxyClient.finnBehandler(
-                behandlerFnr = receivedDialogmelding.personNrLege,
-                msgId = receivedDialogmelding.msgId,
-                loggingMeta = loggingMeta
-            )
+        val doctorSuspend = legeSuspensjonClient.checkTherapist(
+            receivedDialogmelding.personNrLege,
+            receivedDialogmelding.msgId,
+            DateTimeFormatter.ISO_DATE.format(receivedDialogmelding.mottattDato)
+        ).suspendert
 
-            if (avsenderBehandler == null) {
-                return ValidationResult(
-                    status = Status.INVALID,
-                    ruleHits = listOf(
-                        RuleInfo(
-                            ruleName = "BEHANDLER_NOT_IN_HPR",
-                            messageForSender = "Den som har skrevet dialogmeldingen ble ikke funnet i Helsepersonellregisteret (HPR)",
-                            messageForUser = "Avsender fodselsnummer er ikke registert i Helsepersonellregisteret (HPR)",
-                            ruleStatus = Status.INVALID
-                        )
+        val avsenderBehandler = syfohelsenettproxyClient.finnBehandler(
+            behandlerFnr = receivedDialogmelding.personNrLege,
+            msgId = receivedDialogmelding.msgId,
+            loggingMeta = loggingMeta
+        )
+
+        if (avsenderBehandler == null) {
+            return ValidationResult(
+                status = Status.INVALID,
+                ruleHits = listOf(
+                    RuleInfo(
+                        ruleName = "BEHANDLER_NOT_IN_HPR",
+                        messageForSender = "Den som har skrevet dialogmeldingen ble ikke funnet i Helsepersonellregisteret (HPR)",
+                        messageForUser = "Avsender fodselsnummer er ikke registert i Helsepersonellregisteret (HPR)",
+                        ruleStatus = Status.INVALID
                     )
                 )
-            }
-
-            val results = listOf(
-                ValidationRuleChain.values().executeFlow(
-                    dialogmelding,
-                    RuleMetadata(
-                        receivedDate = receivedDialogmelding.mottattDato,
-                        signatureDate = receivedDialogmelding.mottattDato,
-                        innbyggerident = receivedDialogmelding.personNrPasient,
-                        legekontorOrgnr = receivedDialogmelding.legekontorOrgNr,
-                        tssid = receivedDialogmelding.tssid,
-                        avsenderfnr = receivedDialogmelding.personNrLege
-                    )
-                ),
-                HPRRuleChain.values().executeFlow(dialogmelding, avsenderBehandler),
-                LegesuspensjonRuleChain.values().executeFlow(dialogmelding, doctorSuspend)
-            ).flatten()
-
-            log.info("Rules hit {}, {}", results.map { it.name }, fields(loggingMeta))
-
-            return validationResult(results)
+            )
         }
+
+        val results = listOf(
+            ValidationRuleChain.values().executeFlow(
+                dialogmelding,
+                RuleMetadata(
+                    receivedDate = receivedDialogmelding.mottattDato,
+                    signatureDate = receivedDialogmelding.mottattDato,
+                    innbyggerident = receivedDialogmelding.personNrPasient,
+                    legekontorOrgnr = receivedDialogmelding.legekontorOrgNr,
+                    tssid = receivedDialogmelding.tssid,
+                    avsenderfnr = receivedDialogmelding.personNrLege
+                )
+            ),
+            HPRRuleChain.values().executeFlow(dialogmelding, avsenderBehandler),
+            LegesuspensjonRuleChain.values().executeFlow(dialogmelding, doctorSuspend)
+        ).flatten()
+
+        log.info("Rules hit {}, {}", results.map { it.name }, fields(loggingMeta))
+
+        return validationResult(results)
+    }
 
     private fun validationResult(results: List<Rule<Any>>): ValidationResult = ValidationResult(
         status = results

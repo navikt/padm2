@@ -5,6 +5,7 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import no.nav.syfo.UserConstants.PATIENT_FNR_NO_AKTOER_ID
 import no.nav.syfo.client.*
 import no.nav.syfo.getRandomPort
 
@@ -31,11 +32,19 @@ class AktoerIdMock {
                     val list = call.request.headers["Nav-Personidenter"]!!.split(",")
                     var i = 0
                     val responseMap = list.map {
-                        it to IdentInfoResult(listOf(IdentInfo("${i++}", "", true)), null)
+                        it to createIdentInfoResult(it, i++)
                     }.toMap()
                     call.respond(responseMap)
                 }
             }
+        }
+    }
+
+    fun createIdentInfoResult(fnr: String, i: Int): IdentInfoResult {
+        return if (fnr == PATIENT_FNR_NO_AKTOER_ID) {
+            IdentInfoResult(emptyList(), "Finner ingen aktørid")
+        } else {
+            IdentInfoResult(listOf(IdentInfo("$i", "", true)), null)
         }
     }
 }

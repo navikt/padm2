@@ -75,5 +75,5 @@ suspend fun handleStatusOK(
     handleRecivedMessage(receivedDialogmelding, validationResult, sha256String, loggingMeta, database)
 
     sendReceipt(session, receiptProducer, fellesformat, ApprecStatus.ok)
-    logger.info("Apprec Receipt sent to {}, {}", apprecQueueName, StructuredArguments.fields(loggingMeta))
+    logger.info("Apprec Receipt with status OK sent to {}, {}", apprecQueueName, StructuredArguments.fields(loggingMeta))
 }

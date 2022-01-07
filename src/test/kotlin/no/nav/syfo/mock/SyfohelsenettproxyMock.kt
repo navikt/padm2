@@ -5,6 +5,7 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import no.nav.syfo.UserConstants
 import no.nav.syfo.client.*
 import no.nav.syfo.getRandomPort
 import no.nav.syfo.model.HelsepersonellKategori
@@ -29,17 +30,19 @@ class SyfohelsenettproxyMock {
             installContentNegotiation()
             routing {
                 get(path) {
+                    val behandlerFnr = call.request.headers["behandlerFnr"]
                     call.respond(
                         HelsenettProxyBehandler(
-                            godkjenninger = listOf(
+                            godkjenninger =
+                            listOf(
                                 Godkjenning(
                                     autorisasjon = Kode(
-                                        aktiv = true,
+                                        aktiv = behandlerFnr != UserConstants.BEHANDLER_FNR_IKKE_AUTORISERT,
                                         oid = 7704,
                                         verdi = "1",
                                     ),
                                     helsepersonellkategori = Kode(
-                                        aktiv = true,
+                                        aktiv = behandlerFnr != UserConstants.BEHANDLER_FNR_IKKE_AUTORISERT,
                                         oid = 0,
                                         verdi = HelsepersonellKategori.LEGE.verdi,
                                     ),

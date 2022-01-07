@@ -54,21 +54,27 @@ suspend fun handleStatusINVALID(
     handleRecivedMessage(receivedDialogmelding, validationResult, sha256String, loggingMeta, database)
 
     sendReceipt(
-        session, receiptProducer, fellesformat, ApprecStatus.avvist,
-        validationResult.ruleHits.map { it.toApprecCV() }
+        session = session,
+        receiptProducer = receiptProducer,
+        fellesformat = fellesformat,
+        apprecStatus = ApprecStatus.avvist,
+        apprecErrors = run {
+            val errors = mutableListOf<XMLCV>()
+            validationResult.apprecMessage?.let {
+                errors.add(createApprecError(it))
+            }
+            errors.addAll(validationResult.ruleHits.map { it.toApprecCV() })
+            errors
+        }
     )
-    logger.info("Apprec Receipt sent to {}, {}", apprecQueueName, fields(loggingMeta))
+    logger.info("Apprec Receipt with status Avvist sent to {}, {}", apprecQueueName, fields(loggingMeta))
 }
 
 fun handleDuplicateDialogmeldingContent(
-    session: Session,
-    receiptProducer: MessageProducer,
-    fellesformat: XMLEIFellesformat,
     loggingMeta: LoggingMeta,
-    env: Environment,
     sha256String: String,
     opprinneligMeldingTidspunkt: DialogmeldingTidspunkt,
-) {
+): String {
     val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")
     val tidMottattOpprinneligMelding = opprinneligMeldingTidspunkt.mottattTidspunkt.format(formatter)
     val tidMottattNyMelding = LocalDateTime.now().format(formatter)
@@ -85,26 +91,14 @@ fun handleDuplicateDialogmeldingContent(
         )
     )
 
-    sendReceipt(
-        session, receiptProducer, fellesformat, ApprecStatus.avvist,
-        listOf(
-            createApprecError(
-                "Duplikat! - Dialogmeldingen fra $tidMottattNyMelding har vi tidligere mottatt den $tidMottattOpprinneligMelding. Skal ikke sendes på nytt."
-            )
-        )
-    )
-    logger.info("Apprec Receipt sent to {}, {}", env.apprecQueueName, fields(loggingMeta))
     INVALID_MESSAGE_NO_NOTICE.inc()
+    return "Duplikat! - Dialogmeldingen fra $tidMottattNyMelding har vi tidligere mottatt den $tidMottattOpprinneligMelding. Skal ikke sendes på nytt."
 }
 
 fun handlePatientNotFoundInAktorRegister(
     patientIdents: IdentInfoResult?,
-    session: Session,
-    receiptProducer: MessageProducer,
-    fellesformat: XMLEIFellesformat,
-    env: Environment,
     loggingMeta: LoggingMeta
-) {
+): String {
     logger.warn(
         "Patient not found i aktorRegister error {}",
         createLogEntry(
@@ -113,17 +107,8 @@ fun handlePatientNotFoundInAktorRegister(
             "errorMessage" to (patientIdents?.feilmelding ?: "No response for FNR"),
         )
     )
-
-    sendReceipt(
-        session, receiptProducer, fellesformat, ApprecStatus.avvist,
-        listOf(
-            createApprecError("Pasienten er ikke registrert i folkeregisteret")
-        )
-    )
-
-    logger.info("Apprec Receipt sent to {}, {}", env.apprecQueueName, fields(loggingMeta))
-
     INVALID_MESSAGE_NO_NOTICE.inc()
+    return "Pasienten er ikke registrert i folkeregisteret"
 }
 
 fun handlePatientNotFound(
@@ -147,20 +132,15 @@ fun handlePatientNotFound(
             createApprecError("Pasienten er ikke funnet i dialogmeldingen")
         )
     )
-
-    logger.info("Apprec Receipt sent to {}, {}", env.apprecQueueName, fields(loggingMeta))
+    logger.info("Apprec Receipt with status Avvist sent to {}, {}", env.apprecQueueName, fields(loggingMeta))
 
     INVALID_MESSAGE_NO_NOTICE.inc()
 }
 
 fun handleDoctorNotFoundInAktorRegister(
     doctorIdents: IdentInfoResult?,
-    session: Session,
-    receiptProducer: MessageProducer,
-    fellesformat: XMLEIFellesformat,
-    env: Environment,
     loggingMeta: LoggingMeta
-) {
+): String {
     logger.warn(
         "Behandler er ikke registrert i folkeregisteret {}",
         createLogEntry(
@@ -169,29 +149,13 @@ fun handleDoctorNotFoundInAktorRegister(
             "errorMessage" to (doctorIdents?.feilmelding ?: "No response for FNR")
         ),
     )
-
-    sendReceipt(
-        session, receiptProducer, fellesformat, ApprecStatus.avvist,
-        listOf(
-            createApprecError(
-                "Dialogmelding kan ikke rettes, det må skrives en ny. Grunnet følgende:" +
-                    " Behandler er ikke registrert i folkeregisteret"
-            )
-        )
-    )
-
-    logger.info("Apprec Receipt sent to {}, {}", env.apprecQueueName, fields(loggingMeta))
-
     INVALID_MESSAGE_NO_NOTICE.inc()
+    return "Dialogmelding kan ikke rettes, det må skrives en ny. Grunnet følgende: Behandler er ikke registrert i folkeregisteret"
 }
 
 fun handleTestFnrInProd(
-    session: Session,
-    receiptProducer: MessageProducer,
-    fellesformat: XMLEIFellesformat,
-    env: Environment,
     loggingMeta: LoggingMeta
-) {
+): String {
     logger.warn(
         "Test fødselsnummer er kommet inn i produksjon {}",
         createLogEntry(
@@ -200,36 +164,14 @@ fun handleTestFnrInProd(
         )
     )
 
-    logger.warn(
-        "Avsender fodselsnummer er registert i Helsepersonellregisteret (HPR) {}",
-        createLogEntry(
-            LogType.INVALID_MESSAGE,
-            loggingMeta
-        )
-    )
-
-    sendReceipt(
-        session, receiptProducer, fellesformat, ApprecStatus.avvist,
-        listOf(
-            createApprecError(
-                "Dialogmelding kan ikke rettes, test fødselsnummer er kommet inn i produksjon." +
-                    "Kontakt din EPJ-leverandør)"
-            )
-        )
-    )
-    logger.info("Apprec Receipt sent to {}, {}", env.apprecQueueName, fields(loggingMeta))
-
     INVALID_MESSAGE_NO_NOTICE.inc()
     TEST_FNR_IN_PROD.inc()
+    return "Dialogmelding kan ikke rettes, test fødselsnummer er kommet inn i produksjon. Kontakt din EPJ-leverandør"
 }
 
 fun handleMeldingsTekstMangler(
-    session: Session,
-    receiptProducer: MessageProducer,
-    fellesformat: XMLEIFellesformat,
-    env: Environment,
     loggingMeta: LoggingMeta
-) {
+): String {
 
     logger.warn(
         "TekstNotatInnhold mangler {}",
@@ -238,28 +180,13 @@ fun handleMeldingsTekstMangler(
             loggingMeta
         )
     )
-
-    sendReceipt(
-        session, receiptProducer, fellesformat, ApprecStatus.avvist,
-        listOf(
-            createApprecError(
-                "Dialogmelding kan ikke rettes, meldingstekst (tekstNotatInnhold) mangler, " +
-                    "Kontakt din EPJ-leverandør)"
-            )
-        )
-    )
-    logger.info("Apprec Receipt sent to {}, {}", env.apprecQueueName, fields(loggingMeta))
-
     INVALID_MESSAGE_NO_NOTICE.inc()
+    return "Dialogmelding kan ikke rettes, meldingstekst (tekstNotatInnhold) mangler. Kontakt din EPJ-leverandør"
 }
 
 fun handleInvalidDialogMeldingKodeverk(
-    session: Session,
-    receiptProducer: MessageProducer,
-    fellesformat: XMLEIFellesformat,
-    env: Environment,
     loggingMeta: LoggingMeta
-) {
+): String {
 
     logger.warn(
         "Det er brukt ein ugyldig kombinasjon av dialogmelding kodeverk {}",
@@ -268,23 +195,12 @@ fun handleInvalidDialogMeldingKodeverk(
             loggingMeta
         )
     )
-
-    sendReceipt(
-        session, receiptProducer, fellesformat, ApprecStatus.avvist,
-        listOf(
-            createApprecError(
-                "Dialogmelding kan ikke rettes, det er brukt ein ugyldig dialogmelding kodeverk kombinasjon, " +
-                    "Kontakt din EPJ-leverandør)"
-            )
-        )
-    )
-    logger.info("Apprec Receipt sent to {}, {}", env.apprecQueueName, fields(loggingMeta))
-
     INVALID_MESSAGE_NO_NOTICE.inc()
+    return "Dialogmelding kan ikke rettes, det er brukt ein ugyldig dialogmelding kodeverk kombinasjon. Kontakt din EPJ-leverandør"
 }
 
-fun createApprecError(textToTreater: String): XMLCV = XMLCV().apply {
-    dn = textToTreater
+fun createApprecError(errorText: String): XMLCV = XMLCV().apply {
+    dn = errorText
     v = "2.16.578.1.12.4.1.1.8221"
     s = "X99"
 }

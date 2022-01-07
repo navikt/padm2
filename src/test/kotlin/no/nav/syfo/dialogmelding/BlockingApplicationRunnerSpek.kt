@@ -53,7 +53,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     justRun { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                     justRun { subscriptionEmottak.startSubscription(any()) }
                 }
-                it("Prosesserer innkommet melding") {
+                it("Prosesserer innkommet melding (melding ok)") {
                     val fellesformat =
                         getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
                     every { incomingMessage.text } returns(fellesformat)
@@ -64,6 +64,37 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 0) { backoutProducer.send(any()) }
                     verify(exactly = 1) { arenaProducer.send(any()) }
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
+                }
+                it("Prosesserer innkommet melding (duplikat)") {
+                    val fellesformat =
+                        getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
+                    every { incomingMessage.text } returns(fellesformat)
+                    runBlocking {
+                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                    }
+                    verify(exactly = 1) { receiptProducer.send(any()) }
+                    verify(exactly = 0) { backoutProducer.send(any()) }
+                    verify(exactly = 1) { arenaProducer.send(any()) }
+                    verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
+                    runBlocking {
+                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                    }
+                    verify(exactly = 2) { receiptProducer.send(any()) }
+                    verify(exactly = 0) { backoutProducer.send(any()) }
+                    verify(exactly = 1) { arenaProducer.send(any()) }
+                    verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
+                }
+                it("Prosesserer innkommet melding (manglende innbyggerid)") {
+                    val fellesformat = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
+                        .replace("01010142365", "")
+                    every { incomingMessage.text } returns(fellesformat)
+                    runBlocking {
+                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                    }
+                    verify(exactly = 1) { receiptProducer.send(any()) }
+                    verify(exactly = 0) { backoutProducer.send(any()) }
+                    verify(exactly = 0) { arenaProducer.send(any()) }
+                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                 }
                 it("Prosesserer innkommet melding (ugyldig innbyggerid)") {
                     val fellesformat = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
@@ -86,6 +117,42 @@ class BlockingApplicationRunnerSpek : Spek({
                     }
                     verify(exactly = 0) { receiptProducer.send(any()) }
                     verify(exactly = 1) { backoutProducer.send(any()) }
+                    verify(exactly = 0) { arenaProducer.send(any()) }
+                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
+                }
+                it("Prosesserer innkommet melding (ingen aktoer id)") {
+                    val fellesformat = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
+                        .replace("01010142365", UserConstants.PATIENT_FNR_NO_AKTOER_ID)
+                    every { incomingMessage.text } returns(fellesformat)
+                    runBlocking {
+                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                    }
+                    verify(exactly = 1) { receiptProducer.send(any()) }
+                    verify(exactly = 0) { backoutProducer.send(any()) }
+                    verify(exactly = 0) { arenaProducer.send(any()) }
+                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
+                }
+                it("Prosesserer innkommet melding (lege ugyldig fnr)") {
+                    val fellesformat = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
+                        .replace("01010112377", UserConstants.BEHANDLER_FNR_UGYLDIG)
+                    every { incomingMessage.text } returns(fellesformat)
+                    runBlocking {
+                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                    }
+                    verify(exactly = 1) { receiptProducer.send(any()) }
+                    verify(exactly = 0) { backoutProducer.send(any()) }
+                    verify(exactly = 0) { arenaProducer.send(any()) }
+                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
+                }
+                it("Prosesserer innkommet melding (lege ikke autorisert)") {
+                    val fellesformat = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
+                        .replace("01010112377", UserConstants.BEHANDLER_FNR_IKKE_AUTORISERT)
+                    every { incomingMessage.text } returns(fellesformat)
+                    runBlocking {
+                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                    }
+                    verify(exactly = 1) { receiptProducer.send(any()) }
+                    verify(exactly = 0) { backoutProducer.send(any()) }
                     verify(exactly = 0) { arenaProducer.send(any()) }
                     verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                 }
