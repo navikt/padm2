@@ -4,8 +4,7 @@ import net.logstash.logback.argument.StructuredArguments.fields
 import no.nav.helse.apprecV1.XMLCV
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.syfo.Environment
-import no.nav.syfo.apprec.ApprecStatus
-import no.nav.syfo.apprec.toApprecCV
+import no.nav.syfo.apprec.*
 import no.nav.syfo.client.IdentInfoResult
 import no.nav.syfo.db.DatabaseInterface
 import no.nav.syfo.logger
@@ -42,14 +41,18 @@ suspend fun handleStatusINVALID(
     sha256String: String,
 ) {
 
-    journalService.onJournalRequest(
-        receivedDialogmelding,
-        validationResult,
-        vedleggListe,
-        loggingMeta,
-        pasientNavn,
-        navnSignerendeLege
-    )
+    if (receivedDialogmelding.pasientAktoerId != null) {
+        journalService.onJournalRequest(
+            receivedDialogmelding,
+            validationResult,
+            vedleggListe,
+            loggingMeta,
+            pasientNavn,
+            navnSignerendeLege
+        )
+    } else {
+        logger.info("Lagrer ikke i Joark pga av manglende AktoerId for pasient {}", fields(loggingMeta))
+    }
 
     handleRecivedMessage(receivedDialogmelding, validationResult, sha256String, loggingMeta, database)
 
