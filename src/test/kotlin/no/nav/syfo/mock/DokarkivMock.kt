@@ -7,6 +7,7 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import no.nav.syfo.UserConstants
 import no.nav.syfo.client.installContentNegotiation
 import no.nav.syfo.getRandomPort
 import no.nav.syfo.model.JournalpostRequest
@@ -39,7 +40,11 @@ class DokarkivMock {
             routing {
                 post {
                     val journalpostRequest = call.receive<JournalpostRequest>()
-                    call.respond(journalpostResponse)
+                    if (journalpostRequest.bruker!!.id != UserConstants.PATIENT_FNR_NO_AKTOER_ID) {
+                        call.respond(journalpostResponse)
+                    } else {
+                        call.respond(HttpStatusCode.InternalServerError)
+                    }
                 }
             }
         }
