@@ -37,7 +37,7 @@ fun XMLNotat.toHenvendelseFraLegeHenvendelse(): HenvendelseFraLegeHenvendelse {
 
     return HenvendelseFraLegeHenvendelse(
         temaKode = temaKodet.toTemaKode(),
-        tekstNotatInnhold = tekstNotatInnhold.toString(),
+        tekstNotatInnhold = tekstNotatInnhold?.toString() ?: "",
         dokIdNotat = dokIdNotat,
         foresporsel = null, // Ignore because EPJ send incorrect data and we don't use it
         rollerRelatertNotat = if (rollerRelatertNotat.isNotEmpty()) {
@@ -92,7 +92,7 @@ fun XMLNotat.toForesporselFraSaksbehandlerForesporselSvar(): ForesporselFraSaksb
 
     return ForesporselFraSaksbehandlerForesporselSvar(
         temaKode = temaKodet.toTemaKode(),
-        tekstNotatInnhold = tekstNotatInnhold.toString(),
+        tekstNotatInnhold = tekstNotatInnhold?.toString() ?: "",
         dokIdNotat = dokIdNotat,
         datoNotat = datoNotat?.toGregorianCalendar()?.toZonedDateTime()?.toLocalDateTime()
     )
