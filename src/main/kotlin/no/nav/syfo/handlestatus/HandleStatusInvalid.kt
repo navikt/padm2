@@ -111,7 +111,7 @@ fun handlePatientNotFoundInAktorRegister(
         )
     )
     INVALID_MESSAGE_NO_NOTICE.inc()
-    return "Pasienten er ikke registrert i folkeregisteret"
+    return "Dialogmeldingen er ikke gyldig. Pasienten er ikke registrert i folkeregisteret."
 }
 
 fun handlePatientNotFound(
@@ -153,7 +153,7 @@ fun handleDoctorNotFoundInAktorRegister(
         ),
     )
     INVALID_MESSAGE_NO_NOTICE.inc()
-    return "Dialogmelding kan ikke rettes, det må skrives en ny. Grunnet følgende: Behandler er ikke registrert i folkeregisteret"
+    return "Dialogmeldingen er ikke gyldig. Behandler er ikke registrert i folkeregisteret."
 }
 
 fun handleTestFnrInProd(
@@ -169,7 +169,7 @@ fun handleTestFnrInProd(
 
     INVALID_MESSAGE_NO_NOTICE.inc()
     TEST_FNR_IN_PROD.inc()
-    return "Dialogmelding kan ikke rettes, test fødselsnummer er kommet inn i produksjon. Kontakt din EPJ-leverandør"
+    return "Dialogmeldingen er ikke gyldig. Fødselsnummer er fra testmiljøet. Kontakt din EPJ-leverandør."
 }
 
 fun handleMeldingsTekstMangler(
@@ -184,7 +184,7 @@ fun handleMeldingsTekstMangler(
         )
     )
     INVALID_MESSAGE_NO_NOTICE.inc()
-    return "Dialogmelding kan ikke rettes, meldingstekst (tekstNotatInnhold) mangler. Kontakt din EPJ-leverandør"
+    return "Dialogmeldingen er ikke gyldig: meldingstekst mangler."
 }
 
 fun handleInvalidDialogMeldingKodeverk(
@@ -199,7 +199,7 @@ fun handleInvalidDialogMeldingKodeverk(
         )
     )
     INVALID_MESSAGE_NO_NOTICE.inc()
-    return "Dialogmelding kan ikke rettes, det er brukt ein ugyldig dialogmelding kodeverk kombinasjon. Kontakt din EPJ-leverandør"
+    return "Dialogmeldingen er ikke gyldig: meldingstypen stemmer ikke med innholdet. Kontakt din EPJ-leverandør."
 }
 
 fun createApprecError(errorText: String): XMLCV = XMLCV().apply {
