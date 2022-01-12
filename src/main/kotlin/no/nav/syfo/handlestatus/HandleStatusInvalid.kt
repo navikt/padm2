@@ -204,6 +204,6 @@ fun handleInvalidDialogMeldingKodeverk(
 
 fun createApprecError(errorText: String): XMLCV = XMLCV().apply {
     dn = errorText
-    v = "2.16.578.1.12.4.1.1.8221"
-    s = "X99"
+    v = "X99"
+    s = "2.16.578.1.12.4.1.1.8221"
 }
