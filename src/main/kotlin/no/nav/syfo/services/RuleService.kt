@@ -59,7 +59,7 @@ class RuleService(
                     RuleInfo(
                         ruleName = "BEHANDLER_NOT_IN_HPR",
                         messageForSender = "Den som har skrevet dialogmeldingen ble ikke funnet i Helsepersonellregisteret (HPR)",
-                        messageForUser = "Avsender fodselsnummer er ikke registert i Helsepersonellregisteret (HPR)",
+                        messageForUser = "Avsender fødselsnummer er ikke registert i Helsepersonellregisteret (HPR)",
                         ruleStatus = Status.INVALID
                     )
                 )

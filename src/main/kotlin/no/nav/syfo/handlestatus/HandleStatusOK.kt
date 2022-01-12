@@ -65,15 +65,15 @@ suspend fun handleStatusOK(
         loggingMeta
     )
 
+    handleRecivedMessage(receivedDialogmelding, validationResult, sha256String, loggingMeta, database)
+
+    sendReceipt(session, receiptProducer, fellesformat, ApprecStatus.ok)
+    logger.info("Apprec Receipt with status OK sent to {}, {}", apprecQueueName, StructuredArguments.fields(loggingMeta))
+
     dialogmeldingProducer.sendDialogmelding(
         receivedDialogmelding = receivedDialogmelding,
         msgHead = msgHead,
         journalpostResponse = journalpostResponse,
         antallVedlegg = vedleggListe?.size ?: 0,
     )
-
-    handleRecivedMessage(receivedDialogmelding, validationResult, sha256String, loggingMeta, database)
-
-    sendReceipt(session, receiptProducer, fellesformat, ApprecStatus.ok)
-    logger.info("Apprec Receipt with status OK sent to {}, {}", apprecQueueName, StructuredArguments.fields(loggingMeta))
 }
