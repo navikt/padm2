@@ -75,7 +75,7 @@ class BlockingApplicationRunner(
         azureAdV2Client = azureAdV2Client,
         dokArkivClientId = env.dokArkivClientId,
         url = env.dokArkivUrl,
-        httpClient = httpClientWithProxy,
+        httpClient = httpClientWithTimeout,
     )
 
     val syfohelsenettproxyClient = SyfohelsenettproxyClient(
