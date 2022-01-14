@@ -8,6 +8,7 @@ import no.nav.syfo.*
 import no.nav.syfo.application.BlockingApplicationRunner
 import no.nav.syfo.kafka.DialogmeldingProducer
 import no.nav.syfo.util.getFileAsString
+import no.nav.syfo.util.getFileAsStringISO88591
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import javax.jms.*
@@ -96,6 +97,48 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 0) { backoutProducer.send(any()) }
                     verify(exactly = 1) { arenaProducer.send(any()) }
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
+                }
+                it("Prosesserer innkommet melding (duplikat, med vedlegg)") {
+                    val fellesformat =
+                        getFileAsString("src/test/resources/dialogmelding_dialog_notat_vedlegg.xml")
+                    every { incomingMessage.text } returns(fellesformat)
+                    runBlocking {
+                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                    }
+                    verify(exactly = 1) { receiptProducer.send(any()) }
+                    verify(exactly = 0) { backoutProducer.send(any()) }
+                    verify(exactly = 1) { arenaProducer.send(any()) }
+                    verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
+                    runBlocking {
+                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                    }
+                    verify(exactly = 2) { receiptProducer.send(any()) }
+                    verify(exactly = 0) { backoutProducer.send(any()) }
+                    verify(exactly = 1) { arenaProducer.send(any()) }
+                    verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
+                }
+                it("Prosesserer innkommet melding (ikke duplikat, bare nesten)") {
+                    val fellesformat =
+                        getFileAsStringISO88591("src/test/resources/dialogmelding_dialog_notat_vedlegg.xml")
+                    every { incomingMessage.text } returns(fellesformat)
+                    runBlocking {
+                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                    }
+                    verify(exactly = 1) { receiptProducer.send(any()) }
+                    verify(exactly = 0) { backoutProducer.send(any()) }
+                    verify(exactly = 1) { arenaProducer.send(any()) }
+                    verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
+                    val fellesformatNestenDuplikat =
+                        getFileAsStringISO88591("src/test/resources/dialogmelding_dialog_notat_vedlegg.xml")
+                            .replace("Et vedlegg fra lege", "Et vedlegg fra lege nesten likt")
+                    every { incomingMessage.text } returns(fellesformatNestenDuplikat)
+                    runBlocking {
+                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                    }
+                    verify(exactly = 2) { receiptProducer.send(any()) }
+                    verify(exactly = 0) { backoutProducer.send(any()) }
+                    verify(exactly = 2) { arenaProducer.send(any()) }
+                    verify(exactly = 2) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                 }
                 it("Prosesserer innkommet melding (manglende innbyggerid)") {
                     val fellesformat = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")

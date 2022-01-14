@@ -154,10 +154,10 @@ class BlockingApplicationRunner(
         val legekontorReshId = extractOrganisationReshNumberFromSender(fellesformat)?.id
         val dialogmeldingXml = extractDialogmelding(fellesformat)
         val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
-        val sha256String = sha256hashstring(dialogmeldingXml)
+        val vedlegg = extractVedlegg(fellesformat)
+        val sha256String = sha256hashstring(dialogmeldingXml, vedlegg)
         val legeHpr = extractLegeHpr(fellesformat)
         val behandlerNavn = extractBehandlerNavn(fellesformat)
-        val vedleggListe = extractVedlegg(fellesformat).map { it.toVedlegg() }
         val pasientNavn = extractPasientNavn(fellesformat)
 
         val requestLatency = REQUEST_TIME.startTimer()
@@ -247,7 +247,7 @@ class BlockingApplicationRunner(
                 dialogmeldingProducer,
                 receivedDialogmelding,
                 validationResult,
-                vedleggListe,
+                vedlegg.map { it.toVedlegg() },
                 arenaProducer,
                 msgHead,
                 receiverBlock,
@@ -267,7 +267,7 @@ class BlockingApplicationRunner(
                 env.apprecQueueName,
                 journalService,
                 receivedDialogmelding,
-                vedleggListe,
+                vedlegg.map { it.toVedlegg() },
                 database,
                 pasientNavn,
                 navnSignerendeLege,
