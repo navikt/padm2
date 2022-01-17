@@ -17,6 +17,8 @@ class PdfGenMock {
     val url = "http://localhost:$port"
 
     val name = "pdfgen"
+    var alwaysFail = false
+    var allowFail = true
     val server = mockPdfGenServer(
         port
     )
@@ -32,7 +34,7 @@ class PdfGenMock {
             routing {
                 post() {
                     val pdfModel = call.receive<PdfModel>()
-                    if (pdfModel.pasientFnr == UserConstants.PATIENT_FNR_PDFGEN_FAIL) {
+                    if (alwaysFail || (allowFail && pdfModel.pasientFnr == UserConstants.PATIENT_FNR_PDFGEN_FAIL)) {
                         call.respond(HttpStatusCode.BadRequest)
                     } else {
                         call.respond(byteArrayOf(0x2E, 0x28))

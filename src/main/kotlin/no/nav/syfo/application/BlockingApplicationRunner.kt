@@ -21,6 +21,8 @@ import no.nav.syfo.metrics.REQUEST_TIME
 import no.nav.syfo.metrics.SAR_TSS_MISS_COUNTER
 import no.nav.syfo.model.*
 import no.nav.syfo.persistering.db.hentMottattTidspunkt
+import no.nav.syfo.persistering.persistRecivedMessageValidation
+import no.nav.syfo.persistering.persistReceivedMessage
 import no.nav.syfo.services.*
 import no.nav.syfo.util.*
 import no.nav.syfo.validation.isKodeverkValid
@@ -98,6 +100,7 @@ class BlockingApplicationRunner(
     val journalService = JournalService(
         dokArkivClient = dokArkivClient,
         pdfgenClient = pdfgenClient,
+        database = database,
     )
 
     val signerendeLegeService = SignerendeLegeService(
@@ -118,119 +121,137 @@ class BlockingApplicationRunner(
     }
 
     suspend fun processMessageHandleException(message: Message) {
-        try {
-            val inputMessageText = when (message) {
-                is TextMessage -> message.text
-                else -> throw RuntimeException("Incoming message needs to be a byte message or text message")
-            }
-            processMessage(inputMessageText)
+        val inputMessageText = when (message) {
+            is TextMessage -> message.text
+            else -> throw RuntimeException("Incoming message needs to be a byte message or text message")
+        }
+        val dialogmeldingId: String? = try {
+            storeMessage(inputMessageText)
         } catch (e: Exception) {
             backoutProducer.send(message)
             MESSAGES_SENT_TO_BOQ.inc()
-            logger.error("Exception caught while handling message, sent to backout: {}", e.message)
+            logger.error("Exception caught while storing message, sent to backout: {}", e.message)
+            null
         } catch (t: Throwable) {
             try {
                 backoutProducer.send(message)
                 MESSAGES_SENT_TO_BOQ.inc()
-                logger.error("Error caught while handling message, sent to backout: {}", t.message)
+                logger.error("Error caught while storing message, sent to backout: {}", t.message)
+                null
             } finally {
                 throw t
             }
         }
+
+        try {
+            if (inputMessageText != null && dialogmeldingId != null) {
+                processMessage(dialogmeldingId, inputMessageText)
+            }
+        } catch (e: Exception) {
+            logger.warn("Exception caught while processing message, will try again later: {}", e.message)
+        }
     }
 
-    suspend fun processMessage(inputMessageText: String) {
+    fun storeMessage(
+        inputMessageText: String
+    ): String? {
+        val fellesformat = fellesformatUnmarshaller.unmarshal(StringReader(inputMessageText)) as XMLEIFellesformat
+        val msgHead: XMLMsgHead = fellesformat.get()
+        val receiverBlock = fellesformat.get<XMLMottakenhetBlokk>()
+        val ediLoggId = receiverBlock.ediLoggId
+        val dialogmeldingXml = extractDialogmelding(fellesformat)
+        val vedlegg = extractVedlegg(fellesformat)
+        val sha256String = sha256hashstring(dialogmeldingXml, vedlegg)
+
+        val innbyggerIdent = extractInnbyggerident(fellesformat)
+        val legekontorOrgNr = extractOrganisationNumberFromSender(fellesformat)?.id
+        val loggingMeta = LoggingMeta(
+            mottakId = ediLoggId,
+            orgNr = legekontorOrgNr,
+            msgId = msgHead.msgInfo.msgId,
+        )
+        logger.info("Received message, {}", StructuredArguments.fields(loggingMeta))
+        if (innbyggerIdent.isNullOrEmpty()) {
+            handlePatientNotFound(
+                session, receiptProducer, fellesformat, env, loggingMeta,
+            )
+            return null
+        }
+
+        val dialogmeldingId = UUID.randomUUID().toString()
+
+        val receivedDialogmelding = createReceivedDialogmelding(
+            dialogmeldingId = dialogmeldingId,
+            fellesformat = fellesformat,
+            inputMessageText = inputMessageText,
+        )
+
+        persistReceivedMessage(
+            receivedDialogmelding = receivedDialogmelding,
+            sha256String = sha256String,
+            loggingMeta = loggingMeta,
+            database = database,
+        )
+        INCOMING_MESSAGE_COUNTER.inc()
+        return dialogmeldingId
+    }
+
+    suspend fun processMessage(
+        dialogmeldingId: String,
+        inputMessageText: String,
+    ) {
         val fellesformat = fellesformatUnmarshaller.unmarshal(StringReader(inputMessageText)) as XMLEIFellesformat
         val msgHead: XMLMsgHead = fellesformat.get()
         val receiverBlock = fellesformat.get<XMLMottakenhetBlokk>()
         val ediLoggId = receiverBlock.ediLoggId
         val msgId = msgHead.msgInfo.msgId
-
-        val legekontorOrgNr = extractOrganisationNumberFromSender(fellesformat)?.id
-        val innbyggerIdent = extractInnbyggerident(fellesformat)
-        val legeIdent = receiverBlock.avsenderFnrFraDigSignatur
-        val legekontorOrgName = extractSenderOrganisationName(fellesformat)
-        val legekontorHerId = extractOrganisationHerNumberFromSender(fellesformat)?.id
-        val legekontorReshId = extractOrganisationReshNumberFromSender(fellesformat)?.id
         val dialogmeldingXml = extractDialogmelding(fellesformat)
-        val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
         val vedlegg = extractVedlegg(fellesformat)
         val sha256String = sha256hashstring(dialogmeldingXml, vedlegg)
-        val legeHpr = extractLegeHpr(fellesformat)
-        val behandlerNavn = extractBehandlerNavn(fellesformat)
+        val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
+        val legekontorOrgNr = extractOrganisationNumberFromSender(fellesformat)?.id
         val pasientNavn = extractPasientNavn(fellesformat)
-
-        val requestLatency = REQUEST_TIME.startTimer()
 
         val loggingMeta = LoggingMeta(
             mottakId = ediLoggId,
             orgNr = legekontorOrgNr,
             msgId = msgHead.msgInfo.msgId,
         )
+        val requestLatency = REQUEST_TIME.startTimer()
 
-        logger.info("Received message, {}", StructuredArguments.fields(loggingMeta))
-
-        INCOMING_MESSAGE_COUNTER.inc()
-
-        if (innbyggerIdent.isNullOrEmpty()) {
-            handlePatientNotFound(
-                session, receiptProducer, fellesformat, env, loggingMeta,
-            )
-            return
-        }
-
+        val receivedDialogmelding = createReceivedDialogmelding(
+            dialogmeldingId = dialogmeldingId,
+            fellesformat = fellesformat,
+            inputMessageText = inputMessageText,
+        )
         val aktoerIds = aktoerIdClient.getAktoerIds(
-            personIdenter = listOf(legeIdent, innbyggerIdent),
+            personIdenter = listOf(receivedDialogmelding.personNrLege, receivedDialogmelding.personNrPasient),
             loggingMeta = loggingMeta
         )
-        val innbyggerAktoerIdents = aktoerIds[innbyggerIdent]
-        val legeAktoerIdents = aktoerIds[legeIdent]
+
+        val innbyggerAktoerIdents = aktoerIds[receivedDialogmelding.personNrPasient]
+        val legeAktoerIdents = aktoerIds[receivedDialogmelding.personNrLege]
 
         val samhandlerPraksis = findSamhandlerpraksis(
-            legeIdent = legeIdent,
-            legekontorOrgName = legekontorOrgName,
-            legekontorHerId = legekontorHerId,
+            legeIdent = receivedDialogmelding.personNrLege,
+            legekontorOrgName = receivedDialogmelding.legekontorOrgName,
+            legekontorHerId = receivedDialogmelding.legekontorHerId,
             receiverBlock = receiverBlock,
             msgHead = msgHead,
             loggingMeta = loggingMeta,
         )
 
-        val dialogmelding = dialogmeldingXml.toDialogmelding(
-            dialogmeldingId = UUID.randomUUID().toString(),
-            dialogmeldingType = dialogmeldingType,
-            signaturDato = msgHead.msgInfo.genDate,
-            navnHelsePersonellNavn = behandlerNavn
-        )
-
-        val receivedDialogmelding = ReceivedDialogmelding(
-            dialogmelding = dialogmelding,
-            personNrPasient = innbyggerIdent,
-            pasientAktoerId = innbyggerAktoerIdents?.identer?.firstOrNull()?.ident,
-            personNrLege = legeIdent,
-            legeAktoerId = legeAktoerIdents?.identer?.firstOrNull()?.ident,
-            navLogId = ediLoggId,
+        val navnSignerendeLege = signerendeLegeService.signerendeLegeNavn(
+            signerendeLegeFnr = receivedDialogmelding.personNrLege,
             msgId = msgId,
-            legekontorOrgNr = legekontorOrgNr,
-            legekontorOrgName = legekontorOrgName,
-            legekontorHerId = legekontorHerId,
-            legekontorReshId = legekontorReshId,
-            mottattDato = receiverBlock.mottattDatotid.toGregorianCalendar().toZonedDateTime()
-                .withZoneSameInstant(
-                    ZoneId.of("Europe/Oslo")
-                ).toLocalDateTime(),
-            legehpr = legeHpr,
-            fellesformat = inputMessageText,
-            tssid = samhandlerPraksis?.tss_ident ?: ""
+            loggingMeta = loggingMeta,
         )
-
-        val navnSignerendeLege = signerendeLegeService.signerendeLegeNavn(legeIdent, msgId, loggingMeta)
 
         val validationResult = validateMessage(
             sha256String = sha256String,
             loggingMeta = loggingMeta,
             innbyggerAktoerIdents = innbyggerAktoerIdents,
             legeAktoerIdents = legeAktoerIdents,
-            innbyggerIdent = innbyggerIdent,
             dialogmeldingType = dialogmeldingType,
             dialogmeldingXml = dialogmeldingXml,
             receivedDialogmelding = receivedDialogmelding,
@@ -238,42 +259,49 @@ class BlockingApplicationRunner(
 
         when (validationResult.status) {
             Status.OK -> handleStatusOK(
-                session,
-                receiptProducer,
-                fellesformat,
-                loggingMeta,
-                env.apprecQueueName,
-                journalService,
-                dialogmeldingProducer,
-                receivedDialogmelding,
-                validationResult,
-                vedlegg.map { it.toVedlegg() },
-                arenaProducer,
-                msgHead,
-                receiverBlock,
-                dialogmelding,
-                database,
-                pasientNavn,
-                navnSignerendeLege,
-                sha256String,
+                session = session,
+                database = database,
+                receiptProducer = receiptProducer,
+                fellesformat = fellesformat,
+                loggingMeta = loggingMeta,
+                apprecQueueName = env.apprecQueueName,
+                journalService = journalService,
+                dialogmeldingProducer = dialogmeldingProducer,
+                receivedDialogmelding = receivedDialogmelding,
+                validationResult = validationResult,
+                vedleggListe = vedlegg.map { it.toVedlegg() },
+                arenaProducer = arenaProducer,
+                msgHead = msgHead,
+                receiverBlock = receiverBlock,
+                pasientNavn = pasientNavn,
+                navnSignerendeLege = navnSignerendeLege,
+                samhandlerPraksis = samhandlerPraksis,
+                pasientAktoerId = innbyggerAktoerIdents!!.identer!!.first().ident,
+                legeAktoerId = legeAktoerIdents!!.identer!!.first().ident,
             )
 
             Status.INVALID -> handleStatusINVALID(
-                validationResult,
-                session,
-                receiptProducer,
-                fellesformat,
-                loggingMeta,
-                env.apprecQueueName,
-                journalService,
-                receivedDialogmelding,
-                vedlegg.map { it.toVedlegg() },
-                database,
-                pasientNavn,
-                navnSignerendeLege,
-                sha256String,
+                validationResult = validationResult,
+                session = session,
+                database = database,
+                receiptProducer = receiptProducer,
+                fellesformat = fellesformat,
+                loggingMeta = loggingMeta,
+                apprecQueueName = env.apprecQueueName,
+                journalService = journalService,
+                receivedDialogmelding = receivedDialogmelding,
+                vedleggListe = vedlegg.map { it.toVedlegg() },
+                pasientNavn = pasientNavn,
+                navnSignerendeLege = navnSignerendeLege,
+                innbyggerAktoerIdent = innbyggerAktoerIdents?.identer?.firstOrNull()?.ident,
             )
         }
+
+        persistRecivedMessageValidation(
+            receivedDialogmelding = receivedDialogmelding,
+            validationResult = validationResult,
+            database = database,
+        )
 
         val currentRequestLatency = requestLatency.observeDuration()
 
@@ -289,40 +317,84 @@ class BlockingApplicationRunner(
         )
     }
 
+    private fun createReceivedDialogmelding(
+        dialogmeldingId: String,
+        fellesformat: XMLEIFellesformat,
+        inputMessageText: String,
+    ): ReceivedDialogmelding {
+        val receiverBlock = fellesformat.get<XMLMottakenhetBlokk>()
+        val msgHead: XMLMsgHead = fellesformat.get()
+        val legeIdent = receiverBlock.avsenderFnrFraDigSignatur
+        val legekontorOrgName = extractSenderOrganisationName(fellesformat)
+        val legekontorHerId = extractOrganisationHerNumberFromSender(fellesformat)?.id
+        val legekontorReshId = extractOrganisationReshNumberFromSender(fellesformat)?.id
+        val dialogmeldingXml = extractDialogmelding(fellesformat)
+        val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
+        val legeHpr = extractLegeHpr(fellesformat)
+        val behandlerNavn = extractBehandlerNavn(fellesformat)
+        val innbyggerIdent = extractInnbyggerident(fellesformat)
+        val legekontorOrgNr = extractOrganisationNumberFromSender(fellesformat)?.id
+
+        val dialogmelding = dialogmeldingXml.toDialogmelding(
+            dialogmeldingId = dialogmeldingId,
+            dialogmeldingType = dialogmeldingType,
+            signaturDato = msgHead.msgInfo.genDate,
+            navnHelsePersonellNavn = behandlerNavn
+        )
+
+        return ReceivedDialogmelding(
+            dialogmelding = dialogmelding,
+            personNrPasient = innbyggerIdent!!,
+            personNrLege = legeIdent,
+            navLogId = receiverBlock.ediLoggId,
+            msgId = msgHead.msgInfo.msgId,
+            legekontorOrgNr = legekontorOrgNr,
+            legekontorOrgName = legekontorOrgName,
+            legekontorHerId = legekontorHerId,
+            legekontorReshId = legekontorReshId,
+            mottattDato = receiverBlock.mottattDatotid.toGregorianCalendar().toZonedDateTime()
+                .withZoneSameInstant(
+                    ZoneId.of("Europe/Oslo")
+                ).toLocalDateTime(),
+            legehpr = legeHpr,
+            fellesformat = inputMessageText,
+        )
+    }
+
     suspend fun validateMessage(
         sha256String: String,
         loggingMeta: LoggingMeta,
         innbyggerAktoerIdents: IdentInfoResult?,
         legeAktoerIdents: IdentInfoResult?,
-        innbyggerIdent: String,
         dialogmeldingType: DialogmeldingType,
         dialogmeldingXml: XMLDialogmelding,
         receivedDialogmelding: ReceivedDialogmelding,
     ): ValidationResult {
-        val initialValidationResult = if (dialogmeldingDokumentWithShaExists(sha256String, database)) {
-            val tidMottattOpprinneligMelding = database.connection.hentMottattTidspunkt(sha256String)
-            handleDuplicateDialogmeldingContent(
-                loggingMeta, sha256String, tidMottattOpprinneligMelding
-            )
-        } else if (innbyggerAktoerIdents == null || innbyggerAktoerIdents.feilmelding != null) {
-            handlePatientNotFoundInAktorRegister(
-                innbyggerAktoerIdents,
-                loggingMeta,
-            )
-        } else if (legeAktoerIdents == null || legeAktoerIdents.feilmelding != null) {
-            handleDoctorNotFoundInAktorRegister(
-                legeAktoerIdents,
-                loggingMeta,
-            )
-        } else if (erTestFnr(innbyggerIdent) && env.cluster == "prod-fss") {
-            handleTestFnrInProd(loggingMeta)
-        } else if (dialogmeldingType.isHenvendelseFraLegeOrForesporselSvar() && dialogmeldingXml.notat.first().tekstNotatInnhold.isNullOrEmpty()) {
-            handleMeldingsTekstMangler(loggingMeta)
-        } else if (!isKodeverkValid(dialogmeldingXml, dialogmeldingType)) {
-            handleInvalidDialogMeldingKodeverk(loggingMeta)
-        } else {
-            null
-        }
+        val initialValidationResult =
+            if (dialogmeldingDokumentWithShaExists(receivedDialogmelding.dialogmelding.id, sha256String, database)) {
+                val tidMottattOpprinneligMelding = database.hentMottattTidspunkt(sha256String)
+                handleDuplicateDialogmeldingContent(
+                    loggingMeta, sha256String, tidMottattOpprinneligMelding
+                )
+            } else if (innbyggerAktoerIdents == null || innbyggerAktoerIdents.feilmelding != null) {
+                handlePatientNotFoundInAktorRegister(
+                    innbyggerAktoerIdents,
+                    loggingMeta,
+                )
+            } else if (legeAktoerIdents == null || legeAktoerIdents.feilmelding != null) {
+                handleDoctorNotFoundInAktorRegister(
+                    legeAktoerIdents,
+                    loggingMeta,
+                )
+            } else if (erTestFnr(receivedDialogmelding.personNrPasient) && env.cluster == "prod-fss") {
+                handleTestFnrInProd(loggingMeta)
+            } else if (dialogmeldingType.isHenvendelseFraLegeOrForesporselSvar() && dialogmeldingXml.notat.first().tekstNotatInnhold.isNullOrEmpty()) {
+                handleMeldingsTekstMangler(loggingMeta)
+            } else if (!isKodeverkValid(dialogmeldingXml, dialogmeldingType)) {
+                handleInvalidDialogMeldingKodeverk(loggingMeta)
+            } else {
+                null
+            }
         return if (initialValidationResult != null) {
             ValidationResult(
                 status = Status.INVALID,

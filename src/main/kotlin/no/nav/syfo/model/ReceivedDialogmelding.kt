@@ -5,9 +5,7 @@ import java.time.LocalDateTime
 data class ReceivedDialogmelding(
     val dialogmelding: Dialogmelding,
     val personNrPasient: String,
-    val pasientAktoerId: String?,
     val personNrLege: String,
-    val legeAktoerId: String?,
     val navLogId: String,
     val msgId: String,
     val legekontorOrgNr: String?,
@@ -17,5 +15,4 @@ data class ReceivedDialogmelding(
     val mottattDato: LocalDateTime,
     val legehpr: String?,
     val fellesformat: String,
-    val tssid: String?
 )

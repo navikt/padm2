@@ -17,16 +17,20 @@ class DialogmeldingProducer(
     fun sendDialogmelding(
         receivedDialogmelding: ReceivedDialogmelding,
         msgHead: XMLMsgHead,
-        journalpostResponse: JournalpostResponse,
+        journalpostId: String,
         antallVedlegg: Int,
+        pasientAktoerId: String,
+        legeAktoerId: String,
     ) {
         if (enabled) {
             try {
                 val dialogmeldingForKafka = createDialogmeldingForKafka(
                     receivedDialogmelding = receivedDialogmelding,
                     msgHead = msgHead,
-                    journalpostResponse = journalpostResponse,
+                    journalpostId = journalpostId,
                     antallVedlegg = antallVedlegg,
+                    pasientAktoerId = pasientAktoerId,
+                    legeAktoerId = legeAktoerId,
                 )
                 kafkaProducerDialogmelding.send(
                     ProducerRecord(
@@ -51,8 +55,10 @@ class DialogmeldingProducer(
     fun createDialogmeldingForKafka(
         receivedDialogmelding: ReceivedDialogmelding,
         msgHead: XMLMsgHead,
-        journalpostResponse: JournalpostResponse,
+        journalpostId: String,
         antallVedlegg: Int,
+        pasientAktoerId: String,
+        legeAktoerId: String,
     ): DialogmeldingForKafka {
         val xmlMsgInfo = msgHead.msgInfo
         return DialogmeldingForKafka(
@@ -63,9 +69,9 @@ class DialogmeldingProducer(
             conversationRef = xmlMsgInfo.conversationRef?.refToConversation,
             parentRef = xmlMsgInfo.conversationRef?.refToParent,
             personIdentPasient = receivedDialogmelding.personNrPasient,
-            pasientAktoerId = receivedDialogmelding.pasientAktoerId!!,
+            pasientAktoerId = pasientAktoerId,
             personIdentBehandler = receivedDialogmelding.personNrLege,
-            behandlerAktoerId = receivedDialogmelding.legeAktoerId!!,
+            behandlerAktoerId = legeAktoerId,
             legekontorOrgNr = receivedDialogmelding.legekontorOrgNr,
             legekontorHerId = receivedDialogmelding.legekontorHerId,
             legekontorReshId = receivedDialogmelding.legekontorReshId,
@@ -73,7 +79,7 @@ class DialogmeldingProducer(
             legehpr = receivedDialogmelding.legehpr,
             dialogmelding = receivedDialogmelding.dialogmelding,
             antallVedlegg = antallVedlegg,
-            journalpostId = journalpostResponse.journalpostId,
+            journalpostId = journalpostId,
             fellesformatXML = cloneAndPrune(receivedDialogmelding.fellesformat),
         )
     }

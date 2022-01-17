@@ -74,7 +74,6 @@ class RuleService(
                     signatureDate = receivedDialogmelding.mottattDato,
                     innbyggerident = receivedDialogmelding.personNrPasient,
                     legekontorOrgnr = receivedDialogmelding.legekontorOrgNr,
-                    tssid = receivedDialogmelding.tssid,
                     avsenderfnr = receivedDialogmelding.personNrLege
                 )
             ),

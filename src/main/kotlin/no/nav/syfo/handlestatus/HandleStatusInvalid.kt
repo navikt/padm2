@@ -14,7 +14,8 @@ import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.model.ValidationResult
 import no.nav.syfo.model.Vedlegg
 import no.nav.syfo.persistering.db.domain.DialogmeldingTidspunkt
-import no.nav.syfo.persistering.handleRecivedMessage
+import no.nav.syfo.persistering.db.erDialogmeldingOpplysningerSendtApprec
+import no.nav.syfo.persistering.db.lagreSendtApprec
 import no.nav.syfo.services.JournalService
 import no.nav.syfo.services.sendReceipt
 import no.nav.syfo.util.LogType
@@ -28,6 +29,7 @@ import javax.jms.Session
 suspend fun handleStatusINVALID(
     validationResult: ValidationResult,
     session: Session,
+    database: DatabaseInterface,
     receiptProducer: MessageProducer,
     fellesformat: XMLEIFellesformat,
     loggingMeta: LoggingMeta,
@@ -35,13 +37,12 @@ suspend fun handleStatusINVALID(
     journalService: JournalService,
     receivedDialogmelding: ReceivedDialogmelding,
     vedleggListe: List<Vedlegg>?,
-    database: DatabaseInterface,
     pasientNavn: String,
     navnSignerendeLege: String,
-    sha256String: String,
+    innbyggerAktoerIdent: String?,
 ) {
 
-    if (receivedDialogmelding.pasientAktoerId != null) {
+    if (innbyggerAktoerIdent != null) {
         journalService.onJournalRequest(
             receivedDialogmelding,
             validationResult,
@@ -54,23 +55,24 @@ suspend fun handleStatusINVALID(
         logger.info("Lagrer ikke i Joark pga av manglende AktoerId for pasient {}", fields(loggingMeta))
     }
 
-    handleRecivedMessage(receivedDialogmelding, validationResult, sha256String, loggingMeta, database)
-
-    sendReceipt(
-        session = session,
-        receiptProducer = receiptProducer,
-        fellesformat = fellesformat,
-        apprecStatus = ApprecStatus.avvist,
-        apprecErrors = run {
-            val errors = mutableListOf<XMLCV>()
-            validationResult.apprecMessage?.let {
-                errors.add(createApprecError(it))
+    if (!database.erDialogmeldingOpplysningerSendtApprec(receivedDialogmelding.dialogmelding.id)) {
+        sendReceipt(
+            session = session,
+            receiptProducer = receiptProducer,
+            fellesformat = fellesformat,
+            apprecStatus = ApprecStatus.avvist,
+            apprecErrors = run {
+                val errors = mutableListOf<XMLCV>()
+                validationResult.apprecMessage?.let {
+                    errors.add(createApprecError(it))
+                }
+                errors.addAll(validationResult.ruleHits.map { it.toApprecCV() })
+                errors
             }
-            errors.addAll(validationResult.ruleHits.map { it.toApprecCV() })
-            errors
-        }
-    )
-    logger.info("Apprec Receipt with status Avvist sent to {}, {}", apprecQueueName, fields(loggingMeta))
+        )
+        logger.info("Apprec Receipt with status Avvist sent to {}, {}", apprecQueueName, fields(loggingMeta))
+        database.lagreSendtApprec(receivedDialogmelding.dialogmelding.id)
+    }
 }
 
 fun handleDuplicateDialogmeldingContent(

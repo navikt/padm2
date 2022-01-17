@@ -4,13 +4,8 @@ import io.ktor.application.*
 import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import no.nav.emottak.subscription.SubscriptionPort
-import no.nav.syfo.application.ApplicationState
-import no.nav.syfo.application.BlockingApplicationRunner
+import no.nav.syfo.application.*
 import no.nav.syfo.application.api.registerNaisApi
 import no.nav.syfo.db.Database
 import no.nav.syfo.db.VaultCredentialService
@@ -78,27 +73,14 @@ fun main() {
     server.start(false)
 }
 
-fun createListener(applicationState: ApplicationState, action: suspend CoroutineScope.() -> Unit): Job =
-    GlobalScope.launch {
-        try {
-            action()
-        } catch (e: TrackableException) {
-            logger.error("En uhåndtert feil oppstod, applikasjonen restarter {}", e.cause)
-        } catch (t: Throwable) {
-            logger.error("En uhåndtert systemfeil oppstod, applikasjonen restarter {}", t.message)
-            throw t
-        } finally {
-            applicationState.alive = false
-        }
-    }
-
 fun launchListeners(
     applicationState: ApplicationState,
     env: Environment,
     database: Database,
 ) {
-    createListener(applicationState) {
-
+    launchBackgroundTask(
+        applicationState = applicationState,
+    ) {
         val factory = connectionFactory(env)
 
         factory.createConnection(env.serviceuserUsername, env.serviceuserPassword).use { connection ->
@@ -119,7 +101,7 @@ fun launchListeners(
                 port { withBasicAuth(env.serviceuserUsername, env.serviceuserPassword) }
             }
 
-            BlockingApplicationRunner(
+            val blockingApplicationRunner = BlockingApplicationRunner(
                 applicationState = applicationState,
                 database = database,
                 env = env,
@@ -130,7 +112,22 @@ fun launchListeners(
                 arenaProducer = arenaProducer,
                 dialogmeldingProducer = dialogmeldingProducer,
                 subscriptionEmottak = subscriptionEmottak,
-            ).run()
+            )
+
+            val rerunCronJob = RerunCronJob(
+                database = database,
+                blockingApplicationRunner = blockingApplicationRunner,
+            )
+
+            launchBackgroundTask(
+                applicationState = applicationState,
+            ) {
+                CronjobRunner(
+                    applicationState = applicationState,
+                ).start(cronjob = rerunCronJob)
+            }
+
+            blockingApplicationRunner.run()
         }
     }
 }

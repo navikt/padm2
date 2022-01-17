@@ -22,7 +22,7 @@ internal class DialogmeldingProducerTest {
     lateinit var fellesformat: XMLEIFellesformat
     lateinit var receivedDialogmelding: ReceivedDialogmelding
     lateinit var msgHead: XMLMsgHead
-    lateinit var journalpostResponse: JournalpostResponse
+    lateinit var journalpostId: String
 
     @Before
     fun before() {
@@ -40,8 +40,10 @@ internal class DialogmeldingProducerTest {
         dialogmeldingProducer.sendDialogmelding(
             receivedDialogmelding = receivedDialogmelding,
             msgHead = msgHead,
-            journalpostResponse = journalpostResponse,
+            journalpostId = journalpostId,
             antallVedlegg = fellesformat.calculateNumberOfVedlegg(),
+            pasientAktoerId = "",
+            legeAktoerId = "",
         )
         val slot = slot<ProducerRecord<String, DialogmeldingForKafka>>()
 
@@ -65,8 +67,10 @@ internal class DialogmeldingProducerTest {
         dialogmeldingProducer.sendDialogmelding(
             receivedDialogmelding = receivedDialogmelding,
             msgHead = msgHead,
-            journalpostResponse = journalpostResponse,
+            journalpostId = journalpostId,
             antallVedlegg = fellesformat.calculateNumberOfVedlegg(),
+            pasientAktoerId = "",
+            legeAktoerId = "",
         )
         val slot = slot<ProducerRecord<String, DialogmeldingForKafka>>()
 
@@ -90,8 +94,10 @@ internal class DialogmeldingProducerTest {
         dialogmeldingProducer.sendDialogmelding(
             receivedDialogmelding = receivedDialogmelding,
             msgHead = msgHead,
-            journalpostResponse = journalpostResponse,
+            journalpostId = journalpostId,
             antallVedlegg = fellesformat.calculateNumberOfVedlegg(),
+            pasientAktoerId = "",
+            legeAktoerId = "",
         )
         val slot = slot<ProducerRecord<String, DialogmeldingForKafka>>()
 
@@ -116,8 +122,10 @@ internal class DialogmeldingProducerTest {
         dialogmeldingProducer.sendDialogmelding(
             receivedDialogmelding = receivedDialogmelding,
             msgHead = msgHead,
-            journalpostResponse = journalpostResponse,
+            journalpostId = journalpostId,
             antallVedlegg = fellesformat.calculateNumberOfVedlegg(),
+            pasientAktoerId = "",
+            legeAktoerId = "",
         )
         val slot = slot<ProducerRecord<String, DialogmeldingForKafka>>()
 
@@ -164,9 +172,7 @@ internal class DialogmeldingProducerTest {
         receivedDialogmelding = ReceivedDialogmelding(
             dialogmelding = dialogmelding,
             personNrPasient = innbyggerident,
-            pasientAktoerId = "",
             personNrLege = personNumberDoctor,
-            legeAktoerId = "",
             navLogId = ediLoggId,
             msgId = msgId,
             legekontorOrgNr = legekontorOrgNr,
@@ -179,13 +185,8 @@ internal class DialogmeldingProducerTest {
                 ).toLocalDateTime(),
             legehpr = legeHpr,
             fellesformat = inputMessageText,
-            tssid = ""
         )
-        journalpostResponse = JournalpostResponse(
-            dokumenter = emptyList(),
-            journalpostId = "jpid",
-            journalpostferdigstilt = true,
-        )
+        journalpostId = "jpid"
     }
 }
 
