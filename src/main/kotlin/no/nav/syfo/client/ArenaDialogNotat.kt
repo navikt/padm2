@@ -5,12 +5,11 @@ import no.nav.helse.arenadialognotat.*
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
+import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.logger
 import no.nav.syfo.model.Behandler
 import no.nav.syfo.model.Dialogmelding
 import no.nav.syfo.util.*
-import javax.jms.MessageProducer
-import javax.jms.Session
 
 const val MAKS_TEKSTLENGDE = 2000
 
@@ -24,7 +23,6 @@ fun createArenaDialogNotat(
     dialogmelding: Dialogmelding
 ): ArenaDialogNotat =
     ArenaDialogNotat().apply {
-        val org = msgHead.msgInfo.sender.organisation
         val dialogmeldingXml = extractDialogmelding(fellesformat)
         val behandler = extractBehandler(fellesformat)
         eiaDokumentInfo = EiaDokumentInfoType().apply {
@@ -131,15 +129,12 @@ fun findArenaNotatTittel(dialogmelding: Dialogmelding): String {
 }
 
 fun sendArenaDialogNotat(
-    producer: MessageProducer,
-    session: Session,
+    mqSender: MQSenderInterface,
     arenaDialogNotat: ArenaDialogNotat,
     loggingMeta: LoggingMeta
 ) {
-    producer.send(
-        session.createTextMessage().apply {
-            text = arenaDialogNotatMarshaller.toString(arenaDialogNotat)
-        }
+    mqSender.sendArena(
+        payload = arenaDialogNotatMarshaller.toString(arenaDialogNotat)
     )
     logger.info("Message is sent to arena {}", fields(loggingMeta))
 }

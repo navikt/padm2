@@ -17,11 +17,10 @@ internal class ValidationRuleChainSpek {
         signatureDate: LocalDateTime = LocalDateTime.now(),
         patientPersonNumber: String = "1234567891",
         legekontorOrgNr: String = "123456789",
-        tssid: String? = "1314445",
         avsenderfnr: String = "131515"
     ): RuleData<RuleMetadata> = RuleData(
         dialogmelding,
-        RuleMetadata(signatureDate, receivedDate, patientPersonNumber, legekontorOrgNr, tssid, avsenderfnr)
+        RuleMetadata(signatureDate, receivedDate, patientPersonNumber, legekontorOrgNr, avsenderfnr)
     )
 
     @Test

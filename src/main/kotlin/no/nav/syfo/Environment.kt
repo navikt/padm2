@@ -1,6 +1,6 @@
 package no.nav.syfo
 
-import no.nav.syfo.util.MqConfig
+import no.nav.syfo.application.mq.MqConfig
 import no.nav.syfo.util.getFileAsString
 
 data class Environment(

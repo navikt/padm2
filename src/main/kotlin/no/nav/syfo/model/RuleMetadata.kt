@@ -7,6 +7,5 @@ data class RuleMetadata(
     val receivedDate: LocalDateTime,
     val innbyggerident: String,
     val legekontorOrgnr: String?,
-    val tssid: String?,
     val avsenderfnr: String
 )

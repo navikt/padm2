@@ -3,7 +3,7 @@ package no.nav.syfo.handlestatus
 import net.logstash.logback.argument.StructuredArguments.fields
 import no.nav.helse.apprecV1.XMLCV
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
-import no.nav.syfo.Environment
+import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.apprec.*
 import no.nav.syfo.client.IdentInfoResult
 import no.nav.syfo.db.DatabaseInterface
@@ -14,7 +14,8 @@ import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.model.ValidationResult
 import no.nav.syfo.model.Vedlegg
 import no.nav.syfo.persistering.db.domain.DialogmeldingTidspunkt
-import no.nav.syfo.persistering.handleRecivedMessage
+import no.nav.syfo.persistering.db.erDialogmeldingOpplysningerSendtApprec
+import no.nav.syfo.persistering.db.lagreSendtApprec
 import no.nav.syfo.services.JournalService
 import no.nav.syfo.services.sendReceipt
 import no.nav.syfo.util.LogType
@@ -22,26 +23,22 @@ import no.nav.syfo.util.LoggingMeta
 import no.nav.syfo.util.createLogEntry
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import javax.jms.MessageProducer
-import javax.jms.Session
 
 suspend fun handleStatusINVALID(
+    database: DatabaseInterface,
+    mqSender: MQSenderInterface,
     validationResult: ValidationResult,
-    session: Session,
-    receiptProducer: MessageProducer,
     fellesformat: XMLEIFellesformat,
     loggingMeta: LoggingMeta,
-    apprecQueueName: String,
     journalService: JournalService,
     receivedDialogmelding: ReceivedDialogmelding,
     vedleggListe: List<Vedlegg>?,
-    database: DatabaseInterface,
     pasientNavn: String,
     navnSignerendeLege: String,
-    sha256String: String,
+    innbyggerAktoerIdent: String?,
 ) {
 
-    if (receivedDialogmelding.pasientAktoerId != null) {
+    if (innbyggerAktoerIdent != null) {
         journalService.onJournalRequest(
             receivedDialogmelding,
             validationResult,
@@ -54,23 +51,23 @@ suspend fun handleStatusINVALID(
         logger.info("Lagrer ikke i Joark pga av manglende AktoerId for pasient {}", fields(loggingMeta))
     }
 
-    handleRecivedMessage(receivedDialogmelding, validationResult, sha256String, loggingMeta, database)
-
-    sendReceipt(
-        session = session,
-        receiptProducer = receiptProducer,
-        fellesformat = fellesformat,
-        apprecStatus = ApprecStatus.avvist,
-        apprecErrors = run {
-            val errors = mutableListOf<XMLCV>()
-            validationResult.apprecMessage?.let {
-                errors.add(createApprecError(it))
+    if (!database.erDialogmeldingOpplysningerSendtApprec(receivedDialogmelding.dialogmelding.id)) {
+        sendReceipt(
+            mqSender = mqSender,
+            fellesformat = fellesformat,
+            apprecStatus = ApprecStatus.avvist,
+            apprecErrors = run {
+                val errors = mutableListOf<XMLCV>()
+                validationResult.apprecMessage?.let {
+                    errors.add(createApprecError(it))
+                }
+                errors.addAll(validationResult.ruleHits.map { it.toApprecCV() })
+                errors
             }
-            errors.addAll(validationResult.ruleHits.map { it.toApprecCV() })
-            errors
-        }
-    )
-    logger.info("Apprec Receipt with status Avvist sent to {}, {}", apprecQueueName, fields(loggingMeta))
+        )
+        logger.info("Apprec Receipt with status Avvist sent, {}", fields(loggingMeta))
+        database.lagreSendtApprec(receivedDialogmelding.dialogmelding.id)
+    }
 }
 
 fun handleDuplicateDialogmeldingContent(
@@ -115,10 +112,8 @@ fun handlePatientNotFoundInAktorRegister(
 }
 
 fun handlePatientNotFound(
-    session: Session,
-    receiptProducer: MessageProducer,
+    mqSender: MQSenderInterface,
     fellesformat: XMLEIFellesformat,
-    env: Environment,
     loggingMeta: LoggingMeta
 ) {
     logger.warn(
@@ -130,12 +125,12 @@ fun handlePatientNotFound(
     )
 
     sendReceipt(
-        session, receiptProducer, fellesformat, ApprecStatus.avvist,
+        mqSender, fellesformat, ApprecStatus.avvist,
         listOf(
             createApprecError("Pasienten er ikke funnet i dialogmeldingen")
         )
     )
-    logger.info("Apprec Receipt with status Avvist sent to {}, {}", env.apprecQueueName, fields(loggingMeta))
+    logger.info("Apprec Receipt with status Avvist sent, {}", fields(loggingMeta))
 
     INVALID_MESSAGE_NO_NOTICE.inc()
 }
