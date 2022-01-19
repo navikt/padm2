@@ -261,14 +261,18 @@ fun DatabaseInterface.hentIkkeFullforteDialogmeldinger() =
     connection.use { connection ->
         connection.prepareStatement(
             """
-                SELECT id, fellesformat
+                SELECT id, fellesformat, mottatt_tidspunkt
                 FROM dialogmeldingopplysninger
                 WHERE apprec IS NULL AND mottatt_tidspunkt < (NOW() - INTERVAL '10 minutes')
                 ORDER BY mottatt_tidspunkt ASC
                 """
         ).use {
             it.executeQuery().toList {
-                Pair(getString("id"), getString("fellesformat"))
+                Triple(
+                    first = getString("id"),
+                    second = getString("fellesformat"),
+                    third = getTimestamp("mottatt_tidspunkt").toLocalDateTime(),
+                )
             }
         }
     }

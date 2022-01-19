@@ -23,3 +23,9 @@ spec:
       description: "Prosessering av minst 1 melding feilet og ble sendt til MQ backout queue"
       action: "Undersøk om det er noen feil og send melding fra backout-queue for retry."
       severity: danger
+    - alert: PADM2 cronjob klarer ikke å ferdigstille meldinger
+      expr: sum(increase(padm2_messages_still_fail_after_1h{app="padm2"} [1h])) > 0
+      for: 5m
+      description: "Prosessering av minst 1 melding feilet og ble ikke fullført selv om cronjob'en har forsøkt flere ganger"
+      action: "Undersøk om det er noe feil med meldingene som er persistert i databasen"
+      severity: danger
