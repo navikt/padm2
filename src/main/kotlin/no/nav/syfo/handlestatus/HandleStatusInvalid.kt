@@ -3,7 +3,7 @@ package no.nav.syfo.handlestatus
 import net.logstash.logback.argument.StructuredArguments.fields
 import no.nav.helse.apprecV1.XMLCV
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
-import no.nav.syfo.Environment
+import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.apprec.*
 import no.nav.syfo.client.IdentInfoResult
 import no.nav.syfo.db.DatabaseInterface
@@ -23,17 +23,13 @@ import no.nav.syfo.util.LoggingMeta
 import no.nav.syfo.util.createLogEntry
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import javax.jms.MessageProducer
-import javax.jms.Session
 
 suspend fun handleStatusINVALID(
-    validationResult: ValidationResult,
-    session: Session,
     database: DatabaseInterface,
-    receiptProducer: MessageProducer,
+    mqSender: MQSenderInterface,
+    validationResult: ValidationResult,
     fellesformat: XMLEIFellesformat,
     loggingMeta: LoggingMeta,
-    apprecQueueName: String,
     journalService: JournalService,
     receivedDialogmelding: ReceivedDialogmelding,
     vedleggListe: List<Vedlegg>?,
@@ -57,8 +53,7 @@ suspend fun handleStatusINVALID(
 
     if (!database.erDialogmeldingOpplysningerSendtApprec(receivedDialogmelding.dialogmelding.id)) {
         sendReceipt(
-            session = session,
-            receiptProducer = receiptProducer,
+            mqSender = mqSender,
             fellesformat = fellesformat,
             apprecStatus = ApprecStatus.avvist,
             apprecErrors = run {
@@ -70,7 +65,7 @@ suspend fun handleStatusINVALID(
                 errors
             }
         )
-        logger.info("Apprec Receipt with status Avvist sent to {}, {}", apprecQueueName, fields(loggingMeta))
+        logger.info("Apprec Receipt with status Avvist sent, {}", fields(loggingMeta))
         database.lagreSendtApprec(receivedDialogmelding.dialogmelding.id)
     }
 }
@@ -117,10 +112,8 @@ fun handlePatientNotFoundInAktorRegister(
 }
 
 fun handlePatientNotFound(
-    session: Session,
-    receiptProducer: MessageProducer,
+    mqSender: MQSenderInterface,
     fellesformat: XMLEIFellesformat,
-    env: Environment,
     loggingMeta: LoggingMeta
 ) {
     logger.warn(
@@ -132,12 +125,12 @@ fun handlePatientNotFound(
     )
 
     sendReceipt(
-        session, receiptProducer, fellesformat, ApprecStatus.avvist,
+        mqSender, fellesformat, ApprecStatus.avvist,
         listOf(
             createApprecError("Pasienten er ikke funnet i dialogmeldingen")
         )
     )
-    logger.info("Apprec Receipt with status Avvist sent to {}, {}", env.apprecQueueName, fields(loggingMeta))
+    logger.info("Apprec Receipt with status Avvist sent, {}", fields(loggingMeta))
 
     INVALID_MESSAGE_NO_NOTICE.inc()
 }

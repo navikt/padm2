@@ -263,7 +263,8 @@ fun DatabaseInterface.hentIkkeFullforteDialogmeldinger() =
             """
                 SELECT id, fellesformat
                 FROM dialogmeldingopplysninger
-                WHERE apprec IS NULL AND mottatt_tidspunkt < (NOW() - INTERVAL '2 minutes')
+                WHERE apprec IS NULL AND mottatt_tidspunkt < (NOW() - INTERVAL '10 minutes')
+                ORDER BY mottatt_tidspunkt ASC
                 """
         ).use {
             it.executeQuery().toList {

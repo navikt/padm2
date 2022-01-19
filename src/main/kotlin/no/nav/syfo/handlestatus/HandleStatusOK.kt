@@ -1,11 +1,10 @@
 package no.nav.syfo.handlestatus
 
-import javax.jms.MessageProducer
-import javax.jms.Session
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
+import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.apprec.ApprecStatus
 import no.nav.syfo.client.*
 import no.nav.syfo.db.DatabaseInterface
@@ -20,18 +19,15 @@ import no.nav.syfo.services.sendReceipt
 import no.nav.syfo.util.LoggingMeta
 
 suspend fun handleStatusOK(
-    session: Session,
     database: DatabaseInterface,
-    receiptProducer: MessageProducer,
+    mqSender: MQSenderInterface,
     fellesformat: XMLEIFellesformat,
     loggingMeta: LoggingMeta,
-    apprecQueueName: String,
     journalService: JournalService,
     dialogmeldingProducer: DialogmeldingProducer,
     receivedDialogmelding: ReceivedDialogmelding,
     validationResult: ValidationResult,
     vedleggListe: List<Vedlegg>?,
-    arenaProducer: MessageProducer,
     msgHead: XMLMsgHead,
     receiverBlock: XMLMottakenhetBlokk,
     pasientNavn: String,
@@ -51,7 +47,7 @@ suspend fun handleStatusOK(
 
     if (!database.erDialogmeldingOpplysningerSendtArena(receivedDialogmelding.dialogmelding.id)) {
         sendArenaDialogNotat(
-            arenaProducer, session,
+            mqSender,
             createArenaDialogNotat(
                 fellesformat,
                 samhandlerPraksis?.tss_ident,
@@ -79,8 +75,8 @@ suspend fun handleStatusOK(
     }
 
     if (!database.erDialogmeldingOpplysningerSendtApprec(receivedDialogmelding.dialogmelding.id)) {
-        sendReceipt(session, receiptProducer, fellesformat, ApprecStatus.ok)
-        logger.info("Apprec Receipt with status OK sent to {}, {}", apprecQueueName, StructuredArguments.fields(loggingMeta))
+        sendReceipt(mqSender, fellesformat, ApprecStatus.ok)
+        logger.info("Apprec Receipt with status OK sent, {}", StructuredArguments.fields(loggingMeta))
         database.lagreSendtApprec(receivedDialogmelding.dialogmelding.id)
     }
 }

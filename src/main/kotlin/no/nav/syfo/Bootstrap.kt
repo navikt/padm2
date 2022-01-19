@@ -7,10 +7,10 @@ import io.ktor.server.netty.*
 import no.nav.emottak.subscription.SubscriptionPort
 import no.nav.syfo.application.*
 import no.nav.syfo.application.api.registerNaisApi
+import no.nav.syfo.application.mq.*
 import no.nav.syfo.db.Database
 import no.nav.syfo.db.VaultCredentialService
 import no.nav.syfo.kafka.*
-import no.nav.syfo.util.*
 import no.nav.syfo.vault.RenewVaultService
 import no.nav.syfo.ws.createPort
 import org.apache.kafka.clients.producer.KafkaProducer
@@ -78,6 +78,16 @@ fun launchListeners(
     env: Environment,
     database: Database,
 ) {
+    val dialogmeldingProducer = DialogmeldingProducer(
+        kafkaProducerDialogmelding = KafkaProducer<String, DialogmeldingForKafka>(
+            kafkaDialogmeldingProducerConfig(env.kafka)
+        ),
+        enabled = env.toggleDialogmeldingerTilKafka,
+    )
+    val subscriptionEmottak = createPort<SubscriptionPort>(env.subscriptionEndpointURL) {
+        port { withBasicAuth(env.serviceuserUsername, env.serviceuserPassword) }
+    }
+
     launchBackgroundTask(
         applicationState = applicationState,
     ) {
@@ -86,48 +96,42 @@ fun launchListeners(
         factory.createConnection(env.serviceuserUsername, env.serviceuserPassword).use { connection ->
             connection.start()
             val session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE)
-
             val inputconsumer = session.consumerForQueue(env.inputQueueName)
-            val receiptProducer = session.producerForQueue(env.apprecQueueName)
-            val backoutProducer = session.producerForQueue(env.inputBackoutQueueName)
-            val arenaProducer = session.producerForQueue(env.arenaQueueName)
-            val dialogmeldingProducer = DialogmeldingProducer(
-                kafkaProducerDialogmelding = KafkaProducer<String, DialogmeldingForKafka>(
-                    kafkaDialogmeldingProducerConfig(env.kafka)
-                ),
-                enabled = env.toggleDialogmeldingerTilKafka,
+            val mqSender = MQSender(
+                env = env,
             )
-            val subscriptionEmottak = createPort<SubscriptionPort>(env.subscriptionEndpointURL) {
-                port { withBasicAuth(env.serviceuserUsername, env.serviceuserPassword) }
-            }
-
             val blockingApplicationRunner = BlockingApplicationRunner(
                 applicationState = applicationState,
                 database = database,
                 env = env,
                 inputconsumer = inputconsumer,
-                session = session,
-                receiptProducer = receiptProducer,
-                backoutProducer = backoutProducer,
-                arenaProducer = arenaProducer,
+                mqSender = mqSender,
                 dialogmeldingProducer = dialogmeldingProducer,
                 subscriptionEmottak = subscriptionEmottak,
             )
-
-            val rerunCronJob = RerunCronJob(
-                database = database,
-                blockingApplicationRunner = blockingApplicationRunner,
-            )
-
-            launchBackgroundTask(
-                applicationState = applicationState,
-            ) {
-                CronjobRunner(
-                    applicationState = applicationState,
-                ).start(cronjob = rerunCronJob)
-            }
-
             blockingApplicationRunner.run()
         }
+    }
+
+    launchBackgroundTask(
+        applicationState = applicationState,
+    ) {
+        val mqSender = MQSender(
+            env = env,
+        )
+        val dialogmeldingProcessor = DialogmeldingProcessor(
+            database = database,
+            env = env,
+            mqSender = mqSender,
+            dialogmeldingProducer = dialogmeldingProducer,
+            subscriptionEmottak = subscriptionEmottak,
+        )
+        val rerunCronJob = RerunCronJob(
+            database = database,
+            dialogmeldingProcessor = dialogmeldingProcessor,
+        )
+        CronjobRunner(
+            applicationState = applicationState,
+        ).start(cronjob = rerunCronJob)
     }
 }
