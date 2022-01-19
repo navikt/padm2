@@ -192,6 +192,29 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 0) { mqSender.sendArena(any()) }
                     verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any(), any(), any()) }
                 }
+                it("Prosesserer innkommet melding (ugyldig innbyggerid først, og så gyldig melding etterpå skal ikke gi duplikat)") {
+                    val fellesformatUgyldig = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
+                        .replace("01010142365", "01010142366")
+                    every { incomingMessage.text } returns(fellesformatUgyldig)
+                    runBlocking {
+                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                    }
+                    verify(exactly = 1) { mqSender.sendReceipt(any()) }
+                    verify(exactly = 0) { mqSender.sendBackout(any()) }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
+                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any(), any(), any()) }
+
+                    val fellesformatGyldigMenSammeShaString = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
+                    every { incomingMessage.text } returns(fellesformatGyldigMenSammeShaString)
+                    runBlocking {
+                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                    }
+                    verify(exactly = 2) { mqSender.sendReceipt(any()) }
+                    verify(exactly = 0) { mqSender.sendBackout(any()) }
+                    verify(exactly = 1) { mqSender.sendArena(any()) }
+                    verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any(), any(), any()) }
+                }
+
                 it("Prosesserer innkommet melding (pdfgen feiler, gammel mottattdato)") {
                     val fellesformat = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
                         .replace("01010142365", UserConstants.PATIENT_FNR_PDFGEN_FAIL)
