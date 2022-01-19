@@ -279,8 +279,9 @@ fun DatabaseInterface.hentMottattTidspunkt(shaString: String) =
             """
                 SELECT dok.dialogmelding -> 'signaturDato' AS signaturDato, o.mottatt_tidspunkt
                 FROM dialogmeldingdokument dok
-                INNER JOIN dialogmeldingopplysninger o ON o.id = dok.id
-                WHERE dok.sha_string=?
+                INNER JOIN dialogmeldingopplysninger o ON (o.id = dok.id)
+                INNER JOIN BEHANDLINGSUTFALL utfall ON (dok.id = utfall.id)
+                WHERE dok.sha_string=? AND utfall.behandlingsutfall ->> 'status' = 'OK'
                 ORDER BY o.mottatt_tidspunkt ASC
                 """
         ).use {
@@ -293,9 +294,9 @@ fun DatabaseInterface.hasSavedDialogmeldingDokument(dialogmeldingId: String, sha
     connection.use { connection ->
         connection.prepareStatement(
             """
-                SELECT *
-                FROM DIALOGMELDINGDOKUMENT
-                WHERE id != ? AND sha_string=?;
+                SELECT dok.*
+                FROM DIALOGMELDINGDOKUMENT dok INNER JOIN BEHANDLINGSUTFALL utfall ON (dok.id = utfall.id)
+                WHERE dok.id != ? AND dok.sha_string=? AND utfall.behandlingsutfall ->> 'status' = 'OK';
                 """
         ).use {
             it.setString(1, dialogmeldingId)
