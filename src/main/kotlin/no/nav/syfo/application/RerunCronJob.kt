@@ -3,7 +3,9 @@ package no.nav.syfo.application
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.db.DatabaseInterface
 import no.nav.syfo.logger
+import no.nav.syfo.metrics.MESSAGES_STILL_FAIL_AFTER_1H
 import no.nav.syfo.persistering.db.hentIkkeFullforteDialogmeldinger
+import java.time.LocalDateTime
 
 class RerunCronJob(
     val database: DatabaseInterface,
@@ -14,7 +16,7 @@ class RerunCronJob(
 
     override suspend fun run() {
         val result = CronjobResult()
-        database.hentIkkeFullforteDialogmeldinger().forEach { (dialogmeldingId, fellesformat) ->
+        database.hentIkkeFullforteDialogmeldinger().forEach { (dialogmeldingId, fellesformat, mottattDatetime) ->
             try {
                 logger.info("Attempting reprocessing of $dialogmeldingId")
                 dialogmeldingProcessor.processMessage(dialogmeldingId, fellesformat)
@@ -22,6 +24,9 @@ class RerunCronJob(
             } catch (e: Exception) {
                 logger.warn("Exception caught while reprocessing message, will try again later: {}", e.message)
                 result.failed++
+                if (mottattDatetime.isBefore(LocalDateTime.now().minusHours(1))) {
+                    MESSAGES_STILL_FAIL_AFTER_1H.inc()
+                }
             }
         }
         logger.info(

@@ -58,6 +58,12 @@ val MESSAGES_SENT_TO_BOQ: Counter = Counter.build()
     .help("Counts the number of messages sent to backout queue")
     .register()
 
+val MESSAGES_STILL_FAIL_AFTER_1H: Counter = Counter.build()
+    .namespace(METRICS_NS)
+    .name("messages_still_fail_after_1h")
+    .help("Counts the number of messages that still fails after 1 hour")
+    .register()
+
 val RULE_HIT_COUNTER: Counter = Counter.Builder()
     .namespace(METRICS_NS)
     .name("rule_hit_counter")
