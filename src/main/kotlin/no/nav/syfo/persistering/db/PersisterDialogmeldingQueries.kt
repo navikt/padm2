@@ -48,7 +48,6 @@ private fun Connection.opprettDialogmeldingOpplysninger(receivedDialogmelding: R
                 msg_id,
                 legekontor_org_nr,
                 legekontor_her_id,
-                legekontor_resh_id,
                 mottatt_tidspunkt,
                 fellesformat,
                 journalforing,
@@ -56,7 +55,7 @@ private fun Connection.opprettDialogmeldingOpplysninger(receivedDialogmelding: R
                 arena,
                 apprec
                 )
-            VALUES  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """
     ).use {
         it.setString(1, receivedDialogmelding.dialogmelding.id)
@@ -66,13 +65,12 @@ private fun Connection.opprettDialogmeldingOpplysninger(receivedDialogmelding: R
         it.setString(5, receivedDialogmelding.msgId)
         it.setString(6, receivedDialogmelding.legekontorOrgNr)
         it.setString(7, receivedDialogmelding.legekontorHerId)
-        it.setString(8, receivedDialogmelding.legekontorReshId)
-        it.setTimestamp(9, Timestamp.valueOf(receivedDialogmelding.mottattDato))
-        it.setString(10, receivedDialogmelding.fellesformat)
+        it.setTimestamp(8, Timestamp.valueOf(receivedDialogmelding.mottattDato))
+        it.setString(9, receivedDialogmelding.fellesformat)
+        it.setNull(10, Types.TIMESTAMP)
         it.setNull(11, Types.TIMESTAMP)
         it.setNull(12, Types.TIMESTAMP)
         it.setNull(13, Types.TIMESTAMP)
-        it.setNull(14, Types.TIMESTAMP)
         it.executeUpdate()
     }
 }

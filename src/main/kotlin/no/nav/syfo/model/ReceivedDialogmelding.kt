@@ -10,7 +10,6 @@ data class ReceivedDialogmelding(
     val msgId: String,
     val legekontorOrgNr: String?,
     val legekontorHerId: String?,
-    val legekontorReshId: String?,
     val legekontorOrgName: String,
     val mottattDato: LocalDateTime,
     val legehpr: String?,

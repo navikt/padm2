@@ -215,7 +215,6 @@ class DialogmeldingProcessor(
         val legeIdent = receiverBlock.avsenderFnrFraDigSignatur
         val legekontorOrgName = extractSenderOrganisationName(fellesformat)
         val legekontorHerId = extractOrganisationHerNumberFromSender(fellesformat)?.id
-        val legekontorReshId = extractOrganisationReshNumberFromSender(fellesformat)?.id
         val dialogmeldingXml = extractDialogmelding(fellesformat)
         val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
         val legeHpr = extractLegeHpr(fellesformat)
@@ -239,7 +238,6 @@ class DialogmeldingProcessor(
             legekontorOrgNr = legekontorOrgNr,
             legekontorOrgName = legekontorOrgName,
             legekontorHerId = legekontorHerId,
-            legekontorReshId = legekontorReshId,
             mottattDato = receiverBlock.mottattDatotid.toGregorianCalendar().toZonedDateTime()
                 .withZoneSameInstant(
                     ZoneId.of("Europe/Oslo")

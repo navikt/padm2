@@ -16,7 +16,7 @@ data class DialogmeldingForKafka(
     val behandlerAktoerId: String,
     val legekontorOrgNr: String?,
     val legekontorHerId: String?,
-    val legekontorReshId: String?,
+    val legekontorReshId: String? = null,
     val legekontorOrgName: String,
     val legehpr: String?,
     val dialogmelding: Dialogmelding,

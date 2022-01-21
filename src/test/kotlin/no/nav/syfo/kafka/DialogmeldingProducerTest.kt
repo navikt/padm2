@@ -153,7 +153,6 @@ internal class DialogmeldingProducerTest {
         val personNumberDoctor = receiverBlock.avsenderFnrFraDigSignatur
         val legekontorOrgName = extractSenderOrganisationName(fellesformat)
         val legekontorHerId = extractOrganisationHerNumberFromSender(fellesformat)?.id
-        val legekontorReshId = extractOrganisationReshNumberFromSender(fellesformat)?.id
         val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
         val legeHpr = extractLegeHpr(fellesformat)
 
@@ -178,7 +177,6 @@ internal class DialogmeldingProducerTest {
             legekontorOrgNr = legekontorOrgNr,
             legekontorOrgName = legekontorOrgName,
             legekontorHerId = legekontorHerId,
-            legekontorReshId = legekontorReshId,
             mottattDato = receiverBlock.mottattDatotid.toGregorianCalendar().toZonedDateTime()
                 .withZoneSameInstant(
                     ZoneOffset.UTC
