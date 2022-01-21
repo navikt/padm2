@@ -74,7 +74,6 @@ class DialogmeldingProducer(
             behandlerAktoerId = legeAktoerId,
             legekontorOrgNr = receivedDialogmelding.legekontorOrgNr,
             legekontorHerId = receivedDialogmelding.legekontorHerId,
-            legekontorReshId = receivedDialogmelding.legekontorReshId,
             legekontorOrgName = receivedDialogmelding.legekontorOrgName,
             legehpr = receivedDialogmelding.legehpr,
             dialogmelding = receivedDialogmelding.dialogmelding,
