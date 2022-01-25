@@ -12,7 +12,7 @@ class ExternalMockEnvironment private constructor() {
 
     val azureAdV2Mock = AzureAdV2Mock()
     val dokarkivMock = DokarkivMock()
-    val aktoerIdMock = AktoerIdMock()
+    val pdlMock = PdlMock()
     val kuhrsarMock = KuhrSarMock()
     val pdfgenMock = PdfGenMock()
     val syfohelsenettproxyMock = SyfohelsenettproxyMock()
@@ -22,7 +22,7 @@ class ExternalMockEnvironment private constructor() {
     val externalApplicationMockMap = hashMapOf(
         azureAdV2Mock.name to azureAdV2Mock.server,
         dokarkivMock.name to dokarkivMock.server,
-        aktoerIdMock.name to aktoerIdMock.server,
+        pdlMock.name to pdlMock.server,
         kuhrsarMock.name to kuhrsarMock.server,
         pdfgenMock.name to pdfgenMock.server,
         syfohelsenettproxyMock.name to syfohelsenettproxyMock.server,
@@ -34,7 +34,7 @@ class ExternalMockEnvironment private constructor() {
         kafkaBootstrapServers = embeddedEnvironment.brokersURL,
         azureTokenEndpoint = azureAdV2Mock.url,
         dokarkivUrl = dokarkivMock.url,
-        aktoerIdUrl = aktoerIdMock.url,
+        pdlUrl = pdlMock.url,
         kuhrSarApiUrl = kuhrsarMock.url,
         pdfgenUrl = pdfgenMock.url,
         syfohelsenettproxyEndpointUrl = syfohelsenettproxyMock.url,

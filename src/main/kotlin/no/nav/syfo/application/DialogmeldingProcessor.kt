@@ -12,7 +12,9 @@ import no.nav.syfo.application.services.isNotLegevakt
 import no.nav.syfo.application.services.startSubscription
 import no.nav.syfo.client.*
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
+import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.db.DatabaseInterface
+import no.nav.syfo.domain.PersonIdent
 import no.nav.syfo.handlestatus.*
 import no.nav.syfo.kafka.DialogmeldingProducer
 import no.nav.syfo.logger
@@ -39,12 +41,6 @@ class DialogmeldingProcessor(
         password = env.serviceuserPassword,
         stsUrl = env.stsUrl,
     )
-    val aktoerIdClient = AktoerIdClient(
-        endpointUrl = env.aktoerregisterV1Url,
-        stsClient = oidcClient,
-        httpClient = httpClient,
-        serviceUsername = env.serviceuserUsername,
-    )
     val kuhrSarClient = SarClient(
         endpointUrl = env.kuhrSarApiUrl,
         httpClient = httpClient,
@@ -58,6 +54,11 @@ class DialogmeldingProcessor(
         aadAppSecret = env.aadAppSecret,
         aadTokenEndpoint = env.aadTokenEndpoint,
         httpClient = httpClientWithProxy,
+    )
+    val pdlClient = PdlClient(
+        azureAdV2Client = azureAdV2Client,
+        pdlClientId = env.pdlClientId,
+        pdlUrl = env.pdlUrl,
     )
     val dokArkivClient = DokArkivClient(
         azureAdV2Client = azureAdV2Client,
@@ -117,13 +118,9 @@ class DialogmeldingProcessor(
             fellesformat = fellesformat,
             inputMessageText = inputMessageText,
         )
-        val aktoerIds = aktoerIdClient.getAktoerIds(
-            personIdenter = listOf(receivedDialogmelding.personNrLege, receivedDialogmelding.personNrPasient),
-            loggingMeta = loggingMeta
-        )
 
-        val innbyggerAktoerIdents = aktoerIds[receivedDialogmelding.personNrPasient]
-        val legeAktoerIdents = aktoerIds[receivedDialogmelding.personNrLege]
+        val innbyggerAktorIdent = pdlClient.aktorId(PersonIdent(receivedDialogmelding.personNrPasient))
+        val legeAktorIdent = pdlClient.aktorId(PersonIdent(receivedDialogmelding.personNrLege))
 
         val samhandlerPraksis = findSamhandlerpraksis(
             legeIdent = receivedDialogmelding.personNrLege,
@@ -143,8 +140,8 @@ class DialogmeldingProcessor(
         val validationResult = validateMessage(
             sha256String = sha256String,
             loggingMeta = loggingMeta,
-            innbyggerAktoerIdents = innbyggerAktoerIdents,
-            legeAktoerIdents = legeAktoerIdents,
+            innbyggerAktorIdent = innbyggerAktorIdent?.value,
+            legeAktorIdent = legeAktorIdent?.value,
             dialogmeldingType = dialogmeldingType,
             dialogmeldingXml = dialogmeldingXml,
             receivedDialogmelding = receivedDialogmelding,
@@ -166,8 +163,8 @@ class DialogmeldingProcessor(
                 pasientNavn = pasientNavn,
                 navnSignerendeLege = navnSignerendeLege,
                 samhandlerPraksis = samhandlerPraksis,
-                pasientAktoerId = innbyggerAktoerIdents!!.identer!!.first().ident,
-                legeAktoerId = legeAktoerIdents!!.identer!!.first().ident,
+                pasientAktorId = innbyggerAktorIdent!!.value,
+                legeAktorId = legeAktorIdent!!.value,
             )
 
             Status.INVALID -> handleStatusINVALID(
@@ -181,7 +178,7 @@ class DialogmeldingProcessor(
                 vedleggListe = vedlegg.map { it.toVedlegg() },
                 pasientNavn = pasientNavn,
                 navnSignerendeLege = navnSignerendeLege,
-                innbyggerAktoerIdent = innbyggerAktoerIdents?.identer?.firstOrNull()?.ident,
+                innbyggerAktorIdent = innbyggerAktorIdent?.value,
             )
         }
 
@@ -250,8 +247,8 @@ class DialogmeldingProcessor(
     suspend fun validateMessage(
         sha256String: String,
         loggingMeta: LoggingMeta,
-        innbyggerAktoerIdents: IdentInfoResult?,
-        legeAktoerIdents: IdentInfoResult?,
+        innbyggerAktorIdent: String?,
+        legeAktorIdent: String?,
         dialogmeldingType: DialogmeldingType,
         dialogmeldingXml: XMLDialogmelding,
         receivedDialogmelding: ReceivedDialogmelding,
@@ -262,16 +259,10 @@ class DialogmeldingProcessor(
                 handleDuplicateDialogmeldingContent(
                     loggingMeta, sha256String, tidMottattOpprinneligMelding
                 )
-            } else if (innbyggerAktoerIdents == null || innbyggerAktoerIdents.feilmelding != null) {
-                handlePatientNotFoundInAktorRegister(
-                    innbyggerAktoerIdents,
-                    loggingMeta,
-                )
-            } else if (legeAktoerIdents == null || legeAktoerIdents.feilmelding != null) {
-                handleDoctorNotFoundInAktorRegister(
-                    legeAktoerIdents,
-                    loggingMeta,
-                )
+            } else if (innbyggerAktorIdent == null) {
+                handlePatientNotFoundInAktorRegister(loggingMeta)
+            } else if (legeAktorIdent == null) {
+                handleBehandlerNotFoundInAktorRegister(loggingMeta)
             } else if (erTestFnr(receivedDialogmelding.personNrPasient) && env.cluster == "prod-fss") {
                 handleTestFnrInProd(loggingMeta)
             } else if (dialogmeldingType.isHenvendelseFraLegeOrForesporselSvar() && dialogmeldingXml.notat.first().tekstNotatInnhold.isNullOrEmpty()) {

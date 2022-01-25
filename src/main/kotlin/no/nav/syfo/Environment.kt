@@ -15,7 +15,6 @@ data class Environment(
     override val mqChannelName: String = getEnvVar("MQ_CHANNEL_NAME"),
     val inputQueueName: String = getEnvVar("MQ_INPUT_QUEUE_NAME"),
     val apprecQueueName: String = getEnvVar("MQ_APPREC_QUEUE_NAME"),
-    val aktoerregisterV1Url: String = getEnvVar("AKTOR_REGISTER_V1_URL"),
     val kuhrSarApiUrl: String = getEnvVar("KUHR_SAR_API_URL"),
     val subscriptionEndpointURL: String = getEnvVar("SUBSCRIPTION_ENDPOINT_URL"),
     val cluster: String = getEnvVar("NAIS_CLUSTER_NAME"),
@@ -30,6 +29,8 @@ data class Environment(
     val syfohelsenettproxyEndpointURL: String = getEnvVar("HELSENETT_ENDPOINT_URL"),
     val legeSuspensjonEndpointURL: String = getEnvVar("LEGE_SUSPENSJON_ENDPOINT_URL"),
     val helsenettClientId: String = getEnvVar("HELSENETT_CLIENT_ID"),
+    val pdlClientId: String = getEnvVar("PDL_CLIENT_ID"),
+    val pdlUrl: String = getEnvVar("PDL_ENDPOINT_URL"),
     val stsUrl: String = getEnvVar("STS_URL"),
     val kafka: ApplicationEnvironmentKafka = ApplicationEnvironmentKafka(
         bootstrapServers = getEnvVar("KAFKA_BROKERS"),
