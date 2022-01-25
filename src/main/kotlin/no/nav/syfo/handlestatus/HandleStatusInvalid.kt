@@ -5,7 +5,6 @@ import no.nav.helse.apprecV1.XMLCV
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.apprec.*
-import no.nav.syfo.client.IdentInfoResult
 import no.nav.syfo.db.DatabaseInterface
 import no.nav.syfo.logger
 import no.nav.syfo.metrics.INVALID_MESSAGE_NO_NOTICE
@@ -35,10 +34,10 @@ suspend fun handleStatusINVALID(
     vedleggListe: List<Vedlegg>?,
     pasientNavn: String,
     navnSignerendeLege: String,
-    innbyggerAktoerIdent: String?,
+    innbyggerOK: Boolean,
 ) {
 
-    if (innbyggerAktoerIdent != null) {
+    if (innbyggerOK) {
         journalService.onJournalRequest(
             receivedDialogmelding,
             validationResult,
@@ -48,7 +47,7 @@ suspend fun handleStatusINVALID(
             navnSignerendeLege
         )
     } else {
-        logger.info("Lagrer ikke i Joark pga av manglende AktoerId for pasient {}", fields(loggingMeta))
+        logger.info("Lagrer ikke i Joark siden pasient ikke funnet {}", fields(loggingMeta))
     }
 
     if (!database.erDialogmeldingOpplysningerSendtApprec(receivedDialogmelding.dialogmelding.id)) {
@@ -95,29 +94,28 @@ fun handleDuplicateDialogmeldingContent(
     return "Duplikat! - Dialogmeldingen fra $tidMottattNyMelding har vi tidligere mottatt den $tidMottattOpprinneligMelding. Skal ikke sendes på nytt."
 }
 
-fun handlePatientNotFoundInAktorRegister(
-    patientIdents: IdentInfoResult?,
+fun handlePatientNotFound(
     loggingMeta: LoggingMeta
 ): String {
     logger.warn(
-        "Patient not found i aktorRegister error {}",
+        "Patient not found in PDL error {}",
         createLogEntry(
             LogType.INVALID_MESSAGE,
             loggingMeta,
-            "errorMessage" to (patientIdents?.feilmelding ?: "No response for FNR"),
+            "errorMessage" to "No response for FNR",
         )
     )
     INVALID_MESSAGE_NO_NOTICE.inc()
     return "Dialogmeldingen er ikke gyldig. Pasienten er ikke registrert i folkeregisteret."
 }
 
-fun handlePatientNotFound(
+fun handlePatientMissing(
     mqSender: MQSenderInterface,
     fellesformat: XMLEIFellesformat,
     loggingMeta: LoggingMeta
 ) {
     logger.warn(
-        "Pasienten er ikke funnet i dialogmeldingen {}",
+        "Pasienten er ikke funnet i dialogmeldingen eller fnr er ugyldig {}",
         createLogEntry(
             LogType.INVALID_MESSAGE,
             loggingMeta
@@ -127,7 +125,7 @@ fun handlePatientNotFound(
     sendReceipt(
         mqSender, fellesformat, ApprecStatus.avvist,
         listOf(
-            createApprecError("Pasienten er ikke funnet i dialogmeldingen")
+            createApprecError("Pasienten er ikke funnet i dialogmeldingen eller fnr er ugyldig")
         )
     )
     logger.info("Apprec Receipt with status Avvist sent, {}", fields(loggingMeta))
@@ -135,8 +133,7 @@ fun handlePatientNotFound(
     INVALID_MESSAGE_NO_NOTICE.inc()
 }
 
-fun handleDoctorNotFoundInAktorRegister(
-    doctorIdents: IdentInfoResult?,
+fun handleBehandlerNotFound(
     loggingMeta: LoggingMeta
 ): String {
     logger.warn(
@@ -144,7 +141,7 @@ fun handleDoctorNotFoundInAktorRegister(
         createLogEntry(
             LogType.INVALID_MESSAGE,
             loggingMeta,
-            "errorMessage" to (doctorIdents?.feilmelding ?: "No response for FNR")
+            "errorMessage" to "No response for FNR"
         ),
     )
     INVALID_MESSAGE_NO_NOTICE.inc()

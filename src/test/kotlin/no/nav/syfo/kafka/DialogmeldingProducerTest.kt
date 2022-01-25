@@ -42,8 +42,6 @@ internal class DialogmeldingProducerTest {
             msgHead = msgHead,
             journalpostId = journalpostId,
             antallVedlegg = fellesformat.calculateNumberOfVedlegg(),
-            pasientAktoerId = "",
-            legeAktoerId = "",
         )
         val slot = slot<ProducerRecord<String, DialogmeldingForKafka>>()
 
@@ -69,8 +67,6 @@ internal class DialogmeldingProducerTest {
             msgHead = msgHead,
             journalpostId = journalpostId,
             antallVedlegg = fellesformat.calculateNumberOfVedlegg(),
-            pasientAktoerId = "",
-            legeAktoerId = "",
         )
         val slot = slot<ProducerRecord<String, DialogmeldingForKafka>>()
 
@@ -96,8 +92,6 @@ internal class DialogmeldingProducerTest {
             msgHead = msgHead,
             journalpostId = journalpostId,
             antallVedlegg = fellesformat.calculateNumberOfVedlegg(),
-            pasientAktoerId = "",
-            legeAktoerId = "",
         )
         val slot = slot<ProducerRecord<String, DialogmeldingForKafka>>()
 
@@ -124,8 +118,6 @@ internal class DialogmeldingProducerTest {
             msgHead = msgHead,
             journalpostId = journalpostId,
             antallVedlegg = fellesformat.calculateNumberOfVedlegg(),
-            pasientAktoerId = "",
-            legeAktoerId = "",
         )
         val slot = slot<ProducerRecord<String, DialogmeldingForKafka>>()
 

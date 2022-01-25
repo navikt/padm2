@@ -19,8 +19,6 @@ class DialogmeldingProducer(
         msgHead: XMLMsgHead,
         journalpostId: String,
         antallVedlegg: Int,
-        pasientAktoerId: String,
-        legeAktoerId: String,
     ) {
         if (enabled) {
             try {
@@ -29,8 +27,6 @@ class DialogmeldingProducer(
                     msgHead = msgHead,
                     journalpostId = journalpostId,
                     antallVedlegg = antallVedlegg,
-                    pasientAktoerId = pasientAktoerId,
-                    legeAktoerId = legeAktoerId,
                 )
                 kafkaProducerDialogmelding.send(
                     ProducerRecord(
@@ -57,8 +53,6 @@ class DialogmeldingProducer(
         msgHead: XMLMsgHead,
         journalpostId: String,
         antallVedlegg: Int,
-        pasientAktoerId: String,
-        legeAktoerId: String,
     ): DialogmeldingForKafka {
         val xmlMsgInfo = msgHead.msgInfo
         return DialogmeldingForKafka(
@@ -69,9 +63,7 @@ class DialogmeldingProducer(
             conversationRef = xmlMsgInfo.conversationRef?.refToConversation,
             parentRef = xmlMsgInfo.conversationRef?.refToParent,
             personIdentPasient = receivedDialogmelding.personNrPasient,
-            pasientAktoerId = pasientAktoerId,
             personIdentBehandler = receivedDialogmelding.personNrLege,
-            behandlerAktoerId = legeAktoerId,
             legekontorOrgNr = receivedDialogmelding.legekontorOrgNr,
             legekontorHerId = receivedDialogmelding.legekontorHerId,
             legekontorOrgName = receivedDialogmelding.legekontorOrgName,
