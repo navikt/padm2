@@ -119,8 +119,8 @@ class DialogmeldingProcessor(
             inputMessageText = inputMessageText,
         )
 
-        val innbyggerAktorIdent = pdlClient.aktorId(PersonIdent(receivedDialogmelding.personNrPasient))
-        val legeAktorIdent = pdlClient.aktorId(PersonIdent(receivedDialogmelding.personNrLege))
+        val innbyggerOK = pdlClient.personEksisterer(PersonIdent(receivedDialogmelding.personNrPasient))
+        val legeOK = pdlClient.personEksisterer(PersonIdent(receivedDialogmelding.personNrLege))
 
         val samhandlerPraksis = findSamhandlerpraksis(
             legeIdent = receivedDialogmelding.personNrLege,
@@ -140,8 +140,8 @@ class DialogmeldingProcessor(
         val validationResult = validateMessage(
             sha256String = sha256String,
             loggingMeta = loggingMeta,
-            innbyggerAktorIdent = innbyggerAktorIdent?.value,
-            legeAktorIdent = legeAktorIdent?.value,
+            innbyggerOK = innbyggerOK,
+            legeOK = legeOK,
             dialogmeldingType = dialogmeldingType,
             dialogmeldingXml = dialogmeldingXml,
             receivedDialogmelding = receivedDialogmelding,
@@ -163,8 +163,6 @@ class DialogmeldingProcessor(
                 pasientNavn = pasientNavn,
                 navnSignerendeLege = navnSignerendeLege,
                 samhandlerPraksis = samhandlerPraksis,
-                pasientAktorId = innbyggerAktorIdent!!.value,
-                legeAktorId = legeAktorIdent!!.value,
             )
 
             Status.INVALID -> handleStatusINVALID(
@@ -178,7 +176,7 @@ class DialogmeldingProcessor(
                 vedleggListe = vedlegg.map { it.toVedlegg() },
                 pasientNavn = pasientNavn,
                 navnSignerendeLege = navnSignerendeLege,
-                innbyggerAktorIdent = innbyggerAktorIdent?.value,
+                innbyggerOK = innbyggerOK,
             )
         }
 
@@ -247,8 +245,8 @@ class DialogmeldingProcessor(
     suspend fun validateMessage(
         sha256String: String,
         loggingMeta: LoggingMeta,
-        innbyggerAktorIdent: String?,
-        legeAktorIdent: String?,
+        innbyggerOK: Boolean,
+        legeOK: Boolean,
         dialogmeldingType: DialogmeldingType,
         dialogmeldingXml: XMLDialogmelding,
         receivedDialogmelding: ReceivedDialogmelding,
@@ -259,10 +257,10 @@ class DialogmeldingProcessor(
                 handleDuplicateDialogmeldingContent(
                     loggingMeta, sha256String, tidMottattOpprinneligMelding
                 )
-            } else if (innbyggerAktorIdent == null) {
-                handlePatientNotFoundInAktorRegister(loggingMeta)
-            } else if (legeAktorIdent == null) {
-                handleBehandlerNotFoundInAktorRegister(loggingMeta)
+            } else if (!innbyggerOK) {
+                handlePatientNotFound(loggingMeta)
+            } else if (!legeOK) {
+                handleBehandlerNotFound(loggingMeta)
             } else if (erTestFnr(receivedDialogmelding.personNrPasient) && env.cluster == "prod-fss") {
                 handleTestFnrInProd(loggingMeta)
             } else if (dialogmeldingType.isHenvendelseFraLegeOrForesporselSvar() && dialogmeldingXml.notat.first().tekstNotatInnhold.isNullOrEmpty()) {

@@ -1,7 +1,5 @@
 package no.nav.syfo.client.pdl
 
-import no.nav.syfo.domain.AktorId
-
 data class PdlIdenterResponse(
     val errors: List<PdlError>?,
     val data: PdlHentIdenter?,
@@ -42,14 +40,4 @@ enum class IdentType {
     FOLKEREGISTERIDENT,
     NPID,
     AKTORID,
-}
-
-fun PdlHentIdenter?.aktorId(): AktorId? {
-    val identer = this?.hentIdenter?.identer
-
-    return identer?.firstOrNull { pdlIdent ->
-        pdlIdent.gruppe == IdentType.AKTORID.name
-    }?.ident?.let { ident ->
-        AktorId(ident)
-    }
 }

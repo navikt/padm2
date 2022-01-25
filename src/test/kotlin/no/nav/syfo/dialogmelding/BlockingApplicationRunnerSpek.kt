@@ -58,7 +58,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     justRun { mqSender.sendArena(any()) }
                     justRun { mqSender.sendReceipt(any()) }
                     justRun { mqSender.sendBackout(any()) }
-                    justRun { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any(), any(), any()) }
+                    justRun { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                     justRun { subscriptionEmottak.startSubscription(any()) }
                 }
                 it("Prosesserer innkommet melding (melding ok)") {
@@ -71,7 +71,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
                     verify(exactly = 1) { mqSender.sendArena(any()) }
-                    verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any(), any(), any()) }
+                    verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                 }
                 it("Prosesserer innkommet melding (melding ok, men pdf-gen feiler)") {
                     val fellesformat =
@@ -84,7 +84,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 0) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
                     verify(exactly = 0) { mqSender.sendArena(any()) }
-                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any(), any(), any()) }
+                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
 
                     externalMockEnvironment.pdfgenMock.alwaysFail = false
                     runBlocking {
@@ -93,7 +93,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
                     verify(exactly = 1) { mqSender.sendArena(any()) }
-                    verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any(), any(), any()) }
+                    verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                 }
 
                 it("Prosesserer innkommet melding (tekst i notatinnhold mangler)") {
@@ -107,7 +107,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
                     verify(exactly = 0) { mqSender.sendArena(any()) }
-                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any(), any(), any()) }
+                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                 }
                 it("Prosesserer innkommet melding (duplikat)") {
                     val fellesformat =
@@ -119,14 +119,14 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
                     verify(exactly = 1) { mqSender.sendArena(any()) }
-                    verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any(), any(), any()) }
+                    verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                     runBlocking {
                         blockingApplicationRunner.processMessageHandleException(incomingMessage)
                     }
                     verify(exactly = 2) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
                     verify(exactly = 1) { mqSender.sendArena(any()) }
-                    verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any(), any(), any()) }
+                    verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                 }
                 it("Prosesserer innkommet melding (duplikat, med vedlegg)") {
                     val fellesformat =
@@ -138,14 +138,14 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
                     verify(exactly = 1) { mqSender.sendArena(any()) }
-                    verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any(), any(), any()) }
+                    verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                     runBlocking {
                         blockingApplicationRunner.processMessageHandleException(incomingMessage)
                     }
                     verify(exactly = 2) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
                     verify(exactly = 1) { mqSender.sendArena(any()) }
-                    verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any(), any(), any()) }
+                    verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                 }
                 it("Prosesserer innkommet melding (ikke duplikat, bare nesten)") {
                     val fellesformat =
@@ -157,7 +157,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
                     verify(exactly = 1) { mqSender.sendArena(any()) }
-                    verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any(), any(), any()) }
+                    verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                     val fellesformatNestenDuplikat =
                         getFileAsStringISO88591("src/test/resources/dialogmelding_dialog_notat_vedlegg.xml")
                             .replace("Et vedlegg fra lege", "Et vedlegg fra lege nesten likt")
@@ -168,7 +168,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 2) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
                     verify(exactly = 2) { mqSender.sendArena(any()) }
-                    verify(exactly = 2) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any(), any(), any()) }
+                    verify(exactly = 2) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                 }
                 it("Prosesserer innkommet melding (manglende innbyggerid)") {
                     val fellesformat = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
@@ -180,9 +180,21 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
                     verify(exactly = 0) { mqSender.sendArena(any()) }
-                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any(), any(), any()) }
+                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                 }
-                it("Prosesserer innkommet melding (ugyldig innbyggerid)") {
+                it("Prosesserer innkommet melding (feil antall siffer i innbyggerid)") {
+                    val fellesformat = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
+                        .replace("01010142365", "0101014236")
+                    every { incomingMessage.text } returns(fellesformat)
+                    runBlocking {
+                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                    }
+                    verify(exactly = 1) { mqSender.sendReceipt(any()) }
+                    verify(exactly = 0) { mqSender.sendBackout(any()) }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
+                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
+                }
+                it("Prosesserer innkommet melding (ugyldig 11-sifret innbyggerid)") {
                     val fellesformat = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
                         .replace("01010142365", "01010142366")
                     every { incomingMessage.text } returns(fellesformat)
@@ -192,7 +204,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
                     verify(exactly = 0) { mqSender.sendArena(any()) }
-                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any(), any(), any()) }
+                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                 }
                 it("Prosesserer innkommet melding (ugyldig innbyggerid først, og så gyldig melding etterpå skal ikke gi duplikat)") {
                     val fellesformatUgyldig = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
@@ -204,7 +216,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
                     verify(exactly = 0) { mqSender.sendArena(any()) }
-                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any(), any(), any()) }
+                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
 
                     val fellesformatGyldigMenSammeShaString = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
                     every { incomingMessage.text } returns(fellesformatGyldigMenSammeShaString)
@@ -214,7 +226,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 2) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
                     verify(exactly = 1) { mqSender.sendArena(any()) }
-                    verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any(), any(), any()) }
+                    verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                 }
 
                 it("Prosesserer innkommet melding (pdfgen feiler, gammel mottattdato)") {
@@ -227,7 +239,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 0) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
                     verify(exactly = 0) { mqSender.sendArena(any()) }
-                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any(), any(), any()) }
+                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                     MESSAGES_STILL_FAIL_AFTER_1H.get() shouldBeEqualTo 0.0
                     externalMockEnvironment.pdfgenMock.allowFail = false
                     runBlocking {
@@ -237,7 +249,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
                     verify(exactly = 0) { mqSender.sendArena(any()) }
-                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any(), any(), any()) }
+                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                     MESSAGES_STILL_FAIL_AFTER_1H.get() shouldBeEqualTo 0.0
                 }
                 it("Prosesserer innkommet melding (pdfgen feiler, gammel mottattdato, feiler også ved rerun)") {
@@ -250,7 +262,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 0) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
                     verify(exactly = 0) { mqSender.sendArena(any()) }
-                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any(), any(), any()) }
+                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                     MESSAGES_STILL_FAIL_AFTER_1H.get() shouldBeEqualTo 0.0
                     runBlocking {
                         rerunCronJob.run()
@@ -258,7 +270,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 0) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
                     verify(exactly = 0) { mqSender.sendArena(any()) }
-                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any(), any(), any()) }
+                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                     MESSAGES_STILL_FAIL_AFTER_1H.get() shouldBeEqualTo 1.0
                 }
                 it("Prosesserer innkommet melding (pdfgen feiler, mottattdato nå)") {
@@ -272,7 +284,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 0) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
                     verify(exactly = 0) { mqSender.sendArena(any()) }
-                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any(), any(), any()) }
+                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                     externalMockEnvironment.pdfgenMock.allowFail = false
                     runBlocking {
                         // Meldingen må være ti minutter gammel for å bli plukket opp av cronjobben
@@ -282,7 +294,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 0) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
                     verify(exactly = 0) { mqSender.sendArena(any()) }
-                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any(), any(), any()) }
+                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                 }
                 it("Prosesserer innkommet melding (ingen aktoer id)") {
                     val fellesformat = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
@@ -294,7 +306,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
                     verify(exactly = 0) { mqSender.sendArena(any()) }
-                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any(), any(), any()) }
+                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                 }
                 it("Prosesserer innkommet melding (lege ugyldig fnr)") {
                     val fellesformat = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
@@ -306,7 +318,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
                     verify(exactly = 0) { mqSender.sendArena(any()) }
-                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any(), any(), any()) }
+                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                 }
                 it("Prosesserer innkommet melding (lege ikke autorisert)") {
                     val fellesformat = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
@@ -318,7 +330,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
                     verify(exactly = 0) { mqSender.sendArena(any()) }
-                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any(), any(), any()) }
+                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                 }
             }
         }

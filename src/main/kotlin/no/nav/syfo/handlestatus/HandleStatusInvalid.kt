@@ -34,10 +34,10 @@ suspend fun handleStatusINVALID(
     vedleggListe: List<Vedlegg>?,
     pasientNavn: String,
     navnSignerendeLege: String,
-    innbyggerAktorIdent: String?,
+    innbyggerOK: Boolean,
 ) {
 
-    if (innbyggerAktorIdent != null) {
+    if (innbyggerOK) {
         journalService.onJournalRequest(
             receivedDialogmelding,
             validationResult,
@@ -47,7 +47,7 @@ suspend fun handleStatusINVALID(
             navnSignerendeLege
         )
     } else {
-        logger.info("Lagrer ikke i Joark pga av manglende AktoerId for pasient {}", fields(loggingMeta))
+        logger.info("Lagrer ikke i Joark siden pasient ikke funnet {}", fields(loggingMeta))
     }
 
     if (!database.erDialogmeldingOpplysningerSendtApprec(receivedDialogmelding.dialogmelding.id)) {
@@ -94,11 +94,11 @@ fun handleDuplicateDialogmeldingContent(
     return "Duplikat! - Dialogmeldingen fra $tidMottattNyMelding har vi tidligere mottatt den $tidMottattOpprinneligMelding. Skal ikke sendes på nytt."
 }
 
-fun handlePatientNotFoundInAktorRegister(
+fun handlePatientNotFound(
     loggingMeta: LoggingMeta
 ): String {
     logger.warn(
-        "Patient not found i aktorRegister error {}",
+        "Patient not found in PDL error {}",
         createLogEntry(
             LogType.INVALID_MESSAGE,
             loggingMeta,
@@ -109,13 +109,13 @@ fun handlePatientNotFoundInAktorRegister(
     return "Dialogmeldingen er ikke gyldig. Pasienten er ikke registrert i folkeregisteret."
 }
 
-fun handlePatientNotFound(
+fun handlePatientMissing(
     mqSender: MQSenderInterface,
     fellesformat: XMLEIFellesformat,
     loggingMeta: LoggingMeta
 ) {
     logger.warn(
-        "Pasienten er ikke funnet i dialogmeldingen {}",
+        "Pasienten er ikke funnet i dialogmeldingen eller fnr er ugyldig {}",
         createLogEntry(
             LogType.INVALID_MESSAGE,
             loggingMeta
@@ -125,7 +125,7 @@ fun handlePatientNotFound(
     sendReceipt(
         mqSender, fellesformat, ApprecStatus.avvist,
         listOf(
-            createApprecError("Pasienten er ikke funnet i dialogmeldingen")
+            createApprecError("Pasienten er ikke funnet i dialogmeldingen eller fnr er ugyldig")
         )
     )
     logger.info("Apprec Receipt with status Avvist sent, {}", fields(loggingMeta))
@@ -133,7 +133,7 @@ fun handlePatientNotFound(
     INVALID_MESSAGE_NO_NOTICE.inc()
 }
 
-fun handleBehandlerNotFoundInAktorRegister(
+fun handleBehandlerNotFound(
     loggingMeta: LoggingMeta
 ): String {
     logger.warn(

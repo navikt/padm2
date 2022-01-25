@@ -10,6 +10,7 @@ import no.nav.syfo.*
 import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.kafka.DialogmeldingProducer
 import no.nav.syfo.db.DatabaseInterface
+import no.nav.syfo.domain.elevenDigits
 import no.nav.syfo.handlestatus.*
 import no.nav.syfo.metrics.INCOMING_MESSAGE_COUNTER
 import no.nav.syfo.metrics.MESSAGES_SENT_TO_BOQ
@@ -100,8 +101,8 @@ class BlockingApplicationRunner(
             msgId = msgHead.msgInfo.msgId,
         )
         logger.info("Received message, {}", StructuredArguments.fields(loggingMeta))
-        if (innbyggerIdent.isNullOrEmpty()) {
-            handlePatientNotFound(
+        if (innbyggerIdent.isNullOrEmpty() || !elevenDigits.matches(innbyggerIdent)) {
+            handlePatientMissing(
                 mqSender, fellesformat, loggingMeta,
             )
             return null

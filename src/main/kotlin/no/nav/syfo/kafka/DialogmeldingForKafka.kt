@@ -11,12 +11,12 @@ data class DialogmeldingForKafka(
     val conversationRef: String?,
     val parentRef: String?,
     val personIdentPasient: String,
-    val pasientAktoerId: String,
+    val pasientAktoerId: String? = null, // deprecated
     val personIdentBehandler: String,
-    val behandlerAktoerId: String,
+    val behandlerAktoerId: String? = null, // deprecated
     val legekontorOrgNr: String?,
     val legekontorHerId: String?,
-    val legekontorReshId: String? = null,
+    val legekontorReshId: String? = null, // deprecated
     val legekontorOrgName: String,
     val legehpr: String?,
     val dialogmelding: Dialogmelding,

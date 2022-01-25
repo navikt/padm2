@@ -33,8 +33,6 @@ suspend fun handleStatusOK(
     pasientNavn: String,
     navnSignerendeLege: String,
     samhandlerPraksis: SamhandlerPraksis?,
-    pasientAktorId: String,
-    legeAktorId: String,
 ) {
     val journalpostId = journalService.onJournalRequest(
         receivedDialogmelding,
@@ -68,8 +66,6 @@ suspend fun handleStatusOK(
             msgHead = msgHead,
             journalpostId = journalpostId,
             antallVedlegg = vedleggListe?.size ?: 0,
-            pasientAktoerId = pasientAktorId,
-            legeAktoerId = legeAktorId,
         )
         database.lagreSendtKafka(receivedDialogmelding.dialogmelding.id)
     }

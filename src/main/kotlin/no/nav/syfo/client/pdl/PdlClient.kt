@@ -7,7 +7,6 @@ import io.ktor.http.*
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.client.azuread.v2.AzureAdV2Token
 import no.nav.syfo.client.httpClient
-import no.nav.syfo.domain.AktorId
 import no.nav.syfo.domain.PersonIdent
 import no.nav.syfo.util.*
 import org.slf4j.LoggerFactory
@@ -18,18 +17,18 @@ class PdlClient(
     private val pdlUrl: String,
 ) {
 
-    suspend fun aktorId(
+    suspend fun personEksisterer(
         personIdent: PersonIdent,
-    ): AktorId? {
+    ): Boolean {
         val token = azureAdV2Client.getSystemToken(pdlClientId)
             ?: throw RuntimeException("Failed to send request to PDL: No token was found")
         return identer(
             ident = personIdent.value,
             token = token,
-        )?.aktorId()
+        )?.hentIdenter?.identer?.isNotEmpty() ?: false
     }
 
-    suspend fun identer(
+    private suspend fun identer(
         ident: String,
         token: AzureAdV2Token,
     ): PdlHentIdenter? {

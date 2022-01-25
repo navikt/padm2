@@ -1,11 +1,11 @@
 package no.nav.syfo.domain
 
-data class PersonIdent(val value: String) {
-    private val elevenDigits = Regex("^\\d{11}\$")
+val elevenDigits = Regex("^\\d{11}\$")
 
+data class PersonIdent(val value: String) {
     init {
         if (!elevenDigits.matches(value)) {
-            throw IllegalArgumentException("Value is not a valid PersonIdentNumber")
+            throw IllegalArgumentException("Value is not a valid PersonIdent")
         }
     }
 }
