@@ -90,7 +90,9 @@ spec:
       value: https://syfohelsenettproxy.nais.preprod.local
     - name: LEGE_SUSPENSJON_ENDPOINT_URL
       value: https://btsys.nais.preprod.local
+    - name: KUHR_SAR_API_CLIENT_ID
+      value: dev-fss.teamkuhr.kuhr-sar-api
     - name: KUHR_SAR_API_URL
-      value: https://kuhr-sar-api.nais.preprod.local
+      value: https://kuhr-sar-api.dev.adeo.no
     - name: STS_URL
       value: https://security-token-service.nais.preprod.local/rest/v1/sts/token

@@ -42,6 +42,7 @@ fun testEnvironment(
     inputBackoutQueueName = "backoutQueue",
     pdlClientId = "pdl",
     pdlUrl = pdlUrl,
+    kuhrSarApiClientId = "kuhrsar",
     kuhrSarApiUrl = kuhrSarApiUrl,
     subscriptionEndpointURL = "subscriptionEndpointURL",
     helsenettClientId = "helsenett",
