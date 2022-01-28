@@ -41,10 +41,6 @@ class DialogmeldingProcessor(
         password = env.serviceuserPassword,
         stsUrl = env.stsUrl,
     )
-    val kuhrSarClient = SarClient(
-        endpointUrl = env.kuhrSarApiUrl,
-        httpClient = httpClient,
-    )
     val pdfgenClient = PdfgenClient(
         url = env.syfopdfgen,
         httpClient = httpClient,
@@ -54,6 +50,12 @@ class DialogmeldingProcessor(
         aadAppSecret = env.aadAppSecret,
         aadTokenEndpoint = env.aadTokenEndpoint,
         httpClient = httpClientWithProxy,
+    )
+    val kuhrSarClient = KuhrSarClient(
+        azureAdV2Client = azureAdV2Client,
+        kuhrSarClientId = env.kuhrSarApiClientId,
+        kuhrSarUrl = env.kuhrSarApiUrl,
+        httpClient = httpClient,
     )
     val pdlClient = PdlClient(
         azureAdV2Client = azureAdV2Client,

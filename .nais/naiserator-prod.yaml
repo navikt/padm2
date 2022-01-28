@@ -92,6 +92,8 @@ spec:
       value: https://syfohelsenettproxy.nais.adeo.no
     - name: LEGE_SUSPENSJON_ENDPOINT_URL
       value: https://btsys.nais.adeo.no
+    - name: KUHR_SAR_API_CLIENT_ID
+      value: prod-fss.teamkuhr.kuhr-sar-api
     - name: KUHR_SAR_API_URL
       value: https://kuhr-sar-api.nais.adeo.no
     - name: STS_URL

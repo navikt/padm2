@@ -2,29 +2,32 @@ package no.nav.syfo.client
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.*
-import io.ktor.client.request.accept
-import io.ktor.client.request.get
-import io.ktor.client.request.parameter
+import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import java.util.Date
 import kotlin.math.max
 import net.logstash.logback.argument.StructuredArguments
 import net.logstash.logback.argument.StructuredArguments.keyValue
-import no.nav.syfo.util.retry
+import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.logger
 import no.nav.syfo.model.SamhandlerPraksisType
-import no.nav.syfo.util.LoggingMeta
+import no.nav.syfo.util.*
 import org.apache.commons.text.similarity.LevenshteinDistance
 import java.io.IOException
 
-class SarClient(
-    private val endpointUrl: String,
+class KuhrSarClient(
+    private val azureAdV2Client: AzureAdV2Client,
+    private val kuhrSarClientId: String,
+    private val kuhrSarUrl: String,
     private val httpClient: HttpClient
 ) {
     suspend fun getSamhandler(ident: String): List<Samhandler> = retry("get_samhandler") {
-        val response: HttpResponse = httpClient.get("$endpointUrl/rest/sar/samh") {
+        val token = azureAdV2Client.getSystemToken(kuhrSarClientId)
+            ?: throw RuntimeException("Failed to send request to KuhrSar: No token was found")
+        val response: HttpResponse = httpClient.get("$kuhrSarUrl/sar/rest/v2/samh") {
             accept(ContentType.Application.Json)
+            header(HttpHeaders.Authorization, bearerHeader(token.accessToken))
             parameter("ident", ident)
         }
         when (response.status) {

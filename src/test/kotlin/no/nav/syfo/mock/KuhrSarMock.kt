@@ -10,7 +10,7 @@ import no.nav.syfo.getRandomPort
 
 class KuhrSarMock {
     private val port = getRandomPort()
-    private val path = "/rest/sar/samh"
+    private val path = "/sar/rest/v2/samh"
     val url = "http://localhost:$port"
 
     val name = "kuhrsar"
