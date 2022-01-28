@@ -308,6 +308,26 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 0) { mqSender.sendArena(any()) }
                     verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                 }
+                it("Prosesserer innkommet melding (PDL feiler)") {
+                    val fellesformat = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
+                    every { incomingMessage.text } returns(fellesformat)
+                    externalMockEnvironment.pdlMock.pdlAlwaysFail = true
+                    runBlocking {
+                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                    }
+                    verify(exactly = 0) { mqSender.sendReceipt(any()) }
+                    verify(exactly = 0) { mqSender.sendBackout(any()) }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
+                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
+                    externalMockEnvironment.pdlMock.pdlAlwaysFail = false
+                    runBlocking {
+                        rerunCronJob.run()
+                    }
+                    verify(exactly = 1) { mqSender.sendReceipt(any()) }
+                    verify(exactly = 0) { mqSender.sendBackout(any()) }
+                    verify(exactly = 1) { mqSender.sendArena(any()) }
+                    verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
+                }
                 it("Prosesserer innkommet melding (lege ugyldig fnr)") {
                     val fellesformat = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
                         .replace("01010112377", UserConstants.BEHANDLER_FNR_UGYLDIG)

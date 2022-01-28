@@ -68,8 +68,7 @@ class PdlClient(
             }
             else -> {
                 COUNT_CALL_PDL_IDENTER_FAIL.inc()
-                logger.error("Request with url: $pdlUrl failed with response code ${response.status.value}")
-                null
+                throw RuntimeException("Request with url: $pdlUrl failed with response code ${response.status.value}")
             }
         }
     }

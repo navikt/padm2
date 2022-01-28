@@ -1,6 +1,7 @@
 package no.nav.syfo.mock
 
 import io.ktor.application.*
+import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
@@ -14,6 +15,7 @@ import no.nav.syfo.getRandomPort
 class PdlMock {
     private val port = getRandomPort()
     val url = "http://localhost:$port"
+    var pdlAlwaysFail = false
 
     val name = "pdl"
     val server = mockPdlServer(
@@ -30,30 +32,34 @@ class PdlMock {
             installContentNegotiation()
             routing {
                 post() {
-                    val pdlRequest = call.receive<PdlHentIdenterRequest>()
-                    val personIdentNumber = pdlRequest.variables.ident
-                    val response = if (personIdentNumber == PATIENT_FNR_NO_AKTOER_ID) {
-                        generatePdlIdenterResponse(
-                            identValueTypeList = emptyList(),
-                            errors = listOf(
-                                PdlError(
-                                    message = "ikke funnet",
-                                    locations = emptyList(),
-                                    path = emptyList(),
-                                    extensions = PdlErrorExtension("", "")
+                    if (pdlAlwaysFail) {
+                        call.respond(HttpStatusCode.ServiceUnavailable)
+                    } else {
+                        val pdlRequest = call.receive<PdlHentIdenterRequest>()
+                        val personIdentNumber = pdlRequest.variables.ident
+                        val response = if (personIdentNumber == PATIENT_FNR_NO_AKTOER_ID) {
+                            generatePdlIdenterResponse(
+                                identValueTypeList = emptyList(),
+                                errors = listOf(
+                                    PdlError(
+                                        message = "ikke funnet",
+                                        locations = emptyList(),
+                                        path = emptyList(),
+                                        extensions = PdlErrorExtension("", "")
+                                    )
                                 )
                             )
-                        )
-                    } else {
-                        val identValueTypeList = listOf(
-                            Pair(personIdentNumber, IdentType.FOLKEREGISTERIDENT),
-                            Pair("10$personIdentNumber", IdentType.AKTORID),
-                        )
-                        generatePdlIdenterResponse(
-                            identValueTypeList = identValueTypeList,
-                        )
+                        } else {
+                            val identValueTypeList = listOf(
+                                Pair(personIdentNumber, IdentType.FOLKEREGISTERIDENT),
+                                Pair("10$personIdentNumber", IdentType.AKTORID),
+                            )
+                            generatePdlIdenterResponse(
+                                identValueTypeList = identValueTypeList,
+                            )
+                        }
+                        call.respond(response)
                     }
-                    call.respond(response)
                 }
             }
         }
