@@ -6,6 +6,9 @@ More information on dialogmeldinger can be found here: https://www.nhn.no/samhan
 
 <img src="src/svg/dialogmeldingflyt_2021_09_14.svg" alt="Image of the flow of the padm2 application">
 
+Meldinger kan bli avvist av ulike grunner, da sendes såkalt negativ apprec. En årsak til avvisning kan være
+at behandleren som har sendt meldingen er suspendert: https://navno.sharepoint.com/sites/fag-og-ytelser-arbeid-sykefravarsoppfolging-og-sykepenger/SitePages/Sjekk-om-behandleren-er-suspendert.aspx
+
 ## Technologies used
 * Kotlin
 * Ktor

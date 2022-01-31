@@ -10,7 +10,7 @@ import no.nav.syfo.getRandomPort
 
 class LegeSuspensjonEndpointMock {
     private val port = getRandomPort()
-    private val path = "/api/v1/suspensjon/status"
+    private val path = "/api/v1/btsys/suspensjon/status"
     val url = "http://localhost:$port"
 
     val name = "legeSuspensjonEndpoint"

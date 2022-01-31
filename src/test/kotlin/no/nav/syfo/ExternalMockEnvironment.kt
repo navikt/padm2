@@ -17,7 +17,6 @@ class ExternalMockEnvironment private constructor() {
     val pdfgenMock = PdfGenMock()
     val syfohelsenettproxyMock = SyfohelsenettproxyMock()
     val legeSuspensjonEndpointMock = LegeSuspensjonEndpointMock()
-    val stsMock = StsMock()
 
     val externalApplicationMockMap = hashMapOf(
         azureAdV2Mock.name to azureAdV2Mock.server,
@@ -26,7 +25,6 @@ class ExternalMockEnvironment private constructor() {
         kuhrsarMock.name to kuhrsarMock.server,
         pdfgenMock.name to pdfgenMock.server,
         syfohelsenettproxyMock.name to syfohelsenettproxyMock.server,
-        stsMock.name to stsMock.server,
         legeSuspensjonEndpointMock.name to legeSuspensjonEndpointMock.server,
     )
 
@@ -39,7 +37,6 @@ class ExternalMockEnvironment private constructor() {
         pdfgenUrl = pdfgenMock.url,
         syfohelsenettproxyEndpointUrl = syfohelsenettproxyMock.url,
         legeSuspensjonEndpointUrl = legeSuspensjonEndpointMock.url,
-        stsClientUrl = stsMock.url,
     )
 
     companion object {
