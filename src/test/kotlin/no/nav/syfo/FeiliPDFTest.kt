@@ -14,62 +14,61 @@ import no.nav.syfo.util.*
 import org.junit.Test
 import java.io.File
 import java.io.StringReader
-import java.nio.file.Paths
 
 class FeiliPDFTest {
     @Test
     internal fun `Create pdf`() {
-        val fellesformat = fellesformatUnmarshaller.unmarshal(
-            StringReader(getFileAsString("src/test/resources/feilpdf/633889387.xml"))
-        ) as XMLEIFellesformat
 
-        val pasientNavn = extractPasientNavn(fellesformat)
-        val vedlegg = extractVedlegg(fellesformat)
-        val vedleggListe = vedlegg.map { it.toVedlegg() }
-        val antallVedlegg = vedleggListe?.size ?: 0
+        File("src/test/resources/feilpdf/").walk().drop(1).forEach {
+            val filename = it.nameWithoutExtension
 
-        val validationResult = ValidationResult(
-            status = Status.OK,
-            ruleHits = emptyList(),
-        )
-        val receiverBlock = fellesformat.get<XMLMottakenhetBlokk>()
-        val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
-        val legeIdent = receiverBlock.avsenderFnrFraDigSignatur
-        val dialogmeldingXml = extractDialogmelding(fellesformat)
-        val msgHead: XMLMsgHead = fellesformat.get()
-        val behandlerNavn = extractBehandlerNavn(fellesformat)
-        val innbyggerIdent = extractInnbyggerident(fellesformat)
+            val fellesformat = fellesformatUnmarshaller.unmarshal(
+                StringReader(getFileAsString("src/test/resources/feilpdf/${filename}.xml"))
+            ) as XMLEIFellesformat
 
-        val dialogmelding = dialogmeldingXml.toDialogmelding(
-            dialogmeldingId = "1",
-            dialogmeldingType = dialogmeldingType,
-            signaturDato = msgHead.msgInfo.genDate,
-            navnHelsePersonellNavn = behandlerNavn
-        )
+            val pasientNavn = extractPasientNavn(fellesformat)
+            val vedlegg = extractVedlegg(fellesformat)
+            val vedleggListe = vedlegg.map { it.toVedlegg() }
+            val antallVedlegg = vedleggListe?.size ?: 0
 
-        val pdfPayload = createPdfPayload(
-            dialogmelding,
-            validationResult, //kan være null, brukes kun hvis det er feil i validering
-            innbyggerIdent!!,
-            pasientNavn,
-            legeIdent, //blir fnr ikke navn
-            antallVedlegg
-        )
+            val validationResult = ValidationResult(
+                status = Status.OK,
+                ruleHits = emptyList(),
+            )
+            val receiverBlock = fellesformat.get<XMLMottakenhetBlokk>()
+            val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
+            val legeIdent = receiverBlock.avsenderFnrFraDigSignatur
+            val dialogmeldingXml = extractDialogmelding(fellesformat)
+            val msgHead: XMLMsgHead = fellesformat.get()
+            val behandlerNavn = extractBehandlerNavn(fellesformat)
+            val innbyggerIdent = extractInnbyggerident(fellesformat)
 
-         val httpClient = HttpClient(Apache, config)
+            val dialogmelding = dialogmeldingXml.toDialogmelding(
+                dialogmeldingId = "1",
+                dialogmeldingType = dialogmeldingType,
+                signaturDato = msgHead.msgInfo.genDate,git g
+                navnHelsePersonellNavn = behandlerNavn
+            )
 
-        val pdfgenClient = PdfgenClient(
-            url = "http://localhost:8080/api/v1/genpdf/padm2/padm2",
-            httpClient = httpClient,
-        )
-        runBlocking {
-            val pdf = pdfgenClient.createPdf(pdfPayload)
-            val path = Paths.get("").toAbsolutePath().toString()
-            File("joarkpdf/633889387.pdf").writeBytes(pdf)
+            val pdfPayload = createPdfPayload(
+                dialogmelding,
+                validationResult, //kan være null, brukes kun hvis det er feil i validering
+                innbyggerIdent!!,
+                pasientNavn,
+                legeIdent, //blir fnr ikke navn
+                antallVedlegg // Vises i PDF hvis forespørselsvar, og melding har vedlegg
+            )
 
+            val httpClient = HttpClient(Apache, config)
+            val pdfgenClient = PdfgenClient(
+                url = "http://localhost:8080/api/v1/genpdf/padm2/padm2",
+                httpClient = httpClient,
+            )
+            runBlocking {
+                val pdf = pdfgenClient.createPdf(pdfPayload)
+                File("joarkpdf/${filename}.pdf").writeBytes(pdf)
+
+            }
         }
-
-
-
     }
 }
