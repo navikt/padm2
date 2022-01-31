@@ -40,7 +40,7 @@ class RuleService(
 
         val dialogmelding = receivedDialogmelding.dialogmelding
 
-        val doctorSuspend = legeSuspensjonClient.checkTherapist(
+        val behandlerSuspendert = legeSuspensjonClient.sjekkSuspensjon(
             receivedDialogmelding.personNrLege,
             receivedDialogmelding.msgId,
             DateTimeFormatter.ISO_DATE.format(receivedDialogmelding.mottattDato)
@@ -78,7 +78,7 @@ class RuleService(
                 )
             ),
             HPRRuleChain.values().executeFlow(dialogmelding, avsenderBehandler),
-            LegesuspensjonRuleChain.values().executeFlow(dialogmelding, doctorSuspend)
+            LegesuspensjonRuleChain.values().executeFlow(dialogmelding, behandlerSuspendert)
         ).flatten()
 
         log.info("Rules hit {}, {}", results.map { it.name }, fields(loggingMeta))

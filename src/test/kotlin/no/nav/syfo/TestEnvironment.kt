@@ -13,7 +13,6 @@ fun testEnvironment(
     kuhrSarApiUrl: String,
     syfohelsenettproxyEndpointUrl: String,
     legeSuspensjonEndpointUrl: String,
-    stsClientUrl: String,
 ) = Environment(
     aadAppClient = "isdialogmote-client-id",
     aadAppSecret = "isdialogmote-secret",
@@ -47,8 +46,8 @@ fun testEnvironment(
     subscriptionEndpointURL = "subscriptionEndpointURL",
     helsenettClientId = "helsenett",
     syfohelsenettproxyEndpointURL = syfohelsenettproxyEndpointUrl,
+    legeSuspensjonClientId = "legesuspensjon",
     legeSuspensjonEndpointURL = legeSuspensjonEndpointUrl,
-    stsUrl = stsClientUrl,
     toggleDialogmeldingerTilKafka = true,
 )
 

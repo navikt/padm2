@@ -90,11 +90,11 @@ spec:
       value: prod-fss.teamsykmelding.syfohelsenettproxy
     - name: HELSENETT_ENDPOINT_URL
       value: https://syfohelsenettproxy.nais.adeo.no
+    - name: LEGE_SUSPENSJON_CLIENT_ID
+      value: prod-fss.teamsykefravr.isproxy
     - name: LEGE_SUSPENSJON_ENDPOINT_URL
-      value: https://btsys.nais.adeo.no
+      value: https://isproxy.intern.nav.no
     - name: KUHR_SAR_API_CLIENT_ID
       value: prod-fss.teamkuhr.kuhr-sar-api
     - name: KUHR_SAR_API_URL
       value: https://kuhr-sar-api.nais.adeo.no
-    - name: STS_URL
-      value: https://security-token-service.nais.adeo.no/rest/v1/sts/token

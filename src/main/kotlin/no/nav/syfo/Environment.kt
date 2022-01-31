@@ -28,11 +28,11 @@ data class Environment(
     val mountPathVault: String = getEnvVar("MOUNT_PATH_VAULT"),
     val databaseName: String = getEnvVar("DATABASE_NAME", "padm2"),
     val syfohelsenettproxyEndpointURL: String = getEnvVar("HELSENETT_ENDPOINT_URL"),
+    val legeSuspensjonClientId: String = getEnvVar("LEGE_SUSPENSJON_CLIENT_ID"),
     val legeSuspensjonEndpointURL: String = getEnvVar("LEGE_SUSPENSJON_ENDPOINT_URL"),
     val helsenettClientId: String = getEnvVar("HELSENETT_CLIENT_ID"),
     val pdlClientId: String = getEnvVar("PDL_CLIENT_ID"),
     val pdlUrl: String = getEnvVar("PDL_ENDPOINT_URL"),
-    val stsUrl: String = getEnvVar("STS_URL"),
     val kafka: ApplicationEnvironmentKafka = ApplicationEnvironmentKafka(
         bootstrapServers = getEnvVar("KAFKA_BROKERS"),
         aivenCredstorePassword = getEnvVar("KAFKA_CREDSTORE_PASSWORD"),

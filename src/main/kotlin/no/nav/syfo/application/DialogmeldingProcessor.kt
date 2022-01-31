@@ -36,11 +36,6 @@ class DialogmeldingProcessor(
     val dialogmeldingProducer: DialogmeldingProducer,
     val subscriptionEmottak: SubscriptionPort,
 ) {
-    val oidcClient = StsOidcClient(
-        username = env.serviceuserUsername,
-        password = env.serviceuserPassword,
-        stsUrl = env.stsUrl,
-    )
     val pdfgenClient = PdfgenClient(
         url = env.syfopdfgen,
         httpClient = httpClient,
@@ -74,13 +69,14 @@ class DialogmeldingProcessor(
         httpClient = httpClient,
         helsenettClientId = env.helsenettClientId,
     )
+    val legeSuspensjonClient = LegeSuspensjonClient(
+        azureAdV2Client = azureAdV2Client,
+        endpointUrl = env.legeSuspensjonEndpointURL,
+        endpointClientId = env.legeSuspensjonClientId,
+        httpClient = httpClient,
+    )
     val padm2ReglerService = RuleService(
-        legeSuspensjonClient = LegeSuspensjonClient(
-            endpointUrl = env.legeSuspensjonEndpointURL,
-            username = env.serviceuserUsername,
-            stsClient = oidcClient,
-            httpClient = httpClient,
-        ),
+        legeSuspensjonClient = legeSuspensjonClient,
         syfohelsenettproxyClient = syfohelsenettproxyClient,
     )
     val journalService = JournalService(
