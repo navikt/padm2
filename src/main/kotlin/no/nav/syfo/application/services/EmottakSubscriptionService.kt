@@ -29,13 +29,14 @@ suspend fun startSubscription(
         retryIntervals = arrayOf(500L, 1000L, 3000L, 5000L, 10000L),
         legalExceptions = *arrayOf(IOException::class, WstxException::class)
     ) {
-        subscriptionEmottak.startSubscription(
+        val response = subscriptionEmottak.startSubscription(
             StartSubscriptionRequest().apply {
                 key = samhandlerPraksis.tss_ident
                 data = convertSenderToBase64(msgHead.msgInfo.sender)
                 partnerid = receiverBlock.partnerReferanse.toInt()
             }
         )
+        logger.info("Started emottak subscription for ${samhandlerPraksis.tss_ident}, got response: ${response.status} (key: ${response.key}, description: ${response.description})")
     }
 }
 
