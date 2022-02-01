@@ -1,15 +1,12 @@
 package no.nav.syfo.application
 
 import net.logstash.logback.argument.StructuredArguments
-import no.nav.emottak.subscription.SubscriptionPort
 import no.nav.helse.dialogmelding.XMLDialogmelding
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.Environment
 import no.nav.syfo.application.mq.MQSenderInterface
-import no.nav.syfo.application.services.isNotLegevakt
-import no.nav.syfo.application.services.startSubscription
 import no.nav.syfo.client.*
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.client.pdl.PdlClient
@@ -34,7 +31,6 @@ class DialogmeldingProcessor(
     val env: Environment,
     val mqSender: MQSenderInterface,
     val dialogmeldingProducer: DialogmeldingProducer,
-    val subscriptionEmottak: SubscriptionPort,
 ) {
     val pdfgenClient = PdfgenClient(
         url = env.syfopdfgen,
@@ -73,6 +69,12 @@ class DialogmeldingProcessor(
         azureAdV2Client = azureAdV2Client,
         endpointUrl = env.legeSuspensjonEndpointURL,
         endpointClientId = env.legeSuspensjonClientId,
+        httpClient = httpClient,
+    )
+    val emottakSubscriptionClient = EmottakSubscriptionClient(
+        azureAdV2Client = azureAdV2Client,
+        endpointUrl = env.subscriptionEndpointURL,
+        endpointClientId = env.subscriptionEndpointClientId,
         httpClient = httpClient,
     )
     val padm2ReglerService = RuleService(
@@ -318,8 +320,7 @@ class DialogmeldingProcessor(
                     !receiverBlock.partnerReferanse.isNullOrEmpty() &&
                     receiverBlock.partnerReferanse.isNotBlank()
                 ) {
-                    startSubscription(
-                        subscriptionEmottak,
+                    emottakSubscriptionClient.startSubscription(
                         samhandlerPraksis,
                         msgHead,
                         receiverBlock,
@@ -336,3 +337,10 @@ class DialogmeldingProcessor(
         return samhandlerPraksis
     }
 }
+
+fun isLegevakt(samhandlerPraksis: SamhandlerPraksis): Boolean {
+    val kode = samhandlerPraksis.samh_praksis_type_kode
+    return !kode.isNullOrEmpty() && (kode == "LEVA" || kode == "LEKO")
+}
+
+fun isNotLegevakt(samhandlerPraksis: SamhandlerPraksis): Boolean = !isLegevakt(samhandlerPraksis)

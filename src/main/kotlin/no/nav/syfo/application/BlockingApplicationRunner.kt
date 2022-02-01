@@ -2,7 +2,6 @@ package no.nav.syfo.application
 
 import kotlinx.coroutines.delay
 import net.logstash.logback.argument.StructuredArguments
-import no.nav.emottak.subscription.SubscriptionPort
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
@@ -27,14 +26,12 @@ class BlockingApplicationRunner(
     val inputconsumer: MessageConsumer,
     val mqSender: MQSenderInterface,
     val dialogmeldingProducer: DialogmeldingProducer,
-    val subscriptionEmottak: SubscriptionPort,
 ) {
     val dialogmeldingProcessor = DialogmeldingProcessor(
         database = database,
         env = env,
         mqSender = mqSender,
         dialogmeldingProducer = dialogmeldingProducer,
-        subscriptionEmottak = subscriptionEmottak,
     )
 
     suspend fun run() {

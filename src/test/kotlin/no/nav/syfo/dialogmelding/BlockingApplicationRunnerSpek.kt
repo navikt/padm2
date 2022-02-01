@@ -3,7 +3,6 @@ package no.nav.syfo.dialogmelding
 import io.ktor.server.testing.*
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
-import no.nav.emottak.subscription.SubscriptionPort
 import no.nav.syfo.*
 import no.nav.syfo.application.*
 import no.nav.syfo.application.mq.MQSenderInterface
@@ -26,7 +25,6 @@ class BlockingApplicationRunnerSpek : Spek({
             val database = externalMockEnvironment.database
             val mqSender = mockk<MQSenderInterface>(relaxed = true)
             val dialogmeldingProducer = mockk<DialogmeldingProducer>(relaxed = true)
-            val subscriptionEmottak = mockk<SubscriptionPort>(relaxed = true)
             val incomingMessage = mockk<TextMessage>(relaxed = true)
 
             val blockingApplicationRunner = BlockingApplicationRunner(
@@ -36,14 +34,12 @@ class BlockingApplicationRunnerSpek : Spek({
                 inputconsumer = mockk(),
                 mqSender = mqSender,
                 dialogmeldingProducer = dialogmeldingProducer,
-                subscriptionEmottak = subscriptionEmottak,
             )
             val dialogmeldingProcessor = DialogmeldingProcessor(
                 database = database,
                 env = externalMockEnvironment.environment,
                 mqSender = mqSender,
                 dialogmeldingProducer = dialogmeldingProducer,
-                subscriptionEmottak = subscriptionEmottak,
             )
             val rerunCronJob = RerunCronJob(
                 database = database,
@@ -59,7 +55,6 @@ class BlockingApplicationRunnerSpek : Spek({
                     justRun { mqSender.sendReceipt(any()) }
                     justRun { mqSender.sendBackout(any()) }
                     justRun { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
-                    justRun { subscriptionEmottak.startSubscription(any()) }
                 }
                 it("Prosesserer innkommet melding (melding ok)") {
                     val fellesformat =

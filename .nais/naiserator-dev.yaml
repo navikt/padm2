@@ -58,8 +58,6 @@ spec:
       value: MQLS04
     - name: MQ_CHANNEL_NAME
       value: Q1_PADM
-    - name: SUBSCRIPTION_ENDPOINT_URL
-      value: https://wasapp-q1.adeo.no/nav-emottak-eletter-web/services/
     - name: MQ_APPREC_QUEUE_NAME
       value: QA.Q414.IU03_UTSENDING
     - name: MQ_INPUT_BOQ_QUEUE_NAME
@@ -91,6 +89,10 @@ spec:
     - name: LEGE_SUSPENSJON_CLIENT_ID
       value: dev-fss.teamsykefravr.isproxy
     - name: LEGE_SUSPENSJON_ENDPOINT_URL
+      value: https://isproxy.dev.intern.nav.no
+    - name: SUBSCRIPTION_CLIENT_ID
+      value: dev-fss.teamsykefravr.isproxy
+    - name: SUBSCRIPTION_ENDPOINT_URL
       value: https://isproxy.dev.intern.nav.no
     - name: KUHR_SAR_API_CLIENT_ID
       value: dev-fss.teamkuhr.kuhr-sar-api
