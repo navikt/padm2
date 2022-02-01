@@ -4,7 +4,6 @@ import io.ktor.application.*
 import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import no.nav.emottak.subscription.SubscriptionPort
 import no.nav.syfo.application.*
 import no.nav.syfo.application.api.registerNaisApi
 import no.nav.syfo.application.mq.*
@@ -12,7 +11,6 @@ import no.nav.syfo.db.Database
 import no.nav.syfo.db.VaultCredentialService
 import no.nav.syfo.kafka.*
 import no.nav.syfo.vault.RenewVaultService
-import no.nav.syfo.ws.createPort
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -84,9 +82,6 @@ fun launchListeners(
         ),
         enabled = env.toggleDialogmeldingerTilKafka,
     )
-    val subscriptionEmottak = createPort<SubscriptionPort>(env.subscriptionEndpointURL) {
-        port { withBasicAuth(env.serviceuserUsername, env.serviceuserPassword) }
-    }
 
     launchBackgroundTask(
         applicationState = applicationState,
@@ -107,7 +102,6 @@ fun launchListeners(
                 inputconsumer = inputconsumer,
                 mqSender = mqSender,
                 dialogmeldingProducer = dialogmeldingProducer,
-                subscriptionEmottak = subscriptionEmottak,
             )
             blockingApplicationRunner.run()
         }
@@ -124,7 +118,6 @@ fun launchListeners(
             env = env,
             mqSender = mqSender,
             dialogmeldingProducer = dialogmeldingProducer,
-            subscriptionEmottak = subscriptionEmottak,
         )
         val rerunCronJob = RerunCronJob(
             database = database,

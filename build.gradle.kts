@@ -1,5 +1,4 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 
 group = "no.nav.syfo"
 version = "1.0.0"
@@ -12,13 +11,11 @@ val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e446
 val fellesformat2Version = "1.0329dd1"
 val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
 val ibmMqVersion = "9.2.4.0"
-val cxfFrameworkVersion = "3.4.5"
-val commonsCollectionVersion = "3.2.2"
-val jaxwsApiVersion = "2.3.1"
 val javaxAnnotationApiVersion = "1.3.2"
 val jaxbRuntimeVersion = "2.4.0-b180830.0438"
 val jaxbApiVersion = "2.4.0-b180830.0359"
 val javaxActivationVersion = "1.2.0"
+val jaxwsApiVersion = "2.3.1"
 val jaxwsToolsVersion = "2.3.1"
 val dialogmeldingVersion = "1.5d21db9"
 val base64containerVersion = "1.5ac2176"
@@ -41,7 +38,6 @@ val spek = "2.0.17"
 
 plugins {
     java
-    id("com.github.bjornvester.wsdl2java") version "1.2"
     kotlin("jvm") version "1.6.10"
     id("com.github.johnrengelman.shadow") version "7.1.1"
     id("org.jlleitschuh.gradle.ktlint") version "10.2.0"
@@ -108,16 +104,6 @@ dependencies {
 
     implementation("com.ibm.mq:com.ibm.mq.allclient:$ibmMqVersion")
 
-    implementation("org.apache.cxf:cxf-rt-frontend-jaxws:$cxfFrameworkVersion")
-    implementation("org.apache.cxf:cxf-rt-features-logging:$cxfFrameworkVersion")
-    implementation("org.apache.cxf:cxf-rt-transports-http:$cxfFrameworkVersion")
-    implementation("org.apache.cxf:cxf-rt-ws-security:$cxfFrameworkVersion")
-    implementation("commons-collections:commons-collections") {
-        version {
-            strictly(commonsCollectionVersion)
-        }
-    }
-
     implementation("org.apache.kafka:kafka_2.13:$kafkaVersion")
     testImplementation("no.nav:kafka-embedded-env:$kafkaEmbeddedVersion")
 
@@ -154,25 +140,14 @@ tasks {
     }
 
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        dependsOn("wsdl2java")
 
         kotlinOptions.jvmTarget = "17"
-    }
-
-    wsdl2java {
-        cxfVersion.set(cxfFrameworkVersion)
-        wsdlDir.set(layout.projectDirectory.dir("$projectDir/src/main/resources/wsdl"))
-        bindingFile.set(layout.projectDirectory.file("$projectDir/src/main/resources/xjb/binding.xml"))
     }
 
     withType<ShadowJar> {
         archiveBaseName.set("app")
         archiveClassifier.set("")
         archiveVersion.set("")
-        transform(ServiceFileTransformer::class.java) {
-            setPath("META-INF/cxf")
-            include("bus-extensions.txt")
-        }
     }
 
     withType<Test> {

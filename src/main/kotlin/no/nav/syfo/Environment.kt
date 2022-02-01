@@ -17,6 +17,7 @@ data class Environment(
     val apprecQueueName: String = getEnvVar("MQ_APPREC_QUEUE_NAME"),
     val kuhrSarApiClientId: String = getEnvVar("KUHR_SAR_API_CLIENT_ID"),
     val kuhrSarApiUrl: String = getEnvVar("KUHR_SAR_API_URL"),
+    val subscriptionEndpointClientId: String = getEnvVar("SUBSCRIPTION_CLIENT_ID"),
     val subscriptionEndpointURL: String = getEnvVar("SUBSCRIPTION_ENDPOINT_URL"),
     val cluster: String = getEnvVar("NAIS_CLUSTER_NAME"),
     val inputBackoutQueueName: String = getEnvVar("MQ_INPUT_BOQ_QUEUE_NAME"),
