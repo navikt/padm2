@@ -251,7 +251,7 @@ class DialogmeldingProcessor(
         dialogmeldingXml: XMLDialogmelding,
         receivedDialogmelding: ReceivedDialogmelding,
     ): ValidationResult {
-        val initialValidationResult =
+        val initialValidationResult: ValidationResult? =
             if (dialogmeldingDokumentWithShaExists(receivedDialogmelding.dialogmelding.id, sha256String, database)) {
                 val tidMottattOpprinneligMelding = database.hentMottattTidspunkt(sha256String)
                 handleDuplicateDialogmeldingContent(
@@ -270,17 +270,10 @@ class DialogmeldingProcessor(
             } else {
                 null
             }
-        return if (initialValidationResult != null) {
-            ValidationResult(
-                status = Status.INVALID,
-                apprecMessage = initialValidationResult,
-                ruleHits = emptyList(),
-            )
-        } else {
-            padm2ReglerService.executeRuleChains(
-                receivedDialogmelding = receivedDialogmelding,
-            )
-        }
+
+        return initialValidationResult ?: padm2ReglerService.executeRuleChains(
+            receivedDialogmelding = receivedDialogmelding,
+        )
     }
 
     suspend fun findSamhandlerpraksis(

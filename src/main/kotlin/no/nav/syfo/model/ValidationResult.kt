@@ -2,7 +2,6 @@ package no.nav.syfo.model
 
 data class ValidationResult(
     val status: Status,
-    val apprecMessage: String? = null,
     val ruleHits: List<RuleInfo>
 )
 

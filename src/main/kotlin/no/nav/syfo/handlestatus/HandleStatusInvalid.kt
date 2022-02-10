@@ -9,9 +9,7 @@ import no.nav.syfo.db.DatabaseInterface
 import no.nav.syfo.logger
 import no.nav.syfo.metrics.INVALID_MESSAGE_NO_NOTICE
 import no.nav.syfo.metrics.TEST_FNR_IN_PROD
-import no.nav.syfo.model.ReceivedDialogmelding
-import no.nav.syfo.model.ValidationResult
-import no.nav.syfo.model.Vedlegg
+import no.nav.syfo.model.*
 import no.nav.syfo.persistering.db.domain.DialogmeldingTidspunkt
 import no.nav.syfo.persistering.db.erDialogmeldingOpplysningerSendtApprec
 import no.nav.syfo.persistering.db.lagreSendtApprec
@@ -57,9 +55,6 @@ suspend fun handleStatusINVALID(
             apprecStatus = ApprecStatus.avvist,
             apprecErrors = run {
                 val errors = mutableListOf<XMLCV>()
-                validationResult.apprecMessage?.let {
-                    errors.add(createApprecError(it))
-                }
                 errors.addAll(validationResult.ruleHits.map { it.toApprecCV() })
                 errors
             }
@@ -73,7 +68,7 @@ fun handleDuplicateDialogmeldingContent(
     loggingMeta: LoggingMeta,
     sha256String: String,
     opprinneligMeldingTidspunkt: DialogmeldingTidspunkt,
-): String {
+): ValidationResult {
     val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")
     val tidMottattOpprinneligMelding = opprinneligMeldingTidspunkt.mottattTidspunkt.format(formatter)
     val tidMottattNyMelding = LocalDateTime.now().format(formatter)
@@ -91,12 +86,24 @@ fun handleDuplicateDialogmeldingContent(
     )
 
     INVALID_MESSAGE_NO_NOTICE.inc()
-    return "Duplikat! - Dialogmeldingen fra $tidMottattNyMelding har vi tidligere mottatt den $tidMottattOpprinneligMelding. Skal ikke sendes på nytt."
+
+    val message = "Duplikat! - Dialogmeldingen fra $tidMottattNyMelding har vi tidligere mottatt den $tidMottattOpprinneligMelding. Skal ikke sendes på nytt."
+    return ValidationResult(
+        status = Status.INVALID,
+        ruleHits = listOf(
+            RuleInfo(
+                ruleName = "DUPLICATE_DIALOGMELDING_CONTENT",
+                messageForSender = message,
+                messageForUser = message,
+                ruleStatus = Status.INVALID
+            )
+        )
+    )
 }
 
 fun handlePatientNotFound(
     loggingMeta: LoggingMeta
-): String {
+): ValidationResult {
     logger.warn(
         "Patient not found in PDL error {}",
         createLogEntry(
@@ -106,7 +113,19 @@ fun handlePatientNotFound(
         )
     )
     INVALID_MESSAGE_NO_NOTICE.inc()
-    return "Dialogmeldingen er ikke gyldig. Pasienten er ikke registrert i folkeregisteret."
+
+    val message = "Dialogmeldingen er ikke gyldig. Pasienten er ikke registrert i folkeregisteret."
+    return ValidationResult(
+        status = Status.INVALID,
+        ruleHits = listOf(
+            RuleInfo(
+                ruleName = "PATIENT_NOT_FOUND",
+                messageForSender = message,
+                messageForUser = message,
+                ruleStatus = Status.INVALID
+            )
+        )
+    )
 }
 
 fun handlePatientMissing(
@@ -135,7 +154,7 @@ fun handlePatientMissing(
 
 fun handleBehandlerNotFound(
     loggingMeta: LoggingMeta
-): String {
+): ValidationResult {
     logger.warn(
         "Behandler er ikke registrert i folkeregisteret {}",
         createLogEntry(
@@ -145,12 +164,24 @@ fun handleBehandlerNotFound(
         ),
     )
     INVALID_MESSAGE_NO_NOTICE.inc()
-    return "Dialogmeldingen er ikke gyldig. Behandler er ikke registrert i folkeregisteret."
+
+    val message = "Dialogmeldingen er ikke gyldig. Behandler er ikke registrert i folkeregisteret."
+    return ValidationResult(
+        status = Status.INVALID,
+        ruleHits = listOf(
+            RuleInfo(
+                ruleName = "BEHANDLER_NOT_FOUND",
+                messageForSender = message,
+                messageForUser = message,
+                ruleStatus = Status.INVALID
+            )
+        )
+    )
 }
 
 fun handleTestFnrInProd(
     loggingMeta: LoggingMeta
-): String {
+): ValidationResult {
     logger.warn(
         "Test fødselsnummer er kommet inn i produksjon {}",
         createLogEntry(
@@ -161,12 +192,24 @@ fun handleTestFnrInProd(
 
     INVALID_MESSAGE_NO_NOTICE.inc()
     TEST_FNR_IN_PROD.inc()
-    return "Dialogmeldingen er ikke gyldig. Fødselsnummer er fra testmiljøet. Kontakt din EPJ-leverandør."
+
+    val message = "Dialogmeldingen er ikke gyldig. Fødselsnummer er fra testmiljøet. Kontakt din EPJ-leverandør."
+    return ValidationResult(
+        status = Status.INVALID,
+        ruleHits = listOf(
+            RuleInfo(
+                ruleName = "TEST_FNR_IN_PROD",
+                messageForSender = message,
+                messageForUser = message,
+                ruleStatus = Status.INVALID
+            )
+        )
+    )
 }
 
 fun handleMeldingsTekstMangler(
     loggingMeta: LoggingMeta
-): String {
+): ValidationResult {
 
     logger.warn(
         "TekstNotatInnhold mangler {}",
@@ -176,12 +219,24 @@ fun handleMeldingsTekstMangler(
         )
     )
     INVALID_MESSAGE_NO_NOTICE.inc()
-    return "Dialogmeldingen er ikke gyldig: meldingstekst mangler."
+
+    val message = "Dialogmeldingen er ikke gyldig: meldingstekst mangler."
+    return ValidationResult(
+        status = Status.INVALID,
+        ruleHits = listOf(
+            RuleInfo(
+                ruleName = "MELDINGSTEKST_MANGLER",
+                messageForSender = message,
+                messageForUser = message,
+                ruleStatus = Status.INVALID
+            )
+        )
+    )
 }
 
 fun handleInvalidDialogMeldingKodeverk(
     loggingMeta: LoggingMeta
-): String {
+): ValidationResult {
 
     logger.warn(
         "Det er brukt ein ugyldig kombinasjon av dialogmelding kodeverk {}",
@@ -191,7 +246,19 @@ fun handleInvalidDialogMeldingKodeverk(
         )
     )
     INVALID_MESSAGE_NO_NOTICE.inc()
-    return "Dialogmeldingen er ikke gyldig: meldingstypen stemmer ikke med innholdet. Kontakt din EPJ-leverandør."
+
+    val message = "Dialogmeldingen er ikke gyldig: meldingstypen stemmer ikke med innholdet. Kontakt din EPJ-leverandør."
+    return ValidationResult(
+        status = Status.INVALID,
+        ruleHits = listOf(
+            RuleInfo(
+                ruleName = "INVALID_KODEVERK",
+                messageForSender = message,
+                messageForUser = message,
+                ruleStatus = Status.INVALID
+            )
+        )
+    )
 }
 
 fun createApprecError(errorText: String): XMLCV = XMLCV().apply {
