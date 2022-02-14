@@ -6,6 +6,7 @@ import no.nav.syfo.client.HelsenettProxyBehandler
 import no.nav.syfo.client.Kode
 import no.nav.syfo.model.Dialogmelding
 import no.nav.syfo.model.HelsepersonellKategori
+import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldEqual
 import org.junit.Test
 
@@ -35,7 +36,7 @@ internal class HPRRuleChainTest {
             null
         )
 
-        HPRRuleChain.BEHANDLER_IKKE_GYLDIG_I_HPR(ruleData(dialogmelding, behandler)) shouldEqual true
+        HPRRuleChain.BEHANDLER_IKKE_GYLDIG_I_HPR(ruleData(dialogmelding, behandler)) shouldBeEqualTo true
     }
 
     @Test
@@ -57,7 +58,7 @@ internal class HPRRuleChainTest {
             null
         )
 
-        HPRRuleChain.BEHANDLER_IKKE_GYLDIG_I_HPR(ruleData(dialogmelding, behandler)) shouldEqual false
+        HPRRuleChain.BEHANDLER_IKKE_GYLDIG_I_HPR(ruleData(dialogmelding, behandler)) shouldBeEqualTo false
     }
 
     @Test
@@ -79,7 +80,7 @@ internal class HPRRuleChainTest {
             null
         )
 
-        HPRRuleChain.BEHANDLER_MANGLER_AUTORISASJON_I_HPR(ruleData(dialogmelding, behandler)) shouldEqual true
+        HPRRuleChain.BEHANDLER_MANGLER_AUTORISASJON_I_HPR(ruleData(dialogmelding, behandler)) shouldBeEqualTo true
     }
 
     @Test
@@ -101,7 +102,7 @@ internal class HPRRuleChainTest {
             null
         )
 
-        HPRRuleChain.BEHANDLER_MANGLER_AUTORISASJON_I_HPR(ruleData(dialogmelding, behandler)) shouldEqual false
+        HPRRuleChain.BEHANDLER_MANGLER_AUTORISASJON_I_HPR(ruleData(dialogmelding, behandler)) shouldBeEqualTo false
     }
 
     @Test
@@ -128,7 +129,7 @@ internal class HPRRuleChainTest {
             null
         )
 
-        HPRRuleChain.BEHANDLER_MANGLER_AUTORISASJON_I_HPR(ruleData(dialogmelding, behandler)) shouldEqual true
+        HPRRuleChain.BEHANDLER_MANGLER_AUTORISASJON_I_HPR(ruleData(dialogmelding, behandler)) shouldBeEqualTo true
     }
 
     @Test
@@ -155,7 +156,7 @@ internal class HPRRuleChainTest {
             null
         )
 
-        HPRRuleChain.BEHANDLER_IKKE_LE_KI_MT_TL_FT_PS_I_HPR(ruleData(dialogmelding, behandler)) shouldEqual false
+        HPRRuleChain.BEHANDLER_IKKE_LE_KI_MT_TL_FT_PS_I_HPR(ruleData(dialogmelding, behandler)) shouldBeEqualTo false
     }
 
     @Test
@@ -182,7 +183,7 @@ internal class HPRRuleChainTest {
             null
         )
 
-        HPRRuleChain.BEHANDLER_IKKE_LE_KI_MT_TL_FT_PS_I_HPR(ruleData(dialogmelding, behandler)) shouldEqual true
+        HPRRuleChain.BEHANDLER_IKKE_LE_KI_MT_TL_FT_PS_I_HPR(ruleData(dialogmelding, behandler)) shouldBeEqualTo true
     }
 
     @Test
@@ -209,6 +210,6 @@ internal class HPRRuleChainTest {
             null
         )
 
-        HPRRuleChain.BEHANDLER_IKKE_LE_KI_MT_TL_FT_PS_I_HPR(ruleData(dialogmelding, behandler)) shouldEqual false
+        HPRRuleChain.BEHANDLER_IKKE_LE_KI_MT_TL_FT_PS_I_HPR(ruleData(dialogmelding, behandler)) shouldBeEqualTo false
     }
 }

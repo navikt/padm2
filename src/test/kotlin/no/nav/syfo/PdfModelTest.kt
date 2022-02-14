@@ -1,10 +1,25 @@
 package no.nav.syfo
 
-import no.nav.syfo.model.*
 import no.nav.syfo.util.objectMapper
 import org.amshove.kluent.shouldBeEqualTo
 import java.time.LocalDateTime
 import java.util.UUID
+import no.nav.syfo.model.Dialogmelding
+import no.nav.syfo.model.Foresporsel
+import no.nav.syfo.model.ForesporselFraSaksbehandlerForesporselSvar
+import no.nav.syfo.model.Helsepersonell
+import no.nav.syfo.model.HenvendelseFraLegeHenvendelse
+import no.nav.syfo.model.InnkallingMoterespons
+import no.nav.syfo.model.PdfModel
+import no.nav.syfo.model.Person
+import no.nav.syfo.model.RolleNotat
+import no.nav.syfo.model.RollerRelatertNotat
+import no.nav.syfo.model.RuleInfo
+import no.nav.syfo.model.Status
+import no.nav.syfo.model.TemaKode
+import no.nav.syfo.model.TypeForesp
+import no.nav.syfo.model.ValidationResult
+import no.nav.syfo.model.sanitizeForPdfGen
 import org.junit.Test
 
 internal class PdfModelTest {

@@ -1,14 +1,19 @@
 package no.nav.syfo.persistering.db
 
-import no.nav.syfo.db.*
+import java.sql.Connection
+import java.sql.ResultSet
+import java.sql.SQLException
+import java.sql.Timestamp
+import java.sql.Types
 import no.nav.syfo.model.Dialogmelding
 import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.model.ValidationResult
 import no.nav.syfo.persistering.db.domain.DialogmeldingTidspunkt
 import no.nav.syfo.util.objectMapper
 import org.postgresql.util.PGobject
-import java.sql.*
 import java.time.LocalDateTime
+import no.nav.syfo.db.DatabaseInterface
+import no.nav.syfo.db.toList
 
 fun DatabaseInterface.lagreMottattDialogmelding(
     receivedDialogmelding: ReceivedDialogmelding,

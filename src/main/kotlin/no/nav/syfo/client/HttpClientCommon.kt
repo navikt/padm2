@@ -1,12 +1,17 @@
 package no.nav.syfo.client
 
-import io.ktor.application.*
-import io.ktor.client.*
-import io.ktor.client.engine.apache.*
-import io.ktor.client.features.*
-import io.ktor.client.features.json.*
-import io.ktor.features.*
-import io.ktor.jackson.*
+
+import io.ktor.application.Application
+import io.ktor.application.install
+import io.ktor.client.HttpClient
+import io.ktor.client.HttpClientConfig
+import io.ktor.client.engine.apache.Apache
+import io.ktor.client.engine.apache.ApacheEngineConfig
+import io.ktor.client.features.HttpTimeout
+import io.ktor.client.features.json.JacksonSerializer
+import io.ktor.client.features.json.JsonFeature
+import io.ktor.features.ContentNegotiation
+import io.ktor.jackson.jackson
 import no.nav.syfo.util.configureJacksonMapper
 import no.nav.syfo.util.configuredJacksonMapper
 import org.apache.http.impl.conn.SystemDefaultRoutePlanner

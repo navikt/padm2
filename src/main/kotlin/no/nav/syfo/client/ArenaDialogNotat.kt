@@ -1,7 +1,13 @@
 package no.nav.syfo.client
 
 import net.logstash.logback.argument.StructuredArguments.fields
-import no.nav.helse.arenadialognotat.*
+import no.nav.helse.arenadialognotat.ArenaDialogNotat
+import no.nav.helse.arenadialognotat.DokumentInfoType
+import no.nav.helse.arenadialognotat.EiaDokumentInfoType
+import no.nav.helse.arenadialognotat.LegeType
+import no.nav.helse.arenadialognotat.NavnType
+import no.nav.helse.arenadialognotat.PasientDataType
+import no.nav.helse.arenadialognotat.PersonType
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
@@ -9,7 +15,11 @@ import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.logger
 import no.nav.syfo.model.Behandler
 import no.nav.syfo.model.Dialogmelding
-import no.nav.syfo.util.*
+import no.nav.syfo.util.LoggingMeta
+import no.nav.syfo.util.arenaDialogNotatMarshaller
+import no.nav.syfo.util.extractBehandler
+import no.nav.syfo.util.extractDialogmelding
+import no.nav.syfo.util.toString
 
 const val MAKS_TEKSTLENGDE = 2000
 

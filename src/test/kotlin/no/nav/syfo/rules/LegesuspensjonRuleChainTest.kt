@@ -2,7 +2,7 @@ package no.nav.syfo.rules
 
 import io.mockk.mockk
 import no.nav.syfo.model.Dialogmelding
-import org.amshove.kluent.shouldEqual
+import org.amshove.kluent.shouldBeEqualTo
 import org.junit.Test
 
 internal class LegesuspensjonRuleChainTest {
@@ -18,13 +18,13 @@ internal class LegesuspensjonRuleChainTest {
     internal fun `Should check rule BEHANDLER_SUSPENDERT, should trigger rule`() {
         val suspended = true
 
-        LegesuspensjonRuleChain.BEHANDLER_SUSPENDERT(ruleData(dialogmelding, suspended)) shouldEqual true
+        LegesuspensjonRuleChain.BEHANDLER_SUSPENDERT(ruleData(dialogmelding, suspended)) shouldBeEqualTo true
     }
 
     @Test
     internal fun `Should check rule BEHANDLER_SUSPENDERT, should NOT trigger rule`() {
         val suspended = false
 
-        LegesuspensjonRuleChain.BEHANDLER_SUSPENDERT(ruleData(dialogmelding, suspended)) shouldEqual false
+        LegesuspensjonRuleChain.BEHANDLER_SUSPENDERT(ruleData(dialogmelding, suspended)) shouldBeEqualTo false
     }
 }

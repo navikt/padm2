@@ -2,7 +2,9 @@ package no.nav.syfo.util
 
 import no.nav.helse.dialogmelding.XMLDialogmelding
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
-import no.nav.helse.msgHead.*
+import no.nav.helse.msgHead.XMLDocument
+import no.nav.helse.msgHead.XMLIdent
+import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.model.Behandler
 import no.nav.syfo.model.getName
 

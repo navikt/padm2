@@ -1,10 +1,14 @@
 package no.nav.syfo.client
 
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
+import io.ktor.client.HttpClient
+import io.ktor.client.call.receive
+import io.ktor.client.request.accept
+import io.ktor.client.request.get
+import io.ktor.client.request.headers
+import io.ktor.client.request.parameter
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.util.retry
 import no.nav.syfo.logger

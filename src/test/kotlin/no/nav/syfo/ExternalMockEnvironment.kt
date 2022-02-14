@@ -1,9 +1,16 @@
 package no.nav.syfo
 
-import io.ktor.server.netty.*
+import io.ktor.server.netty.NettyApplicationEngine
 import no.nav.common.KafkaEnvironment
 import no.nav.syfo.application.ApplicationState
-import no.nav.syfo.mock.*
+import no.nav.syfo.mock.AzureAdV2Mock
+import no.nav.syfo.mock.DokarkivMock
+import no.nav.syfo.mock.KuhrSarMock
+import no.nav.syfo.mock.LegeSuspensjonEndpointMock
+import no.nav.syfo.mock.PdfGenMock
+import no.nav.syfo.mock.PdlMock
+import no.nav.syfo.mock.SubscriptionEndpointMock
+import no.nav.syfo.mock.SyfohelsenettproxyMock
 
 class ExternalMockEnvironment private constructor() {
     val applicationState: ApplicationState = testAppState()

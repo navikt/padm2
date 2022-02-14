@@ -1,12 +1,14 @@
 package no.nav.syfo.mock
 
-import io.ktor.application.*
-import io.ktor.http.*
-import io.ktor.response.*
-import io.ktor.routing.*
-import io.ktor.server.engine.*
-import io.ktor.server.netty.*
-import no.nav.syfo.client.*
+import io.ktor.application.call
+import io.ktor.http.HttpStatusCode
+import io.ktor.response.respond
+import io.ktor.routing.post
+import io.ktor.routing.routing
+import io.ktor.server.engine.embeddedServer
+import io.ktor.server.netty.Netty
+import io.ktor.server.netty.NettyApplicationEngine
+import no.nav.syfo.client.installContentNegotiation
 import no.nav.syfo.getRandomPort
 
 class SubscriptionEndpointMock {

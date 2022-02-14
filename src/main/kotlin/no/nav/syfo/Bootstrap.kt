@@ -1,21 +1,33 @@
 package no.nav.syfo
 
-import io.ktor.application.*
-import io.ktor.routing.*
-import io.ktor.server.engine.*
-import io.ktor.server.netty.*
-import no.nav.syfo.application.*
+import io.ktor.application.ApplicationStarted
+import io.ktor.routing.routing
+import io.ktor.server.engine.applicationEngineEnvironment
+import io.ktor.server.engine.connector
+import io.ktor.server.engine.embeddedServer
+import io.ktor.server.engine.stop
+import io.ktor.server.netty.Netty
 import no.nav.syfo.application.api.registerNaisApi
-import no.nav.syfo.application.mq.*
 import no.nav.syfo.db.Database
 import no.nav.syfo.db.VaultCredentialService
-import no.nav.syfo.kafka.*
 import no.nav.syfo.vault.RenewVaultService
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
 import javax.jms.Session
+import no.nav.syfo.application.ApplicationState
+import no.nav.syfo.application.BlockingApplicationRunner
+import no.nav.syfo.application.CronjobRunner
+import no.nav.syfo.application.DialogmeldingProcessor
+import no.nav.syfo.application.RerunCronJob
+import no.nav.syfo.application.launchBackgroundTask
+import no.nav.syfo.application.mq.MQSender
+import no.nav.syfo.application.mq.connectionFactory
+import no.nav.syfo.application.mq.consumerForQueue
+import no.nav.syfo.kafka.DialogmeldingForKafka
+import no.nav.syfo.kafka.DialogmeldingProducer
+import no.nav.syfo.kafka.kafkaDialogmeldingProducerConfig
 
 val logger: Logger = LoggerFactory.getLogger("no.nav.syfo.padm2")
 

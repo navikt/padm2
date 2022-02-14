@@ -8,14 +8,20 @@ import no.nav.syfo.client.createAvsender
 import no.nav.syfo.model.DialogmeldingKodeverk
 import no.nav.syfo.model.findDialogmeldingType
 import no.nav.syfo.model.toDialogmelding
-import no.nav.syfo.util.*
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldEqual
 import org.junit.Test
 import java.io.StringReader
 import java.math.BigInteger
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
+import no.nav.syfo.util.extractBehandler
+import no.nav.syfo.util.extractBehandlerNavn
+import no.nav.syfo.util.extractDialogmelding
+import no.nav.syfo.util.extractInnbyggerident
+import no.nav.syfo.util.fellesformatUnmarshaller
+import no.nav.syfo.util.get
+import no.nav.syfo.util.getFileAsString
 
 class FromKiropraktorTest {
 

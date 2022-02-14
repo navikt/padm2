@@ -5,12 +5,16 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import io.ktor.client.*
-import io.ktor.client.engine.mock.*
-import io.ktor.client.features.json.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
-import io.ktor.util.*
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.mock.MockEngine
+import io.ktor.client.engine.mock.respond
+import io.ktor.client.engine.mock.respondError
+import io.ktor.client.features.json.JacksonSerializer
+import io.ktor.client.features.json.JsonFeature
+import io.ktor.client.statement.HttpStatement
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.headersOf
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
@@ -22,10 +26,10 @@ import no.nav.syfo.model.JournalpostRequest
 import no.nav.syfo.model.JournalpostResponse
 import no.nav.syfo.model.JournalpostType
 import no.nav.syfo.util.LoggingMeta
-import org.amshove.kluent.shouldEqual
 import org.junit.Before
 import org.junit.Test
 import java.time.LocalDateTime
+import org.amshove.kluent.shouldBeEqualTo
 import kotlin.test.assertFailsWith
 
 internal class DokArkivClientTest {
@@ -42,7 +46,7 @@ internal class DokArkivClientTest {
     lateinit var httpStatement: HttpStatement
 
     @MockK
-    lateinit var httpResponse: HttpResponse
+    lateinit var httpResponse: io.ktor.client.statement.HttpResponse
 
     @Before
     fun setUp() {
@@ -120,7 +124,7 @@ internal class DokArkivClientTest {
                 .createJournalpost(journalpostRequest, LoggingMeta("1", "2", "3"))
         }
 
-        response.journalpostId shouldEqual journalpostOKResponse.journalpostId
+        response.journalpostId shouldBeEqualTo journalpostOKResponse.journalpostId
     }
 
     @Test
@@ -137,7 +141,7 @@ internal class DokArkivClientTest {
                 .createJournalpost(journalpostRequest, LoggingMeta("1", "2", "3"))
         }
 
-        response.journalpostId shouldEqual journalpostOKResponse.journalpostId
+        response.journalpostId shouldBeEqualTo journalpostOKResponse.journalpostId
     }
 
     val journalpostRequest = JournalpostRequest(

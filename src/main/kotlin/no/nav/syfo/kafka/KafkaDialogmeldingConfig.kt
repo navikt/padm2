@@ -1,11 +1,11 @@
 package no.nav.syfo.kafka
 
+import java.util.Properties
 import no.nav.syfo.ApplicationEnvironmentKafka
 import no.nav.syfo.application.kafka.JacksonKafkaSerializer
 import no.nav.syfo.application.kafka.commonKafkaAivenProducerConfig
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.common.serialization.StringSerializer
-import java.util.*
 
 fun kafkaDialogmeldingProducerConfig(
     kafkaEnvironment: ApplicationEnvironmentKafka,

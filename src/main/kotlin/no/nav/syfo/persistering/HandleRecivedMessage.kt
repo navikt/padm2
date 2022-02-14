@@ -6,7 +6,9 @@ import no.nav.syfo.logger
 import no.nav.syfo.metrics.MESSAGE_STORED_IN_DB_COUNTER
 import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.model.ValidationResult
-import no.nav.syfo.persistering.db.*
+import no.nav.syfo.persistering.db.erDialogmeldingOpplysningerLagret
+import no.nav.syfo.persistering.db.lagreMottattDialogmelding
+import no.nav.syfo.persistering.db.lagreMottattDialogmeldingValidering
 import no.nav.syfo.util.LoggingMeta
 
 fun persistReceivedMessage(

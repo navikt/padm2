@@ -1,6 +1,5 @@
 package no.nav.syfo.services
 
-import io.ktor.util.*
 import no.nav.syfo.client.HelsenettProxyBehandler
 import no.nav.syfo.client.SyfohelsenettproxyClient
 import no.nav.syfo.util.LoggingMeta

@@ -1,14 +1,17 @@
 package no.nav.syfo.client.pdl
 
-import io.ktor.client.call.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
+import io.ktor.client.call.receive
+import io.ktor.client.request.header
+import io.ktor.client.request.post
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.client.azuread.v2.AzureAdV2Token
 import no.nav.syfo.client.httpClient
 import no.nav.syfo.domain.PersonIdent
-import no.nav.syfo.util.*
+import no.nav.syfo.util.ALLE_TEMA_HEADERVERDI
+import no.nav.syfo.util.TEMA_HEADER
+import no.nav.syfo.util.bearerHeader
 import org.slf4j.LoggerFactory
 
 class PdlClient(
@@ -44,7 +47,7 @@ class PdlClient(
             )
         )
 
-        val response: HttpResponse = httpClient.post(pdlUrl) {
+        val response: io.ktor.client.statement.HttpResponse = httpClient.post(pdlUrl) {
             body = request
             header(HttpHeaders.ContentType, "application/json")
             header(HttpHeaders.Authorization, bearerHeader(token.accessToken))

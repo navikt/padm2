@@ -1,14 +1,18 @@
 package no.nav.syfo.kafka
 
+import java.io.StringReader
+import java.io.StringWriter
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.msgHead.XMLMsgHead
-import no.nav.syfo.model.*
-import no.nav.syfo.util.*
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.slf4j.LoggerFactory
-import java.io.*
 import javax.xml.bind.Marshaller
+import no.nav.syfo.model.ReceivedDialogmelding
+import no.nav.syfo.util.fellesformatJaxBContext
+import no.nav.syfo.util.fellesformatUnmarshaller
+import no.nav.syfo.util.get
+import no.nav.syfo.util.isVedlegg
 
 class DialogmeldingProducer(
     private val kafkaProducerDialogmelding: KafkaProducer<String, DialogmeldingForKafka>,

@@ -1,19 +1,34 @@
 package no.nav.syfo.kafka
 
-import io.mockk.*
+import io.mockk.mockk
+import io.mockk.slot
+import io.mockk.verify
 import java.io.StringReader
 import java.time.LocalDateTime
 import java.util.UUID
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
-import no.nav.syfo.model.*
-import no.nav.syfo.util.*
-import org.amshove.kluent.*
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
-import org.junit.*
 import java.time.ZoneOffset
+import no.nav.syfo.model.ReceivedDialogmelding
+import no.nav.syfo.model.findDialogmeldingType
+import no.nav.syfo.model.toDialogmelding
+import no.nav.syfo.util.extractDialogmelding
+import no.nav.syfo.util.extractInnbyggerident
+import no.nav.syfo.util.extractLegeHpr
+import no.nav.syfo.util.extractOrganisationHerNumberFromSender
+import no.nav.syfo.util.extractOrganisationNumberFromSender
+import no.nav.syfo.util.extractSenderOrganisationName
+import no.nav.syfo.util.fellesformatUnmarshaller
+import no.nav.syfo.util.get
+import no.nav.syfo.util.getFileAsStringISO88591
+import no.nav.syfo.util.isVedlegg
+import org.amshove.kluent.shouldBe
+import org.amshove.kluent.shouldBeEqualTo
+import org.junit.Before
+import org.junit.Test
 
 internal class DialogmeldingProducerTest {
 

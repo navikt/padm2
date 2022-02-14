@@ -5,7 +5,9 @@ import java.time.LocalDateTime
 import java.util.UUID
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
-import no.nav.syfo.model.*
+import no.nav.syfo.model.findDialogmeldingType
+import no.nav.syfo.model.toDialogmelding
+import no.nav.syfo.model.toVedlegg
 import no.nav.syfo.util.extractDialogmelding
 import no.nav.syfo.util.extractVedlegg
 import no.nav.syfo.util.fellesformatUnmarshaller

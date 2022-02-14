@@ -1,12 +1,16 @@
 package no.nav.syfo.client.azuread.v2
 
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.features.*
-import io.ktor.client.request.*
-import io.ktor.client.request.forms.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
+import io.ktor.client.HttpClient
+import io.ktor.client.call.receive
+import io.ktor.client.features.ClientRequestException
+import io.ktor.client.features.ResponseException
+import io.ktor.client.features.ServerResponseException
+import io.ktor.client.request.accept
+import io.ktor.client.request.forms.FormDataContent
+import io.ktor.client.request.post
+import io.ktor.http.ContentType
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.Parameters
 import org.slf4j.LoggerFactory
 
 class AzureAdV2Client(

@@ -1,12 +1,18 @@
 package no.nav.syfo.services
 
 import net.logstash.logback.argument.StructuredArguments
-import no.nav.syfo.client.*
+import no.nav.syfo.client.DokArkivClient
+import no.nav.syfo.client.PdfgenClient
+import no.nav.syfo.client.createJournalpostPayload
+import no.nav.syfo.client.createPdfPayload
 import no.nav.syfo.db.DatabaseInterface
 import no.nav.syfo.logger
 import no.nav.syfo.metrics.MELDING_LAGER_I_JOARK
-import no.nav.syfo.model.*
-import no.nav.syfo.persistering.db.*
+import no.nav.syfo.model.ReceivedDialogmelding
+import no.nav.syfo.model.ValidationResult
+import no.nav.syfo.model.Vedlegg
+import no.nav.syfo.persistering.db.hentDialogmeldingOpplysningerJournalpostId
+import no.nav.syfo.persistering.db.lagreJournalforing
 import no.nav.syfo.util.LoggingMeta
 
 class JournalService(

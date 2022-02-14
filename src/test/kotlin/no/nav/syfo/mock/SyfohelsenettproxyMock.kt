@@ -1,12 +1,18 @@
 package no.nav.syfo.mock
 
-import io.ktor.application.*
-import io.ktor.response.*
-import io.ktor.routing.*
-import io.ktor.server.engine.*
-import io.ktor.server.netty.*
+
+import io.ktor.application.call
+import io.ktor.response.respond
+import io.ktor.routing.get
+import io.ktor.routing.routing
+import io.ktor.server.engine.embeddedServer
+import io.ktor.server.netty.Netty
+import io.ktor.server.netty.NettyApplicationEngine
 import no.nav.syfo.UserConstants
-import no.nav.syfo.client.*
+import no.nav.syfo.client.Godkjenning
+import no.nav.syfo.client.HelsenettProxyBehandler
+import no.nav.syfo.client.Kode
+import no.nav.syfo.client.installContentNegotiation
 import no.nav.syfo.getRandomPort
 import no.nav.syfo.model.HelsepersonellKategori
 

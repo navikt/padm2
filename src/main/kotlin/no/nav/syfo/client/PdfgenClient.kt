@@ -1,10 +1,13 @@
 package no.nav.syfo.client
 
 import io.ktor.client.HttpClient
-import io.ktor.client.call.*
+import io.ktor.client.call.receive
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
-import io.ktor.http.*
+import io.ktor.http.ContentType
+import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
 import no.nav.syfo.util.retry
 import no.nav.syfo.model.Dialogmelding
 import no.nav.syfo.model.PdfModel

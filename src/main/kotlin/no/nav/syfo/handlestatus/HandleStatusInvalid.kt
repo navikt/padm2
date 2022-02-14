@@ -4,12 +4,10 @@ import net.logstash.logback.argument.StructuredArguments.fields
 import no.nav.helse.apprecV1.XMLCV
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.syfo.application.mq.MQSenderInterface
-import no.nav.syfo.apprec.*
 import no.nav.syfo.db.DatabaseInterface
 import no.nav.syfo.logger
 import no.nav.syfo.metrics.INVALID_MESSAGE_NO_NOTICE
 import no.nav.syfo.metrics.TEST_FNR_IN_PROD
-import no.nav.syfo.model.*
 import no.nav.syfo.persistering.db.domain.DialogmeldingTidspunkt
 import no.nav.syfo.persistering.db.erDialogmeldingOpplysningerSendtApprec
 import no.nav.syfo.persistering.db.lagreSendtApprec
@@ -20,6 +18,13 @@ import no.nav.syfo.util.LoggingMeta
 import no.nav.syfo.util.createLogEntry
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import no.nav.syfo.apprec.ApprecStatus
+import no.nav.syfo.apprec.toApprecCV
+import no.nav.syfo.model.ReceivedDialogmelding
+import no.nav.syfo.model.RuleInfo
+import no.nav.syfo.model.Status
+import no.nav.syfo.model.ValidationResult
+import no.nav.syfo.model.Vedlegg
 
 suspend fun handleStatusINVALID(
     database: DatabaseInterface,

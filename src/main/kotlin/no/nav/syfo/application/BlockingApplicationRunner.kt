@@ -5,12 +5,13 @@ import net.logstash.logback.argument.StructuredArguments
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
-import no.nav.syfo.*
+import no.nav.syfo.Environment
 import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.kafka.DialogmeldingProducer
 import no.nav.syfo.db.DatabaseInterface
 import no.nav.syfo.domain.elevenDigits
 import no.nav.syfo.handlestatus.*
+import no.nav.syfo.logger
 import no.nav.syfo.metrics.INCOMING_MESSAGE_COUNTER
 import no.nav.syfo.metrics.MESSAGES_SENT_TO_BOQ
 import no.nav.syfo.persistering.persistReceivedMessage

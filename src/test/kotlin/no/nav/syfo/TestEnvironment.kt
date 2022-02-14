@@ -2,7 +2,7 @@ package no.nav.syfo
 
 import no.nav.syfo.application.ApplicationState
 import java.net.ServerSocket
-import java.util.*
+import java.util.Properties
 
 fun testEnvironment(
     kafkaBootstrapServers: String,

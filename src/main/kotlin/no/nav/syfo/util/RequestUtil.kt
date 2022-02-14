@@ -1,7 +1,9 @@
 package no.nav.syfo.util
 
-import io.ktor.application.*
-import io.ktor.util.pipeline.*
+
+import io.ktor.application.ApplicationCall
+import io.ktor.application.call
+import io.ktor.util.pipeline.PipelineContext
 import net.logstash.logback.argument.StructuredArguments
 
 const val TEMA_HEADER = "Tema"
