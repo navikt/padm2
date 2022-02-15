@@ -22,7 +22,7 @@ import no.nav.syfo.model.JournalpostRequest
 import no.nav.syfo.model.JournalpostResponse
 import no.nav.syfo.model.JournalpostType
 import no.nav.syfo.util.LoggingMeta
-import org.amshove.kluent.shouldEqual
+import org.amshove.kluent.shouldBeEqualTo
 import org.junit.Before
 import org.junit.Test
 import java.time.LocalDateTime
@@ -120,7 +120,7 @@ internal class DokArkivClientTest {
                 .createJournalpost(journalpostRequest, LoggingMeta("1", "2", "3"))
         }
 
-        response.journalpostId shouldEqual journalpostOKResponse.journalpostId
+        response.journalpostId shouldBeEqualTo journalpostOKResponse.journalpostId
     }
 
     @Test
@@ -137,7 +137,7 @@ internal class DokArkivClientTest {
                 .createJournalpost(journalpostRequest, LoggingMeta("1", "2", "3"))
         }
 
-        response.journalpostId shouldEqual journalpostOKResponse.journalpostId
+        response.journalpostId shouldBeEqualTo journalpostOKResponse.journalpostId
     }
 
     val journalpostRequest = JournalpostRequest(
