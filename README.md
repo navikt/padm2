@@ -134,16 +134,8 @@ Creating a docker image should be as simple as `docker build -t padm2 .`
 #### Running a docker image
 `docker run --rm -it -p 8080:8080 padm2`
 
-
-## Contact us
-### Code/project related questions can be sent to
-* John Martin Lindseth, `john.martin.lindseth@nav.no`
-* June Henriksen, `june.henriksen2@nav.no`
-* Erik Gunnar Jansen, `erik.gunnar.jansen@nav.no`
-* Mathias Rørvik, `mathias.rorvik@nav.no`
-* Anders Rognstad, `anders.rognstad@nav.no`
-* Geir Arne Waagbø, `geir.arne.waagbo@nav.no`
-* Audun Sørheim, `audun.sorheim@nav.no`
+## Contact
 
 ### For NAV employees
-We are available at the Slack channel #isyfo
+
+We are available at the Slack channel `#isyfo`.
