@@ -14,7 +14,6 @@ import no.nav.syfo.model.findDialogmeldingType
 import no.nav.syfo.model.toDialogmelding
 import no.nav.syfo.util.*
 import org.amshove.kluent.shouldBeEqualTo
-import org.amshove.kluent.shouldEqual
 import org.junit.Test
 import java.math.BigInteger
 
@@ -64,7 +63,7 @@ internal class CreateArenaDialogNotatTest {
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentreferanse shouldBeEqualTo "b62016eb-6c2d-417a-8ecc-157b3c5ee2ca"
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.ediLoggId shouldBeEqualTo "FiktivTestdata0001"
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeFnr shouldBeEqualTo FASTLEGE_FNR
-        arenaDialogNotat.eiaDokumentInfo.avsender.lege.tssId.shouldEqual(tssid.toBigInteger())
+        arenaDialogNotat.eiaDokumentInfo.avsender.lege.tssId.shouldBeEqualTo(tssid.toBigInteger())
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.fornavn shouldBeEqualTo "Inga"
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.etternavn shouldBeEqualTo "Valda"
         arenaDialogNotat.pasientData.person.personFnr shouldBeEqualTo "3143242342"
@@ -83,7 +82,7 @@ internal class CreateArenaDialogNotatTest {
         val behandler = Behandler(etternavn = "Etternavn", fornavn = "Fornavn", mellomnavn = "Mellomnavn")
         val avsender = createAvsender(FASTLEGE_FNR, "", behandler)
         avsender.lege.legeFnr shouldBeEqualTo FASTLEGE_FNR
-        avsender.lege.tssId shouldEqual BigInteger("0")
+        avsender.lege.tssId shouldBeEqualTo BigInteger("0")
     }
 
     @Test
@@ -91,7 +90,7 @@ internal class CreateArenaDialogNotatTest {
         val behandler = Behandler("Etternavn", "Fornavn", "Mellomnavn")
         val avsender = createAvsender(FASTLEGE_FNR, null, behandler)
         avsender.lege.legeFnr shouldBeEqualTo FASTLEGE_FNR
-        avsender.lege.tssId shouldEqual BigInteger("0")
+        avsender.lege.tssId shouldBeEqualTo BigInteger("0")
     }
 
     @Test
@@ -135,11 +134,11 @@ internal class CreateArenaDialogNotatTest {
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentNavn shouldBeEqualTo "Svar p.. foresp..rsel"
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentreferanse shouldBeEqualTo "9be88bc5-4219-473e-954b-c0dd115ff4e0"
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.ediLoggId shouldBeEqualTo "1901162204amsa22108.1"
-        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.year shouldEqual 2020
-        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.monthValue shouldEqual 9
-        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.dayOfMonth shouldEqual 21
+        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.year shouldBeEqualTo 2020
+        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.monthValue shouldBeEqualTo 9
+        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.dayOfMonth shouldBeEqualTo 21
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeFnr shouldBeEqualTo "12312414234"
-        arenaDialogNotat.eiaDokumentInfo.avsender.lege.tssId.shouldEqual(tssid.toBigInteger())
+        arenaDialogNotat.eiaDokumentInfo.avsender.lege.tssId.shouldBeEqualTo(tssid.toBigInteger())
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.fornavn shouldBeEqualTo "Inga"
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.etternavn shouldBeEqualTo "Valda"
         arenaDialogNotat.pasientData.person.personFnr shouldBeEqualTo "3143242342"
@@ -151,9 +150,9 @@ internal class CreateArenaDialogNotatTest {
         arenaDialogNotat.notatTittel shouldBeEqualTo DialogmeldingKodeverk.SVAR_PAA_INNKALLING_DIALOGMOTE_JA_JEG_KOMMER.arenaNotatTittel
         arenaDialogNotat.notatTekst shouldBeEqualTo "Ta gjerne kontakt ang hvilket telefonnummer jeg skal ringe. Mvh Inga F. Valda."
         arenaDialogNotat.svarReferanse shouldBeEqualTo "OD2009169905747"
-        arenaDialogNotat.notatDato.year shouldEqual 2020
-        arenaDialogNotat.notatDato.monthValue shouldEqual 9
-        arenaDialogNotat.notatDato.dayOfMonth shouldEqual 21
+        arenaDialogNotat.notatDato.year shouldBeEqualTo 2020
+        arenaDialogNotat.notatDato.monthValue shouldBeEqualTo 9
+        arenaDialogNotat.notatDato.dayOfMonth shouldBeEqualTo 21
     }
 
     @Test
@@ -197,9 +196,9 @@ internal class CreateArenaDialogNotatTest {
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentNavn shouldBeEqualTo "Notat"
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentreferanse shouldBeEqualTo "37340D30-FE14-42B5-985F-A8FF8FFA0CB5"
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.ediLoggId shouldBeEqualTo "1901162157lege21826.1"
-        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.shouldEqual(LocalDateTime.of(2019, 1, 16, 21, 51, 35, 531000000))
+        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.shouldBeEqualTo(LocalDateTime.of(2019, 1, 16, 21, 51, 35, 531000000))
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeFnr shouldBeEqualTo "01010112377"
-        arenaDialogNotat.eiaDokumentInfo.avsender.lege.tssId.shouldEqual(tssid.toBigInteger())
+        arenaDialogNotat.eiaDokumentInfo.avsender.lege.tssId.shouldBeEqualTo(tssid.toBigInteger())
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.fornavn shouldBeEqualTo "Inga"
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.etternavn shouldBeEqualTo "Valda"
         arenaDialogNotat.pasientData.person.personFnr shouldBeEqualTo "01010142365"
@@ -211,7 +210,7 @@ internal class CreateArenaDialogNotatTest {
         arenaDialogNotat.notatTittel shouldBeEqualTo DialogmeldingKodeverk.HENVENDELSE_OM_PASIENT_HENVENDELSE_OM_SYKEFRAVARSOPPFOLGING.arenaNotatTittel
         arenaDialogNotat.notatTekst shouldBeEqualTo "Hei,Det gjelder pas. Sender som vedlegg epikrisen"
         arenaDialogNotat.svarReferanse shouldBeEqualTo "A1578B81-0042-453B-8527-6CF182BDA6C7"
-        arenaDialogNotat.notatDato.shouldEqual(LocalDateTime.of(2019, 1, 16, 21, 51, 35, 531000000))
+        arenaDialogNotat.notatDato.shouldBeEqualTo(LocalDateTime.of(2019, 1, 16, 21, 51, 35, 531000000))
     }
 
     @Test

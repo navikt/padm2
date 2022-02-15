@@ -1,13 +1,13 @@
 package no.nav.syfo.util
 
-import org.amshove.kluent.shouldEqual
+import org.amshove.kluent.shouldBeEqualTo
 import org.junit.Test
 import java.io.IOException
 
 internal class NetworkHelpersTest {
     @Test
     internal fun `Should find a IOException in a nested Exception`() {
-        isCausedBy(Exception(IOException("Connection timed out")), 3, arrayOf(IOException::class)) shouldEqual true
+        isCausedBy(Exception(IOException("Connection timed out")), 3, arrayOf(IOException::class)) shouldBeEqualTo true
     }
 
     @Test
@@ -16,7 +16,7 @@ internal class NetworkHelpersTest {
             Exception(IOException("Connection timed out")),
             3,
             arrayOf(RuntimeException::class)
-        ) shouldEqual false
+        ) shouldBeEqualTo false
     }
 
     @Test
@@ -25,7 +25,7 @@ internal class NetworkHelpersTest {
             Exception(Exception(Exception(IOException("Connection timed out")))),
             3,
             arrayOf(IOException::class)
-        ) shouldEqual false
+        ) shouldBeEqualTo false
     }
 
     @Test
@@ -34,6 +34,6 @@ internal class NetworkHelpersTest {
             Exception(Exception(IOException("Connection timed out"))),
             3,
             arrayOf(IOException::class)
-        ) shouldEqual true
+        ) shouldBeEqualTo true
     }
 }
