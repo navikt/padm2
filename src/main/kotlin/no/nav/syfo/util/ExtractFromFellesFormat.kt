@@ -17,7 +17,7 @@ fun extractVedlegg(fellesformat: XMLEIFellesformat) = fellesformat.get<XMLMsgHea
 
 fun XMLDocument.isVedlegg(): Boolean {
     return this.refDoc.msgType.v == "A" &&
-        listOf("application/pdf", "image/tiff", "image/png", "image/jpeg").contains(this.refDoc.mimeType)
+        listOf("application/pdf", "image/tiff", "image/png", "image/jpeg", "image/jpg").contains(this.refDoc.mimeType)
 }
 
 fun extractOrganisationNumberFromSender(fellesformat: XMLEIFellesformat): XMLIdent? =
