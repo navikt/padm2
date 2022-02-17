@@ -33,69 +33,77 @@ fun XMLDialogmelding.toDialogmelding(
 
 )
 
-fun XMLNotat.toHenvendelseFraLegeHenvendelse(): HenvendelseFraLegeHenvendelse {
-
-    return HenvendelseFraLegeHenvendelse(
-        temaKode = temaKodet.toTemaKode(),
-        tekstNotatInnhold = tekstNotatInnhold?.toString() ?: "",
-        dokIdNotat = dokIdNotat,
-        foresporsel = null, // Ignore because EPJ send incorrect data and we don't use it
-        rollerRelatertNotat = if (rollerRelatertNotat.isNotEmpty()) {
-            RollerRelatertNotat(
-                rolleNotat = if (rollerRelatertNotat.firstOrNull()?.person != null) {
-                    RolleNotat(
-                        rollerRelatertNotat.first().rolleNotat.s,
-                        rollerRelatertNotat.first().rolleNotat.v
-                    )
-                } else {
-                    null
-                },
-                person = if (rollerRelatertNotat.firstOrNull()?.person != null) {
-                    Person(rollerRelatertNotat.first().person.givenName, rollerRelatertNotat.first().person.familyName)
-                } else {
-                    null
-                },
-                helsepersonell = if (rollerRelatertNotat.firstOrNull()?.healthcareProfessional != null) {
-                    Helsepersonell(
-                        rollerRelatertNotat.first().healthcareProfessional.givenName,
-                        rollerRelatertNotat.first().healthcareProfessional.familyName
-                    )
-                } else {
-                    null
-                }
-            )
-        } else {
-            null
-        }
-    )
+fun XMLNotat.toHenvendelseFraLegeHenvendelse(): HenvendelseFraLegeHenvendelse? {
+    return temaKodet.toTemaKode()?.let { it ->
+        HenvendelseFraLegeHenvendelse(
+            temaKode = it,
+            tekstNotatInnhold = tekstNotatInnhold?.toString() ?: "",
+            dokIdNotat = dokIdNotat,
+            foresporsel = null, // Ignore because EPJ send incorrect data and we don't use it
+            rollerRelatertNotat = if (rollerRelatertNotat.isNotEmpty()) {
+                RollerRelatertNotat(
+                    rolleNotat = if (rollerRelatertNotat.firstOrNull()?.person != null) {
+                        RolleNotat(
+                            rollerRelatertNotat.first().rolleNotat.s,
+                            rollerRelatertNotat.first().rolleNotat.v
+                        )
+                    } else {
+                        null
+                    },
+                    person = if (rollerRelatertNotat.firstOrNull()?.person != null) {
+                        Person(
+                            rollerRelatertNotat.first().person.givenName,
+                            rollerRelatertNotat.first().person.familyName
+                        )
+                    } else {
+                        null
+                    },
+                    helsepersonell = if (rollerRelatertNotat.firstOrNull()?.healthcareProfessional != null) {
+                        Helsepersonell(
+                            rollerRelatertNotat.first().healthcareProfessional.givenName,
+                            rollerRelatertNotat.first().healthcareProfessional.familyName
+                        )
+                    } else {
+                        null
+                    }
+                )
+            } else {
+                null
+            }
+        )
+    }
 }
 
-fun CV.toTemaKode(): TemaKode {
-    return findDialogmeldingKodeverk(s, v)!!.toTypeMelding()
+fun CV.toTemaKode(): TemaKode? {
+    return findDialogmeldingKodeverk(s, v)?.toTypeMelding()
 }
 
 fun DialogmeldingKodeverk.toTypeMelding(): TemaKode {
     return TemaKode(kodeverkOID, dn, v, arenaNotatKategori, arenaNotatKode, arenaNotatTittel)
 }
 
-fun XMLNotat.toInnkallingMoterespons(): InnkallingMoterespons {
+fun XMLNotat.toInnkallingMoterespons(): InnkallingMoterespons? {
 
-    return InnkallingMoterespons(
-        temaKode = temaKodet.toTemaKode(),
-        tekstNotatInnhold = tekstNotatInnhold?.toString(),
-        dokIdNotat = dokIdNotat,
-        foresporsel = foresporsel?.toForesporsel()
-    )
+    return temaKodet.toTemaKode()?.let { it ->
+        InnkallingMoterespons(
+            temaKode = it,
+            tekstNotatInnhold = tekstNotatInnhold?.toString(),
+            dokIdNotat = dokIdNotat,
+            foresporsel = foresporsel?.toForesporsel()
+        )
+    }
 }
 
-fun XMLNotat.toForesporselFraSaksbehandlerForesporselSvar(): ForesporselFraSaksbehandlerForesporselSvar {
+fun XMLNotat.toForesporselFraSaksbehandlerForesporselSvar(): ForesporselFraSaksbehandlerForesporselSvar? {
 
-    return ForesporselFraSaksbehandlerForesporselSvar(
-        temaKode = temaKodet.toTemaKode(),
-        tekstNotatInnhold = tekstNotatInnhold?.toString() ?: "",
-        dokIdNotat = dokIdNotat,
-        datoNotat = datoNotat?.toGregorianCalendar()?.toZonedDateTime()?.toLocalDateTime()
-    )
+    return temaKodet.toTemaKode()?.let { it ->
+        ForesporselFraSaksbehandlerForesporselSvar(
+            temaKode = it,
+            tekstNotatInnhold = tekstNotatInnhold?.toString() ?: "",
+            dokIdNotat = dokIdNotat,
+            datoNotat = datoNotat?.toGregorianCalendar()?.toZonedDateTime()?.toLocalDateTime()
+        )
+    }
 }
 
 fun XMLForesporsel.toForesporsel(): Foresporsel {

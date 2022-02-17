@@ -104,6 +104,18 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 0) { mqSender.sendArena(any()) }
                     verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                 }
+                it("Prosesserer innkommet melding (ugyldig kodeverk)") {
+                    val fellesformat =
+                        getFileAsString("src/test/resources/dialogmelding_dialog_svar_foresporsel_om_pasient_invalid.xml")
+                    every { incomingMessage.text } returns(fellesformat)
+                    runBlocking {
+                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                    }
+                    verify(exactly = 1) { mqSender.sendReceipt(any()) }
+                    verify(exactly = 0) { mqSender.sendBackout(any()) }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
+                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
+                }
                 it("Prosesserer innkommet melding (duplikat)") {
                     val fellesformat =
                         getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
