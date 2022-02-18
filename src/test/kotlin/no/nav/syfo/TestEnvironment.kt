@@ -13,7 +13,6 @@ fun testEnvironment(
     kuhrSarApiUrl: String,
     syfohelsenettproxyEndpointUrl: String,
     legeSuspensjonEndpointUrl: String,
-    subscriptionEndpointUrl: String,
 ) = Environment(
     aadAppClient = "isdialogmote-client-id",
     aadAppSecret = "isdialogmote-secret",
@@ -44,9 +43,7 @@ fun testEnvironment(
     pdlUrl = pdlUrl,
     kuhrSarApiClientId = "kuhrsar",
     kuhrSarApiUrl = kuhrSarApiUrl,
-    subscriptionEndpointClientId = "subscription",
-    subscriptionEndpointURL = subscriptionEndpointUrl,
-    helsenettClientId = "helsenett",
+    syfohelsenettproxyClientId = "helsenett",
     syfohelsenettproxyEndpointURL = syfohelsenettproxyEndpointUrl,
     legeSuspensjonClientId = "legesuspensjon",
     legeSuspensjonEndpointURL = legeSuspensjonEndpointUrl,

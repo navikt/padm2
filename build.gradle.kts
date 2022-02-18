@@ -25,7 +25,6 @@ val kafkaEmbeddedVersion = "2.8.1"
 val kluentVersion = "1.68"
 val mockkVersion = "1.12.2"
 val jacksonVersion = "2.13.1"
-val commonsTextVersion = "1.4"
 val arenaDialogNotatVersion = "1.e1999cf"
 val javaTimeAdapterVersion = "1.1.3"
 val vaultJavaDriveVersion = "3.1.0"
@@ -74,7 +73,6 @@ dependencies {
 
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
 
-    implementation("org.apache.commons:commons-text:$commonsTextVersion")
     implementation("org.apache.pdfbox:pdfbox:$pdfboxVersion")
 
     implementation("ch.qos.logback:logback-classic:$logbackVersion")

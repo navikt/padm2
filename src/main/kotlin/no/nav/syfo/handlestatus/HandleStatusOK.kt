@@ -32,7 +32,7 @@ suspend fun handleStatusOK(
     receiverBlock: XMLMottakenhetBlokk,
     pasientNavn: String,
     navnSignerendeLege: String,
-    samhandlerPraksis: SamhandlerPraksis?,
+    tssId: String,
 ) {
     val journalpostId = journalService.onJournalRequest(
         receivedDialogmelding,
@@ -48,7 +48,7 @@ suspend fun handleStatusOK(
             mqSender,
             createArenaDialogNotat(
                 fellesformat,
-                samhandlerPraksis?.tss_ident,
+                tssId,
                 receivedDialogmelding.personNrLege,
                 receivedDialogmelding.personNrPasient,
                 msgHead,
