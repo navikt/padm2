@@ -164,7 +164,8 @@ fun findFiltype(vedlegg: Vedlegg): String =
         "image/tiff" -> "TIFF"
         "image/png" -> "PNG"
         "image/jpeg" -> "JPEG"
-        else -> throw RuntimeException("Vedlegget er av av ukjent mimeType ${vedlegg.mimeType}")
+        "image/jpg" -> "JPEG"
+        else -> throw RuntimeException("Vedlegget er av ukjent mimeType ${vedlegg.mimeType}")
     }
 
 fun createAvsenderMottakerValidFnr(
