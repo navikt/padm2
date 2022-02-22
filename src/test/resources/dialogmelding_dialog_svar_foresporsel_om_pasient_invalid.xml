@@ -5,7 +5,7 @@
             <Type DN="Svar på forespørsel" V="DIALOG_SVAR"/>
             <MIGversion>v1.2 2006-05-24</MIGversion>
             <GenDate>2020-09-30T18:00:31.4764563+02:00</GenDate>
-            <MsgId>b62016eb-6c2d-417a-8ecc-157b3c5ee2ca</MsgId>
+            <MsgId>b63016eb-6c2d-417a-8ecc-157b3c5ee2ca</MsgId>
             <Ack DN="Ja" V="J"/>
             <Sender>
                 <Organisation>

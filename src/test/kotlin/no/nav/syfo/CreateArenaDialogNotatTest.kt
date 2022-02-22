@@ -60,7 +60,7 @@ internal class CreateArenaDialogNotatTest {
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentType shouldBeEqualTo "DM"
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentTypeVersjon shouldBeEqualTo "1.0"
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentNavn shouldBeEqualTo "Svar på forespørsel"
-        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentreferanse shouldBeEqualTo "b62016eb-6c2d-417a-8ecc-157b3c5ee2ca"
+        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentreferanse shouldBeEqualTo "b63016eb-6c2d-417a-8ecc-157b3c5ee2ca"
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.ediLoggId shouldBeEqualTo "FiktivTestdata0001"
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeFnr shouldBeEqualTo FASTLEGE_FNR
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.tssId.shouldBeEqualTo(tssid.toBigInteger())
@@ -132,7 +132,7 @@ internal class CreateArenaDialogNotatTest {
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentType shouldBeEqualTo "DM"
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentTypeVersjon shouldBeEqualTo "1.0"
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentNavn shouldBeEqualTo "Svar p.. foresp..rsel"
-        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentreferanse shouldBeEqualTo "9be88bc5-4219-473e-954b-c0dd115ff4e0"
+        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentreferanse shouldBeEqualTo "9be98bc5-4219-473e-954b-c0dd115ff4e0"
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.ediLoggId shouldBeEqualTo "1901162204amsa22108.1"
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.year shouldBeEqualTo 2020
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.monthValue shouldBeEqualTo 9
@@ -194,7 +194,7 @@ internal class CreateArenaDialogNotatTest {
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentType shouldBeEqualTo "DM"
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentTypeVersjon shouldBeEqualTo "1.0"
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentNavn shouldBeEqualTo "Notat"
-        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentreferanse shouldBeEqualTo "37340D30-FE14-42B5-985F-A8FF8FFA0CB5"
+        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentreferanse shouldBeEqualTo "37440D30-FE14-42B5-985F-A8FF8FFA0CB5"
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.ediLoggId shouldBeEqualTo "1901162157lege21826.1"
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.shouldBeEqualTo(LocalDateTime.of(2019, 1, 16, 21, 51, 35, 531000000))
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeFnr shouldBeEqualTo "01010112377"
