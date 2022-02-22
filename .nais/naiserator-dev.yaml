@@ -90,11 +90,7 @@ spec:
       value: dev-fss.teamsykefravr.isproxy
     - name: LEGE_SUSPENSJON_ENDPOINT_URL
       value: https://isproxy.dev.intern.nav.no
-    - name: SUBSCRIPTION_CLIENT_ID
-      value: dev-fss.teamsykefravr.isproxy
-    - name: SUBSCRIPTION_ENDPOINT_URL
-      value: https://isproxy.dev.intern.nav.no
     - name: KUHR_SAR_API_CLIENT_ID
-      value: dev-fss.teamkuhr.kuhr-sar-api
+      value: dev-fss.teamsykefravr.isproxy
     - name: KUHR_SAR_API_URL
-      value: https://kuhr-sar-api.dev.adeo.no
+      value: https://isproxy.dev.intern.nav.no

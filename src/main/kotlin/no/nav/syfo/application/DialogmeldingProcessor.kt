@@ -16,7 +16,6 @@ import no.nav.syfo.handlestatus.*
 import no.nav.syfo.kafka.DialogmeldingProducer
 import no.nav.syfo.logger
 import no.nav.syfo.metrics.REQUEST_TIME
-import no.nav.syfo.metrics.SAR_TSS_MISS_COUNTER
 import no.nav.syfo.model.*
 import no.nav.syfo.persistering.db.hentMottattTidspunkt
 import no.nav.syfo.persistering.persistRecivedMessageValidation
@@ -63,18 +62,12 @@ class DialogmeldingProcessor(
         azureAdV2Client = azureAdV2Client,
         endpointUrl = env.syfohelsenettproxyEndpointURL,
         httpClient = httpClient,
-        helsenettClientId = env.helsenettClientId,
+        helsenettClientId = env.syfohelsenettproxyClientId,
     )
     val legeSuspensjonClient = LegeSuspensjonClient(
         azureAdV2Client = azureAdV2Client,
         endpointUrl = env.legeSuspensjonEndpointURL,
         endpointClientId = env.legeSuspensjonClientId,
-        httpClient = httpClient,
-    )
-    val emottakSubscriptionClient = EmottakSubscriptionClient(
-        azureAdV2Client = azureAdV2Client,
-        endpointUrl = env.subscriptionEndpointURL,
-        endpointClientId = env.subscriptionEndpointClientId,
         httpClient = httpClient,
     )
     val padm2ReglerService = RuleService(
@@ -122,13 +115,12 @@ class DialogmeldingProcessor(
         val innbyggerOK = pdlClient.personEksisterer(PersonIdent(receivedDialogmelding.personNrPasient))
         val legeOK = pdlClient.personEksisterer(PersonIdent(receivedDialogmelding.personNrLege))
 
-        val samhandlerPraksis = findSamhandlerpraksis(
-            legeIdent = receivedDialogmelding.personNrLege,
+        val tssId = kuhrSarClient.getTssId(
+            legeIdent = PersonIdent(receivedDialogmelding.personNrLege),
+            partnerId = receiverBlock.partnerReferanse.toInt(),
             legekontorOrgName = receivedDialogmelding.legekontorOrgName,
             legekontorHerId = receivedDialogmelding.legekontorHerId,
-            receiverBlock = receiverBlock,
             msgHead = msgHead,
-            loggingMeta = loggingMeta,
         )
 
         val navnSignerendeLege = signerendeLegeService.signerendeLegeNavn(
@@ -162,7 +154,7 @@ class DialogmeldingProcessor(
                 receiverBlock = receiverBlock,
                 pasientNavn = pasientNavn,
                 navnSignerendeLege = navnSignerendeLege,
-                samhandlerPraksis = samhandlerPraksis,
+                tssId = tssId,
             )
 
             Status.INVALID -> handleStatusINVALID(
@@ -275,65 +267,4 @@ class DialogmeldingProcessor(
             receivedDialogmelding = receivedDialogmelding,
         )
     }
-
-    suspend fun findSamhandlerpraksis(
-        legeIdent: String,
-        legekontorOrgName: String,
-        legekontorHerId: String?,
-        receiverBlock: XMLMottakenhetBlokk,
-        msgHead: XMLMsgHead,
-        loggingMeta: LoggingMeta,
-    ): SamhandlerPraksis? {
-        val samhandlerInfo = kuhrSarClient.getSamhandler(legeIdent)
-        val samhandlerPraksisMatch = findBestSamhandlerPraksis(
-            samhandlerInfo,
-            legekontorOrgName,
-            legekontorHerId,
-            loggingMeta
-        )
-
-        val samhandlerPraksis = samhandlerPraksisMatch?.samhandlerPraksis
-
-        if (samhandlerPraksisMatch?.percentageMatch != null && samhandlerPraksisMatch.percentageMatch == 999.0) {
-            logger.info(
-                "SamhandlerPraksis is found but is FALE or FALO, subscription_emottak is not created, {}",
-                StructuredArguments.fields(loggingMeta)
-            )
-        } else {
-
-            when (samhandlerPraksis) {
-                null -> {
-                    logger.info(
-                        "SamhandlerPraksis is Not found, {}",
-                        StructuredArguments.fields(loggingMeta)
-                    )
-                    SAR_TSS_MISS_COUNTER.inc()
-                }
-                else -> if (isNotLegevakt(samhandlerPraksis) &&
-                    !receiverBlock.partnerReferanse.isNullOrEmpty() &&
-                    receiverBlock.partnerReferanse.isNotBlank()
-                ) {
-                    emottakSubscriptionClient.startSubscription(
-                        samhandlerPraksis,
-                        msgHead,
-                        receiverBlock,
-                        loggingMeta
-                    )
-                } else {
-                    logger.info(
-                        "SamhandlerPraksis is Legevakt or partnerReferanse is empty or blank, subscription_emottak is not created, {}",
-                        StructuredArguments.fields(loggingMeta)
-                    )
-                }
-            }
-        }
-        return samhandlerPraksis
-    }
 }
-
-fun isLegevakt(samhandlerPraksis: SamhandlerPraksis): Boolean {
-    val kode = samhandlerPraksis.samh_praksis_type_kode
-    return !kode.isNullOrEmpty() && (kode == "LEVA" || kode == "LEKO")
-}
-
-fun isNotLegevakt(samhandlerPraksis: SamhandlerPraksis): Boolean = !isLegevakt(samhandlerPraksis)

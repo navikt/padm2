@@ -7,6 +7,7 @@ import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.logger
+import no.nav.syfo.metrics.SAR_TSS_MISS_COUNTER
 import no.nav.syfo.model.Behandler
 import no.nav.syfo.model.Dialogmelding
 import no.nav.syfo.util.*
@@ -69,7 +70,10 @@ fun createAvsender(
     tssid: String?,
     behandler: Behandler?
 ): EiaDokumentInfoType.Avsender {
-    val validatedTssID = if (tssid.isNullOrBlank()) "0" else tssid
+    val validatedTssID = if (tssid.isNullOrBlank()) {
+        SAR_TSS_MISS_COUNTER.inc()
+        "0"
+    } else tssid
     return EiaDokumentInfoType.Avsender().apply {
         lege = LegeType().apply {
             legeFnr = legefnr
@@ -86,13 +90,13 @@ fun createAvsender(
 fun findArenaNotatKategori(dialogmelding: Dialogmelding): String {
     return when {
         dialogmelding.foresporselFraSaksbehandlerForesporselSvar != null -> {
-            dialogmelding.foresporselFraSaksbehandlerForesporselSvar!!.temaKode.arenaNotatKategori
+            dialogmelding.foresporselFraSaksbehandlerForesporselSvar.temaKode.arenaNotatKategori
         }
         dialogmelding.henvendelseFraLegeHenvendelse != null -> {
-            dialogmelding.henvendelseFraLegeHenvendelse!!.temaKode.arenaNotatKategori
+            dialogmelding.henvendelseFraLegeHenvendelse.temaKode.arenaNotatKategori
         }
         dialogmelding.innkallingMoterespons != null -> {
-            dialogmelding.innkallingMoterespons!!.temaKode.arenaNotatKategori
+            dialogmelding.innkallingMoterespons.temaKode.arenaNotatKategori
         }
         else -> throw RuntimeException("Ugyldig dialogmeldingtype")
     }
@@ -101,13 +105,13 @@ fun findArenaNotatKategori(dialogmelding: Dialogmelding): String {
 fun findArenaNotatKode(dialogmelding: Dialogmelding): String {
     return when {
         dialogmelding.foresporselFraSaksbehandlerForesporselSvar != null -> {
-            dialogmelding.foresporselFraSaksbehandlerForesporselSvar!!.temaKode.arenaNotatKode
+            dialogmelding.foresporselFraSaksbehandlerForesporselSvar.temaKode.arenaNotatKode
         }
         dialogmelding.henvendelseFraLegeHenvendelse != null -> {
-            dialogmelding.henvendelseFraLegeHenvendelse!!.temaKode.arenaNotatKode
+            dialogmelding.henvendelseFraLegeHenvendelse.temaKode.arenaNotatKode
         }
         dialogmelding.innkallingMoterespons != null -> {
-            dialogmelding.innkallingMoterespons!!.temaKode.arenaNotatKode
+            dialogmelding.innkallingMoterespons.temaKode.arenaNotatKode
         }
         else -> throw RuntimeException("Ugyldig dialogmeldingtype")
     }
@@ -116,13 +120,13 @@ fun findArenaNotatKode(dialogmelding: Dialogmelding): String {
 fun findArenaNotatTittel(dialogmelding: Dialogmelding): String {
     return when {
         dialogmelding.foresporselFraSaksbehandlerForesporselSvar != null -> {
-            dialogmelding.foresporselFraSaksbehandlerForesporselSvar!!.temaKode.arenaNotatTittel
+            dialogmelding.foresporselFraSaksbehandlerForesporselSvar.temaKode.arenaNotatTittel
         }
         dialogmelding.henvendelseFraLegeHenvendelse != null -> {
-            dialogmelding.henvendelseFraLegeHenvendelse!!.temaKode.arenaNotatTittel
+            dialogmelding.henvendelseFraLegeHenvendelse.temaKode.arenaNotatTittel
         }
         dialogmelding.innkallingMoterespons != null -> {
-            dialogmelding.innkallingMoterespons!!.temaKode.arenaNotatTittel
+            dialogmelding.innkallingMoterespons.temaKode.arenaNotatTittel
         }
         else -> throw RuntimeException("Ugyldig dialogmeldingtype")
     }
