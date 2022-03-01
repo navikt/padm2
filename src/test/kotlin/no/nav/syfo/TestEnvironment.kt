@@ -47,7 +47,6 @@ fun testEnvironment(
     syfohelsenettproxyEndpointURL = syfohelsenettproxyEndpointUrl,
     legeSuspensjonClientId = "legesuspensjon",
     legeSuspensjonEndpointURL = legeSuspensjonEndpointUrl,
-    toggleDialogmeldingerTilKafka = true,
 )
 
 fun testAppState() = ApplicationState(

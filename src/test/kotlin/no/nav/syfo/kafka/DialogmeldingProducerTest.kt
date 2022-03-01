@@ -29,7 +29,6 @@ internal class DialogmeldingProducerTest {
         kafkaProducerMock = mockk<KafkaProducer<String, DialogmeldingForKafka>>(relaxed = true)
         dialogmeldingProducer = DialogmeldingProducer(
             kafkaProducerDialogmelding = kafkaProducerMock,
-            enabled = true,
         )
     }
 
