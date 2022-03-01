@@ -68,6 +68,19 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 1) { mqSender.sendArena(any()) }
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                 }
+                it("Prosesserer innkommet test-melding fra syfomock (melding ok)") {
+                    val fellesformat =
+                        getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
+                            .replace("<MsgId>37340D30-FE14-42B5-985F-A8FF8FFA0CB5</MsgId>", "<MsgId>syfomock-37340D30-FE14-42B5-985F-A8FF8FFA0CB5</MsgId>")
+                    every { incomingMessage.text } returns(fellesformat)
+                    runBlocking {
+                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                    }
+                    verify(exactly = 0) { mqSender.sendReceipt(any()) }
+                    verify(exactly = 0) { mqSender.sendBackout(any()) }
+                    verify(exactly = 1) { mqSender.sendArena(any()) }
+                    verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
+                }
                 it("Prosesserer innkommet melding (melding ok, men pdf-gen feiler)") {
                     val fellesformat =
                         getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
