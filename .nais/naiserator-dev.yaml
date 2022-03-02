@@ -64,6 +64,8 @@ spec:
       value: QA.Q1_414.AO01_SKJEMA_MOTTAK
     - name: MQ_APPREC_QUEUE_NAME
       value: QA.Q414.IU03_UTSENDING
+    - name: TOGGLE_PROCESS_MESSAGES
+      value: "true"
     - name: PADM2_DB_URL
       value: jdbc:postgresql://b27dbvl013.preprod.local:5432/padm2
     - name: MOUNT_PATH_VAULT
