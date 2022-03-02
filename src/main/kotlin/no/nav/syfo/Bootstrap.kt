@@ -82,27 +82,29 @@ fun launchListeners(
         ),
     )
 
-    launchBackgroundTask(
-        applicationState = applicationState,
-    ) {
-        val factory = connectionFactory(env)
+    if (env.toggleProcessDialogmeldinger) {
+        launchBackgroundTask(
+            applicationState = applicationState,
+        ) {
+            val factory = connectionFactory(env)
 
-        factory.createConnection(env.serviceuserUsername, env.serviceuserPassword).use { connection ->
-            connection.start()
-            val session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE)
-            val inputconsumer = session.consumerForQueue(env.inputQueueName)
-            val mqSender = MQSender(
-                env = env,
-            )
-            val blockingApplicationRunner = BlockingApplicationRunner(
-                applicationState = applicationState,
-                database = database,
-                env = env,
-                inputconsumer = inputconsumer,
-                mqSender = mqSender,
-                dialogmeldingProducer = dialogmeldingProducer,
-            )
-            blockingApplicationRunner.run()
+            factory.createConnection(env.serviceuserUsername, env.serviceuserPassword).use { connection ->
+                connection.start()
+                val session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE)
+                val inputconsumer = session.consumerForQueue(env.inputQueueName)
+                val mqSender = MQSender(
+                    env = env,
+                )
+                val blockingApplicationRunner = BlockingApplicationRunner(
+                    applicationState = applicationState,
+                    database = database,
+                    env = env,
+                    inputconsumer = inputconsumer,
+                    mqSender = mqSender,
+                    dialogmeldingProducer = dialogmeldingProducer,
+                )
+                blockingApplicationRunner.run()
+            }
         }
     }
 

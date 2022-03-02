@@ -64,6 +64,8 @@ spec:
       value: QA.P414.AO01_SKJEMA_MOTTAK
     - name: MQ_APPREC_QUEUE_NAME
       value: QA.P414.IU03_UTSENDING
+    - name: TOGGLE_PROCESS_MESSAGES
+      value: "true"
     - name: MOUNT_PATH_VAULT
       value: /postgresql/prod-fss
     - name: PADM2_DB_URL
