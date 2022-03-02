@@ -12,7 +12,6 @@ import javax.xml.bind.Marshaller
 
 class DialogmeldingProducer(
     private val kafkaProducerDialogmelding: KafkaProducer<String, DialogmeldingForKafka>,
-    private val enabled: Boolean,
 ) {
     fun sendDialogmelding(
         receivedDialogmelding: ReceivedDialogmelding,
@@ -20,31 +19,27 @@ class DialogmeldingProducer(
         journalpostId: String,
         antallVedlegg: Int,
     ) {
-        if (enabled) {
-            try {
-                val dialogmeldingForKafka = createDialogmeldingForKafka(
-                    receivedDialogmelding = receivedDialogmelding,
-                    msgHead = msgHead,
-                    journalpostId = journalpostId,
-                    antallVedlegg = antallVedlegg,
+        try {
+            val dialogmeldingForKafka = createDialogmeldingForKafka(
+                receivedDialogmelding = receivedDialogmelding,
+                msgHead = msgHead,
+                journalpostId = journalpostId,
+                antallVedlegg = antallVedlegg,
+            )
+            kafkaProducerDialogmelding.send(
+                ProducerRecord(
+                    DIALOGMELDING_TOPIC,
+                    dialogmeldingForKafka.msgId,
+                    dialogmeldingForKafka,
                 )
-                kafkaProducerDialogmelding.send(
-                    ProducerRecord(
-                        DIALOGMELDING_TOPIC,
-                        dialogmeldingForKafka.msgId,
-                        dialogmeldingForKafka,
-                    )
-                ).get()
-            } catch (e: Exception) {
-                log.error(
-                    "Exception was thrown when attempting to send dialogmelding with id {}: ${e.message}",
-                    receivedDialogmelding.msgId,
-                    e
-                )
-                throw e
-            }
-        } else {
-            log.info("Send to Kafka-topic disabled. Would have sent record with msgId ${msgHead.msgInfo.msgId} with conversationRef ${msgHead.msgInfo.conversationRef?.refToConversation}")
+            ).get()
+        } catch (e: Exception) {
+            log.error(
+                "Exception was thrown when attempting to send dialogmelding with id {}: ${e.message}",
+                receivedDialogmelding.msgId,
+                e
+            )
+            throw e
         }
     }
 

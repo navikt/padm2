@@ -80,7 +80,6 @@ fun launchListeners(
         kafkaProducerDialogmelding = KafkaProducer<String, DialogmeldingForKafka>(
             kafkaDialogmeldingProducerConfig(env.kafka)
         ),
-        enabled = env.toggleDialogmeldingerTilKafka,
     )
 
     launchBackgroundTask(

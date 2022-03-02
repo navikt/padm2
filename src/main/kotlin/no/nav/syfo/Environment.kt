@@ -38,7 +38,6 @@ data class Environment(
         aivenTruststoreLocation = getEnvVar("KAFKA_TRUSTSTORE_PATH"),
         aivenKeystoreLocation = getEnvVar("KAFKA_KEYSTORE_PATH"),
     ),
-    val toggleDialogmeldingerTilKafka: Boolean = getEnvVar("TOGGLE_DIALOGMELDINGER_TIL_KAFKA").toBoolean(),
     val serviceuserPassword: String = getFileAsString("/secrets/serviceuser/password"),
     val serviceuserUsername: String = getFileAsString("/secrets/serviceuser/username"),
 ) : MqConfig
