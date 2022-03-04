@@ -33,6 +33,7 @@ class DokArkivClient(
             logger.info("Kall til dokarkiv Nav-Callid {}, {}", journalpostRequest.eksternReferanseId, fields(loggingMeta))
 
             val accessToken = azureAdV2Client.getSystemToken(dokArkivClientId)?.accessToken
+                ?: throw RuntimeException("Failed to send request to DokArkiv: No token was found")
 
             val response: HttpResponse = httpClient.post(url) {
                 header("Authorization", "Bearer $accessToken")

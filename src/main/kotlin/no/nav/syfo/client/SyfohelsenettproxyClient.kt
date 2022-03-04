@@ -30,10 +30,7 @@ class SyfohelsenettproxyClient(
         logger.info("Henter behandler fra syfohelsenettproxy for msgId {}", msgId)
 
         val accessToken = azureAdV2Client.getSystemToken(helsenettClientId)?.accessToken
-            ?: run {
-                logger.error("Syfohelsenettproxy kunne ikke hente AzureAdV2 token for msgID {}, {}", msgId, fields(loggingMeta))
-                return@retry null
-            }
+            ?: throw RuntimeException("Failed to send request to SyfohelsenettProxy: No token was found")
 
         val response: HttpResponse = httpClient.get("$endpointUrl/api/v2/behandler") {
             accept(ContentType.Application.Json)
