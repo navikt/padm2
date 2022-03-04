@@ -27,7 +27,6 @@ val mockkVersion = "1.12.2"
 val jacksonVersion = "2.13.1"
 val arenaDialogNotatVersion = "1.e1999cf"
 val javaTimeAdapterVersion = "1.1.3"
-val vaultJavaDriveVersion = "3.1.0"
 val postgresVersion = "42.3.2"
 val postgresEmbedded = "0.13.4"
 val flywayVersion = "8.4.0"
@@ -88,7 +87,6 @@ dependencies {
     implementation("org.postgresql:postgresql:$postgresVersion")
     implementation("com.zaxxer:HikariCP:$hikariVersion")
     implementation("org.flywaydb:flyway-core:$flywayVersion")
-    implementation("com.bettercloud:vault-java-driver:$vaultJavaDriveVersion")
 
     implementation("javax.xml.ws:jaxws-api:$jaxwsApiVersion")
     implementation("javax.annotation:javax.annotation-api:$javaxAnnotationApiVersion")

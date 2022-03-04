@@ -253,7 +253,7 @@ class DialogmeldingProcessor(
                 handlePatientNotFound(loggingMeta)
             } else if (!legeOK) {
                 handleBehandlerNotFound(loggingMeta)
-            } else if (erTestFnr(receivedDialogmelding.personNrPasient) && env.cluster == "prod-fss") {
+            } else if (erTestFnr(receivedDialogmelding.personNrPasient) && env.cluster == "prod-gcp") {
                 handleTestFnrInProd(loggingMeta)
             } else if (dialogmeldingType.isHenvendelseFraLegeOrForesporselSvar() && dialogmeldingXml.notat.first().tekstNotatInnhold.isNullOrEmpty()) {
                 handleMeldingsTekstMangler(loggingMeta)

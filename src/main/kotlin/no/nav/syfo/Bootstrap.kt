@@ -8,9 +8,7 @@ import no.nav.syfo.application.*
 import no.nav.syfo.application.api.registerNaisApi
 import no.nav.syfo.application.mq.*
 import no.nav.syfo.db.Database
-import no.nav.syfo.db.VaultCredentialService
 import no.nav.syfo.kafka.*
-import no.nav.syfo.vault.RenewVaultService
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -23,11 +21,9 @@ fun main() {
     logger.info("Padm2 starting with java version: " + Runtime.version())
     val env = Environment()
     val applicationState = ApplicationState()
-    val vaultCredentialService = VaultCredentialService()
 
     val database = Database(
         env = env,
-        vaultCredentialService = vaultCredentialService,
     )
 
     val applicationEngineEnvironment = applicationEngineEnvironment {
@@ -45,11 +41,6 @@ fun main() {
     applicationEngineEnvironment.monitor.subscribe(ApplicationStarted) {
         applicationState.ready = true
         logger.info("Application is ready")
-        val renewVaultService = RenewVaultService(
-            vaultCredentialService = vaultCredentialService,
-            applicationState = applicationState,
-        )
-        renewVaultService.startRenewTasks()
 
         launchListeners(
             applicationState = applicationState,

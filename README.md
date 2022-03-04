@@ -60,29 +60,8 @@ or the command line:
 
 ### Access to the Postgres database
 
-For utfyllende dokumentasjon se [Postgres i NAV](https://github.com/navikt/utvikling/blob/master/PostgreSQL.md)
+For utfyllende dokumentasjon se [Postgres i NAV](https://doc.nais.io/persistence/postgres/)
 
-#### Tldr
-
-The application uses dynamically generated user / passwords for the database.
-To connect to the database one must generate user / password (which lasts for one hour)
-as follows:
-
-Use The Vault Browser CLI that is build in https://vault.adeo.no
-
-Preprod credentials:
-
-```
-read postgresql/preprod-fss/creds/padm2-admin
-
-```
-
-Prod credentials:
-
-```
-read postgresql/prod-fss/creds/padm2-readonly
-
-```
 ### Kafka
 
 This application owns and produces to the following topic:
