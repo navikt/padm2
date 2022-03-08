@@ -75,7 +75,7 @@ spec:
     - name: MQ_APPREC_QUEUE_NAME
       value: QA.P414.IU03_UTSENDING
     - name: TOGGLE_PROCESS_MESSAGES
-      value: "false"
+      value: "true"
     - name: DOKARKIV_CLIENT_ID
       value: "162b3255-2f72-4399-8f7a-244add9ffaac"
     - name: DOK_ARKIV_URL
