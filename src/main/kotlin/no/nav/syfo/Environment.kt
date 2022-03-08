@@ -1,7 +1,6 @@
 package no.nav.syfo
 
 import no.nav.syfo.application.mq.MqConfig
-import no.nav.syfo.util.getFileAsString
 
 data class Environment(
     val aadAppClient: String = getEnvVar("AZURE_APP_CLIENT_ID"),
@@ -24,9 +23,11 @@ data class Environment(
     val dokArkivUrl: String = getEnvVar("DOK_ARKIV_URL"),
     val syfopdfgen: String = getEnvVar("PDF_GEN_URL"),
     val arenaQueueName: String = getEnvVar("ARENA_OUTBOUND_QUEUENAME"),
-    val padm2DBURL: String = getEnvVar("PADM2_DB_URL"),
-    val mountPathVault: String = getEnvVar("MOUNT_PATH_VAULT"),
-    val databaseName: String = getEnvVar("DATABASE_NAME", "padm2"),
+    val databaseHost: String = getEnvVar("NAIS_DATABASE_PADM2_PADM2_DB_HOST"),
+    val databasePort: String = getEnvVar("NAIS_DATABASE_PADM2_PADM2_DB_PORT"),
+    val databaseName: String = getEnvVar("NAIS_DATABASE_PADM2_PADM2_DB_DATABASE"),
+    val databaseUsername: String = getEnvVar("NAIS_DATABASE_PADM2_PADM2_DB_USERNAME"),
+    val databasePassword: String = getEnvVar("NAIS_DATABASE_PADM2_PADM2_DB_PASSWORD"),
     val syfohelsenettproxyClientId: String = getEnvVar("HELSENETT_CLIENT_ID"),
     val syfohelsenettproxyEndpointURL: String = getEnvVar("HELSENETT_ENDPOINT_URL"),
     val legeSuspensjonClientId: String = getEnvVar("LEGE_SUSPENSJON_CLIENT_ID"),
@@ -39,9 +40,13 @@ data class Environment(
         aivenTruststoreLocation = getEnvVar("KAFKA_TRUSTSTORE_PATH"),
         aivenKeystoreLocation = getEnvVar("KAFKA_KEYSTORE_PATH"),
     ),
-    val serviceuserPassword: String = getFileAsString("/secrets/serviceuser/password"),
-    val serviceuserUsername: String = getFileAsString("/secrets/serviceuser/username"),
-) : MqConfig
+    val serviceuserUsername: String = getEnvVar("SERVICEUSER_USERNAME"),
+    val serviceuserPassword: String = getEnvVar("SERVICEUSER_PASSWORD"),
+) : MqConfig {
+    fun jdbcUrl(): String {
+        return "jdbc:postgresql://$databaseHost:$databasePort/$databaseName"
+    }
+}
 
 data class ApplicationEnvironmentKafka(
     val bootstrapServers: String,
