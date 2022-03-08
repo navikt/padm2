@@ -14,7 +14,6 @@ data class Environment(
     override val mqChannelName: String = getEnvVar("MQ_CHANNEL_NAME"),
     val inputQueueName: String = getEnvVar("MQ_INPUT_QUEUE_NAME"),
     val apprecQueueName: String = getEnvVar("MQ_APPREC_QUEUE_NAME"),
-    val toggleProcessDialogmeldinger: Boolean = getEnvVar("TOGGLE_PROCESS_MESSAGES").toBoolean(),
     val kuhrSarApiClientId: String = getEnvVar("KUHR_SAR_API_CLIENT_ID"),
     val kuhrSarApiUrl: String = getEnvVar("KUHR_SAR_API_URL"),
     val cluster: String = getEnvVar("NAIS_CLUSTER_NAME"),
