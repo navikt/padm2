@@ -29,7 +29,6 @@ fun testEnvironment(
         aivenTruststoreLocation = "truststore",
         aivenKeystoreLocation = "keystore",
     ),
-    toggleProcessDialogmeldinger = true,
     serviceuserUsername = "user",
     serviceuserPassword = "password",
     dokArkivClientId = "dokarkiv",

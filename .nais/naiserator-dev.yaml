@@ -74,8 +74,6 @@ spec:
       value: QA.Q1_414.AO01_SKJEMA_MOTTAK
     - name: MQ_APPREC_QUEUE_NAME
       value: QA.Q414.IU03_UTSENDING
-    - name: TOGGLE_PROCESS_MESSAGES
-      value: "true"
     - name: DOKARKIV_CLIENT_ID
       value: "972814f3-8bdf-44f8-a191-c2ed00020b54"
     - name: DOK_ARKIV_URL
