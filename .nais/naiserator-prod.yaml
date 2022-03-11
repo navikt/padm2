@@ -75,7 +75,7 @@ spec:
     - name: MQ_APPREC_QUEUE_NAME
       value: QA.P414.IU03_UTSENDING
     - name: DOKARKIV_CLIENT_ID
-      value: "162b3255-2f72-4399-8f7a-244add9ffaac"
+      value: prod-fss.teamdokumenthandtering.dokarkiv
     - name: DOK_ARKIV_URL
       value: https://dokarkiv.prod-fss-pub.nais.io/rest/journalpostapi/v1/journalpost
     - name: PDF_GEN_URL
