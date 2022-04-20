@@ -58,7 +58,7 @@ class SyfohelsenettproxyClient(
             }
             else -> {
                 logger.info("Hentet behandler for msgId {}, {}", msgId, fields(loggingMeta))
-                response.receive<HelsenettProxyBehandler>()
+                response.body<HelsenettProxyBehandler>()
             }
         }
     }

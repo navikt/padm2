@@ -40,7 +40,7 @@ class LegeSuspensjonClient(
             throw IOException("Btsys svarte (via isproxy) med uventet kode ${httpResponse.status} for $ediloggid")
         }
 
-        httpResponse.call.response.receive()
+        httpResponse.call.response.body()
     }
 }
 

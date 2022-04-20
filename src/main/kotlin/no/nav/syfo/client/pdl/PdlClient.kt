@@ -45,7 +45,7 @@ class PdlClient(
         )
 
         val response: HttpResponse = httpClient.post(pdlUrl) {
-            body = request
+            setBody(request)
             header(HttpHeaders.ContentType, "application/json")
             header(HttpHeaders.Authorization, bearerHeader(token.accessToken))
             header(TEMA_HEADER, ALLE_TEMA_HEADERVERDI)
@@ -54,7 +54,7 @@ class PdlClient(
 
         return when (response.status) {
             HttpStatusCode.OK -> {
-                val pdlPersonReponse = response.receive<PdlIdenterResponse>()
+                val pdlPersonReponse = response.body<PdlIdenterResponse>()
                 if (pdlPersonReponse.errors.isNullOrEmpty()) {
                     COUNT_CALL_PDL_IDENTER_SUCCESS.inc()
                     pdlPersonReponse.data

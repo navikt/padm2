@@ -3,36 +3,38 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 group = "no.nav.syfo"
 version = "1.0.0"
 
-val ktorVersion = "1.6.8"
-val logbackVersion = "1.2.10"
-val logstashEncoderVersion = "7.0.1"
-val prometheusVersion = "0.9.0"
-val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
-val fellesformat2Version = "1.0329dd1"
-val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
-val ibmMqVersion = "9.2.4.0"
-val javaxAnnotationApiVersion = "1.3.2"
-val jaxbRuntimeVersion = "2.4.0-b180830.0438"
-val jaxbApiVersion = "2.4.0-b180830.0359"
-val javaxActivationVersion = "1.2.0"
-val jaxwsApiVersion = "2.3.1"
-val jaxwsToolsVersion = "2.3.1"
-val dialogmeldingVersion = "1.5d21db9"
-val base64containerVersion = "1.5ac2176"
-val junitJupiterVersion = "5.8.2"
-val kafkaVersion = "2.8.1"
-val kafkaEmbeddedVersion = "2.8.1"
-val kluentVersion = "1.68"
-val mockkVersion = "1.12.2"
-val jacksonVersion = "2.13.1"
-val arenaDialogNotatVersion = "1.e1999cf"
-val javaTimeAdapterVersion = "1.1.3"
-val postgresVersion = "42.3.3"
-val postgresEmbedded = "0.13.4"
-val flywayVersion = "8.4.0"
-val hikariVersion = "5.0.1"
-val pdfboxVersion = "2.0.24"
-val spek = "2.0.17"
+object Versions {
+    const val arenaDialogNotatVersion = "1.e1999cf"
+    const val base64containerVersion = "1.5ac2176"
+    const val dialogmeldingVersion = "1.5d21db9"
+    const val fellesformat2Version = "1.0329dd1"
+    const val flywayVersion = "8.4.0"
+    const val hikariVersion = "5.0.1"
+    const val ibmMqVersion = "9.2.4.0"
+    const val jacksonVersion = "2.13.1"
+    const val javaTimeAdapterVersion = "1.1.3"
+    const val kafkaEmbeddedVersion = "2.8.1"
+    const val kafkaVersion = "2.8.1"
+    const val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
+    const val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
+    const val kluentVersion = "1.68"
+    const val ktorVersion = "2.0.0"
+    const val logbackVersion = "1.2.10"
+    const val logstashEncoderVersion = "7.0.1"
+    const val javaxAnnotationApiVersion = "1.3.2"
+    const val javaxActivationVersion = "1.2.0"
+    const val jaxbApiVersion = "2.4.0-b180830.0359"
+    const val jaxbRuntimeVersion = "2.4.0-b180830.0438"
+    const val jaxwsApiVersion = "2.3.1"
+    const val jaxwsToolsVersion = "2.3.1"
+    const val junitJupiterVersion = "5.8.2"
+    const val mockkVersion = "1.12.2"
+    const val pdfboxVersion = "2.0.24"
+    const val postgresEmbedded = "0.13.4"
+    const val postgresVersion = "42.3.3"
+    const val prometheusVersion = "0.9.0"
+    const val spek = "2.0.17"
+}
 
 plugins {
     java
@@ -61,65 +63,64 @@ dependencies {
     implementation(kotlin("reflect"))
     implementation(kotlin("stdlib"))
 
-    implementation("io.ktor:ktor-server-netty:$ktorVersion")
-    implementation("io.ktor:ktor-client-apache:$ktorVersion")
-    implementation("io.ktor:ktor-client-jackson:$ktorVersion")
-    implementation("io.ktor:ktor-client-auth-jvm:$ktorVersion")
-    implementation("io.ktor:ktor-jackson:$ktorVersion")
+    implementation("io.ktor:ktor-server-netty:${Versions.ktorVersion}")
+    implementation("io.ktor:ktor-server-content-negotiation:${Versions.ktorVersion}")
+    implementation("io.ktor:ktor-client-apache:${Versions.ktorVersion}")
+    implementation("io.ktor:ktor-client-jackson:${Versions.ktorVersion}")
+    implementation("io.ktor:ktor-client-auth-jvm:${Versions.ktorVersion}")
+    implementation("io.ktor:ktor-client-content-negotiation:${Versions.ktorVersion}")
+    implementation("io.ktor:ktor-serialization-jackson:${Versions.ktorVersion}")
 
-    implementation("io.prometheus:simpleclient_hotspot:$prometheusVersion")
-    implementation("io.prometheus:simpleclient_common:$prometheusVersion")
+    implementation("io.prometheus:simpleclient_hotspot:${Versions.prometheusVersion}")
+    implementation("io.prometheus:simpleclient_common:${Versions.prometheusVersion}")
 
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${Versions.jacksonVersion}")
 
-    implementation("org.apache.pdfbox:pdfbox:$pdfboxVersion")
+    implementation("org.apache.pdfbox:pdfbox:${Versions.pdfboxVersion}")
 
-    implementation("ch.qos.logback:logback-classic:$logbackVersion")
-    implementation("net.logstash.logback:logstash-logback-encoder:$logstashEncoderVersion")
+    implementation("ch.qos.logback:logback-classic:${Versions.logbackVersion}")
+    implementation("net.logstash.logback:logstash-logback-encoder:${Versions.logstashEncoderVersion}")
 
-    implementation("no.nav.helse.xml:xmlfellesformat2:$fellesformat2Version")
-    implementation("no.nav.helse.xml:kith-hodemelding:$kithHodemeldingVersion")
-    implementation("no.nav.helse.xml:kith-apprec:$kithApprecVersion")
-    implementation("no.nav.helse.xml:dialogmelding:$dialogmeldingVersion")
-    implementation("no.nav.helse.xml:base64Container:$base64containerVersion")
-    implementation("no.nav.helse.xml:arenaDialogNotat:$arenaDialogNotatVersion")
+    implementation("no.nav.helse.xml:xmlfellesformat2:${Versions.fellesformat2Version}")
+    implementation("no.nav.helse.xml:kith-hodemelding:${Versions.kithHodemeldingVersion}")
+    implementation("no.nav.helse.xml:kith-apprec:${Versions.kithApprecVersion}")
+    implementation("no.nav.helse.xml:dialogmelding:${Versions.dialogmeldingVersion}")
+    implementation("no.nav.helse.xml:base64Container:${Versions.base64containerVersion}")
+    implementation("no.nav.helse.xml:arenaDialogNotat:${Versions.arenaDialogNotatVersion}")
 
-    implementation("org.postgresql:postgresql:$postgresVersion")
-    implementation("com.zaxxer:HikariCP:$hikariVersion")
-    implementation("org.flywaydb:flyway-core:$flywayVersion")
+    implementation("org.postgresql:postgresql:${Versions.postgresVersion}")
+    implementation("com.zaxxer:HikariCP:${Versions.hikariVersion}")
+    implementation("org.flywaydb:flyway-core:${Versions.flywayVersion}")
 
-    implementation("javax.xml.ws:jaxws-api:$jaxwsApiVersion")
-    implementation("javax.annotation:javax.annotation-api:$javaxAnnotationApiVersion")
-    implementation("javax.xml.bind:jaxb-api:$jaxbApiVersion")
-    implementation("org.glassfish.jaxb:jaxb-runtime:$jaxbRuntimeVersion")
-    implementation("com.sun.activation:javax.activation:$javaxActivationVersion")
-    implementation("com.sun.xml.ws:jaxws-tools:$jaxwsToolsVersion") {
+    implementation("javax.xml.ws:jaxws-api:${Versions.jaxwsApiVersion}")
+    implementation("javax.annotation:javax.annotation-api:${Versions.javaxAnnotationApiVersion}")
+    implementation("javax.xml.bind:jaxb-api:${Versions.jaxbApiVersion}")
+    implementation("org.glassfish.jaxb:jaxb-runtime:${Versions.jaxbRuntimeVersion}")
+    implementation("com.sun.activation:javax.activation:${Versions.javaxActivationVersion}")
+    implementation("com.sun.xml.ws:jaxws-tools:${Versions.jaxwsToolsVersion}") {
         exclude(group = "com.sun.xml.ws", module = "policy")
     }
-    implementation("com.migesok:jaxb-java-time-adapters:$javaTimeAdapterVersion")
+    implementation("com.migesok:jaxb-java-time-adapters:${Versions.javaTimeAdapterVersion}")
 
-    implementation("com.ibm.mq:com.ibm.mq.allclient:$ibmMqVersion")
+    implementation("com.ibm.mq:com.ibm.mq.allclient:${Versions.ibmMqVersion}")
 
-    implementation("org.apache.kafka:kafka_2.13:$kafkaVersion")
-    testImplementation("no.nav:kafka-embedded-env:$kafkaEmbeddedVersion")
+    implementation("org.apache.kafka:kafka_2.13:${Versions.kafkaVersion}")
+    testImplementation("no.nav:kafka-embedded-env:${Versions.kafkaEmbeddedVersion}")
 
     testImplementation(kotlin("test"))
-    testImplementation("io.ktor:ktor-server-test-host:$ktorVersion") {
-        exclude(group = "org.eclipse.jetty")
-    }
-    testImplementation("org.amshove.kluent:kluent:$kluentVersion")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion")
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
-    testImplementation("io.mockk:mockk:$mockkVersion")
-    testImplementation("io.ktor:ktor-client-mock:$ktorVersion")
-    testImplementation("com.opentable.components:otj-pg-embedded:$postgresEmbedded")
-    testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
-    testImplementation("org.spekframework.spek2:spek-dsl-jvm:$spek") {
+    testImplementation("org.amshove.kluent:kluent:${Versions.kluentVersion}")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:${Versions.junitJupiterVersion}")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:${Versions.junitJupiterVersion}")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:${Versions.junitJupiterVersion}")
+    testImplementation("io.mockk:mockk:${Versions.mockkVersion}")
+    testImplementation("io.ktor:ktor-client-mock:${Versions.ktorVersion}")
+    testImplementation("com.opentable.components:otj-pg-embedded:${Versions.postgresEmbedded}")
+    testImplementation("io.ktor:ktor-server-test-host:${Versions.ktorVersion}")
+    testImplementation("org.spekframework.spek2:spek-dsl-jvm:${Versions.spek}") {
         exclude(group = "org.jetbrains.kotlin")
     }
-    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:$junitJupiterVersion")
-    testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:$spek") {
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:${Versions.junitJupiterVersion}")
+    testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:${Versions.spek}") {
         exclude(group = "org.jetbrains.kotlin")
     }
 }

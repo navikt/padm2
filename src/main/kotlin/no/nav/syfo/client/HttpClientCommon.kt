@@ -1,27 +1,24 @@
 package no.nav.syfo.client
 
-import io.ktor.application.*
+import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.*
 import io.ktor.client.engine.apache.*
-import io.ktor.client.features.*
-import io.ktor.client.features.json.*
-import io.ktor.features.*
-import io.ktor.jackson.*
-import no.nav.syfo.util.configureJacksonMapper
-import no.nav.syfo.util.configuredJacksonMapper
+import io.ktor.client.plugins.*
+import io.ktor.serialization.jackson.*
+import no.nav.syfo.util.configure
 import org.apache.http.impl.conn.SystemDefaultRoutePlanner
 import java.net.ProxySelector
 
 val config: HttpClientConfig<ApacheEngineConfig>.() -> Unit = {
-    install(JsonFeature) {
-        serializer = JacksonSerializer(configuredJacksonMapper())
+    install(ContentNegotiation) {
+        jackson { configure() }
     }
     expectSuccess = false
 }
 
 val httpClientWithProxyAndTimeout: HttpClientConfig<ApacheEngineConfig>.() -> Unit = {
-    install(JsonFeature) {
-        serializer = JacksonSerializer(configuredJacksonMapper())
+    install(ContentNegotiation) {
+        jackson { configure() }
     }
     install(HttpTimeout) {
         socketTimeoutMillis = 60000
@@ -34,8 +31,8 @@ val httpClientWithProxyAndTimeout: HttpClientConfig<ApacheEngineConfig>.() -> Un
 }
 
 val proxyConfig: HttpClientConfig<ApacheEngineConfig>.() -> Unit = {
-    install(JsonFeature) {
-        serializer = JacksonSerializer(configuredJacksonMapper())
+    install(ContentNegotiation) {
+        jackson { configure() }
     }
     engine {
         customizeClient {
@@ -47,9 +44,3 @@ val proxyConfig: HttpClientConfig<ApacheEngineConfig>.() -> Unit = {
 val httpClient = HttpClient(Apache, config)
 val httpClientWithTimeout = HttpClient(Apache, httpClientWithProxyAndTimeout)
 val httpClientWithProxy = HttpClient(Apache, proxyConfig)
-
-fun Application.installContentNegotiation() {
-    install(ContentNegotiation) {
-        jackson(block = configureJacksonMapper())
-    }
-}
