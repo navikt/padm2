@@ -32,17 +32,19 @@ class KuhrSarClient(
             contentType(ContentType.Application.Json)
             accept(ContentType.Application.Json)
             header(HttpHeaders.Authorization, bearerHeader(token.accessToken))
-            body = KuhrsarRequest(
-                behandlerIdent = legeIdent,
-                partnerId = partnerId,
-                legekontorOrgName = legekontorOrgName,
-                legekontorHerId = legekontorHerId,
-                data = convertSenderToBase64(msgHead.msgInfo.sender),
+            setBody(
+                KuhrsarRequest(
+                    behandlerIdent = legeIdent,
+                    partnerId = partnerId,
+                    legekontorOrgName = legekontorOrgName,
+                    legekontorHerId = legekontorHerId,
+                    data = convertSenderToBase64(msgHead.msgInfo.sender),
+                )
             )
         }
         when (response.status) {
-            HttpStatusCode.OK -> response.receive<KuhrsarResponse>().tssId
-            else -> throw IOException("Vi fikk en uventet feil fra kuhrSar, prøver på nytt! ${response.content}")
+            HttpStatusCode.OK -> response.body<KuhrsarResponse>().tssId
+            else -> throw IOException("Vi fikk en uventet feil fra kuhrSar, prøver på nytt! ${response.bodyAsText()}")
         }
     }
 }

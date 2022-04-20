@@ -1,27 +1,21 @@
 package no.nav.syfo.client
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.ktor.client.*
 import io.ktor.client.engine.mock.*
-import io.ktor.client.features.json.*
+import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.util.*
+import io.ktor.serialization.jackson.*
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.runBlocking
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.client.azuread.v2.AzureAdV2Token
-import no.nav.syfo.model.DokumentInfo
-import no.nav.syfo.model.JournalpostRequest
-import no.nav.syfo.model.JournalpostResponse
-import no.nav.syfo.model.JournalpostType
+import no.nav.syfo.model.*
 import no.nav.syfo.util.LoggingMeta
+import no.nav.syfo.util.configure
 import org.amshove.kluent.shouldBeEqualTo
 import org.junit.Before
 import org.junit.Test
@@ -57,12 +51,9 @@ internal class DokArkivClientTest {
 
     fun createClient(statusCode: HttpStatusCode): HttpClient {
         return HttpClient(MockEngine) {
-            install(JsonFeature) {
-                serializer = JacksonSerializer {
-                    registerKotlinModule()
-                    registerModule(JavaTimeModule())
-                    configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-                    configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            install(ContentNegotiation) {
+                jackson {
+                    configure()
                 }
             }
             engine {

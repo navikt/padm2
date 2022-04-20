@@ -1,9 +1,9 @@
 package no.nav.syfo
 
-import io.ktor.application.*
-import io.ktor.routing.*
+import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import io.ktor.server.routing.*
 import no.nav.syfo.application.*
 import no.nav.syfo.application.api.registerNaisApi
 import no.nav.syfo.application.mq.*

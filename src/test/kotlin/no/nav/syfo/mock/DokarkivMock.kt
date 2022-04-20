@@ -1,17 +1,19 @@
 package no.nav.syfo.mock
 
-import io.ktor.application.*
 import io.ktor.http.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.serialization.jackson.*
+import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import no.nav.syfo.UserConstants
-import no.nav.syfo.client.installContentNegotiation
 import no.nav.syfo.getRandomPort
 import no.nav.syfo.model.JournalpostRequest
 import no.nav.syfo.model.JournalpostResponse
+import no.nav.syfo.util.configure
 
 class DokarkivMock {
     private val port = getRandomPort()
@@ -36,7 +38,9 @@ class DokarkivMock {
             factory = Netty,
             port = port
         ) {
-            installContentNegotiation()
+            install(ContentNegotiation) {
+                jackson { configure() }
+            }
             routing {
                 post {
                     val journalpostRequest = call.receive<JournalpostRequest>()

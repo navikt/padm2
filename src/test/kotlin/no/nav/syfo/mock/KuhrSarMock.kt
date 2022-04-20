@@ -1,12 +1,15 @@
 package no.nav.syfo.mock
 
-import io.ktor.application.*
-import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.serialization.jackson.*
+import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import no.nav.syfo.client.*
 import no.nav.syfo.getRandomPort
+import no.nav.syfo.util.configure
 
 class KuhrSarMock {
     private val port = getRandomPort()
@@ -25,7 +28,9 @@ class KuhrSarMock {
             factory = Netty,
             port = port
         ) {
-            installContentNegotiation()
+            install(ContentNegotiation) {
+                jackson { configure() }
+            }
             routing {
                 get(path) {
                     call.respond(KuhrsarResponse("123"))

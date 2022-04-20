@@ -1,14 +1,16 @@
 package no.nav.syfo.mock
 
-import io.ktor.application.*
-import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.serialization.jackson.*
+import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import no.nav.syfo.UserConstants
 import no.nav.syfo.client.azuread.v2.AzureAdV2TokenResponse
-import no.nav.syfo.client.installContentNegotiation
 import no.nav.syfo.getRandomPort
+import no.nav.syfo.util.configure
 
 class AzureAdV2Mock {
     private val port = getRandomPort()
@@ -24,13 +26,15 @@ class AzureAdV2Mock {
     val server = mockAzureAdV2Server(port = port)
 
     private fun mockAzureAdV2Server(
-        port: Int
+        port: Int,
     ): NettyApplicationEngine {
         return embeddedServer(
             factory = Netty,
             port = port
         ) {
-            installContentNegotiation()
+            install(ContentNegotiation) {
+                jackson { configure() }
+            }
             routing {
                 post {
                     call.respond(aadV2TokenResponse)

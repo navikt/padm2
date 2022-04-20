@@ -38,14 +38,14 @@ class DokArkivClient(
             val response: HttpResponse = httpClient.post(url) {
                 header("Authorization", "Bearer $accessToken")
                 header("Nav-Callid", journalpostRequest.eksternReferanseId)
-                body = journalpostRequest
+                setBody(journalpostRequest)
                 contentType(ContentType.Application.Json)
                 parameter("forsoekFerdigstill", true)
             }
             when (response.status) {
-                HttpStatusCode.OK -> response.receive()
-                HttpStatusCode.Created -> response.receive()
-                else -> throw RuntimeException("Http status: ${response.status} Content: ${response.content}")
+                HttpStatusCode.OK -> response.body()
+                HttpStatusCode.Created -> response.body()
+                else -> throw RuntimeException("Http status: ${response.status} Content: ${response.bodyAsText()}")
             }
         } catch (e: Exception) {
             logger.warn("Oppretting av journalpost feilet: ${e.message}, {}", fields(loggingMeta))
