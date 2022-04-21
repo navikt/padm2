@@ -44,7 +44,7 @@ class KuhrSarClient(
         }
         when (response.status) {
             HttpStatusCode.OK -> response.body<KuhrsarResponse>().tssId
-            else -> throw IOException("Vi fikk en uventet feil fra kuhrSar, prøver på nytt! ${response.bodyAsText()}")
+            else -> throw IOException("Vi fikk en uventet feil fra kuhrSar, prøver på nytt! ${response.bodyAsChannel()}")
         }
     }
 }
