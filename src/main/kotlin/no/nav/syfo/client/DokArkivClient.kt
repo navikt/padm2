@@ -45,7 +45,7 @@ class DokArkivClient(
             when (response.status) {
                 HttpStatusCode.OK -> response.body()
                 HttpStatusCode.Created -> response.body()
-                else -> throw RuntimeException("Http status: ${response.status} Content: ${response.bodyAsText()}")
+                else -> throw RuntimeException("Http status: ${response.status} Content: ${response.bodyAsChannel()}")
             }
         } catch (e: Exception) {
             logger.warn("Oppretting av journalpost feilet: ${e.message}, {}", fields(loggingMeta))

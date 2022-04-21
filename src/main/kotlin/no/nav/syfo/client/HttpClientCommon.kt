@@ -20,6 +20,7 @@ val httpClientWithProxyAndTimeout: HttpClientConfig<ApacheEngineConfig>.() -> Un
     install(ContentNegotiation) {
         jackson { configure() }
     }
+    expectSuccess = true
     install(HttpTimeout) {
         socketTimeoutMillis = 60000
     }
@@ -34,6 +35,7 @@ val proxyConfig: HttpClientConfig<ApacheEngineConfig>.() -> Unit = {
     install(ContentNegotiation) {
         jackson { configure() }
     }
+    expectSuccess = true
     engine {
         customizeClient {
             setRoutePlanner(SystemDefaultRoutePlanner(ProxySelector.getDefault()))

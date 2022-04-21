@@ -56,6 +56,7 @@ internal class DokArkivClientTest {
                     configure()
                 }
             }
+            expectSuccess = true
             engine {
                 addHandler {
                     val responseHeaders = headersOf("Content-Type", ContentType.Application.Json.toString())
