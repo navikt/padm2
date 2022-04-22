@@ -20,7 +20,7 @@ object Versions {
     const val kluentVersion = "1.68"
     const val ktorVersion = "2.0.0"
     const val logbackVersion = "1.2.10"
-    const val logstashEncoderVersion = "7.0.1"
+    const val logstashEncoderVersion = "7.1.1"
     const val javaxAnnotationApiVersion = "1.3.2"
     const val javaxActivationVersion = "1.2.0"
     const val jaxbApiVersion = "2.4.0-b180830.0359"
