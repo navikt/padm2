@@ -104,8 +104,11 @@ dependencies {
 
     implementation("com.ibm.mq:com.ibm.mq.allclient:${Versions.ibmMqVersion}")
 
-    implementation("org.apache.kafka:kafka_2.13:${Versions.kafkaVersion}")
-    testImplementation("no.nav:kafka-embedded-env:${Versions.kafkaEmbeddedVersion}")
+    val excludeLog4j = fun ExternalModuleDependency.() {
+        exclude(group = "log4j")
+    }
+    implementation("org.apache.kafka:kafka_2.13:${Versions.kafkaVersion}", excludeLog4j)
+    testImplementation("no.nav:kafka-embedded-env:${Versions.kafkaEmbeddedVersion}", excludeLog4j)
 
     testImplementation(kotlin("test"))
     testImplementation("org.amshove.kluent:kluent:${Versions.kluentVersion}")
