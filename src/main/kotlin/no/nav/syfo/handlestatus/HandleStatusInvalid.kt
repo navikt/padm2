@@ -21,6 +21,8 @@ import no.nav.syfo.util.createLogEntry
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+val RULE_NAME_DUPLICATE = "DUPLICATE_DIALOGMELDING_CONTENT"
+
 suspend fun handleStatusINVALID(
     database: DatabaseInterface,
     mqSender: MQSenderInterface,
@@ -35,7 +37,7 @@ suspend fun handleStatusINVALID(
     innbyggerOK: Boolean,
 ) {
 
-    if (innbyggerOK) {
+    if (innbyggerOK && !validationResult.isDuplicate()) {
         journalService.onJournalRequest(
             receivedDialogmelding,
             validationResult,
@@ -45,7 +47,14 @@ suspend fun handleStatusINVALID(
             navnSignerendeLege
         )
     } else {
-        logger.info("Lagrer ikke i Joark siden pasient ikke funnet {}", fields(loggingMeta))
+        logger.info(
+            if (validationResult.isDuplicate()) {
+                "Lagrer ikke i Joark siden meldingen er en duplikat dialogmelding {}"
+            } else {
+                "Lagrer ikke i Joark siden pasient ikke funnet {}"
+            },
+            fields(loggingMeta)
+        )
     }
 
     if (!database.erDialogmeldingOpplysningerSendtApprec(receivedDialogmelding.dialogmelding.id)) {
@@ -92,7 +101,7 @@ fun handleDuplicateDialogmeldingContent(
         status = Status.INVALID,
         ruleHits = listOf(
             RuleInfo(
-                ruleName = "DUPLICATE_DIALOGMELDING_CONTENT",
+                ruleName = RULE_NAME_DUPLICATE,
                 messageForSender = message,
                 messageForUser = message,
                 ruleStatus = Status.INVALID

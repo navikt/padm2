@@ -47,7 +47,7 @@ class BlockingApplicationRunner(
         }
     }
 
-    suspend fun processMessageHandleException(message: Message) {
+    suspend fun processMessageHandleException(message: Message): String? {
         val inputMessageText = when (message) {
             is TextMessage -> message.text
             else -> throw RuntimeException("Incoming message needs to be a byte message or text message")
@@ -77,6 +77,7 @@ class BlockingApplicationRunner(
         } catch (e: Exception) {
             logger.warn("Exception caught while processing message, will try again later: {}", e.message)
         }
+        return dialogmeldingId
     }
 
     private fun storeMessage(

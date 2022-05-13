@@ -8,9 +8,9 @@ import no.nav.syfo.application.*
 import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.kafka.DialogmeldingProducer
 import no.nav.syfo.metrics.MESSAGES_STILL_FAIL_AFTER_1H
-import no.nav.syfo.util.getFileAsString
-import no.nav.syfo.util.getFileAsStringISO88591
-import org.amshove.kluent.shouldBeEqualTo
+import no.nav.syfo.persistering.db.hentDialogmeldingOpplysningerJournalpostId
+import no.nav.syfo.util.*
+import org.amshove.kluent.*
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import javax.jms.*
@@ -60,13 +60,16 @@ class BlockingApplicationRunnerSpek : Spek({
                     val fellesformat =
                         getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
                     every { incomingMessage.text } returns(fellesformat)
-                    runBlocking {
+                    val dialogmeldingId = runBlocking {
                         blockingApplicationRunner.processMessageHandleException(incomingMessage)
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
                     verify(exactly = 1) { mqSender.sendArena(any()) }
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
+                    dialogmeldingId shouldNotBe null
+                    val journalpostId = database.hentDialogmeldingOpplysningerJournalpostId(dialogmeldingId!!)
+                    journalpostId shouldNotBe null
                 }
                 it("Prosesserer innkommet test-melding fra syfomock (melding ok)") {
                     val fellesformat =
@@ -140,13 +143,16 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
                     verify(exactly = 1) { mqSender.sendArena(any()) }
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
-                    runBlocking {
+                    val dialogmeldingId = runBlocking {
                         blockingApplicationRunner.processMessageHandleException(incomingMessage)
                     }
                     verify(exactly = 2) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
                     verify(exactly = 1) { mqSender.sendArena(any()) }
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
+                    dialogmeldingId shouldNotBe null
+                    val journalpostId = database.hentDialogmeldingOpplysningerJournalpostId(dialogmeldingId!!)
+                    journalpostId shouldBe null
                 }
                 it("Prosesserer innkommet melding (duplikat, med vedlegg)") {
                     val fellesformat =
