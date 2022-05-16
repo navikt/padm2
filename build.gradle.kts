@@ -18,7 +18,7 @@ object Versions {
     const val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
     const val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
     const val kluentVersion = "1.68"
-    const val ktorVersion = "2.0.0"
+    const val ktorVersion = "2.0.1"
     const val logbackVersion = "1.2.11"
     const val logstashEncoderVersion = "7.1.1"
     const val javaxAnnotationApiVersion = "1.3.2"

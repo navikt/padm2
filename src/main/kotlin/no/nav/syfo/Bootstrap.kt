@@ -59,7 +59,7 @@ fun main() {
             server.stop(10, 10, TimeUnit.SECONDS)
         }
     )
-    server.start(false)
+    server.start(wait = true)
 }
 
 fun launchListeners(
