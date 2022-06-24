@@ -8,19 +8,19 @@ object Versions {
     const val base64containerVersion = "1.5ac2176"
     const val dialogmeldingVersion = "1.5d21db9"
     const val fellesformat2Version = "1.0329dd1"
-    const val flywayVersion = "8.5.9"
+    const val flywayVersion = "8.5.13"
     const val hikariVersion = "5.0.1"
     const val ibmMqVersion = "9.2.5.0"
-    const val jacksonVersion = "2.13.1"
+    const val jacksonVersion = "2.13.3"
     const val javaTimeAdapterVersion = "1.1.3"
     const val kafkaEmbeddedVersion = "3.1.0"
     const val kafkaVersion = "3.1.0"
     const val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
     const val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
     const val kluentVersion = "1.68"
-    const val ktorVersion = "2.0.1"
+    const val ktorVersion = "2.0.2"
     const val logbackVersion = "1.2.11"
-    const val logstashEncoderVersion = "7.1.1"
+    const val logstashEncoderVersion = "7.2"
     const val javaxAnnotationApiVersion = "1.3.2"
     const val javaxActivationVersion = "1.2.0"
     const val jaxbApiVersion = "2.4.0-b180830.0359"
@@ -28,19 +28,19 @@ object Versions {
     const val jaxwsApiVersion = "2.3.1"
     const val jaxwsToolsVersion = "2.3.1"
     const val junitJupiterVersion = "5.8.2"
-    const val mockkVersion = "1.12.2"
+    const val mockkVersion = "1.12.4"
     const val pdfboxVersion = "2.0.24"
     const val postgresEmbedded = "0.13.4"
     const val postgresVersion = "42.3.4"
     const val prometheusVersion = "0.9.0"
-    const val spek = "2.0.17"
+    const val spek = "2.0.18"
 }
 
 plugins {
     java
-    kotlin("jvm") version "1.6.20"
+    kotlin("jvm") version "1.7.0"
     id("com.github.johnrengelman.shadow") version "7.1.2"
-    id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
+    id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
 }
 
 val githubUser: String by project
