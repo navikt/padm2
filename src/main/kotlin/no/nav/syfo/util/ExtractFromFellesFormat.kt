@@ -39,13 +39,13 @@ fun extractLegeHpr(fellesformat: XMLEIFellesformat): String? =
     }?.id
 
 fun no.nav.helse.dialogmelding.XMLHealthcareProfessional.toBehandler(): Behandler = Behandler(
-    fornavn = givenName,
+    fornavn = givenName ?: "",
     etternavn = familyName,
     mellomnavn = middleName ?: null
 )
 
 fun no.nav.helse.msgHead.XMLHealthcareProfessional.toBehandler(): Behandler = Behandler(
-    fornavn = givenName,
+    fornavn = givenName ?: "",
     etternavn = familyName,
     mellomnavn = middleName ?: null
 )
