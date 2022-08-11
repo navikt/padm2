@@ -31,7 +31,7 @@ object Versions {
     const val mockkVersion = "1.12.4"
     const val pdfboxVersion = "2.0.24"
     const val postgresEmbedded = "0.13.4"
-    const val postgresVersion = "42.3.4"
+    const val postgresVersion = "42.4.1"
     const val prometheusVersion = "0.9.0"
     const val spek = "2.0.18"
 }
