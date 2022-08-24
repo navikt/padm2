@@ -109,6 +109,14 @@ dependencies {
     }
     implementation("org.apache.kafka:kafka_2.13:${Versions.kafkaVersion}", excludeLog4j)
     testImplementation("no.nav:kafka-embedded-env:${Versions.kafkaEmbeddedVersion}", excludeLog4j)
+    constraints {
+        implementation("org.eclipse.jetty.http2:http2-server") {
+            because("no.nav:kafka-embedded-env:${Versions.kafkaEmbeddedVersion} -> https://advisory.checkmarx.net/advisory/vulnerability/CVE-2022-2048/")
+            version {
+                require("9.4.48.v20220622")
+            }
+        }
+    }
 
     testImplementation(kotlin("test"))
     testImplementation("org.amshove.kluent:kluent:${Versions.kluentVersion}")
