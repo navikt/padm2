@@ -13,12 +13,12 @@ object Versions {
     const val ibmMqVersion = "9.2.5.0"
     const val jacksonVersion = "2.13.3"
     const val javaTimeAdapterVersion = "1.1.3"
-    const val kafkaEmbeddedVersion = "3.1.6"
-    const val kafkaVersion = "3.1.0"
+    const val kafkaEmbeddedVersion = "3.2.1"
+    const val kafkaVersion = "3.2.0"
     const val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
     const val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
     const val kluentVersion = "1.68"
-    const val ktorVersion = "2.0.3"
+    const val ktorVersion = "2.1.0"
     const val logbackVersion = "1.2.11"
     const val logstashEncoderVersion = "7.2"
     const val javaxAnnotationApiVersion = "1.3.2"
@@ -109,6 +109,14 @@ dependencies {
     }
     implementation("org.apache.kafka:kafka_2.13:${Versions.kafkaVersion}", excludeLog4j)
     testImplementation("no.nav:kafka-embedded-env:${Versions.kafkaEmbeddedVersion}", excludeLog4j)
+    constraints {
+        implementation("org.eclipse.jetty.http2:http2-server") {
+            because("no.nav:kafka-embedded-env:${Versions.kafkaEmbeddedVersion} -> https://advisory.checkmarx.net/advisory/vulnerability/CVE-2022-2048/")
+            version {
+                require("9.4.48.v20220622")
+            }
+        }
+    }
 
     testImplementation(kotlin("test"))
     testImplementation("org.amshove.kluent:kluent:${Versions.kluentVersion}")
