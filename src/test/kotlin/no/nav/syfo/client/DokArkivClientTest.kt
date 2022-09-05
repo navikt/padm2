@@ -16,6 +16,7 @@ import no.nav.syfo.client.azuread.v2.AzureAdV2Token
 import no.nav.syfo.model.*
 import no.nav.syfo.util.LoggingMeta
 import no.nav.syfo.util.configure
+import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEqualTo
 import org.junit.Before
 import org.junit.Test
@@ -131,6 +132,76 @@ internal class DokArkivClientTest {
 
         response.journalpostId shouldBeEqualTo journalpostOKResponse.journalpostId
     }
+
+    @Test
+    fun `JournalpostRequest gets AvsenderMottaker with 0-padded hpr as id if hpr is not null`() {
+        val hprNrWithFiveDigits = "12345"
+
+        val journalpostRequest = createJournalpostPayload(
+            dialogmelding = dialogmelding,
+            pdf = byteArrayOf(),
+            avsenderFnr = "12345678901",
+            avsenderHpr = hprNrWithFiveDigits,
+            ediLoggId = "asd",
+            signaturDato = LocalDateTime.now(),
+            validationResult = ValidationResult(Status.OK, emptyList()),
+            pasientFnr = "90876543219",
+            vedleggListe = null,
+        )
+
+        journalpostRequest.avsenderMottaker!!.id shouldBeEqualTo "0000$hprNrWithFiveDigits"
+        journalpostRequest.avsenderMottaker?.idType shouldBe IdType.HPR.value
+        journalpostRequest.avsenderMottaker?.navn shouldBe dialogmelding.navnHelsepersonell
+    }
+
+    @Test
+    fun `JournalpostRequest gets AvsenderMottaker without id, only name if hpr is null and avsenderFnr is not valid`() {
+        val journalpostRequest = createJournalpostPayload(
+            dialogmelding = dialogmelding,
+            pdf = byteArrayOf(),
+            avsenderFnr = "invalid",
+            avsenderHpr = null,
+            ediLoggId = "asd",
+            signaturDato = LocalDateTime.now(),
+            validationResult = ValidationResult(Status.OK, emptyList()),
+            pasientFnr = "90876543219",
+            vedleggListe = null,
+        )
+
+        journalpostRequest.avsenderMottaker?.id shouldBe null
+        journalpostRequest.avsenderMottaker?.idType shouldBe null
+        journalpostRequest.avsenderMottaker?.navn shouldBe dialogmelding.navnHelsepersonell
+    }
+
+    @Test
+    fun `JournalpostRequest gets AvsenderMottaker with fnr as id if hpr is null and avsenderFnr is a valid dnr`() {
+        val validDnr = "45088649080"
+
+        val journalpostRequest = createJournalpostPayload(
+            dialogmelding = dialogmelding,
+            pdf = byteArrayOf(),
+            avsenderFnr = validDnr,
+            avsenderHpr = null,
+            ediLoggId = "asd",
+            signaturDato = LocalDateTime.now(),
+            validationResult = ValidationResult(Status.OK, emptyList()),
+            pasientFnr = "90876543219",
+            vedleggListe = null,
+        )
+
+        journalpostRequest.avsenderMottaker?.id shouldBe validDnr
+        journalpostRequest.avsenderMottaker?.idType shouldBe IdType.PERSON_IDENT.value
+        journalpostRequest.avsenderMottaker?.navn shouldBe dialogmelding.navnHelsepersonell
+    }
+
+    val dialogmelding = Dialogmelding(
+        id = "1234",
+        innkallingMoterespons = null,
+        foresporselFraSaksbehandlerForesporselSvar = null,
+        henvendelseFraLegeHenvendelse = null,
+        navnHelsepersonell = "Lego Legesen",
+        signaturDato = LocalDateTime.now()
+    )
 
     val journalpostRequest = JournalpostRequest(
         dokumenter = emptyList(),

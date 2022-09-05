@@ -22,6 +22,7 @@ enum class IdType(
     val value: String,
 ) {
     PERSON_IDENT("FNR"),
+    HPR("HPRNR"),
 }
 
 enum class JournalpostType(

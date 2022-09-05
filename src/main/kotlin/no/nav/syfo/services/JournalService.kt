@@ -44,6 +44,7 @@ class JournalService(
                 receivedDialogmelding.dialogmelding,
                 pdf,
                 receivedDialogmelding.personNrLege,
+                receivedDialogmelding.legehpr,
                 receivedDialogmelding.navLogId,
                 receivedDialogmelding.dialogmelding.signaturDato,
                 validationResult,
