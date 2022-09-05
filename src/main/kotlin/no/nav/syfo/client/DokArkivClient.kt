@@ -58,16 +58,19 @@ fun createJournalpostPayload(
     dialogmelding: Dialogmelding,
     pdf: ByteArray,
     avsenderFnr: String,
+    avsenderHpr: String?,
     ediLoggId: String,
     signaturDato: LocalDateTime,
     validationResult: ValidationResult,
     pasientFnr: String,
     vedleggListe: List<Vedlegg>?
 ) = JournalpostRequest(
-    avsenderMottaker = when (validatePersonAndDNumber(avsenderFnr)) {
-        true -> createAvsenderMottakerValidFnr(avsenderFnr, dialogmelding)
-        else -> createAvsenderMottakerNotValidFnr(dialogmelding)
-    },
+    avsenderMottaker = createAvsenderMottaker(
+        avsenderFnr = avsenderFnr,
+        avsenderHpr = avsenderHpr,
+        dialogmelding = dialogmelding,
+    ),
+
     bruker = Bruker(
         id = pasientFnr,
         idType = IdType.PERSON_IDENT.value
@@ -169,7 +172,34 @@ fun findFiltype(vedlegg: Vedlegg): String =
         else -> throw RuntimeException("Vedlegget er av ukjent mimeType ${vedlegg.mimeType}")
     }
 
-fun createAvsenderMottakerValidFnr(
+private fun createAvsenderMottaker(
+    avsenderFnr: String,
+    avsenderHpr: String?,
+    dialogmelding: Dialogmelding,
+): AvsenderMottaker {
+    if (avsenderHpr != null) {
+        return createAvsenderMottakerValidHpr(avsenderHpr, dialogmelding)
+    }
+    return when (validatePersonAndDNumber(avsenderFnr)) {
+        true -> createAvsenderMottakerValidFnr(avsenderFnr, dialogmelding)
+        else -> createAvsenderMottakerNotValidFnr(dialogmelding)
+    }
+}
+
+private fun createAvsenderMottakerValidHpr(
+    hprNr: String,
+    dialogmelding: Dialogmelding,
+): AvsenderMottaker = AvsenderMottaker(
+    id = hprNrWithNineDigits(hprNr),
+    idType = IdType.HPR.value,
+    navn = dialogmelding.navnHelsepersonell
+)
+
+private fun hprNrWithNineDigits(hprnummer: String): String {
+    return hprnummer.padStart(9, '0')
+}
+
+private fun createAvsenderMottakerValidFnr(
     avsenderFnr: String,
     dialogmelding: Dialogmelding
 ): AvsenderMottaker = AvsenderMottaker(
@@ -178,7 +208,7 @@ fun createAvsenderMottakerValidFnr(
     navn = dialogmelding.navnHelsepersonell,
 )
 
-fun createAvsenderMottakerNotValidFnr(
+private fun createAvsenderMottakerNotValidFnr(
     dialogmelding: Dialogmelding
 ): AvsenderMottaker = AvsenderMottaker(
     navn = dialogmelding.navnHelsepersonell,
