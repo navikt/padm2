@@ -14,11 +14,11 @@ object Versions {
     const val jacksonVersion = "2.13.3"
     const val javaTimeAdapterVersion = "1.1.3"
     const val kafkaEmbeddedVersion = "3.2.1"
-    const val kafkaVersion = "3.2.0"
+    const val kafkaVersion = "3.2.3"
     const val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
     const val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
     const val kluentVersion = "1.68"
-    const val ktorVersion = "2.1.0"
+    const val ktorVersion = "2.1.2"
     const val logbackVersion = "1.2.11"
     const val logstashEncoderVersion = "7.2"
     const val javaxAnnotationApiVersion = "1.3.2"
@@ -33,6 +33,7 @@ object Versions {
     const val postgresEmbedded = "0.13.4"
     const val postgresVersion = "42.4.1"
     const val prometheusVersion = "0.9.0"
+    const val scala = "2.13.9"
     const val spek = "2.0.18"
 }
 
@@ -108,8 +109,22 @@ dependencies {
         exclude(group = "log4j")
     }
     implementation("org.apache.kafka:kafka_2.13:${Versions.kafkaVersion}", excludeLog4j)
+    constraints {
+        implementation("org.scala-lang:scala-library") {
+            because("org.apache.kafka:kafka_2.13:${Versions.kafkaVersion} -> https://www.cve.org/CVERecord?id=CVE-2022-36944")
+            version {
+                require(Versions.scala)
+            }
+        }
+    }
     testImplementation("no.nav:kafka-embedded-env:${Versions.kafkaEmbeddedVersion}", excludeLog4j)
     constraints {
+        implementation("org.yaml:snakeyaml") {
+            because("no.nav:kafka-embedded-env:${Versions.kafkaEmbeddedVersion} -> https://advisory.checkmarx.net/advisory/vulnerability/CVE-2022-25857/")
+            version {
+                require("1.31")
+            }
+        }
         implementation("org.eclipse.jetty.http2:http2-server") {
             because("no.nav:kafka-embedded-env:${Versions.kafkaEmbeddedVersion} -> https://advisory.checkmarx.net/advisory/vulnerability/CVE-2022-2048/")
             version {
