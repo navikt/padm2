@@ -42,11 +42,11 @@ fun main() {
         applicationState.ready = true
         logger.info("Application is ready")
 
-        launchListeners(
+        /* launchListeners(
             applicationState = applicationState,
             env = env,
             database = database,
-        )
+        ) */
     }
 
     val server = embeddedServer(
