@@ -1,4 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.exclude
 
 group = "no.nav.syfo"
 version = "1.0.0"
@@ -11,7 +12,7 @@ object Versions {
     const val flywayVersion = "8.5.13"
     const val hikariVersion = "5.0.1"
     const val ibmMqVersion = "9.2.5.0"
-    const val jacksonVersion = "2.13.3"
+    const val jacksonVersion = "2.13.4"
     const val javaTimeAdapterVersion = "1.1.3"
     const val kafkaEmbeddedVersion = "3.2.1"
     const val kafkaVersion = "3.2.3"
@@ -26,7 +27,7 @@ object Versions {
     const val jaxbApiVersion = "2.4.0-b180830.0359"
     const val jaxbRuntimeVersion = "2.4.0-b180830.0438"
     const val jaxwsApiVersion = "2.3.1"
-    const val jaxwsToolsVersion = "2.3.1"
+    const val jaxwsToolsVersion = "2.3.4"
     const val junitJupiterVersion = "5.8.2"
     const val mockkVersion = "1.12.4"
     const val pdfboxVersion = "2.0.24"
@@ -39,7 +40,7 @@ object Versions {
 
 plugins {
     java
-    kotlin("jvm") version "1.7.0"
+    kotlin("jvm") version "1.7.20"
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
 }
