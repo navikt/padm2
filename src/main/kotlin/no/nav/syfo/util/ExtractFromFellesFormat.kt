@@ -5,6 +5,7 @@ import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.msgHead.*
 import no.nav.syfo.model.Behandler
 import no.nav.syfo.model.getName
+import no.nav.syfo.logger
 
 fun extractDialogmelding(fellesformat: XMLEIFellesformat): XMLDialogmelding =
     fellesformat.get<XMLMsgHead>().document.first {
@@ -78,3 +79,15 @@ fun extractInnbyggerident(fellesformat: XMLEIFellesformat): String? =
     fellesformat.get<XMLMsgHead>().msgInfo.patient.ident.find {
         it.typeId.v == "FNR" || it.typeId.v == "DNR"
     }?.id
+
+fun extractIdentFromBehandler(fellesformat: XMLEIFellesformat): String? {
+    val behandlerIdent = fellesformat.get<XMLMsgHead>()
+        .msgInfo.sender.organisation?.healthcareProfessional?.ident?.find {
+            it.typeId.v == "FNR" || it.typeId.v == "DNR"
+        }?.id
+
+    if (behandlerIdent == null) {
+        logger.info("Behandler did not include ident type fnr or dnr in dialogmelding")
+    }
+    return behandlerIdent
+}
