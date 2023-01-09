@@ -12,15 +12,15 @@ object Versions {
     const val flywayVersion = "8.5.13"
     const val hikariVersion = "5.0.1"
     const val ibmMqVersion = "9.2.5.0"
-    const val jacksonVersion = "2.13.4"
+    const val jacksonVersion = "2.14.0"
     const val javaTimeAdapterVersion = "1.1.3"
     const val kafkaEmbeddedVersion = "3.2.1"
-    const val kafkaVersion = "3.2.3"
+    const val kafkaVersion = "3.3.1"
     const val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
     const val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
     const val kluentVersion = "1.68"
-    const val ktorVersion = "2.1.2"
-    const val logbackVersion = "1.2.11"
+    const val ktorVersion = "2.2.2"
+    const val logbackVersion = "1.4.4"
     const val logstashEncoderVersion = "7.2"
     const val javaxAnnotationApiVersion = "1.3.2"
     const val javaxActivationVersion = "1.2.0"
@@ -32,7 +32,7 @@ object Versions {
     const val mockkVersion = "1.12.4"
     const val pdfboxVersion = "2.0.24"
     const val postgresEmbedded = "0.13.4"
-    const val postgresVersion = "42.4.1"
+    const val postgresVersion = "42.5.1"
     const val prometheusVersion = "0.9.0"
     const val scala = "2.13.9"
     const val spek = "2.0.18"
@@ -123,13 +123,19 @@ dependencies {
         implementation("org.yaml:snakeyaml") {
             because("no.nav:kafka-embedded-env:${Versions.kafkaEmbeddedVersion} -> https://advisory.checkmarx.net/advisory/vulnerability/CVE-2022-25857/")
             version {
-                require("1.31")
+                require("1.33")
             }
         }
         implementation("org.eclipse.jetty.http2:http2-server") {
             because("no.nav:kafka-embedded-env:${Versions.kafkaEmbeddedVersion} -> https://advisory.checkmarx.net/advisory/vulnerability/CVE-2022-2048/")
             version {
                 require("9.4.48.v20220622")
+            }
+        }
+        implementation("com.google.protobuf:protobuf-java") {
+            because("no.nav:kafka-embedded-env:${Versions.kafkaEmbeddedVersion} -> https://cwe.mitre.org/data/definitions/400.html")
+            version {
+                require("3.21.7")
             }
         }
     }
