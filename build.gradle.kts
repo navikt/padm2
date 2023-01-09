@@ -34,6 +34,7 @@ object Versions {
     const val postgresEmbedded = "0.13.4"
     const val postgresVersion = "42.5.1"
     const val prometheusVersion = "0.9.0"
+    const val scala = "2.13.9"
     const val spek = "2.0.18"
 }
 
@@ -109,6 +110,14 @@ dependencies {
         exclude(group = "log4j")
     }
     implementation("org.apache.kafka:kafka_2.13:${Versions.kafkaVersion}", excludeLog4j)
+    constraints {
+        implementation("org.scala-lang:scala-library") {
+            because("org.apache.kafka:kafka_2.13:${Versions.kafkaVersion} -> https://www.cve.org/CVERecord?id=CVE-2022-36944")
+            version {
+                require(Versions.scala)
+            }
+        }
+    }
     testImplementation("no.nav:kafka-embedded-env:${Versions.kafkaEmbeddedVersion}", excludeLog4j)
     constraints {
         implementation("org.yaml:snakeyaml") {
