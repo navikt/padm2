@@ -176,11 +176,10 @@ private fun createAvsenderMottaker(
     avsenderFnr: String,
     avsenderHpr: String?,
     dialogmelding: Dialogmelding,
-): AvsenderMottaker {
-    if (avsenderHpr != null) {
-        return createAvsenderMottakerValidHpr(avsenderHpr, dialogmelding)
-    }
-    return when (validatePersonAndDNumber(avsenderFnr)) {
+) = if (avsenderHpr != null) {
+    createAvsenderMottakerValidHpr(avsenderHpr, dialogmelding)
+} else {
+    when (validatePersonAndDNumber(avsenderFnr)) {
         true -> createAvsenderMottakerValidFnr(avsenderFnr, dialogmelding)
         else -> createAvsenderMottakerNotValidFnr(dialogmelding)
     }
