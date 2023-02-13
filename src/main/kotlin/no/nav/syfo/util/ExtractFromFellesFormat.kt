@@ -45,7 +45,7 @@ fun extractLegeHpr(dialogmeldingId: String, fellesformat: XMLEIFellesformat): St
 }
 
 private fun isValidHpr(hprNr: String?) =
-    hprNr != null && hprNr.length <= 9 && hprNr.all { char -> char.isDigit() }
+    hprNr != null && hprNr.length > 0 && hprNr.length <= 9 && hprNr.all { char -> char.isDigit() }
 
 fun no.nav.helse.dialogmelding.XMLHealthcareProfessional.toBehandler(): Behandler = Behandler(
     fornavn = givenName ?: "",
