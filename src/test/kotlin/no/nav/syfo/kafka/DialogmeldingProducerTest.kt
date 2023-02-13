@@ -163,6 +163,7 @@ internal class DialogmeldingProducerTest {
     fun setupTestData(inputMessageText: String) {
         fellesformat = fellesformatUnmarshaller.unmarshal(StringReader(inputMessageText)) as XMLEIFellesformat
 
+        val dialogmeldingId = UUID.randomUUID().toString()
         val receiverBlock = fellesformat.get<XMLMottakenhetBlokk>()
         val ediLoggId = receiverBlock.ediLoggId
         val msgId = fellesformat.get<XMLMsgHead>().msgInfo.msgId
@@ -173,10 +174,9 @@ internal class DialogmeldingProducerTest {
         val legekontorOrgName = extractSenderOrganisationName(fellesformat)
         val legekontorHerId = extractOrganisationHerNumberFromSender(fellesformat)?.id
         val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
-        val legeHpr = extractLegeHpr(fellesformat)
+        val legeHpr = extractLegeHpr(dialogmeldingId, fellesformat)
 
         val dialomeldingxml = extractDialogmelding(fellesformat)
-        val dialogmeldingId = UUID.randomUUID().toString()
         val signaturDato = LocalDateTime.of(2017, 11, 5, 0, 0, 0)
         val navnHelsePersonellNavn = "Per Hansen"
 
