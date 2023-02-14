@@ -146,6 +146,18 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 0) { mqSender.sendArena(any()) }
                     verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                 }
+                it("Prosesserer innkommet melding (ugyldig hpr-nr)") {
+                    val fellesformat = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
+                        .replace("<Id>1234567</Id>", "<Id>-1234567</Id>")
+                    every { incomingMessage.text } returns(fellesformat)
+                    runBlocking {
+                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                    }
+                    verify(exactly = 1) { mqSender.sendReceipt(any()) }
+                    verify(exactly = 0) { mqSender.sendBackout(any()) }
+                    verify(exactly = 1) { mqSender.sendArena(any()) }
+                    verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
+                }
                 it("Prosesserer innkommet melding (duplikat)") {
                     val fellesformat =
                         getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")

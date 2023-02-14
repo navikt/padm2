@@ -204,7 +204,7 @@ class DialogmeldingProcessor(
         val legekontorHerId = extractOrganisationHerNumberFromSender(fellesformat)?.id
         val dialogmeldingXml = extractDialogmelding(fellesformat)
         val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
-        val legeHpr = extractLegeHpr(fellesformat)
+        val legeHpr = extractLegeHpr(dialogmeldingId, fellesformat)
         val behandlerNavn = extractBehandlerNavn(fellesformat)
         val behandlerIdent = extractIdentFromBehandler(fellesformat)
         val innbyggerIdent = extractInnbyggerident(fellesformat)

@@ -44,7 +44,10 @@ class DokarkivMock {
             routing {
                 post {
                     val journalpostRequest = call.receive<JournalpostRequest>()
-                    if (journalpostRequest.bruker!!.id != UserConstants.PATIENT_FNR_NO_AKTOER_ID) {
+                    if (
+                        journalpostRequest.bruker!!.id != UserConstants.PATIENT_FNR_NO_AKTOER_ID &&
+                        !journalpostRequest.avsenderMottaker!!.id!!.contains('-')
+                    ) {
                         call.respond(journalpostResponse)
                     } else {
                         call.respond(HttpStatusCode.InternalServerError)

@@ -34,10 +34,18 @@ fun extractOrganisationHerNumberFromSender(fellesformat: XMLEIFellesformat): XML
 fun extractSenderOrganisationName(fellesformat: XMLEIFellesformat): String =
     fellesformat.get<XMLMsgHead>().msgInfo.sender.organisation?.organisationName ?: ""
 
-fun extractLegeHpr(fellesformat: XMLEIFellesformat): String? =
-    fellesformat.get<XMLMsgHead>().msgInfo.sender.organisation?.healthcareProfessional?.ident?.find {
+fun extractLegeHpr(dialogmeldingId: String, fellesformat: XMLEIFellesformat): String? {
+    val hpr = fellesformat.get<XMLMsgHead>().msgInfo.sender.organisation?.healthcareProfessional?.ident?.find {
         it.typeId.v == "HPR"
     }?.id
+    return if (isValidHpr(hpr)) hpr else {
+        logger.warn("Invalid hpr, ignoring. Dialogmeldingid: $dialogmeldingId")
+        null
+    }
+}
+
+private fun isValidHpr(hprNr: String?) =
+    hprNr != null && hprNr.length > 0 && hprNr.length <= 9 && hprNr.all { char -> char.isDigit() }
 
 fun no.nav.helse.dialogmelding.XMLHealthcareProfessional.toBehandler(): Behandler = Behandler(
     fornavn = givenName ?: "",
