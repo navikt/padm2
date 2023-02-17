@@ -28,3 +28,6 @@ spec:
     - team: teamsykefravr
       application: isdialogmelding
       access: read
+    - team: teamsykefravr
+      application: isbehandlerdialog
+      access: read
