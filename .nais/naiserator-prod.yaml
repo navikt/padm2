@@ -51,6 +51,7 @@ spec:
         - host: "pdl-api.prod-fss-pub.nais.io"
   azure:
     application:
+      allowAllUsers: true
       enabled: true
       tenant: nav.no
   envFrom:
