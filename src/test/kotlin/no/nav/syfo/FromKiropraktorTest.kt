@@ -80,6 +80,6 @@ class FromKiropraktorTest {
         arenaDialogNotat.notatKode shouldBeEqualTo "31"
         arenaDialogNotat.notatTittel shouldBeEqualTo DialogmeldingKodeverk.HENVENDELSE_OM_PASIENT_HENVENDELSE_OM_SYKEFRAVARSOPPFOLGING.arenaNotatTittel
         arenaDialogNotat.notatTekst shouldBeEqualTo "Kink i nakken.\n                                Mvh Lisa Kiropraktorsen"
-        arenaDialogNotat.notatDato.shouldBeEqualTo(LocalDateTime.of(2021, 2, 9, 7, 32, 3))
+        arenaDialogNotat.notatDato.shouldBeEqualTo(LocalDateTime.of(2021, 2, 9, 8, 32, 3))
     }
 }
