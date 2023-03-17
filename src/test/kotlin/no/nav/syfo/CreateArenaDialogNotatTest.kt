@@ -181,6 +181,7 @@ internal class CreateArenaDialogNotatTest {
             navnHelsePersonellNavn = navnHelsePersonellNavn
         )
 
+        val localDateTime = LocalDateTime.parse("2019-01-16T22:51:35.5317672")
         val arenaDialogNotat = createArenaDialogNotat(
             felleformatDm,
             tssid,
@@ -196,7 +197,7 @@ internal class CreateArenaDialogNotatTest {
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentNavn shouldBeEqualTo "Notat"
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentreferanse shouldBeEqualTo "37340D30-FE14-42B5-985F-A8FF8FFA0CB5"
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.ediLoggId shouldBeEqualTo "1901162157lege21826.1"
-        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.shouldBeEqualTo(LocalDateTime.of(2019, 1, 16, 21, 51, 35, 531000000))
+        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.shouldBeEqualTo(localDateTime)
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeFnr shouldBeEqualTo "01010112377"
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.tssId.shouldBeEqualTo(tssid.toBigInteger())
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.fornavn shouldBeEqualTo "Inga"
@@ -210,7 +211,7 @@ internal class CreateArenaDialogNotatTest {
         arenaDialogNotat.notatTittel shouldBeEqualTo DialogmeldingKodeverk.HENVENDELSE_OM_PASIENT_HENVENDELSE_OM_SYKEFRAVARSOPPFOLGING.arenaNotatTittel
         arenaDialogNotat.notatTekst shouldBeEqualTo "Hei,Det gjelder pas. Sender som vedlegg epikrisen"
         arenaDialogNotat.svarReferanse shouldBeEqualTo "A1578B81-0042-453B-8527-6CF182BDA6C7"
-        arenaDialogNotat.notatDato.shouldBeEqualTo(LocalDateTime.of(2019, 1, 16, 21, 51, 35, 531000000))
+        arenaDialogNotat.notatDato.shouldBeEqualTo(localDateTime)
     }
 
     @Test
