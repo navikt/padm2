@@ -35,6 +35,7 @@ spec:
       memory: 128Mi
   ingresses:
     - "https://padm2.dev.intern.nav.no"
+    - "https://padm2.intern.dev.nav.no"
   gcp:
     sqlInstances:
       - type: POSTGRES_14
