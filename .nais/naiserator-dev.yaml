@@ -34,7 +34,6 @@ spec:
       cpu: 100m
       memory: 128Mi
   ingresses:
-    - "https://padm2.dev.intern.nav.no"
     - "https://padm2.intern.dev.nav.no"
   gcp:
     sqlInstances:
@@ -81,7 +80,7 @@ spec:
     - name: DOK_ARKIV_URL
       value: https://dokarkiv.dev-fss-pub.nais.io/rest/journalpostapi/v1/journalpost
     - name: PDF_GEN_URL
-      value: https://padm2pdfgen.dev.intern.nav.no/api/v1/genpdf/padm2/padm2
+      value: https://padm2pdfgen.intern.dev.nav.no/api/v1/genpdf/padm2/padm2
     - name: PDL_CLIENT_ID
       value: dev-fss.pdl.pdl-api
     - name: PDL_ENDPOINT_URL
