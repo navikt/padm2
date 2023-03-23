@@ -45,10 +45,13 @@ spec:
     outbound:
       external:
         - host: "login.microsoftonline.com"
+        - host: "mpls04.adeo.no"
         - host: "dokarkiv.prod-fss-pub.nais.io"
         - host: "syfohelsenettproxy.prod-fss-pub.nais.io"
         - host: "isproxy.prod-fss-pub.nais.io"
         - host: "pdl-api.prod-fss-pub.nais.io"
+      rules:
+        - application: "padm2pdfgen"
   azure:
     application:
       allowAllUsers: true
@@ -80,7 +83,7 @@ spec:
     - name: DOK_ARKIV_URL
       value: https://dokarkiv.prod-fss-pub.nais.io/rest/journalpostapi/v1/journalpost
     - name: PDF_GEN_URL
-      value: https://padm2pdfgen.intern.nav.no/api/v1/genpdf/padm2/padm2
+      value: https://padm2pdfgen/api/v1/genpdf/padm2/padm2
     - name: PDL_CLIENT_ID
       value: prod-fss.pdl.pdl-api
     - name: PDL_ENDPOINT_URL
