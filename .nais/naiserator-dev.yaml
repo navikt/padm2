@@ -51,7 +51,7 @@ spec:
         - host: "isproxy.dev-fss-pub.nais.io"
         - host: "pdl-api.dev-fss-pub.nais.io"
       rules:
-        -application: "padm2pdfgen"
+        - application: "padm2pdfgen"
   azure:
     application:
       allowAllUsers: true
