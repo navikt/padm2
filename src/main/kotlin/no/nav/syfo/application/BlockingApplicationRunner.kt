@@ -75,7 +75,7 @@ class BlockingApplicationRunner(
                 dialogmeldingProcessor.processMessage(dialogmeldingId, inputMessageText)
             }
         } catch (e: Exception) {
-            logger.warn("Exception caught while processing message, will try again later: {}", e.message)
+            logger.warn("Exception caught while processing message, will try again later: ${e.message}", e)
         }
         return dialogmeldingId
     }
