@@ -46,6 +46,10 @@ spec:
       external:
         - host: "login.microsoftonline.com"
         - host: "mpls04.adeo.no"
+          ports:
+            - name: MQ
+              port: 1414
+              protocol: TCP
         - host: "dokarkiv.prod-fss-pub.nais.io"
         - host: "syfohelsenettproxy.prod-fss-pub.nais.io"
         - host: "isproxy.prod-fss-pub.nais.io"

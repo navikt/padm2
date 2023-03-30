@@ -46,6 +46,10 @@ spec:
       external:
         - host: "login.microsoftonline.com"
         - host: "b27apvl222.preprod.local"
+          ports:
+            - name: MQ
+              port: 1413
+              protocol: TCP
         - host: "dokarkiv.dev-fss-pub.nais.io"
         - host: "syfohelsenettproxy.dev-fss-pub.nais.io"
         - host: "isproxy.dev-fss-pub.nais.io"
