@@ -1,9 +1,13 @@
 package no.nav.syfo.metrics
 
+import io.micrometer.prometheus.PrometheusConfig
+import io.micrometer.prometheus.PrometheusMeterRegistry
 import io.prometheus.client.Counter
 import io.prometheus.client.Summary
 
 const val METRICS_NS = "padm2"
+
+val METRICS_REGISTRY = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 
 val REQUEST_TIME: Summary = Summary.build()
     .namespace(METRICS_NS)
