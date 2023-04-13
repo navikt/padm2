@@ -24,7 +24,6 @@ class JournalService(
     ): String {
         val journalpostId = database.hentDialogmeldingOpplysningerJournalpostId(receivedDialogmelding.dialogmelding.id)
         return if (journalpostId == null) {
-
             logger.info("Prover aa lagre i Joark {}", StructuredArguments.fields(loggingMeta))
 
             val antallVedlegg = vedleggListe?.size ?: 0

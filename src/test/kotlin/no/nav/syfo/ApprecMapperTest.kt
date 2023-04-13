@@ -18,7 +18,7 @@ internal class ApprecMapperTest {
             StringReader(getFileAsStringISO88591("src/test/resources/dialogmelding_dialog_svar_foresporsel_om_pasient.xml"))
         ) as XMLEIFellesformat
 
-        val apprec = createApprec(felleformatDm, ApprecStatus.ok)
+        val apprec = createApprec(felleformatDm, ApprecStatus.OK)
         val apprecReceiverBlock = apprec.get<XMLMottakenhetBlokk>()
 
         apprecReceiverBlock.ebAction shouldBeEqualTo "Bekreftelse"

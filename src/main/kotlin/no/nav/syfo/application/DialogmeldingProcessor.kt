@@ -252,7 +252,9 @@ class DialogmeldingProcessor(
             if (dialogmeldingDokumentWithShaExists(receivedDialogmelding.dialogmelding.id, sha256String, database)) {
                 val tidMottattOpprinneligMelding = database.hentMottattTidspunkt(sha256String)
                 handleDuplicateDialogmeldingContent(
-                    loggingMeta, sha256String, tidMottattOpprinneligMelding
+                    loggingMeta,
+                    sha256String,
+                    tidMottattOpprinneligMelding,
                 )
             } else if (!innbyggerOK) {
                 handlePatientNotFound(loggingMeta)

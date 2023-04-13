@@ -16,8 +16,12 @@ import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.helse.msgHead.XMLSender
 
 val fellesformatJaxBContext: JAXBContext = JAXBContext.newInstance(
-    XMLEIFellesformat::class.java, XMLMsgHead::class.java,
-    XMLMottakenhetBlokk::class.java, XMLDialogmelding::class.java, Base64Container::class.java, XMLAppRec::class.java
+    XMLEIFellesformat::class.java,
+    XMLMsgHead::class.java,
+    XMLMottakenhetBlokk::class.java,
+    XMLDialogmelding::class.java,
+    Base64Container::class.java,
+    XMLAppRec::class.java,
 )
 val fellesformatUnmarshaller: Unmarshaller = fellesformatJaxBContext.createUnmarshaller().apply {
     setAdapter(LocalDateTimeXmlAdapter::class.java, XMLDateTimeAdapter())

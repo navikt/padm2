@@ -15,14 +15,14 @@ fun persistReceivedMessage(
     loggingMeta: LoggingMeta,
     database: DatabaseInterface,
 ) {
-
     if (database.erDialogmeldingOpplysningerLagret(
             receivedDialogmelding.dialogmelding.id
         )
     ) {
         logger.warn(
             "Dialogmelding med dialogmeldingid {}, er allerede lagret i databasen, {}",
-            receivedDialogmelding.dialogmelding.id, StructuredArguments.fields(loggingMeta)
+            receivedDialogmelding.dialogmelding.id,
+            StructuredArguments.fields(loggingMeta),
         )
     } else {
         database.lagreMottattDialogmelding(receivedDialogmelding, sha256String)
