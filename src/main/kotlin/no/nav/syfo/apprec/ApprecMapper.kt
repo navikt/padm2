@@ -26,17 +26,17 @@ fun createApprec(fellesformat: XMLEIFellesformat, apprecStatus: ApprecStatus): X
         any.add(
             XMLMottakenhetBlokk().apply {
                 ediLoggId = xmlMottakenhetBlokk.ediLoggId
-                ebRole = ApprecConstant.ebRoleSaksbehandler.string
+                ebRole = ApprecConstant.EB_ROLE_SAKSBEHANDLER.string
                 ebService = xmlMottakenhetBlokk.ebService
-                ebAction = ApprecConstant.ebActionBekreftelse.string
+                ebAction = ApprecConstant.EB_ACTION_BEKREFTELSE.string
             }
         )
         any.add(
             XMLAppRec().apply {
                 msgType = XMLCS().apply {
-                    v = ApprecConstant.apprec.string
+                    v = ApprecConstant.APPREC.string
                 }
-                miGversion = ApprecConstant.apprecVersionV1_0.string
+                miGversion = ApprecConstant.APPREC_VERSION_V1_0.string
                 genDate = LocalDateTime.now()
                 id = xmlMottakenhetBlokk.ediLoggId
 

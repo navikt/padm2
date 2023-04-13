@@ -5,7 +5,6 @@ import no.nav.syfo.model.DialogmeldingType
 import no.nav.syfo.model.findDialogmeldingKodeverk
 
 fun isKodeverkValid(xmlDialogmelding: XMLDialogmelding, dialogmeldingType: DialogmeldingType): Boolean {
-
     when (dialogmeldingType) {
         DialogmeldingType.DIALOGMELDING_DIALOGMOTE_INNKALLING_MOTERESPONS -> {
             val kodeverkOID = xmlDialogmelding.notat.first().temaKodet.s

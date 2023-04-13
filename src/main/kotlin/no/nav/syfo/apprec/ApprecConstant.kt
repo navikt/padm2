@@ -1,8 +1,8 @@
 package no.nav.syfo.apprec
 
 enum class ApprecConstant(val string: String) {
-    apprec("APPREC"),
-    apprecVersionV1_0("1.0 2004-11-21"),
-    ebRoleSaksbehandler("Saksbehandler"),
-    ebActionBekreftelse("Bekreftelse")
+    APPREC("APPREC"),
+    APPREC_VERSION_V1_0("1.0 2004-11-21"),
+    EB_ROLE_SAKSBEHANDLER("Saksbehandler"),
+    EB_ACTION_BEKREFTELSE("Bekreftelse")
 }

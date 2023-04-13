@@ -10,7 +10,6 @@ data class Vedlegg(
 )
 
 fun XMLDocument.toVedlegg(): Vedlegg {
-
     val base64Container = refDoc.content.any[0] as Base64Container
 
     return Vedlegg(

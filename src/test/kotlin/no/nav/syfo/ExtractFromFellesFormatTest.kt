@@ -47,6 +47,7 @@ class ExtractFromFellesFormatTest {
 
         behandlerIdent shouldBeEqualTo null
     }
+
     @Test
     internal fun `Reads GenDate without timezone as timezone Oslo and converts to correct LocalDateTime`() {
         val localDateTime = LocalDateTime.parse("2019-01-16T21:57:36")

@@ -83,7 +83,6 @@ fun DialogmeldingKodeverk.toTypeMelding(): TemaKode {
 }
 
 fun XMLNotat.toInnkallingMoterespons(): InnkallingMoterespons? {
-
     return temaKodet.toTemaKode()?.let { it ->
         InnkallingMoterespons(
             temaKode = it,
@@ -95,7 +94,6 @@ fun XMLNotat.toInnkallingMoterespons(): InnkallingMoterespons? {
 }
 
 fun XMLNotat.toForesporselFraSaksbehandlerForesporselSvar(): ForesporselFraSaksbehandlerForesporselSvar? {
-
     return temaKodet.toTemaKode()?.let { it ->
         ForesporselFraSaksbehandlerForesporselSvar(
             temaKode = it,
@@ -107,7 +105,6 @@ fun XMLNotat.toForesporselFraSaksbehandlerForesporselSvar(): ForesporselFraSaksb
 }
 
 fun XMLForesporsel.toForesporsel(): Foresporsel {
-
     val description = typeForesp.dn ?: ""
 
     return Foresporsel(

@@ -11,7 +11,6 @@ internal class PdfModelTest {
 
     @Test
     internal fun `Creates a static pdfpayload`() {
-
         val dialogmeldingId = UUID.randomUUID().toString()
         val signaturDato = LocalDateTime.of(2017, 11, 5, 0, 0, 0)
         val navnHelsePersonellNavn = "Per Hansen"
@@ -40,7 +39,8 @@ internal class PdfModelTest {
                     dokIdForesp = "OD1812186729156",
                     rollerRelatertNotat = RollerRelatertNotat(
                         rolleNotat = RolleNotat(
-                            "2.16.578.1.12.4.1.1.9057", "1"
+                            "2.16.578.1.12.4.1.1.9057",
+                            "1",
                         ),
                         person = Person(
                             "jon",
@@ -75,7 +75,8 @@ internal class PdfModelTest {
                     dokIdForesp = "OD1812186729156",
                     rollerRelatertNotat = RollerRelatertNotat(
                         rolleNotat = RolleNotat(
-                            "2.16.578.1.12.4.1.1.9057", "1"
+                            "2.16.578.1.12.4.1.1.9057",
+                            "1",
                         ),
                         person = Person(
                             "jon",

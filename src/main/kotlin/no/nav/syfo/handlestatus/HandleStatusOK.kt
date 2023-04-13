@@ -71,7 +71,7 @@ suspend fun handleStatusOK(
     }
 
     if (!database.erDialogmeldingOpplysningerSendtApprec(receivedDialogmelding.dialogmelding.id)) {
-        sendReceipt(mqSender, fellesformat, ApprecStatus.ok)
+        sendReceipt(mqSender, fellesformat, ApprecStatus.OK)
         logger.info("Apprec Receipt with status OK sent, {}", StructuredArguments.fields(loggingMeta))
         database.lagreSendtApprec(receivedDialogmelding.dialogmelding.id)
     }

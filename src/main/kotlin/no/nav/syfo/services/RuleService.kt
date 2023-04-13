@@ -28,7 +28,6 @@ class RuleService(
     suspend fun executeRuleChains(
         receivedDialogmelding: ReceivedDialogmelding,
     ): ValidationResult {
-
         val loggingMeta = LoggingMeta(
             mottakId = receivedDialogmelding.navLogId,
             orgNr = receivedDialogmelding.legekontorOrgNr,

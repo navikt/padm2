@@ -16,9 +16,7 @@ import java.io.OutputStream
 import javax.imageio.ImageIO
 
 fun ImageToPDF(imageStream: InputStream, outputStream: OutputStream) {
-
     PDDocument().use { document ->
-
         val page = PDPage(PDRectangle.A4)
         document.addPage(page)
         val image = toPortait(ImageIO.read(imageStream))

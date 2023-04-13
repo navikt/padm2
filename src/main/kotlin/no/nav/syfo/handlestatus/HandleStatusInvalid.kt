@@ -36,7 +36,6 @@ suspend fun handleStatusINVALID(
     navnSignerendeLege: String,
     innbyggerOK: Boolean,
 ) {
-
     if (innbyggerOK && !validationResult.isDuplicate()) {
         journalService.onJournalRequest(
             receivedDialogmelding,
@@ -61,7 +60,7 @@ suspend fun handleStatusINVALID(
         sendReceipt(
             mqSender = mqSender,
             fellesformat = fellesformat,
-            apprecStatus = ApprecStatus.avvist,
+            apprecStatus = ApprecStatus.AVVIST,
             apprecErrors = run {
                 val errors = mutableListOf<XMLCV>()
                 errors.addAll(validationResult.ruleHits.map { it.toApprecCV() })
@@ -151,10 +150,12 @@ fun handlePatientMissing(
     )
 
     sendReceipt(
-        mqSender, fellesformat, ApprecStatus.avvist,
+        mqSender,
+        fellesformat,
+        ApprecStatus.AVVIST,
         listOf(
             createApprecError("Pasienten er ikke funnet i dialogmeldingen eller fnr er ugyldig")
-        )
+        ),
     )
     logger.info("Apprec Receipt with status Avvist sent, {}", fields(loggingMeta))
 
@@ -219,7 +220,6 @@ fun handleTestFnrInProd(
 fun handleMeldingsTekstMangler(
     loggingMeta: LoggingMeta
 ): ValidationResult {
-
     logger.warn(
         "TekstNotatInnhold mangler {}",
         createLogEntry(
@@ -246,7 +246,6 @@ fun handleMeldingsTekstMangler(
 fun handleInvalidDialogMeldingKodeverk(
     loggingMeta: LoggingMeta
 ): ValidationResult {
-
     logger.warn(
         "Det er brukt ein ugyldig kombinasjon av dialogmelding kodeverk {}",
         createLogEntry(

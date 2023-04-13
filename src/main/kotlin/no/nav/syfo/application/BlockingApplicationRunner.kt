@@ -101,7 +101,9 @@ class BlockingApplicationRunner(
         logger.info("Received message, {}", StructuredArguments.fields(loggingMeta))
         if (innbyggerIdent.isNullOrEmpty() || !elevenDigits.matches(innbyggerIdent)) {
             handlePatientMissing(
-                mqSender, fellesformat, loggingMeta,
+                mqSender,
+                fellesformat,
+                loggingMeta,
             )
             return null
         }

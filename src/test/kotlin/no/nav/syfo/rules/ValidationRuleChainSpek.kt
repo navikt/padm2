@@ -88,7 +88,6 @@ internal class ValidationRuleChainSpek {
 
     @Test
     internal fun `AVSENDER_FNR_ER_SAMME_SOM_PASIENT_FNR should not trigger on rule`() {
-
         ValidationRuleChain.AVSENDER_FNR_ER_SAMME_SOM_INNBYGGER_FNR(
             ruleData(dialogmelding, avsenderfnr = "04030350265", patientPersonNumber = "04030350261")
         ) shouldBeEqualTo false
