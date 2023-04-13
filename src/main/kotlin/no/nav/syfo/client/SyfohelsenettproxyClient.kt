@@ -12,7 +12,6 @@ import net.logstash.logback.argument.StructuredArguments.fields
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.logger
 import no.nav.syfo.util.LoggingMeta
-import no.nav.syfo.util.retry
 import java.io.IOException
 
 class SyfohelsenettproxyClient(
@@ -26,7 +25,7 @@ class SyfohelsenettproxyClient(
         behandlerFnr: String,
         msgId: String,
         loggingMeta: LoggingMeta
-    ): HelsenettProxyBehandler? = retry("finn_behandler") {
+    ): HelsenettProxyBehandler? {
         logger.info("Henter behandler fra syfohelsenettproxy for msgId {}", msgId)
 
         val accessToken = azureAdV2Client.getSystemToken(helsenettClientId)?.accessToken
@@ -41,7 +40,7 @@ class SyfohelsenettproxyClient(
             }
         }
 
-        when (response.status) {
+        return when (response.status) {
             InternalServerError -> {
                 logger.error("Syfohelsenettproxy svarte med feilmelding for msgId {}, {}", msgId, fields(loggingMeta))
                 throw IOException("Syfohelsenettproxy svarte med feilmelding for $msgId")

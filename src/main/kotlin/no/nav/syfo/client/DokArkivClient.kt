@@ -25,12 +25,13 @@ class DokArkivClient(
     suspend fun createJournalpost(
         journalpostRequest: JournalpostRequest,
         loggingMeta: LoggingMeta
-    ): JournalpostResponse = retry(
-        callName = "dokarkiv",
-        retryIntervals = arrayOf(500L, 1000L, 3000L, 5000L, 10000L)
-    ) {
+    ): JournalpostResponse {
         try {
-            logger.info("Kall til dokarkiv Nav-Callid {}, {}", journalpostRequest.eksternReferanseId, fields(loggingMeta))
+            logger.info(
+                "Kall til dokarkiv Nav-Callid {}, {}",
+                journalpostRequest.eksternReferanseId,
+                fields(loggingMeta)
+            )
 
             val accessToken = azureAdV2Client.getSystemToken(dokArkivClientId)?.accessToken
                 ?: throw RuntimeException("Failed to send request to DokArkiv: No token was found")
@@ -42,7 +43,7 @@ class DokArkivClient(
                 contentType(ContentType.Application.Json)
                 parameter("forsoekFerdigstill", true)
             }
-            when (response.status) {
+            return when (response.status) {
                 HttpStatusCode.OK -> response.body()
                 HttpStatusCode.Created -> response.body()
                 else -> throw RuntimeException("Http status: ${response.status} Content: ${response.bodyAsChannel()}")

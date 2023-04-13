@@ -26,7 +26,7 @@ fun persistReceivedMessage(
         )
     } else {
         database.lagreMottattDialogmelding(receivedDialogmelding, sha256String)
-        MESSAGE_STORED_IN_DB_COUNTER.inc()
+        MESSAGE_STORED_IN_DB_COUNTER.increment()
     }
 }
 

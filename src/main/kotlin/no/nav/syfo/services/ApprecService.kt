@@ -29,7 +29,7 @@ fun sendReceipt(
         mqSender.sendReceipt(
             payload = apprecMarshaller.toString(apprec)
         )
-        APPREC_COUNTER.inc()
+        APPREC_COUNTER.increment()
     }
 }
 

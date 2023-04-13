@@ -13,27 +13,24 @@ val config: HttpClientConfig<ApacheEngineConfig>.() -> Unit = {
     install(ContentNegotiation) {
         jackson { configure() }
     }
-    expectSuccess = false
-}
-
-val httpClientWithProxyAndTimeout: HttpClientConfig<ApacheEngineConfig>.() -> Unit = {
-    install(ContentNegotiation) {
-        jackson { configure() }
-    }
-    expectSuccess = true
-    install(HttpTimeout) {
-        socketTimeoutMillis = 60000
-    }
-    engine {
-        customizeClient {
-            setRoutePlanner(SystemDefaultRoutePlanner(ProxySelector.getDefault()))
+    install(HttpRequestRetry) {
+        retryOnExceptionIf(2) { _, cause ->
+            cause !is ClientRequestException
         }
+        constantDelay(500L)
     }
+    expectSuccess = false
 }
 
 val proxyConfig: HttpClientConfig<ApacheEngineConfig>.() -> Unit = {
     install(ContentNegotiation) {
         jackson { configure() }
+    }
+    install(HttpRequestRetry) {
+        retryOnExceptionIf(2) { _, cause ->
+            cause !is ClientRequestException
+        }
+        constantDelay(500L)
     }
     expectSuccess = true
     engine {
@@ -44,5 +41,4 @@ val proxyConfig: HttpClientConfig<ApacheEngineConfig>.() -> Unit = {
 }
 
 val httpClient = HttpClient(Apache, config)
-val httpClientWithTimeout = HttpClient(Apache, httpClientWithProxyAndTimeout)
 val httpClientWithProxy = HttpClient(Apache, proxyConfig)
