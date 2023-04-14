@@ -20,29 +20,30 @@ class DokArkivClient(
     private val azureAdV2Client: AzureAdV2Client,
     private val dokArkivClientId: String,
     private val url: String,
-    private val httpClient: HttpClient
+    private val configuredHttpClient: HttpClient = httpClient,
 ) {
     suspend fun createJournalpost(
         journalpostRequest: JournalpostRequest,
         loggingMeta: LoggingMeta
-    ): JournalpostResponse = retry(
-        callName = "dokarkiv",
-        retryIntervals = arrayOf(500L, 1000L, 3000L, 5000L, 10000L)
-    ) {
+    ): JournalpostResponse {
         try {
-            logger.info("Kall til dokarkiv Nav-Callid {}, {}", journalpostRequest.eksternReferanseId, fields(loggingMeta))
+            logger.info(
+                "Kall til dokarkiv Nav-Callid {}, {}",
+                journalpostRequest.eksternReferanseId,
+                fields(loggingMeta)
+            )
 
             val accessToken = azureAdV2Client.getSystemToken(dokArkivClientId)?.accessToken
                 ?: throw RuntimeException("Failed to send request to DokArkiv: No token was found")
 
-            val response: HttpResponse = httpClient.post(url) {
+            val response: HttpResponse = configuredHttpClient.post(url) {
                 header("Authorization", "Bearer $accessToken")
                 header("Nav-Callid", journalpostRequest.eksternReferanseId)
                 setBody(journalpostRequest)
                 contentType(ContentType.Application.Json)
                 parameter("forsoekFerdigstill", true)
             }
-            when (response.status) {
+            return when (response.status) {
                 HttpStatusCode.OK -> response.body()
                 HttpStatusCode.Created -> response.body()
                 else -> throw RuntimeException("Http status: ${response.status} Content: ${response.bodyAsChannel()}")
