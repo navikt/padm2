@@ -71,7 +71,7 @@ fun createAvsender(
     behandler: Behandler?
 ): EiaDokumentInfoType.Avsender {
     val validatedTssID = if (tssid.isNullOrBlank()) {
-        SAR_TSS_MISS_COUNTER.inc()
+        SAR_TSS_MISS_COUNTER.increment()
         "0"
     } else tssid
     return EiaDokumentInfoType.Avsender().apply {

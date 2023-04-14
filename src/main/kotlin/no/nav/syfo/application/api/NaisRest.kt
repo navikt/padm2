@@ -1,19 +1,16 @@
 package no.nav.syfo.application.api
 
 import io.ktor.server.application.call
-import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import io.prometheus.client.CollectorRegistry
-import io.prometheus.client.exporter.common.TextFormat
 import no.nav.syfo.application.ApplicationState
+import no.nav.syfo.metrics.METRICS_REGISTRY
 
 fun Routing.registerNaisApi(
     applicationState: ApplicationState,
     readynessCheck: () -> Boolean = { applicationState.ready },
     alivenessCheck: () -> Boolean = { applicationState.alive },
-    collectorRegistry: CollectorRegistry = CollectorRegistry.defaultRegistry
 ) {
     get("/is_alive") {
         if (alivenessCheck()) {
@@ -30,9 +27,6 @@ fun Routing.registerNaisApi(
         }
     }
     get("/prometheus") {
-        val names = call.request.queryParameters.getAll("name[]")?.toSet() ?: setOf()
-        call.respondTextWriter(ContentType.parse(TextFormat.CONTENT_TYPE_004)) {
-            TextFormat.write004(this, collectorRegistry.filteredMetricFamilySamples(names))
-        }
+        call.respondText(METRICS_REGISTRY.scrape())
     }
 }

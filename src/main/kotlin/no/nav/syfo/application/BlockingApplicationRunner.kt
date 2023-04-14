@@ -56,13 +56,13 @@ class BlockingApplicationRunner(
             storeMessage(inputMessageText)
         } catch (e: Exception) {
             mqSender.sendBackout(message)
-            MESSAGES_SENT_TO_BOQ.inc()
+            MESSAGES_SENT_TO_BOQ.increment()
             logger.error("Exception caught while storing message, sent to backout: {}", e.message)
             null
         } catch (t: Throwable) {
             try {
                 mqSender.sendBackout(message)
-                MESSAGES_SENT_TO_BOQ.inc()
+                MESSAGES_SENT_TO_BOQ.increment()
                 logger.error("Error caught while storing message, sent to backout: {}", t.message)
                 null
             } finally {
@@ -122,7 +122,7 @@ class BlockingApplicationRunner(
             loggingMeta = loggingMeta,
             database = database,
         )
-        INCOMING_MESSAGE_COUNTER.inc()
+        INCOMING_MESSAGE_COUNTER.increment()
         return dialogmeldingId
     }
 }

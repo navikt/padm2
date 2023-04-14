@@ -25,7 +25,7 @@ class RerunCronJob(
                 logger.warn("Exception caught while reprocessing message, will try again later: ${e.message}", e)
                 result.failed++
                 if (mottattDatetime.isBefore(LocalDateTime.now().minusHours(1))) {
-                    MESSAGES_STILL_FAIL_AFTER_1H.inc()
+                    MESSAGES_STILL_FAIL_AFTER_1H.increment()
                 }
             }
         }
