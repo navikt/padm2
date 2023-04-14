@@ -6,7 +6,6 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
-import no.nav.syfo.util.retry
 import no.nav.syfo.logger
 import java.io.IOException
 
@@ -21,7 +20,7 @@ class LegeSuspensjonClient(
         behandlerId: String,
         ediloggid: String,
         oppslagsdato: String
-    ): Suspendert = retry(callName = "sjekk_suspensjon") {
+    ): Suspendert {
         val token = azureAdV2Client.getSystemToken(endpointClientId)
             ?: throw RuntimeException("Failed to sjekk suspensjon: No token was found")
 
@@ -40,7 +39,7 @@ class LegeSuspensjonClient(
             throw IOException("Btsys svarte (via isproxy) med uventet kode ${httpResponse.status} for $ediloggid")
         }
 
-        httpResponse.call.response.body()
+        return httpResponse.call.response.body()
     }
 }
 

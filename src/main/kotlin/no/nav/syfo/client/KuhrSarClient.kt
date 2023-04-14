@@ -25,7 +25,7 @@ class KuhrSarClient(
         legekontorOrgName: String,
         legekontorHerId: String?,
         msgHead: XMLMsgHead,
-    ): String = retry("get_tssid") {
+    ): String {
         val token = azureAdV2Client.getSystemToken(kuhrSarClientId)
             ?: throw RuntimeException("Failed to send request to KuhrSar: No token was found")
         val response: HttpResponse = httpClient.get("$kuhrSarUrl/api/v1/kuhrsar") {
@@ -42,12 +42,13 @@ class KuhrSarClient(
                 )
             )
         }
-        when (response.status) {
+        return when (response.status) {
             HttpStatusCode.OK -> response.body<KuhrsarResponse>().tssId
             else -> throw IOException("Vi fikk en uventet feil fra kuhrSar, prøver på nytt! ${response.bodyAsChannel()}")
         }
     }
 }
+
 data class KuhrsarRequest(
     val behandlerIdent: PersonIdent,
     val partnerId: Int?,

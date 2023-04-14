@@ -5,7 +5,6 @@ import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.*
-import no.nav.syfo.util.retry
 import no.nav.syfo.model.Dialogmelding
 import no.nav.syfo.model.PdfModel
 import no.nav.syfo.model.ValidationResult
@@ -15,12 +14,12 @@ class PdfgenClient constructor(
     private val url: String,
     private val httpClient: HttpClient
 ) {
-    suspend fun createPdf(payload: PdfModel): ByteArray = retry("pdfgen") {
+    suspend fun createPdf(payload: PdfModel): ByteArray {
         val response: HttpResponse = httpClient.post(url) {
             contentType(ContentType.Application.Json)
             setBody(payload.sanitizeForPdfGen())
         }
-        if (response.status == HttpStatusCode.OK) {
+        return if (response.status == HttpStatusCode.OK) {
             response.body()
         } else {
             throw RuntimeException("Pdfgen returned http status: ${response.status}")
