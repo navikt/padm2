@@ -42,6 +42,9 @@ spec:
           - name: padm2-db
         diskAutoresize: true
   accessPolicy:
+    inbound:
+      rules:
+        - application: isbehandlerdialog
     outbound:
       external:
         - host: "login.microsoftonline.com"
@@ -55,7 +58,7 @@ spec:
         - host: "isproxy.prod-fss-pub.nais.io"
         - host: "pdl-api.prod-fss-pub.nais.io"
       rules:
-        - application: "padm2pdfgen"
+        - application: padm2pdfgen
   azure:
     application:
       allowAllUsers: true

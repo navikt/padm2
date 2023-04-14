@@ -182,13 +182,13 @@ class DialogmeldingProcessor(
         REQUEST_TIME.record(duration)
 
         logger.info(
-            "Finished message got outcome {}, {}, processing took {}s",
+            "Finished message got outcome {}, {}, processing took {} ms",
             StructuredArguments.keyValue("status", validationResult.status),
             StructuredArguments.keyValue(
                 "ruleHits",
                 validationResult.ruleHits.joinToString(", ", "(", ")") { it.ruleName }
             ),
-            StructuredArguments.keyValue("latency", duration),
+            StructuredArguments.keyValue("latency", duration.toMillis()),
             StructuredArguments.fields(loggingMeta)
         )
     }

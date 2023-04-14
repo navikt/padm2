@@ -1,6 +1,8 @@
 package no.nav.syfo
 
 import no.nav.syfo.application.ApplicationState
+import no.nav.syfo.application.api.access.PreAuthorizedClient
+import no.nav.syfo.util.configuredJacksonMapper
 import java.net.ServerSocket
 import java.util.*
 
@@ -17,6 +19,8 @@ fun testEnvironment(
     aadAppClient = "isdialogmote-client-id",
     aadAppSecret = "isdialogmote-secret",
     aadTokenEndpoint = azureTokenEndpoint,
+    aadAppPreAuthorizedApps = configuredJacksonMapper().writeValueAsString(testAzureAppPreAuthorizedApps),
+    aadAppWellKnownUrl = "wellknown",
     databaseHost = "localhost",
     databasePort = "5432",
     databaseName = "padm2_dev",
@@ -61,7 +65,11 @@ fun getRandomPort() = ServerSocket(0).use {
     it.localPort
 }
 
-fun Properties.overrideForTest(): Properties = apply {
-    remove("security.protocol")
-    remove("sasl.mechanism")
-}
+const val testIsBehandlerDialogClientId = "isbehandlerdialog-client-id"
+
+val testAzureAppPreAuthorizedApps = listOf(
+    PreAuthorizedClient(
+        name = "dev-gcp:teamsykefravr:isbehandlerdialog",
+        clientId = testIsBehandlerDialogClientId,
+    ),
+)
