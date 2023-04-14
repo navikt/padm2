@@ -39,7 +39,7 @@ class VedleggSystemApiSpek : Spek({
                 )
 
                 describe("Happy path") {
-                    it("should get vedlegg for msgId") {
+                    it("should get vedlegg for msgId (hardcoded to OK-response for now)") {
                         with(
                             handleRequest(HttpMethod.Get, url) {
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
