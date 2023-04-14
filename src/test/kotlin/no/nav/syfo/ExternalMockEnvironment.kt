@@ -3,12 +3,15 @@ package no.nav.syfo
 import io.ktor.server.netty.*
 import no.nav.common.KafkaEnvironment
 import no.nav.syfo.application.ApplicationState
+import no.nav.syfo.client.wellknown.WellKnown
 import no.nav.syfo.mock.*
+import java.nio.file.Paths
 
 class ExternalMockEnvironment private constructor() {
     val applicationState: ApplicationState = testAppState()
     val database = TestDatabase()
     val embeddedEnvironment: KafkaEnvironment = testKafka()
+    val wellKnownInternalAzureAD = wellKnownInternalAzureAD()
 
     val azureAdV2Mock = AzureAdV2Mock()
     val dokarkivMock = DokarkivMock()
@@ -46,6 +49,15 @@ class ExternalMockEnvironment private constructor() {
             }
         }
     }
+}
+
+fun wellKnownInternalAzureAD(): WellKnown {
+    val path = "src/test/resources/jwkset.json"
+    val uri = Paths.get(path).toUri().toURL()
+    return WellKnown(
+        issuer = "https://sts.issuer.net/veileder/v2",
+        jwksUri = uri.toString()
+    )
 }
 
 fun ExternalMockEnvironment.startExternalMocks() {

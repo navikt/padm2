@@ -6,6 +6,8 @@ data class Environment(
     val aadAppClient: String = getEnvVar("AZURE_APP_CLIENT_ID"),
     val aadAppSecret: String = getEnvVar("AZURE_APP_CLIENT_SECRET"),
     val aadTokenEndpoint: String = getEnvVar("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"),
+    val aadAppPreAuthorizedApps: String = getEnvVar("AZURE_APP_PRE_AUTHORIZED_APPS"),
+    val aadAppWellKnownUrl: String = getEnvVar("AZURE_APP_WELL_KNOWN_URL"),
     val applicationName: String = getEnvVar("NAIS_APP_NAME", "padm2"),
     val applicationPort: Int = getEnvVar("APPLICATION_PORT", "8080").toInt(),
     override val mqHostname: String = getEnvVar("MQ_HOST_NAME"),
@@ -41,6 +43,10 @@ data class Environment(
     ),
     val serviceuserUsername: String = getEnvVar("SERVICEUSER_USERNAME"),
     val serviceuserPassword: String = getEnvVar("SERVICEUSER_PASSWORD"),
+    private val isbehandlerdialogApplicationName: String = "isbehandlerdialog",
+    val systemAPIAuthorizedConsumerApplicationNames: List<String> = listOf(
+        isbehandlerdialogApplicationName,
+    ),
 ) : MqConfig {
     fun jdbcUrl(): String {
         return "jdbc:postgresql://$databaseHost:$databasePort/$databaseName"

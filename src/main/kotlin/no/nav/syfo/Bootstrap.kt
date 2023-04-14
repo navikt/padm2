@@ -3,10 +3,10 @@ package no.nav.syfo
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import io.ktor.server.routing.*
 import no.nav.syfo.application.*
-import no.nav.syfo.application.api.registerNaisApi
+import no.nav.syfo.application.api.apiModule
 import no.nav.syfo.application.mq.*
+import no.nav.syfo.client.wellknown.getWellKnown
 import no.nav.syfo.db.Database
 import no.nav.syfo.kafka.*
 import org.apache.kafka.clients.producer.KafkaProducer
@@ -22,6 +22,10 @@ fun main() {
     val env = Environment()
     val applicationState = ApplicationState()
 
+    val wellKnownInternalAzureAD = getWellKnown(
+        wellKnownUrl = env.aadAppWellKnownUrl,
+    )
+
     val database = Database(
         env = env,
     )
@@ -32,9 +36,12 @@ fun main() {
             port = env.applicationPort
         }
         module {
-            routing {
-                registerNaisApi(applicationState)
-            }
+            apiModule(
+                applicationState = applicationState,
+                database = database,
+                environment = env,
+                wellKnownInternalAzureAD = wellKnownInternalAzureAD,
+            )
         }
     }
 

@@ -188,7 +188,7 @@ class DialogmeldingProcessor(
                 "ruleHits",
                 validationResult.ruleHits.joinToString(", ", "(", ")") { it.ruleName }
             ),
-            StructuredArguments.keyValue("latency", duration),
+            StructuredArguments.keyValue("latency (ms)", duration.toMillis()),
             StructuredArguments.fields(loggingMeta)
         )
     }

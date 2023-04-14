@@ -30,6 +30,7 @@ object Versions {
     const val junitJupiterVersion = "5.8.2"
     const val micrometerRegistry = "1.9.4"
     const val mockkVersion = "1.12.4"
+    const val nimbusJoseJwt = "9.25.3"
     const val pdfboxVersion = "2.0.24"
     const val postgresEmbedded = "0.13.4"
     const val postgresVersion = "42.5.1"
@@ -64,6 +65,9 @@ dependencies {
     implementation(kotlin("reflect"))
     implementation(kotlin("stdlib"))
 
+    implementation("io.ktor:ktor-server-auth-jwt:${Versions.ktorVersion}")
+    implementation("io.ktor:ktor-server-call-id:${Versions.ktorVersion}")
+    implementation("io.ktor:ktor-server-status-pages:${Versions.ktorVersion}")
     implementation("io.ktor:ktor-server-netty:${Versions.ktorVersion}")
     implementation("io.ktor:ktor-server-content-negotiation:${Versions.ktorVersion}")
     implementation("io.ktor:ktor-client-apache:${Versions.ktorVersion}")
@@ -140,6 +144,7 @@ dependencies {
     }
 
     testImplementation(kotlin("test"))
+    testImplementation("com.nimbusds:nimbus-jose-jwt:${Versions.nimbusJoseJwt}")
     testImplementation("org.amshove.kluent:kluent:${Versions.kluentVersion}")
     testImplementation("org.junit.jupiter:junit-jupiter-api:${Versions.junitJupiterVersion}")
     testImplementation("org.junit.jupiter:junit-jupiter-params:${Versions.junitJupiterVersion}")
