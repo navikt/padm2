@@ -332,7 +332,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
                     verify(exactly = 0) { mqSender.sendArena(any()) }
                     verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
-                    MESSAGES_STILL_FAIL_AFTER_1H.get() shouldBeEqualTo 0.0
+                    MESSAGES_STILL_FAIL_AFTER_1H.count() shouldBeEqualTo 0.0
                     externalMockEnvironment.pdfgenMock.allowFail = false
                     runBlocking {
                         rerunCronJob.run()
@@ -342,7 +342,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
                     verify(exactly = 0) { mqSender.sendArena(any()) }
                     verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
-                    MESSAGES_STILL_FAIL_AFTER_1H.get() shouldBeEqualTo 0.0
+                    MESSAGES_STILL_FAIL_AFTER_1H.count() shouldBeEqualTo 0.0
                 }
                 it("Prosesserer innkommet melding (pdfgen feiler, gammel mottattdato, feiler også ved rerun)") {
                     val fellesformat = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
@@ -355,7 +355,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
                     verify(exactly = 0) { mqSender.sendArena(any()) }
                     verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
-                    MESSAGES_STILL_FAIL_AFTER_1H.get() shouldBeEqualTo 0.0
+                    MESSAGES_STILL_FAIL_AFTER_1H.count() shouldBeEqualTo 0.0
                     runBlocking {
                         rerunCronJob.run()
                     }
@@ -363,7 +363,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
                     verify(exactly = 0) { mqSender.sendArena(any()) }
                     verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
-                    MESSAGES_STILL_FAIL_AFTER_1H.get() shouldBeEqualTo 1.0
+                    MESSAGES_STILL_FAIL_AFTER_1H.count() shouldBeEqualTo 1.0
                 }
                 it("Prosesserer innkommet melding (pdfgen feiler, mottattdato nå)") {
                     val fellesformat = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")

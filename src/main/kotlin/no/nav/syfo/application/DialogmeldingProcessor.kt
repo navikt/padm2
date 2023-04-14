@@ -23,6 +23,7 @@ import no.nav.syfo.services.*
 import no.nav.syfo.util.*
 import no.nav.syfo.validation.isKodeverkValid
 import java.io.StringReader
+import java.time.Duration
 import java.time.ZoneId
 
 class DialogmeldingProcessor(
@@ -103,7 +104,7 @@ class DialogmeldingProcessor(
             orgNr = legekontorOrgNr,
             msgId = msgHead.msgInfo.msgId,
         )
-        val requestLatency = REQUEST_TIME.startTimer()
+        val starttime = System.currentTimeMillis()
 
         val receivedDialogmelding = createReceivedDialogmelding(
             dialogmeldingId = dialogmeldingId,
@@ -177,7 +178,8 @@ class DialogmeldingProcessor(
             database = database,
         )
 
-        val currentRequestLatency = requestLatency.observeDuration()
+        val duration = Duration.ofMillis(System.currentTimeMillis() - starttime)
+        REQUEST_TIME.record(duration)
 
         logger.info(
             "Finished message got outcome {}, {}, processing took {}s",
@@ -186,7 +188,7 @@ class DialogmeldingProcessor(
                 "ruleHits",
                 validationResult.ruleHits.joinToString(", ", "(", ")") { it.ruleName }
             ),
-            StructuredArguments.keyValue("latency", currentRequestLatency),
+            StructuredArguments.keyValue("latency", duration),
             StructuredArguments.fields(loggingMeta)
         )
     }

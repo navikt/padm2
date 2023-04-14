@@ -19,6 +19,6 @@ interface Rule<in T> {
 inline fun <reified T, reified R : Rule<RuleData<T>>> List<R>.executeFlow(dialogmelding: Dialogmelding, value: T): List<Rule<Any>> =
     filter { it.predicate(RuleData(dialogmelding, value)) }
         .map { it as Rule<Any> }
-        .onEach { RULE_HIT_COUNTER.labels(it.name).inc() }
+        .onEach { RULE_HIT_COUNTER.increment() }
 
 inline fun <reified T, reified R : Rule<RuleData<T>>> Array<R>.executeFlow(dialogmelding: Dialogmelding, value: T): List<Rule<Any>> = toList().executeFlow(dialogmelding, value)

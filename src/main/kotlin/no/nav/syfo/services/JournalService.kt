@@ -52,7 +52,7 @@ class JournalService(
             )
             val journalpost = dokArkivClient.createJournalpost(journalpostPayload, loggingMeta)
 
-            MELDING_LAGER_I_JOARK.inc()
+            MELDING_LAGER_I_JOARK.increment()
             logger.info(
                 "Melding lagret i Joark med journalpostId {}, {}",
                 journalpost.journalpostId,

@@ -25,7 +25,7 @@ fun PdfModel.sanitizeForPdfGen(): PdfModel {
 
     val sanitizedJson = pdfModelJsonString.toCharArray().filter {
         if (it in illegalCharacters || it < NUL) {
-            SANITIZE_INVALID_CHAR_COUNTER.inc()
+            SANITIZE_INVALID_CHAR_COUNTER.increment()
             logger.warn("Illegal character in PdfModel: %x".format(it.code))
             false
         } else {

@@ -28,11 +28,11 @@ object Versions {
     const val jaxwsApiVersion = "2.3.1"
     const val jaxwsToolsVersion = "2.3.4"
     const val junitJupiterVersion = "5.8.2"
+    const val micrometerRegistry = "1.9.4"
     const val mockkVersion = "1.12.4"
     const val pdfboxVersion = "2.0.24"
     const val postgresEmbedded = "0.13.4"
     const val postgresVersion = "42.5.1"
-    const val prometheusVersion = "0.9.0"
     const val scala = "2.13.9"
     const val spek = "2.0.18"
 }
@@ -72,8 +72,8 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:${Versions.ktorVersion}")
     implementation("io.ktor:ktor-serialization-jackson:${Versions.ktorVersion}")
 
-    implementation("io.prometheus:simpleclient_hotspot:${Versions.prometheusVersion}")
-    implementation("io.prometheus:simpleclient_common:${Versions.prometheusVersion}")
+    implementation("io.ktor:ktor-server-metrics-micrometer:${Versions.ktorVersion}")
+    implementation("io.micrometer:micrometer-registry-prometheus:${Versions.micrometerRegistry}")
 
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${Versions.jacksonVersion}")
 

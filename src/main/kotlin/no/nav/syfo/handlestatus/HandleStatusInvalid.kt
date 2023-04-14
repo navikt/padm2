@@ -93,7 +93,7 @@ fun handleDuplicateDialogmeldingContent(
         )
     )
 
-    INVALID_MESSAGE_NO_NOTICE.inc()
+    INVALID_MESSAGE_NO_NOTICE.increment()
 
     val message = "Duplikat! - Dialogmeldingen fra $tidMottattNyMelding har vi tidligere mottatt den $tidMottattOpprinneligMelding. Skal ikke sendes på nytt."
     return ValidationResult(
@@ -120,7 +120,7 @@ fun handlePatientNotFound(
             "errorMessage" to "No response for FNR",
         )
     )
-    INVALID_MESSAGE_NO_NOTICE.inc()
+    INVALID_MESSAGE_NO_NOTICE.increment()
 
     val message = "Dialogmeldingen er ikke gyldig. Pasienten er ikke registrert i folkeregisteret."
     return ValidationResult(
@@ -159,7 +159,7 @@ fun handlePatientMissing(
     )
     logger.info("Apprec Receipt with status Avvist sent, {}", fields(loggingMeta))
 
-    INVALID_MESSAGE_NO_NOTICE.inc()
+    INVALID_MESSAGE_NO_NOTICE.increment()
 }
 
 fun handleBehandlerNotFound(
@@ -173,7 +173,7 @@ fun handleBehandlerNotFound(
             "errorMessage" to "No response for FNR"
         ),
     )
-    INVALID_MESSAGE_NO_NOTICE.inc()
+    INVALID_MESSAGE_NO_NOTICE.increment()
 
     val message = "Dialogmeldingen er ikke gyldig. Behandler er ikke registrert i folkeregisteret."
     return ValidationResult(
@@ -200,8 +200,8 @@ fun handleTestFnrInProd(
         )
     )
 
-    INVALID_MESSAGE_NO_NOTICE.inc()
-    TEST_FNR_IN_PROD.inc()
+    INVALID_MESSAGE_NO_NOTICE.increment()
+    TEST_FNR_IN_PROD.increment()
 
     val message = "Dialogmeldingen er ikke gyldig. Fødselsnummer er fra testmiljøet. Kontakt din EPJ-leverandør."
     return ValidationResult(
@@ -227,7 +227,7 @@ fun handleMeldingsTekstMangler(
             loggingMeta
         )
     )
-    INVALID_MESSAGE_NO_NOTICE.inc()
+    INVALID_MESSAGE_NO_NOTICE.increment()
 
     val message = "Dialogmeldingen er ikke gyldig: meldingstekst mangler."
     return ValidationResult(
@@ -253,7 +253,7 @@ fun handleInvalidDialogMeldingKodeverk(
             loggingMeta
         )
     )
-    INVALID_MESSAGE_NO_NOTICE.inc()
+    INVALID_MESSAGE_NO_NOTICE.increment()
 
     val message = "Dialogmeldingen er ikke gyldig: meldingstypen stemmer ikke med innholdet. Kontakt din EPJ-leverandør."
     return ValidationResult(
