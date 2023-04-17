@@ -11,8 +11,7 @@ import java.awt.geom.AffineTransform
 import java.awt.image.AffineTransformOp
 import java.awt.image.AffineTransformOp.TYPE_BILINEAR
 import java.awt.image.BufferedImage
-import java.io.InputStream
-import java.io.OutputStream
+import java.io.*
 import javax.imageio.ImageIO
 
 fun ImageToPDF(imageStream: InputStream, outputStream: OutputStream) {

@@ -2,6 +2,10 @@ package no.nav.syfo.model
 
 import no.nav.helse.base64container.Base64Container
 import no.nav.helse.msgHead.XMLDocument
+import no.nav.syfo.client.findFiltype
+import no.nav.syfo.logger
+import no.nav.syfo.util.ImageToPDF
+import java.io.ByteArrayOutputStream
 
 data class Vedlegg(
     val mimeType: String,
@@ -16,5 +20,22 @@ fun XMLDocument.toVedlegg(): Vedlegg {
         mimeType = refDoc.mimeType,
         beskrivelse = refDoc.description ?: "",
         contentBase64 = base64Container.value
+    )
+}
+
+fun Vedlegg.toPDFVedlegg(): Vedlegg {
+    if (findFiltype(this) == "PDFA") return this
+
+    logger.info("Converting vedlegg of type ${this.mimeType} to PDFA")
+
+    val image = ByteArrayOutputStream().use { outputStream ->
+        ImageToPDF(this.contentBase64.inputStream(), outputStream)
+        outputStream.toByteArray()
+    }
+
+    return Vedlegg(
+        "application/pdf",
+        this.beskrivelse,
+        image,
     )
 }

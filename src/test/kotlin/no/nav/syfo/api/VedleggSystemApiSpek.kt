@@ -1,15 +1,24 @@
 package no.nav.syfo.api
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.http.*
 import io.ktor.server.testing.*
+import io.mockk.every
+import io.mockk.mockk
+import kotlinx.coroutines.runBlocking
 import no.nav.syfo.*
+import no.nav.syfo.application.BlockingApplicationRunner
+import no.nav.syfo.application.api.VedleggDTO
 import no.nav.syfo.application.api.vedleggSystemApiV1Path
+import no.nav.syfo.application.mq.MQSenderInterface
+import no.nav.syfo.kafka.DialogmeldingProducer
 import no.nav.syfo.util.*
 import org.amshove.kluent.shouldBeEqualTo
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import java.util.*
+import javax.jms.TextMessage
 
 class VedleggSystemApiSpek : Spek({
     val objectMapper: ObjectMapper = configuredJacksonMapper()
@@ -19,6 +28,18 @@ class VedleggSystemApiSpek : Spek({
 
         val externalMockEnvironment = ExternalMockEnvironment.instance
         val database = externalMockEnvironment.database
+        val mqSender = mockk<MQSenderInterface>(relaxed = true)
+        val dialogmeldingProducer = mockk<DialogmeldingProducer>(relaxed = true)
+        val incomingMessage = mockk<TextMessage>(relaxed = true)
+
+        val blockingApplicationRunner = BlockingApplicationRunner(
+            applicationState = externalMockEnvironment.applicationState,
+            database = database,
+            env = externalMockEnvironment.environment,
+            inputconsumer = mockk(),
+            mqSender = mqSender,
+            dialogmeldingProducer = dialogmeldingProducer,
+        )
 
         application.testApiModule(
             externalMockEnvironment = externalMockEnvironment,
@@ -39,13 +60,55 @@ class VedleggSystemApiSpek : Spek({
                 )
 
                 describe("Happy path") {
-                    it("should get vedlegg for msgId (hardcoded to OK-response for now)") {
+                    it("should get vedlegg for msgId") {
+                        every { incomingMessage.text } returns(
+                            getFileAsString("src/test/resources/dialogmelding_dialog_notat_vedlegg.xml")
+                                .replace(
+                                    "<MsgId>37340D30-FE14-42B5-985F-A8FF8FFA0CB5</MsgId>",
+                                    "<MsgId>$msgId</MsgId>",
+                                )
+                            )
+                        runBlocking {
+                            blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                        }
                         with(
                             handleRequest(HttpMethod.Get, url) {
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
                             }
                         ) {
+                            val vedleggListe = objectMapper.readValue<List<VedleggDTO>>(response.content!!)
+                            vedleggListe.size shouldBeEqualTo 2
                             response.status() shouldBeEqualTo HttpStatusCode.OK
+                        }
+                    }
+                    it("should get mange vedlegg for msgId") {
+                        every { incomingMessage.text } returns(
+                            getFileAsString("src/test/resources/dialogmelding_dialog_notat_veldig_mange_vedlegg.xml")
+                                .replace(
+                                    "<MsgId>37340D30-FE14-42B5-985F-A8FF8FFA0CB5</MsgId>",
+                                    "<MsgId>$msgId</MsgId>",
+                                )
+                            )
+                        runBlocking {
+                            blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                        }
+                        with(
+                            handleRequest(HttpMethod.Get, url) {
+                                addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                            }
+                        ) {
+                            val vedleggListe = objectMapper.readValue<List<VedleggDTO>>(response.content!!)
+                            vedleggListe.size shouldBeEqualTo 45
+                            response.status() shouldBeEqualTo HttpStatusCode.OK
+                        }
+                    }
+                    it("should return 204 when unknown msgId") {
+                        with(
+                            handleRequest(HttpMethod.Get, url) {
+                                addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                            }
+                        ) {
+                            response.status() shouldBeEqualTo HttpStatusCode.NoContent
                         }
                     }
                 }

@@ -9,6 +9,7 @@ import no.nav.syfo.util.objectMapper
 import org.postgresql.util.PGobject
 import java.sql.*
 import java.time.LocalDateTime
+import java.util.UUID
 
 fun DatabaseInterface.lagreMottattDialogmelding(
     receivedDialogmelding: ReceivedDialogmelding,
@@ -272,6 +273,25 @@ fun DatabaseInterface.hentIkkeFullforteDialogmeldinger() =
                     third = getTimestamp("mottatt_tidspunkt").toLocalDateTime(),
                 )
             }
+        }
+    }
+
+fun DatabaseInterface.hentFellesformat(
+    msgId: UUID,
+): String? =
+    connection.use { connection ->
+        connection.prepareStatement(
+            """
+                SELECT fellesformat
+                FROM dialogmeldingopplysninger
+                WHERE msg_id = ?
+                ORDER BY mottatt_tidspunkt DESC
+                """
+        ).use {
+            it.setString(1, msgId.toString())
+            it.executeQuery().toList {
+                getString("fellesformat")
+            }.firstOrNull()
         }
     }
 

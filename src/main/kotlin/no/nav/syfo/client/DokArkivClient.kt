@@ -11,7 +11,6 @@ import no.nav.syfo.logger
 import no.nav.syfo.model.*
 import no.nav.syfo.util.*
 import no.nav.syfo.validation.validatePersonAndDNumber
-import java.io.ByteArrayOutputStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -120,7 +119,7 @@ fun leggtilDokument(
         val listVedleggDokumenter = ArrayList<Dokument>()
         vedleggListe
             .filter { vedlegg -> vedlegg.contentBase64.isNotEmpty() }
-            .map { vedlegg -> vedleggToPDF(vedlegg) }
+            .map { vedlegg -> vedlegg.toPDFVedlegg() }
             .mapIndexed { index, vedlegg ->
                 listVedleggDokumenter.add(
                     Dokument(
@@ -143,24 +142,6 @@ fun leggtilDokument(
     }
 
     return listDokument
-}
-
-fun vedleggToPDF(vedlegg: Vedlegg): Vedlegg {
-    if (findFiltype(vedlegg) == "PDFA") return vedlegg
-
-    logger.info("Converting vedlegg of type ${vedlegg.mimeType} to PDFA")
-
-    val image =
-        ByteArrayOutputStream().use { outputStream ->
-            ImageToPDF(vedlegg.contentBase64.inputStream(), outputStream)
-            outputStream.toByteArray()
-        }
-
-    return Vedlegg(
-        "application/pdf",
-        vedlegg.beskrivelse,
-        image
-    )
 }
 
 fun findFiltype(vedlegg: Vedlegg): String =
