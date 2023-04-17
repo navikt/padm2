@@ -2,7 +2,6 @@ package no.nav.syfo.model
 
 import no.nav.helse.base64container.Base64Container
 import no.nav.helse.msgHead.XMLDocument
-import no.nav.syfo.client.findFiltype
 import no.nav.syfo.logger
 import no.nav.syfo.util.ImageToPDF
 import java.io.ByteArrayOutputStream
@@ -24,7 +23,7 @@ fun XMLDocument.toVedlegg(): Vedlegg {
 }
 
 fun Vedlegg.toPDFVedlegg(): Vedlegg {
-    if (findFiltype(this) == "PDFA") return this
+    if (findFiltype() == "PDFA") return this
 
     logger.info("Converting vedlegg of type ${this.mimeType} to PDFA")
 
@@ -39,3 +38,13 @@ fun Vedlegg.toPDFVedlegg(): Vedlegg {
         image,
     )
 }
+
+fun Vedlegg.findFiltype(): String =
+    when (this.mimeType) {
+        "application/pdf" -> "PDFA"
+        "image/tiff" -> "TIFF"
+        "image/png" -> "PNG"
+        "image/jpeg" -> "JPEG"
+        "image/jpg" -> "JPEG"
+        else -> throw RuntimeException("Vedlegget er av ukjent mimeType ${this.mimeType}")
+    }

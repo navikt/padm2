@@ -81,7 +81,7 @@ class VedleggSystemApiSpek : Spek({
                             response.status() shouldBeEqualTo HttpStatusCode.OK
                         }
                     }
-                    it("should get mange vedlegg for msgId") {
+                    it("should get plenty of vedlegg for msgId") {
                         every { incomingMessage.text } returns(
                             getFileAsString("src/test/resources/dialogmelding_dialog_notat_veldig_mange_vedlegg.xml")
                                 .replace(

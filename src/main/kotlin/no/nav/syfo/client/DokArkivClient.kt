@@ -125,7 +125,7 @@ fun leggtilDokument(
                     Dokument(
                         dokumentvarianter = listOf(
                             Dokumentvarianter(
-                                filtype = findFiltype(vedlegg),
+                                filtype = vedlegg.findFiltype(),
                                 filnavn = "Vedlegg_nr_${index}_Dialogmelding_$ediLoggId",
                                 variantformat = "ARKIV",
                                 fysiskDokument = vedlegg.contentBase64
@@ -143,16 +143,6 @@ fun leggtilDokument(
 
     return listDokument
 }
-
-fun findFiltype(vedlegg: Vedlegg): String =
-    when (vedlegg.mimeType) {
-        "application/pdf" -> "PDFA"
-        "image/tiff" -> "TIFF"
-        "image/png" -> "PNG"
-        "image/jpeg" -> "JPEG"
-        "image/jpg" -> "JPEG"
-        else -> throw RuntimeException("Vedlegget er av ukjent mimeType ${vedlegg.mimeType}")
-    }
 
 private fun createAvsenderMottaker(
     avsenderFnr: String,
