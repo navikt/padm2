@@ -11,7 +11,6 @@ import no.nav.syfo.logger
 import no.nav.syfo.model.*
 import no.nav.syfo.util.*
 import no.nav.syfo.validation.validatePersonAndDNumber
-import java.io.ByteArrayOutputStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -120,13 +119,13 @@ fun leggtilDokument(
         val listVedleggDokumenter = ArrayList<Dokument>()
         vedleggListe
             .filter { vedlegg -> vedlegg.contentBase64.isNotEmpty() }
-            .map { vedlegg -> vedleggToPDF(vedlegg) }
+            .map { vedlegg -> vedlegg.toPDFVedlegg() }
             .mapIndexed { index, vedlegg ->
                 listVedleggDokumenter.add(
                     Dokument(
                         dokumentvarianter = listOf(
                             Dokumentvarianter(
-                                filtype = findFiltype(vedlegg),
+                                filtype = vedlegg.findFiltype(),
                                 filnavn = "Vedlegg_nr_${index}_Dialogmelding_$ediLoggId",
                                 variantformat = "ARKIV",
                                 fysiskDokument = vedlegg.contentBase64
@@ -144,34 +143,6 @@ fun leggtilDokument(
 
     return listDokument
 }
-
-fun vedleggToPDF(vedlegg: Vedlegg): Vedlegg {
-    if (findFiltype(vedlegg) == "PDFA") return vedlegg
-
-    logger.info("Converting vedlegg of type ${vedlegg.mimeType} to PDFA")
-
-    val image =
-        ByteArrayOutputStream().use { outputStream ->
-            ImageToPDF(vedlegg.contentBase64.inputStream(), outputStream)
-            outputStream.toByteArray()
-        }
-
-    return Vedlegg(
-        "application/pdf",
-        vedlegg.beskrivelse,
-        image
-    )
-}
-
-fun findFiltype(vedlegg: Vedlegg): String =
-    when (vedlegg.mimeType) {
-        "application/pdf" -> "PDFA"
-        "image/tiff" -> "TIFF"
-        "image/png" -> "PNG"
-        "image/jpeg" -> "JPEG"
-        "image/jpg" -> "JPEG"
-        else -> throw RuntimeException("Vedlegget er av ukjent mimeType ${vedlegg.mimeType}")
-    }
 
 private fun createAvsenderMottaker(
     avsenderFnr: String,
