@@ -12,7 +12,6 @@ import no.nav.syfo.model.toVedlegg
 import no.nav.syfo.persistering.db.hentFellesformat
 import no.nav.syfo.util.*
 import java.io.StringReader
-import java.util.UUID
 
 const val vedleggSystemApiV1Path = "/api/system/v1/vedlegg"
 const val vedleggSystemApiMsgIdParam = "msgid"
@@ -30,8 +29,10 @@ fun Route.registerVedleggSystemApi(
                 authorizedApplicationNames = authorizedApplicationNames,
                 token = token,
             )
-            val msgId = UUID.fromString(call.parameters[vedleggSystemApiMsgIdParam])
-            val fellesformatString = database.hentFellesformat(msgId)
+            val msgId = call.parameters[vedleggSystemApiMsgIdParam]
+            val fellesformatString = msgId?.let {
+                database.hentFellesformat(it)
+            }
             if (fellesformatString.isNullOrEmpty()) {
                 call.respond(HttpStatusCode.NoContent)
             } else {
