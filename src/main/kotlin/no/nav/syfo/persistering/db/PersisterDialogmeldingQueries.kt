@@ -9,7 +9,6 @@ import no.nav.syfo.util.objectMapper
 import org.postgresql.util.PGobject
 import java.sql.*
 import java.time.LocalDateTime
-import java.util.UUID
 
 fun DatabaseInterface.lagreMottattDialogmelding(
     receivedDialogmelding: ReceivedDialogmelding,
@@ -277,7 +276,7 @@ fun DatabaseInterface.hentIkkeFullforteDialogmeldinger() =
     }
 
 fun DatabaseInterface.hentFellesformat(
-    msgId: UUID,
+    msgId: String,
 ): String? =
     connection.use { connection ->
         connection.prepareStatement(
@@ -288,7 +287,7 @@ fun DatabaseInterface.hentFellesformat(
                 ORDER BY mottatt_tidspunkt DESC
                 """
         ).use {
-            it.setString(1, msgId.toString())
+            it.setString(1, msgId)
             it.executeQuery().toList {
                 getString("fellesformat")
             }.firstOrNull()
