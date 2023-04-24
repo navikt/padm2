@@ -29,6 +29,7 @@ data class Environment(
     val databaseName: String = getEnvVar("NAIS_DATABASE_PADM2_PADM2_DB_DATABASE"),
     val databaseUsername: String = getEnvVar("NAIS_DATABASE_PADM2_PADM2_DB_USERNAME"),
     val databasePassword: String = getEnvVar("NAIS_DATABASE_PADM2_PADM2_DB_PASSWORD"),
+    val clamavURL: String = getEnvVar("CLAMAV_URL"),
     val syfohelsenettproxyClientId: String = getEnvVar("HELSENETT_CLIENT_ID"),
     val syfohelsenettproxyEndpointURL: String = getEnvVar("HELSENETT_ENDPOINT_URL"),
     val legeSuspensjonClientId: String = getEnvVar("LEGE_SUSPENSJON_CLIENT_ID"),

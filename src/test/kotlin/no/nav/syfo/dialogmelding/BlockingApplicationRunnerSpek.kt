@@ -170,6 +170,22 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 1) { mqSender.sendArena(any()) }
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                 }
+                it("Prosesserer innkommet melding (vedlegg som feiler virussjekk)") {
+                    val fellesformat =
+                        getFileAsString("src/test/resources/dialogmelding_dialog_notat_vedlegg.xml")
+                            .replace("Et vedlegg fra lege", "problem file")
+                    every { incomingMessage.text } returns(fellesformat)
+                    val dialogmeldingId = runBlocking {
+                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                    }
+                    verify(exactly = 1) { mqSender.sendReceipt(any()) }
+                    verify(exactly = 0) { mqSender.sendBackout(any()) }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
+                    verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
+                    dialogmeldingId shouldNotBe null
+                    val journalpostId = database.hentDialogmeldingOpplysningerJournalpostId(dialogmeldingId!!)
+                    journalpostId shouldBe null
+                }
                 it("Prosesserer innkommet melding (duplikat)") {
                     val fellesformat =
                         getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")

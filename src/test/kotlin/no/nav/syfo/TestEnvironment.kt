@@ -4,11 +4,11 @@ import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.api.access.PreAuthorizedClient
 import no.nav.syfo.util.configuredJacksonMapper
 import java.net.ServerSocket
-import java.util.*
 
 fun testEnvironment(
     kafkaBootstrapServers: String,
     azureTokenEndpoint: String = "azureTokenEndpoint",
+    clamAvURL: String,
     dokarkivUrl: String,
     pdfgenUrl: String,
     pdlUrl: String,
@@ -35,6 +35,7 @@ fun testEnvironment(
     ),
     serviceuserUsername = "user",
     serviceuserPassword = "password",
+    clamavURL = clamAvURL,
     dokArkivClientId = "dokarkiv",
     dokArkivUrl = dokarkivUrl,
     syfopdfgen = pdfgenUrl,

@@ -59,6 +59,8 @@ spec:
         - host: "pdl-api.prod-fss-pub.nais.io"
       rules:
         - application: padm2pdfgen
+        - application: clamav
+          namespace: nais-system
   azure:
     application:
       allowAllUsers: true
@@ -85,6 +87,8 @@ spec:
       value: QA.P414.AO01_SKJEMA_MOTTAK
     - name: MQ_APPREC_QUEUE_NAME
       value: QA.P414.IU03_UTSENDING
+    - name: CLAMAV_URL
+      value: http://clamav.nais-system
     - name: DOKARKIV_CLIENT_ID
       value: prod-fss.teamdokumenthandtering.dokarkiv
     - name: DOK_ARKIV_URL

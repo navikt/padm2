@@ -82,6 +82,12 @@ class DialogmeldingProcessor(
     val signerendeLegeService = SignerendeLegeService(
         syfohelsenettproxyClient = syfohelsenettproxyClient,
     )
+    val clamAvClient = ClamAvClient(
+        endpointUrl = env.clamavURL,
+    )
+    val virusScanService = VirusScanService(
+        clamAvClient = clamAvClient,
+    )
 
     suspend fun processMessage(
         dialogmeldingId: String,
@@ -94,8 +100,8 @@ class DialogmeldingProcessor(
         val msgId = msgHead.msgInfo.msgId
         val dialogmeldingXml = extractDialogmelding(fellesformat)
         val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
-        val vedlegg = extractVedlegg(fellesformat)
-        val sha256String = sha256hashstring(dialogmeldingXml, vedlegg)
+        val xmlVedlegg = extractVedlegg(fellesformat)
+        val sha256String = sha256hashstring(dialogmeldingXml, xmlVedlegg)
         val legekontorOrgNr = extractOrganisationNumberFromSender(fellesformat)?.id
         val pasientNavn = extractPasientNavn(fellesformat)
 
@@ -128,6 +134,7 @@ class DialogmeldingProcessor(
             msgId = msgId,
             loggingMeta = loggingMeta,
         )
+        val vedleggListe = xmlVedlegg.map { xmlVedlegg -> xmlVedlegg.toVedlegg() }
 
         val validationResult = validateMessage(
             sha256String = sha256String,
@@ -137,6 +144,7 @@ class DialogmeldingProcessor(
             dialogmeldingType = dialogmeldingType,
             dialogmeldingXml = dialogmeldingXml,
             receivedDialogmelding = receivedDialogmelding,
+            vedlegg = vedleggListe,
         )
 
         when (validationResult.status) {
@@ -149,7 +157,7 @@ class DialogmeldingProcessor(
                 dialogmeldingProducer = dialogmeldingProducer,
                 receivedDialogmelding = receivedDialogmelding,
                 validationResult = validationResult,
-                vedleggListe = vedlegg.map { it.toVedlegg() },
+                vedleggListe = vedleggListe,
                 msgHead = msgHead,
                 receiverBlock = receiverBlock,
                 pasientNavn = pasientNavn,
@@ -165,7 +173,7 @@ class DialogmeldingProcessor(
                 loggingMeta = loggingMeta,
                 journalService = journalService,
                 receivedDialogmelding = receivedDialogmelding,
-                vedleggListe = vedlegg.map { it.toVedlegg() },
+                vedleggListe = vedleggListe,
                 pasientNavn = pasientNavn,
                 navnSignerendeLege = navnSignerendeLege,
                 innbyggerOK = innbyggerOK,
@@ -248,6 +256,7 @@ class DialogmeldingProcessor(
         dialogmeldingType: DialogmeldingType,
         dialogmeldingXml: XMLDialogmelding,
         receivedDialogmelding: ReceivedDialogmelding,
+        vedlegg: List<Vedlegg>,
     ): ValidationResult {
         val initialValidationResult: ValidationResult? =
             if (dialogmeldingDokumentWithShaExists(receivedDialogmelding.dialogmelding.id, sha256String, database)) {
@@ -267,6 +276,8 @@ class DialogmeldingProcessor(
                 handleMeldingsTekstMangler(loggingMeta)
             } else if (!isKodeverkValid(dialogmeldingXml, dialogmeldingType)) {
                 handleInvalidDialogMeldingKodeverk(loggingMeta)
+            } else if (virusScanService.vedleggContainsVirus(vedlegg)) {
+                handleVedleggMayContainVirus(loggingMeta)
             } else {
                 null
             }
