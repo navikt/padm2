@@ -1,31 +1,43 @@
-apiVersion: "nais.io/v1"
-kind: "Alert"
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
 metadata:
   name: padm2-alerts
   namespace: teamsykefravr
   labels:
     team: teamsykefravr
 spec:
-  receivers:
-    slack:
-      channel: '#syfo-alarm'
-      prependText: '<!here> | '
-  alerts:
-    - alert: PADM2 IS DOWN
-      expr: sum(up{app="padm2", job="kubernetes-pods"}) == 0
-      for: 30s
-      description: "Det er ingen pods for app kjørende i namespace og dermed er appen nede"
-      action: "Undersøk hvorfor pods er nede og få den kjørende igjen!"
-      severity: danger
-    - alert: PADM2 sendte melding til backout-queue
-      expr: sum(increase(padm2_message_sent_to_boq{app="padm2"} [1h])) > 0
-      for: 5m
-      description: "Prosessering av minst 1 melding feilet og ble sendt til MQ backout queue"
-      action: "Undersøk om det er noen feil og send melding fra backout-queue for retry."
-      severity: danger
-    - alert: PADM2 cronjob klarer ikke å ferdigstille meldinger
-      expr: sum(increase(padm2_messages_still_fail_after_1h{app="padm2"} [1h])) > 0
-      for: 5m
-      description: "Prosessering av minst 1 melding feilet og ble ikke fullført selv om cronjob'en har forsøkt flere ganger"
-      action: "Undersøk om det er noe feil med meldingene som er persistert i databasen"
-      severity: danger
+  groups:
+    - name: padm2-alert
+      rules:
+        - alert: PADM2-DOWN
+          expr: sum(up{app="padm2", job="kubernetes-pods"}) == 0
+          for: 30s
+          annotations:
+            consequence: Application is unavailable
+            summary: |-
+              Det er ingen pods for app kjørende i namespace og dermed er appen nede.
+              Undersøk hvorfor pods er nede og få den kjørende igjen!
+          labels:
+            namespace: teamsykefravr
+            severity: critical
+        - alert: PADM2-BACKOUT
+          expr: sum(increase(padm2_message_sent_to_boq{app="padm2"} [1h])) > 0
+          for: 5m
+          annotations:
+            consequence: PADM2 sendte melding til backout-queue
+            summary: |-
+              Prosessering av minst 1 melding feilet og ble sendt til MQ backout queue.
+              Undersøk om det er noe feil med meldingene som er persistert i databasen
+          labels:
+            namespace: teamsykefravr
+            severity: danger
+        - alert: PADM2-CRONJOB
+          expr: sum(increase(padm2_messages_still_fail_after_1h{app="padm2"} [1h])) > 0
+          for: 5m
+          annotations:
+            consequence: PADM2 cronjob klarer ikke å ferdigstille meldinger
+            summary: |-
+              Prosessering av minst 1 melding feilet og ble ikke fullført selv om cronjob'en har forsøkt flere ganger
+          labels:
+            namespace: teamsykefravr
+            severity: danger
