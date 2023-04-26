@@ -2,6 +2,7 @@ package no.nav.syfo.client
 
 import io.ktor.client.*
 import io.ktor.client.call.*
+import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -25,7 +26,7 @@ class DokArkivClient(
         journalpostRequest: JournalpostRequest,
         loggingMeta: LoggingMeta
     ): JournalpostResponse {
-        try {
+        return try {
             logger.info(
                 "Kall til dokarkiv Nav-Callid {}, {}",
                 journalpostRequest.eksternReferanseId,
@@ -42,14 +43,19 @@ class DokArkivClient(
                 contentType(ContentType.Application.Json)
                 parameter("forsoekFerdigstill", true)
             }
-            return when (response.status) {
+            when (response.status) {
                 HttpStatusCode.OK -> response.body()
                 HttpStatusCode.Created -> response.body()
                 else -> throw RuntimeException("Http status: ${response.status} Content: ${response.bodyAsChannel()}")
             }
-        } catch (e: Exception) {
-            logger.warn("Oppretting av journalpost feilet: ${e.message}, {}", fields(loggingMeta))
-            throw e
+        } catch (exception: ResponseException) {
+            if (exception.response.status == HttpStatusCode.Conflict) {
+                logger.warn("Journalpost var lagret fra før (fikk 409) {}", fields(loggingMeta))
+                exception.response.body<JournalpostResponse>()
+            } else {
+                logger.warn("Oppretting av journalpost feilet: ${exception.message}, {}", fields(loggingMeta))
+                throw exception
+            }
         }
     }
 }

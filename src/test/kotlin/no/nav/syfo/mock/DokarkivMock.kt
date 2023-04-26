@@ -48,7 +48,11 @@ class DokarkivMock {
                         journalpostRequest.bruker!!.id != UserConstants.PATIENT_FNR_NO_AKTOER_ID &&
                         !journalpostRequest.avsenderMottaker!!.id!!.contains('-')
                     ) {
-                        call.respond(journalpostResponse)
+                        if (journalpostRequest.bruker!!.id == UserConstants.PATIENT_FNR_JP_CONFLICT) {
+                            call.respond(HttpStatusCode.Conflict, journalpostResponse)
+                        } else {
+                            call.respond(journalpostResponse)
+                        }
                     } else {
                         call.respond(HttpStatusCode.InternalServerError)
                     }
