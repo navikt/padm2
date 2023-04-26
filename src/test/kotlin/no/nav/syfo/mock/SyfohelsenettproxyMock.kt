@@ -1,5 +1,6 @@
 package no.nav.syfo.mock
 
+import io.ktor.http.*
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -36,30 +37,34 @@ class SyfohelsenettproxyMock {
             routing {
                 get(path) {
                     val behandlerFnr = call.request.headers["behandlerFnr"]
-                    call.respond(
-                        HelsenettProxyBehandler(
-                            godkjenninger =
-                            listOf(
-                                Godkjenning(
-                                    autorisasjon = Kode(
-                                        aktiv = behandlerFnr != UserConstants.BEHANDLER_FNR_IKKE_AUTORISERT,
-                                        oid = 7704,
-                                        verdi = "1",
-                                    ),
-                                    helsepersonellkategori = Kode(
-                                        aktiv = behandlerFnr != UserConstants.BEHANDLER_FNR_IKKE_AUTORISERT,
-                                        oid = 0,
-                                        verdi = HelsepersonellKategori.LEGE.verdi,
-                                    ),
-                                )
-                            ),
-                            fornavn = "fornavn",
-                            mellomnavn = null,
-                            etternavn = "etternavn",
-                            fnr = null,
-                            hprNummer = 1,
+                    if (behandlerFnr == UserConstants.BEHANDLER_FNR_UKJENT) {
+                        call.respond(HttpStatusCode.NotFound)
+                    } else {
+                        call.respond(
+                            HelsenettProxyBehandler(
+                                godkjenninger =
+                                listOf(
+                                    Godkjenning(
+                                        autorisasjon = Kode(
+                                            aktiv = behandlerFnr != UserConstants.BEHANDLER_FNR_IKKE_AUTORISERT,
+                                            oid = 7704,
+                                            verdi = "1",
+                                        ),
+                                        helsepersonellkategori = Kode(
+                                            aktiv = behandlerFnr != UserConstants.BEHANDLER_FNR_IKKE_AUTORISERT,
+                                            oid = 0,
+                                            verdi = HelsepersonellKategori.LEGE.verdi,
+                                        ),
+                                    )
+                                ),
+                                fornavn = "fornavn",
+                                mellomnavn = null,
+                                etternavn = "etternavn",
+                                fnr = null,
+                                hprNummer = 1,
+                            )
                         )
-                    )
+                    }
                 }
             }
         }
