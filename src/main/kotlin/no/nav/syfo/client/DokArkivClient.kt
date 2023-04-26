@@ -26,7 +26,7 @@ class DokArkivClient(
         journalpostRequest: JournalpostRequest,
         loggingMeta: LoggingMeta
     ): JournalpostResponse {
-        try {
+        return try {
             logger.info(
                 "Kall til dokarkiv Nav-Callid {}, {}",
                 journalpostRequest.eksternReferanseId,
@@ -43,7 +43,7 @@ class DokArkivClient(
                 contentType(ContentType.Application.Json)
                 parameter("forsoekFerdigstill", true)
             }
-            return when (response.status) {
+            when (response.status) {
                 HttpStatusCode.OK -> response.body()
                 HttpStatusCode.Created -> response.body()
                 else -> throw RuntimeException("Http status: ${response.status} Content: ${response.bodyAsChannel()}")
