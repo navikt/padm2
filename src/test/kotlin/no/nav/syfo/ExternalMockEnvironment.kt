@@ -14,6 +14,7 @@ class ExternalMockEnvironment private constructor() {
     val wellKnownInternalAzureAD = wellKnownInternalAzureAD()
 
     val azureAdV2Mock = AzureAdV2Mock()
+    val clamAvMock = ClamAvMock()
     val dokarkivMock = DokarkivMock()
     val pdlMock = PdlMock()
     val kuhrsarMock = KuhrSarMock()
@@ -23,6 +24,7 @@ class ExternalMockEnvironment private constructor() {
 
     val externalApplicationMockMap = hashMapOf(
         azureAdV2Mock.name to azureAdV2Mock.server,
+        clamAvMock.name to clamAvMock.server,
         dokarkivMock.name to dokarkivMock.server,
         pdlMock.name to pdlMock.server,
         kuhrsarMock.name to kuhrsarMock.server,
@@ -34,6 +36,7 @@ class ExternalMockEnvironment private constructor() {
     var environment = testEnvironment(
         kafkaBootstrapServers = embeddedEnvironment.brokersURL,
         azureTokenEndpoint = azureAdV2Mock.url,
+        clamAvURL = clamAvMock.url,
         dokarkivUrl = dokarkivMock.url,
         pdlUrl = pdlMock.url,
         kuhrSarApiUrl = kuhrsarMock.url,

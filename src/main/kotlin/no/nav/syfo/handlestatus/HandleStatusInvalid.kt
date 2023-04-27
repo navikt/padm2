@@ -22,6 +22,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 val RULE_NAME_DUPLICATE = "DUPLICATE_DIALOGMELDING_CONTENT"
+val RULE_NAME_VIRUS_CHECK = "VIRUSSJEKK_FEILET"
 
 suspend fun handleStatusINVALID(
     database: DatabaseInterface,
@@ -36,7 +37,7 @@ suspend fun handleStatusINVALID(
     navnSignerendeLege: String,
     innbyggerOK: Boolean,
 ) {
-    if (innbyggerOK && !validationResult.isDuplicate()) {
+    if (innbyggerOK && !validationResult.isVirusCheck() && !validationResult.isDuplicate()) {
         journalService.onJournalRequest(
             receivedDialogmelding,
             validationResult,
@@ -49,6 +50,8 @@ suspend fun handleStatusINVALID(
         logger.info(
             if (validationResult.isDuplicate()) {
                 "Lagrer ikke i Joark siden meldingen er en duplikat dialogmelding {}"
+            } else if (validationResult.isVirusCheck()) {
+                "Lagrer ikke i Joark siden meldingen feilet på virussjekk"
             } else {
                 "Lagrer ikke i Joark siden pasient ikke funnet {}"
             },
@@ -261,6 +264,32 @@ fun handleInvalidDialogMeldingKodeverk(
         ruleHits = listOf(
             RuleInfo(
                 ruleName = "INVALID_KODEVERK",
+                messageForSender = message,
+                messageForUser = message,
+                ruleStatus = Status.INVALID
+            )
+        )
+    )
+}
+
+fun handleVedleggMayContainVirus(
+    loggingMeta: LoggingMeta
+): ValidationResult {
+    logger.warn(
+        "Et eller flere vedlegg feilet i virussjekk {}",
+        createLogEntry(
+            LogType.INVALID_MESSAGE,
+            loggingMeta
+        )
+    )
+    INVALID_MESSAGE_NO_NOTICE.increment()
+
+    val message = "Dialogmeldingen er ikke gyldig: Et eller flere vedlegg feilet i virussjekk."
+    return ValidationResult(
+        status = Status.INVALID,
+        ruleHits = listOf(
+            RuleInfo(
+                ruleName = RULE_NAME_VIRUS_CHECK,
                 messageForSender = message,
                 messageForUser = message,
                 ruleStatus = Status.INVALID

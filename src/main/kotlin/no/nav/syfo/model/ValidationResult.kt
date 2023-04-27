@@ -1,6 +1,7 @@
 package no.nav.syfo.model
 
 import no.nav.syfo.handlestatus.RULE_NAME_DUPLICATE
+import no.nav.syfo.handlestatus.RULE_NAME_VIRUS_CHECK
 
 data class ValidationResult(
     val status: Status,
@@ -21,3 +22,6 @@ enum class Status {
 
 fun ValidationResult.isDuplicate() =
     (status == Status.INVALID) && ruleHits.any { ruleInfo -> ruleInfo.ruleName == RULE_NAME_DUPLICATE }
+
+fun ValidationResult.isVirusCheck() =
+    (status == Status.INVALID) && ruleHits.any { ruleInfo -> ruleInfo.ruleName == RULE_NAME_VIRUS_CHECK }
