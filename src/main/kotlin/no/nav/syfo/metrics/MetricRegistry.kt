@@ -1,9 +1,9 @@
 package no.nav.syfo.metrics
 
-import io.micrometer.prometheus.PrometheusConfig
-import io.micrometer.prometheus.PrometheusMeterRegistry
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Timer
+import io.micrometer.prometheus.PrometheusConfig
+import io.micrometer.prometheus.PrometheusMeterRegistry
 
 const val METRICS_NS = "padm2"
 
@@ -67,4 +67,14 @@ val SAR_TSS_MISS_COUNTER: Counter = Counter
 val SANITIZE_INVALID_CHAR_COUNTER: Counter = Counter
     .builder("${METRICS_NS}_SANITIZE_INVALID_CHAR_COUNTER")
     .description("Counts the number of encountered illegal chars from sanitation")
+    .register(METRICS_REGISTRY)
+
+val COUNT_TSS_SAR_SMTSS_MATCH: Counter = Counter
+    .builder("${METRICS_NS}_tss_sar_smtss_match")
+    .description("Counts the number of matches for tss from sar and smtss")
+    .register(METRICS_REGISTRY)
+
+val COUNT_TSS_SAR_SMTSS_DIFFERENT: Counter = Counter
+    .builder("${METRICS_NS}_tss_sar_smtss_different")
+    .description("Counts the number of different tss from sar and smtss")
     .register(METRICS_REGISTRY)

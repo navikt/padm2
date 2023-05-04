@@ -15,6 +15,8 @@ import no.nav.syfo.domain.PersonIdent
 import no.nav.syfo.handlestatus.*
 import no.nav.syfo.kafka.DialogmeldingProducer
 import no.nav.syfo.logger
+import no.nav.syfo.metrics.COUNT_TSS_SAR_SMTSS_DIFFERENT
+import no.nav.syfo.metrics.COUNT_TSS_SAR_SMTSS_MATCH
 import no.nav.syfo.metrics.REQUEST_TIME
 import no.nav.syfo.model.*
 import no.nav.syfo.persistering.db.hentMottattTidspunkt
@@ -46,6 +48,12 @@ class DialogmeldingProcessor(
         azureAdV2Client = azureAdV2Client,
         kuhrSarClientId = env.kuhrSarApiClientId,
         kuhrSarUrl = env.kuhrSarApiUrl,
+        httpClient = httpClient,
+    )
+    val smtssClient = SmtssClient(
+        azureAdV2Client = azureAdV2Client,
+        smtssClientId = env.smtssClientId,
+        smtssUrl = env.smtssApiUrl,
         httpClient = httpClient,
     )
     val pdlClient = PdlClient(
@@ -121,11 +129,9 @@ class DialogmeldingProcessor(
         val innbyggerOK = pdlClient.personEksisterer(PersonIdent(receivedDialogmelding.personNrPasient))
         val legeOK = pdlClient.personEksisterer(PersonIdent(receivedDialogmelding.personNrLege))
 
-        val tssId = kuhrSarClient.getTssId(
-            legeIdent = PersonIdent(receivedDialogmelding.personNrLege),
-            partnerId = receiverBlock.partnerReferanse.toInt(),
-            legekontorOrgName = receivedDialogmelding.legekontorOrgName,
-            legekontorHerId = receivedDialogmelding.legekontorHerId,
+        val tssId = getTssId(
+            receivedDialogmelding = receivedDialogmelding,
+            receiverBlock = receiverBlock,
             msgHead = msgHead,
         )
 
@@ -285,5 +291,38 @@ class DialogmeldingProcessor(
         return initialValidationResult ?: padm2ReglerService.executeRuleChains(
             receivedDialogmelding = receivedDialogmelding,
         )
+    }
+
+    private suspend fun getTssId(
+        receivedDialogmelding: ReceivedDialogmelding,
+        receiverBlock: XMLMottakenhetBlokk,
+        msgHead: XMLMsgHead
+    ): String {
+        val tssId = kuhrSarClient.getTssId(
+            legeIdent = PersonIdent(receivedDialogmelding.personNrLege),
+            partnerId = receiverBlock.partnerReferanse.toInt(),
+            legekontorOrgName = receivedDialogmelding.legekontorOrgName,
+            legekontorHerId = receivedDialogmelding.legekontorHerId,
+            msgHead = msgHead,
+        )
+        val smtssEmottak = smtssClient.findBestTssIdEmottak(
+            legePersonIdent = PersonIdent(receivedDialogmelding.personNrLege),
+            legekontorOrgName = receivedDialogmelding.legekontorOrgName,
+            dialogmeldingId = receivedDialogmelding.msgId,
+        )
+        val smtssInfotrygd = smtssClient.findBestTssIdInfotrygd(
+            legePersonIdent = PersonIdent(receivedDialogmelding.personNrLege),
+            legekontorOrgName = receivedDialogmelding.legekontorOrgName,
+            dialogmeldingId = receivedDialogmelding.msgId,
+        )
+
+        logger.info("TSS TRACE: Kuhr-sar: $tssId, smtssEmottak: $smtssEmottak, smtssInfotrygd: $smtssInfotrygd")
+        if (tssId == smtssEmottak || tssId == smtssInfotrygd) {
+            COUNT_TSS_SAR_SMTSS_MATCH.increment()
+        } else {
+            COUNT_TSS_SAR_SMTSS_DIFFERENT.increment()
+        }
+
+        return tssId
     }
 }

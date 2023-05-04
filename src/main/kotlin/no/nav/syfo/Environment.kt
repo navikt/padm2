@@ -48,6 +48,8 @@ data class Environment(
     val systemAPIAuthorizedConsumerApplicationNames: List<String> = listOf(
         isbehandlerdialogApplicationName,
     ),
+    val smtssApiUrl: String = getEnvVar("SMTSS_URL"),
+    val smtssClientId: String = getEnvVar("SMTSS_CLIENT_ID"),
 ) : MqConfig {
     fun jdbcUrl(): String {
         return "jdbc:postgresql://$databaseHost:$databasePort/$databaseName"
