@@ -7,21 +7,22 @@ import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import no.nav.syfo.client.KuhrsarResponse
+import no.nav.syfo.client.TSSident
 import no.nav.syfo.getRandomPort
 import no.nav.syfo.util.configure
 
-class KuhrSarMock {
+class SmtssMock {
     private val port = getRandomPort()
-    private val path = "/api/v1/kuhrsar"
+    private val emottakPath = "/api/v1/samhandler/emottak"
+    private val infotrygdPath = "/api/v1/samhandler/infotrygd"
     val url = "http://localhost:$port"
 
-    val name = "kuhrsar"
-    val server = mockKuhrSarServer(
+    val name = "smtss"
+    val server = mockSmtssServer(
         port
     )
 
-    private fun mockKuhrSarServer(
+    private fun mockSmtssServer(
         port: Int
     ): NettyApplicationEngine {
         return embeddedServer(
@@ -32,8 +33,11 @@ class KuhrSarMock {
                 jackson { configure() }
             }
             routing {
-                get(path) {
-                    call.respond(KuhrsarResponse("123"))
+                get(emottakPath) {
+                    call.respond(TSSident("123"))
+                }
+                get(infotrygdPath) {
+                    call.respond(TSSident("123"))
                 }
             }
         }

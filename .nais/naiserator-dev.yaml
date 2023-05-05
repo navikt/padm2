@@ -61,6 +61,8 @@ spec:
         - application: padm2pdfgen
         - application: clamav
           namespace: nais-system
+        - application: smtss
+          namespace: teamsykmelding
   azure:
     application:
       allowAllUsers: true
@@ -111,3 +113,7 @@ spec:
       value: dev-fss.teamsykefravr.isproxy
     - name: KUHR_SAR_API_URL
       value: https://isproxy.dev-fss-pub.nais.io
+    - name: SMTSS_CLIENT_ID
+      value: dev-gcp.teamsykmelding.smtss
+    - name: SMTSS_URL
+      value: http://smtss.teamsykmelding

@@ -15,6 +15,7 @@ fun testEnvironment(
     kuhrSarApiUrl: String,
     syfohelsenettproxyEndpointUrl: String,
     legeSuspensjonEndpointUrl: String,
+    smtssUrl: String,
 ) = Environment(
     aadAppClient = "isdialogmote-client-id",
     aadAppSecret = "isdialogmote-secret",
@@ -55,6 +56,8 @@ fun testEnvironment(
     syfohelsenettproxyEndpointURL = syfohelsenettproxyEndpointUrl,
     legeSuspensjonClientId = "legesuspensjon",
     legeSuspensjonEndpointURL = legeSuspensjonEndpointUrl,
+    smtssClientId = "smtss",
+    smtssApiUrl = smtssUrl,
 )
 
 fun testAppState() = ApplicationState(
