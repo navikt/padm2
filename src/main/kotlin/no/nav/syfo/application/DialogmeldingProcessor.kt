@@ -316,7 +316,7 @@ class DialogmeldingProcessor(
             dialogmeldingId = receivedDialogmelding.msgId,
         )
 
-        logger.info("TSS TRACE: Kuhr-sar: $tssId, smtssEmottak: $smtssEmottak, smtssInfotrygd: $smtssInfotrygd")
+        logger.info("TSS TRACE: Kuhr-sar: ${nonMaskableTssString(tssId)}, smtssEmottak: ${nonMaskableTssString(smtssEmottak)}, smtssInfotrygd: ${nonMaskableTssString(smtssInfotrygd)}")
         if (tssId == smtssEmottak || tssId == smtssInfotrygd) {
             COUNT_TSS_SAR_SMTSS_MATCH.increment()
         } else {
@@ -324,5 +324,13 @@ class DialogmeldingProcessor(
         }
 
         return tssId
+    }
+
+    private fun nonMaskableTssString(tssId: String?): String? {
+        if (tssId == null || tssId.length < 11) return tssId
+
+        val firstPart = tssId.substring(0, 5)
+        val lastPart = tssId.substring(5)
+        return "$firstPart-$lastPart"
     }
 }
