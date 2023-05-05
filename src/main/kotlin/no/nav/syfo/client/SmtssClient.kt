@@ -57,8 +57,8 @@ class SmtssClient(
             val response = httpClient.get("$smtssUrl$path") {
                 contentType(ContentType.Application.Json)
                 accept(ContentType.Application.Json)
-                parameter("samhandlerFnr", legePersonIdent.value)
-                parameter("samhandlerOrgName", legekontorOrgName)
+                header("samhandlerFnr", legePersonIdent.value)
+                header("samhandlerOrgName", legekontorOrgName)
                 header(HttpHeaders.Authorization, bearerHeader(token.accessToken))
                 header("requestId", dialogmeldingId)
             }
