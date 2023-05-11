@@ -10,13 +10,12 @@ import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.client.*
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.client.pdl.PdlClient
+import no.nav.syfo.client.SmtssClient
 import no.nav.syfo.db.DatabaseInterface
 import no.nav.syfo.domain.PersonIdent
 import no.nav.syfo.handlestatus.*
 import no.nav.syfo.kafka.DialogmeldingProducer
 import no.nav.syfo.logger
-import no.nav.syfo.metrics.COUNT_TSS_SAR_SMTSS_DIFFERENT
-import no.nav.syfo.metrics.COUNT_TSS_SAR_SMTSS_MATCH
 import no.nav.syfo.metrics.REQUEST_TIME
 import no.nav.syfo.model.*
 import no.nav.syfo.persistering.db.hentMottattTidspunkt
@@ -33,29 +32,15 @@ class DialogmeldingProcessor(
     val env: Environment,
     val mqSender: MQSenderInterface,
     val dialogmeldingProducer: DialogmeldingProducer,
+    val azureAdV2Client: AzureAdV2Client,
+    val smtssClient: SmtssClient,
+    val emottakService: EmottakService,
 ) {
     val pdfgenClient = PdfgenClient(
         url = env.syfopdfgen,
         httpClient = httpClient,
     )
-    val azureAdV2Client = AzureAdV2Client(
-        aadAppClient = env.aadAppClient,
-        aadAppSecret = env.aadAppSecret,
-        aadTokenEndpoint = env.aadTokenEndpoint,
-        httpClient = httpClientWithProxy,
-    )
-    val kuhrSarClient = KuhrSarClient(
-        azureAdV2Client = azureAdV2Client,
-        kuhrSarClientId = env.kuhrSarApiClientId,
-        kuhrSarUrl = env.kuhrSarApiUrl,
-        httpClient = httpClient,
-    )
-    val smtssClient = SmtssClient(
-        azureAdV2Client = azureAdV2Client,
-        smtssClientId = env.smtssClientId,
-        smtssUrl = env.smtssApiUrl,
-        httpClient = httpClient,
-    )
+
     val pdlClient = PdlClient(
         azureAdV2Client = azureAdV2Client,
         pdlClientId = env.pdlClientId,
@@ -103,7 +88,7 @@ class DialogmeldingProcessor(
     ) {
         val fellesformat = fellesformatUnmarshaller.unmarshal(StringReader(inputMessageText)) as XMLEIFellesformat
         val msgHead: XMLMsgHead = fellesformat.get()
-        val receiverBlock = fellesformat.get<XMLMottakenhetBlokk>()
+        val receiverBlock = fellesformat.get<XMLMottakenhetBlokk>() // TODO: bytte navn til emottakblokk
         val ediLoggId = receiverBlock.ediLoggId
         val msgId = msgHead.msgInfo.msgId
         val dialogmeldingXml = extractDialogmelding(fellesformat)
@@ -129,11 +114,21 @@ class DialogmeldingProcessor(
         val innbyggerOK = pdlClient.personEksisterer(PersonIdent(receivedDialogmelding.personNrPasient))
         val legeOK = pdlClient.personEksisterer(PersonIdent(receivedDialogmelding.personNrLege))
 
-        val tssId = getTssId(
-            receivedDialogmelding = receivedDialogmelding,
-            receiverBlock = receiverBlock,
-            msgHead = msgHead,
+        val tssId = smtssClient.findBestTss(
+            legePersonIdent = PersonIdent(receivedDialogmelding.personNrLege),
+            legekontorOrgName = receivedDialogmelding.legekontorOrgName,
+            dialogmeldingId = receivedDialogmelding.msgId,
         )
+
+        if (tssId != null && tssId.value.isNotBlank()) {
+            emottakService.registerEmottakSubscription(
+                tssId = tssId,
+                partnerReferanse = receiverBlock.partnerReferanse,
+                sender = msgHead.msgInfo.sender,
+                msgId = msgHead.msgInfo.msgId,
+                loggingMeta = loggingMeta,
+            )
+        }
 
         val navnSignerendeLege = signerendeLegeService.signerendeLegeNavn(
             signerendeLegeFnr = receivedDialogmelding.personNrLege,
@@ -168,7 +163,7 @@ class DialogmeldingProcessor(
                 receiverBlock = receiverBlock,
                 pasientNavn = pasientNavn,
                 navnSignerendeLege = navnSignerendeLege,
-                tssId = tssId,
+                tssId = tssId?.value ?: "",
             )
 
             Status.INVALID -> handleStatusINVALID(
@@ -291,46 +286,5 @@ class DialogmeldingProcessor(
         return initialValidationResult ?: padm2ReglerService.executeRuleChains(
             receivedDialogmelding = receivedDialogmelding,
         )
-    }
-
-    private suspend fun getTssId(
-        receivedDialogmelding: ReceivedDialogmelding,
-        receiverBlock: XMLMottakenhetBlokk,
-        msgHead: XMLMsgHead
-    ): String {
-        val tssId = kuhrSarClient.getTssId(
-            legeIdent = PersonIdent(receivedDialogmelding.personNrLege),
-            partnerId = receiverBlock.partnerReferanse.toInt(),
-            legekontorOrgName = receivedDialogmelding.legekontorOrgName,
-            legekontorHerId = receivedDialogmelding.legekontorHerId,
-            msgHead = msgHead,
-        )
-        val smtssEmottak = smtssClient.findBestTssIdEmottak(
-            legePersonIdent = PersonIdent(receivedDialogmelding.personNrLege),
-            legekontorOrgName = receivedDialogmelding.legekontorOrgName,
-            dialogmeldingId = receivedDialogmelding.msgId,
-        )
-        val smtssInfotrygd = smtssClient.findBestTssIdInfotrygd(
-            legePersonIdent = PersonIdent(receivedDialogmelding.personNrLege),
-            legekontorOrgName = receivedDialogmelding.legekontorOrgName,
-            dialogmeldingId = receivedDialogmelding.msgId,
-        )
-
-        logger.info("TSS TRACE: Kuhr-sar: ${nonMaskableTssString(tssId)}, smtssEmottak: ${nonMaskableTssString(smtssEmottak)}, smtssInfotrygd: ${nonMaskableTssString(smtssInfotrygd)}")
-        if (tssId == smtssEmottak || tssId == smtssInfotrygd) {
-            COUNT_TSS_SAR_SMTSS_MATCH.increment()
-        } else {
-            COUNT_TSS_SAR_SMTSS_DIFFERENT.increment()
-        }
-
-        return tssId
-    }
-
-    private fun nonMaskableTssString(tssId: String?): String? {
-        if (tssId == null || tssId.length < 11) return tssId
-
-        val firstPart = tssId.substring(0, 5)
-        val lastPart = tssId.substring(5)
-        return "$firstPart-$lastPart"
     }
 }

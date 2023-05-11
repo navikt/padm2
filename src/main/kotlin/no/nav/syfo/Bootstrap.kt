@@ -6,9 +6,15 @@ import io.ktor.server.netty.*
 import no.nav.syfo.application.*
 import no.nav.syfo.application.api.apiModule
 import no.nav.syfo.application.mq.*
+import no.nav.syfo.client.SmgcpClient
+import no.nav.syfo.client.SmtssClient
+import no.nav.syfo.client.azuread.v2.AzureAdV2Client
+import no.nav.syfo.client.httpClient
+import no.nav.syfo.client.httpClientWithProxy
 import no.nav.syfo.client.wellknown.getWellKnown
 import no.nav.syfo.db.Database
 import no.nav.syfo.kafka.*
+import no.nav.syfo.services.EmottakService
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -80,6 +86,45 @@ fun launchListeners(
         ),
     )
 
+    val mqSender = MQSender(
+        env = env,
+    )
+
+    val azureAdV2Client = AzureAdV2Client(
+        aadAppClient = env.aadAppClient,
+        aadAppSecret = env.aadAppSecret,
+        aadTokenEndpoint = env.aadTokenEndpoint,
+        httpClient = httpClientWithProxy,
+    )
+
+    val smgcpClient = SmgcpClient(
+        azureAdV2Client = azureAdV2Client,
+        url = env.smgcpProxyUrl,
+        smgcpClientId = env.smgcpProxyClientId,
+        httpClient = httpClient,
+    )
+
+    val smtssClient = SmtssClient(
+        azureAdV2Client = azureAdV2Client,
+        smtssClientId = env.smtssClientId,
+        smtssUrl = env.smtssApiUrl,
+        httpClient = httpClient,
+    )
+
+    val emottakService = EmottakService(
+        smgcpClient = smgcpClient,
+    )
+
+    val dialogmeldingProcessor = DialogmeldingProcessor(
+        database = database,
+        env = env,
+        mqSender = mqSender,
+        dialogmeldingProducer = dialogmeldingProducer,
+        azureAdV2Client = azureAdV2Client,
+        smtssClient = smtssClient,
+        emottakService = emottakService,
+    )
+
     launchBackgroundTask(
         applicationState = applicationState,
     ) {
@@ -89,16 +134,13 @@ fun launchListeners(
             connection.start()
             val session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE)
             val inputconsumer = session.consumerForQueue(env.inputQueueName)
-            val mqSender = MQSender(
-                env = env,
-            )
+
             val blockingApplicationRunner = BlockingApplicationRunner(
                 applicationState = applicationState,
                 database = database,
-                env = env,
                 inputconsumer = inputconsumer,
                 mqSender = mqSender,
-                dialogmeldingProducer = dialogmeldingProducer,
+                dialogmeldingProcessor = dialogmeldingProcessor,
             )
             blockingApplicationRunner.run()
         }
@@ -107,15 +149,6 @@ fun launchListeners(
     launchBackgroundTask(
         applicationState = applicationState,
     ) {
-        val mqSender = MQSender(
-            env = env,
-        )
-        val dialogmeldingProcessor = DialogmeldingProcessor(
-            database = database,
-            env = env,
-            mqSender = mqSender,
-            dialogmeldingProducer = dialogmeldingProducer,
-        )
         val rerunCronJob = RerunCronJob(
             database = database,
             dialogmeldingProcessor = dialogmeldingProcessor,

@@ -1,5 +1,6 @@
 package no.nav.syfo.mock
 
+import io.ktor.http.*
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -7,21 +8,20 @@ import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import no.nav.syfo.client.KuhrsarResponse
 import no.nav.syfo.getRandomPort
 import no.nav.syfo.util.configure
 
-class KuhrSarMock {
+class SmgcpMock {
     private val port = getRandomPort()
-    private val path = "/api/v1/kuhrsar"
+    private val path = "/emottak/startsubscription"
     val url = "http://localhost:$port"
 
-    val name = "kuhrsar"
-    val server = mockKuhrSarServer(
+    val name = "smgcp"
+    val server = mockSmgcpServer(
         port
     )
 
-    private fun mockKuhrSarServer(
+    private fun mockSmgcpServer(
         port: Int
     ): NettyApplicationEngine {
         return embeddedServer(
@@ -32,8 +32,8 @@ class KuhrSarMock {
                 jackson { configure() }
             }
             routing {
-                get(path) {
-                    call.respond(KuhrsarResponse("123"))
+                post(path) {
+                    call.respond(HttpStatusCode.OK)
                 }
             }
         }

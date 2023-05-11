@@ -12,10 +12,10 @@ fun testEnvironment(
     dokarkivUrl: String,
     pdfgenUrl: String,
     pdlUrl: String,
-    kuhrSarApiUrl: String,
     syfohelsenettproxyEndpointUrl: String,
     legeSuspensjonEndpointUrl: String,
     smtssUrl: String,
+    smgcpUrl: String,
 ) = Environment(
     aadAppClient = "isdialogmote-client-id",
     aadAppSecret = "isdialogmote-secret",
@@ -50,14 +50,14 @@ fun testEnvironment(
     inputBackoutQueueName = "backoutQueue",
     pdlClientId = "pdl",
     pdlUrl = pdlUrl,
-    kuhrSarApiClientId = "kuhrsar",
-    kuhrSarApiUrl = kuhrSarApiUrl,
     syfohelsenettproxyClientId = "helsenett",
     syfohelsenettproxyEndpointURL = syfohelsenettproxyEndpointUrl,
     legeSuspensjonClientId = "legesuspensjon",
     legeSuspensjonEndpointURL = legeSuspensjonEndpointUrl,
     smtssClientId = "smtss",
     smtssApiUrl = smtssUrl,
+    smgcpProxyClientId = "smgcp",
+    smgcpProxyUrl = smgcpUrl,
 )
 
 fun testAppState() = ApplicationState(

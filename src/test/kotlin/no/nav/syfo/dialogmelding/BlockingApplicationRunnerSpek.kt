@@ -6,9 +6,13 @@ import kotlinx.coroutines.runBlocking
 import no.nav.syfo.*
 import no.nav.syfo.application.*
 import no.nav.syfo.application.mq.MQSenderInterface
+import no.nav.syfo.client.TssId
+import no.nav.syfo.client.azuread.v2.AzureAdV2Client
+import no.nav.syfo.client.SmtssClient
 import no.nav.syfo.kafka.DialogmeldingProducer
 import no.nav.syfo.metrics.MESSAGES_STILL_FAIL_AFTER_1H
 import no.nav.syfo.persistering.db.hentDialogmeldingOpplysningerJournalpostId
+import no.nav.syfo.services.EmottakService
 import no.nav.syfo.util.*
 import org.amshove.kluent.*
 import org.spekframework.spek2.Spek
@@ -26,20 +30,25 @@ class BlockingApplicationRunnerSpek : Spek({
             val mqSender = mockk<MQSenderInterface>(relaxed = true)
             val dialogmeldingProducer = mockk<DialogmeldingProducer>(relaxed = true)
             val incomingMessage = mockk<TextMessage>(relaxed = true)
+            val azureAdV2Client = mockk<AzureAdV2Client>(relaxed = true)
+            val emottakService = mockk<EmottakService>(relaxed = true)
+            val smtssClient = mockk<SmtssClient>(relaxed = true)
 
-            val blockingApplicationRunner = BlockingApplicationRunner(
-                applicationState = externalMockEnvironment.applicationState,
-                database = database,
-                env = externalMockEnvironment.environment,
-                inputconsumer = mockk(),
-                mqSender = mqSender,
-                dialogmeldingProducer = dialogmeldingProducer,
-            )
             val dialogmeldingProcessor = DialogmeldingProcessor(
                 database = database,
                 env = externalMockEnvironment.environment,
                 mqSender = mqSender,
                 dialogmeldingProducer = dialogmeldingProducer,
+                azureAdV2Client = azureAdV2Client,
+                smtssClient = smtssClient,
+                emottakService = emottakService,
+            )
+            val blockingApplicationRunner = BlockingApplicationRunner(
+                applicationState = externalMockEnvironment.applicationState,
+                database = database,
+                inputconsumer = mockk(),
+                mqSender = mqSender,
+                dialogmeldingProcessor = dialogmeldingProcessor,
             )
             val rerunCronJob = RerunCronJob(
                 database = database,
@@ -55,6 +64,8 @@ class BlockingApplicationRunnerSpek : Spek({
                     justRun { mqSender.sendReceipt(any()) }
                     justRun { mqSender.sendBackout(any()) }
                     justRun { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
+                    coEvery { smtssClient.findBestTss(any(), any(), any()) } returns TssId("123")
+                    coJustRun { emottakService.registerEmottakSubscription(any(), any(), any(), any(), any()) }
                 }
                 it("Prosesserer innkommet melding (melding ok)") {
                     val fellesformat =

@@ -7,7 +7,7 @@ import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import no.nav.syfo.client.TSSident
+import no.nav.syfo.client.TssId
 import no.nav.syfo.getRandomPort
 import no.nav.syfo.util.configure
 
@@ -34,10 +34,10 @@ class SmtssMock {
             }
             routing {
                 get(emottakPath) {
-                    call.respond(TSSident("123"))
+                    call.respond(TssId("123"))
                 }
                 get(infotrygdPath) {
-                    call.respond(TSSident("123"))
+                    call.respond(TssId("123"))
                 }
             }
         }

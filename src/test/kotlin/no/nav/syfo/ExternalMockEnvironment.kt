@@ -17,22 +17,22 @@ class ExternalMockEnvironment private constructor() {
     val clamAvMock = ClamAvMock()
     val dokarkivMock = DokarkivMock()
     val pdlMock = PdlMock()
-    val kuhrsarMock = KuhrSarMock()
     val pdfgenMock = PdfGenMock()
     val syfohelsenettproxyMock = SyfohelsenettproxyMock()
     val legeSuspensjonEndpointMock = LegeSuspensjonEndpointMock()
     val smtssMock = SmtssMock()
+    val smgcpMock = SmgcpMock()
 
     val externalApplicationMockMap = hashMapOf(
         azureAdV2Mock.name to azureAdV2Mock.server,
         clamAvMock.name to clamAvMock.server,
         dokarkivMock.name to dokarkivMock.server,
         pdlMock.name to pdlMock.server,
-        kuhrsarMock.name to kuhrsarMock.server,
         pdfgenMock.name to pdfgenMock.server,
         syfohelsenettproxyMock.name to syfohelsenettproxyMock.server,
         legeSuspensjonEndpointMock.name to legeSuspensjonEndpointMock.server,
         smtssMock.name to smtssMock.server,
+        smgcpMock.name to smgcpMock.server,
     )
 
     var environment = testEnvironment(
@@ -41,11 +41,11 @@ class ExternalMockEnvironment private constructor() {
         clamAvURL = clamAvMock.url,
         dokarkivUrl = dokarkivMock.url,
         pdlUrl = pdlMock.url,
-        kuhrSarApiUrl = kuhrsarMock.url,
         pdfgenUrl = pdfgenMock.url,
         syfohelsenettproxyEndpointUrl = syfohelsenettproxyMock.url,
         legeSuspensjonEndpointUrl = legeSuspensjonEndpointMock.url,
         smtssUrl = smtssMock.url,
+        smgcpUrl = smgcpMock.url,
     )
 
     companion object {
