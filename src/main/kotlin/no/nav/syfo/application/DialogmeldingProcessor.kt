@@ -120,7 +120,7 @@ class DialogmeldingProcessor(
             dialogmeldingId = receivedDialogmelding.msgId,
         )
 
-        if (tssId != null && tssId.value.isNotBlank()) {
+        if (tssId != null && tssId.tssid.isNotBlank()) {
             emottakService.registerEmottakSubscription(
                 tssId = tssId,
                 partnerReferanse = receiverBlock.partnerReferanse,
@@ -163,7 +163,7 @@ class DialogmeldingProcessor(
                 receiverBlock = receiverBlock,
                 pasientNavn = pasientNavn,
                 navnSignerendeLege = navnSignerendeLege,
-                tssId = tssId?.value ?: "",
+                tssId = tssId?.tssid ?: "",
             )
 
             Status.INVALID -> handleStatusINVALID(

@@ -38,7 +38,7 @@ class SmtssClient(
                 header("requestId", dialogmeldingId)
             }
             val responseBody = response.body<TssId>()
-            logger.info("Fant tssId: ${responseBody.value}, requestId: $dialogmeldingId")
+            logger.info("Fant tssId: ${responseBody.tssid}, requestId: $dialogmeldingId")
             responseBody
         } catch (exception: ResponseException) {
             when (exception.response.status) {
@@ -57,5 +57,5 @@ class SmtssClient(
 }
 
 data class TssId(
-    val value: String,
+    val tssid: String,
 )
