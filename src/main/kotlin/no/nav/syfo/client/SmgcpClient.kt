@@ -35,13 +35,13 @@ class SmgcpClient(
                 header("Nav-Call-Id", msgId)
                 setBody(
                     EmottakRequest(
-                        tssId = tssId.value,
+                        tssId = tssId.tssid,
                         senderXMLBlokk = convertSenderToBase64(sender),
                         partnerReferanse = partnerReferanse,
                     ),
                 )
             }
-            logger.info("Started subscription for tss: ${tssId.value} and partnerRef: $partnerReferanse, msgId: $msgId")
+            logger.info("Started subscription for tss: ${tssId.tssid} and partnerRef: $partnerReferanse, msgId: $msgId")
         } catch (exception: ResponseException) {
             logger.error("Couldn't update emottak subscription due to error: ${exception.response.status}, msgId: $msgId")
             throw IOException("Vi fikk en uventet feil fra smgcp, prøver på nytt! ${exception.response.bodyAsChannel()}, msgId: $msgId")
