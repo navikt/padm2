@@ -7,7 +7,7 @@ import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.logger
-import no.nav.syfo.metrics.SAR_TSS_MISS_COUNTER
+import no.nav.syfo.metrics.TSS_MISS_COUNTER
 import no.nav.syfo.model.Behandler
 import no.nav.syfo.model.Dialogmelding
 import no.nav.syfo.util.*
@@ -71,7 +71,7 @@ fun createAvsender(
     behandler: Behandler?
 ): EiaDokumentInfoType.Avsender {
     val validatedTssID = if (tssid.isNullOrBlank()) {
-        SAR_TSS_MISS_COUNTER.increment()
+        TSS_MISS_COUNTER.increment()
         "0"
     } else tssid
     return EiaDokumentInfoType.Avsender().apply {

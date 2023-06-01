@@ -16,8 +16,6 @@ data class Environment(
     override val mqChannelName: String = getEnvVar("MQ_CHANNEL_NAME"),
     val inputQueueName: String = getEnvVar("MQ_INPUT_QUEUE_NAME"),
     val apprecQueueName: String = getEnvVar("MQ_APPREC_QUEUE_NAME"),
-    val kuhrSarApiClientId: String = getEnvVar("KUHR_SAR_API_CLIENT_ID"),
-    val kuhrSarApiUrl: String = getEnvVar("KUHR_SAR_API_URL"),
     val cluster: String = getEnvVar("NAIS_CLUSTER_NAME"),
     val inputBackoutQueueName: String = getEnvVar("MQ_INPUT_BOQ_QUEUE_NAME"),
     val dokArkivClientId: String = getEnvVar("DOKARKIV_CLIENT_ID"),
@@ -50,6 +48,8 @@ data class Environment(
     ),
     val smtssApiUrl: String = getEnvVar("SMTSS_URL"),
     val smtssClientId: String = getEnvVar("SMTSS_CLIENT_ID"),
+    val smgcpProxyUrl: String = getEnvVar("SMGCP_PROXY_URL"),
+    val smgcpProxyClientId: String = getEnvVar("SMGCP_PROXY_CLIENT_ID"),
 ) : MqConfig {
     fun jdbcUrl(): String {
         return "jdbc:postgresql://$databaseHost:$databasePort/$databaseName"

@@ -109,11 +109,11 @@ spec:
       value: dev-fss.teamsykefravr.isproxy
     - name: LEGE_SUSPENSJON_ENDPOINT_URL
       value: https://isproxy.dev-fss-pub.nais.io
-    - name: KUHR_SAR_API_CLIENT_ID
-      value: dev-fss.teamsykefravr.isproxy
-    - name: KUHR_SAR_API_URL
-      value: https://isproxy.dev-fss-pub.nais.io
     - name: SMTSS_CLIENT_ID
       value: dev-gcp.teamsykmelding.smtss
     - name: SMTSS_URL
       value: http://smtss.teamsykmelding
+    - name: SMGCP_PROXY_CLIENT_ID
+      value: dev-fss.teamsykmelding.smgcp-proxy
+    - name: SMGCP_PROXY_URL
+      value: https://smgcp-proxy.dev-fss-pub.nais.io

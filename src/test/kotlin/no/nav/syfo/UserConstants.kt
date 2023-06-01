@@ -9,4 +9,5 @@ object UserConstants {
     val BEHANDLER_FNR_UGYLDIG = "01010112378"
     val BEHANDLER_FNR_IKKE_AUTORISERT = "01010112458"
     val BEHANDLER_FNR_UKJENT = "01010112459"
+    val LEGEKONTOR_ORGNAME = "Kule helsetjenester AS"
 }

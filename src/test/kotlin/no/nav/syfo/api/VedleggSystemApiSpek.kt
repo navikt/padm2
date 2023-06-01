@@ -9,10 +9,14 @@ import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import no.nav.syfo.*
 import no.nav.syfo.application.BlockingApplicationRunner
+import no.nav.syfo.application.DialogmeldingProcessor
 import no.nav.syfo.application.api.VedleggDTO
 import no.nav.syfo.application.api.vedleggSystemApiV1Path
 import no.nav.syfo.application.mq.MQSenderInterface
+import no.nav.syfo.client.azuread.v2.AzureAdV2Client
+import no.nav.syfo.client.SmtssClient
 import no.nav.syfo.kafka.DialogmeldingProducer
+import no.nav.syfo.services.EmottakService
 import no.nav.syfo.util.*
 import org.amshove.kluent.shouldBeEqualTo
 import org.spekframework.spek2.Spek
@@ -31,14 +35,26 @@ class VedleggSystemApiSpek : Spek({
         val mqSender = mockk<MQSenderInterface>(relaxed = true)
         val dialogmeldingProducer = mockk<DialogmeldingProducer>(relaxed = true)
         val incomingMessage = mockk<TextMessage>(relaxed = true)
+        val azureAdV2Client = mockk<AzureAdV2Client>(relaxed = true)
+        val emottakService = mockk<EmottakService>(relaxed = true)
+        val smtssClient = mockk<SmtssClient>(relaxed = true)
+
+        val dialogmeldingProcessor = DialogmeldingProcessor(
+            database = database,
+            env = externalMockEnvironment.environment,
+            mqSender = mqSender,
+            dialogmeldingProducer = dialogmeldingProducer,
+            azureAdV2Client = azureAdV2Client,
+            smtssClient = smtssClient,
+            emottakService = emottakService,
+        )
 
         val blockingApplicationRunner = BlockingApplicationRunner(
             applicationState = externalMockEnvironment.applicationState,
             database = database,
-            env = externalMockEnvironment.environment,
             inputconsumer = mockk(),
             mqSender = mqSender,
-            dialogmeldingProducer = dialogmeldingProducer,
+            dialogmeldingProcessor = dialogmeldingProcessor,
         )
 
         application.testApiModule(

@@ -5,35 +5,28 @@ import net.logstash.logback.argument.StructuredArguments
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
-import no.nav.syfo.*
 import no.nav.syfo.application.mq.MQSenderInterface
-import no.nav.syfo.kafka.DialogmeldingProducer
 import no.nav.syfo.db.DatabaseInterface
 import no.nav.syfo.domain.elevenDigits
-import no.nav.syfo.handlestatus.*
+import no.nav.syfo.handlestatus.handlePatientMissing
+import no.nav.syfo.logger
 import no.nav.syfo.metrics.INCOMING_MESSAGE_COUNTER
 import no.nav.syfo.metrics.MESSAGES_SENT_TO_BOQ
 import no.nav.syfo.persistering.persistReceivedMessage
 import no.nav.syfo.util.*
 import java.io.StringReader
 import java.util.*
-import javax.jms.*
+import javax.jms.Message
+import javax.jms.MessageConsumer
+import javax.jms.TextMessage
 
 class BlockingApplicationRunner(
     val applicationState: ApplicationState,
     val database: DatabaseInterface,
-    val env: Environment,
     val inputconsumer: MessageConsumer,
     val mqSender: MQSenderInterface,
-    val dialogmeldingProducer: DialogmeldingProducer,
+    val dialogmeldingProcessor: DialogmeldingProcessor,
 ) {
-    val dialogmeldingProcessor = DialogmeldingProcessor(
-        database = database,
-        env = env,
-        mqSender = mqSender,
-        dialogmeldingProducer = dialogmeldingProducer,
-    )
-
     suspend fun run() {
         wrapExceptions {
             while (applicationState.ready) {
@@ -47,7 +40,7 @@ class BlockingApplicationRunner(
         }
     }
 
-    suspend fun processMessageHandleException(message: Message): String? {
+    suspend fun processMessageHandleException(message: Message): String? { // TODO: navnebytte, fjerne handle exception?
         val inputMessageText = when (message) {
             is TextMessage -> message.text
             else -> throw RuntimeException("Incoming message needs to be a byte message or text message")

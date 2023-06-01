@@ -59,8 +59,8 @@ val RULE_HIT_COUNTER: Counter = Counter
     .description("Registers a counter for each rule in the rule set")
     .register(METRICS_REGISTRY)
 
-val SAR_TSS_MISS_COUNTER: Counter = Counter
-    .builder("${METRICS_NS}_SAR_TSS_MISS_COUNTER")
+val TSS_MISS_COUNTER: Counter = Counter
+    .builder("${METRICS_NS}_TSS_MISS_COUNTER")
     .description("Counts the number of times we can't find a TSS-ident")
     .register(METRICS_REGISTRY)
 
@@ -69,12 +69,7 @@ val SANITIZE_INVALID_CHAR_COUNTER: Counter = Counter
     .description("Counts the number of encountered illegal chars from sanitation")
     .register(METRICS_REGISTRY)
 
-val COUNT_TSS_SAR_SMTSS_MATCH: Counter = Counter
-    .builder("${METRICS_NS}_tss_sar_smtss_match")
-    .description("Counts the number of matches for tss from sar and smtss")
-    .register(METRICS_REGISTRY)
-
-val COUNT_TSS_SAR_SMTSS_DIFFERENT: Counter = Counter
-    .builder("${METRICS_NS}_tss_sar_smtss_different")
-    .description("Counts the number of different tss from sar and smtss")
+val DONT_UPDATE_EMOTTAK_MISSING_PARTNERREF: Counter = Counter
+    .builder("${METRICS_NS}_dont_update_emottak_missing_partnerref")
+    .description("Counts the number of missing partnerref leading to not updating emottak")
     .register(METRICS_REGISTRY)
