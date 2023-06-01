@@ -36,8 +36,8 @@ class SmgcpClient(
                 setBody(
                     EmottakRequest(
                         tssIdent = tssId.tssid,
-                        senderXMLBlokk = convertSenderToBase64(sender),
-                        partnerReferanse = partnerReferanse,
+                        sender = convertSenderToBase64(sender),
+                        partnerreferanse = partnerReferanse,
                     ),
                 )
             }
@@ -57,6 +57,6 @@ class SmgcpClient(
 
 data class EmottakRequest(
     val tssIdent: String,
-    val senderXMLBlokk: ByteArray,
-    val partnerReferanse: Int,
+    val sender: ByteArray,
+    val partnerreferanse: Int,
 )
