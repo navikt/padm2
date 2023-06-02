@@ -78,8 +78,8 @@ class BlockingApplicationRunner(
     ): String? {
         val fellesformat = fellesformatUnmarshaller.unmarshal(StringReader(inputMessageText)) as XMLEIFellesformat
         val msgHead: XMLMsgHead = fellesformat.get()
-        val receiverBlock = fellesformat.get<XMLMottakenhetBlokk>()
-        val ediLoggId = receiverBlock.ediLoggId
+        val emottakblokk = fellesformat.get<XMLMottakenhetBlokk>()
+        val ediLoggId = emottakblokk.ediLoggId
         val dialogmeldingXml = extractDialogmelding(fellesformat)
         val vedlegg = extractVedlegg(fellesformat)
         val sha256String = sha256hashstring(dialogmeldingXml, vedlegg)

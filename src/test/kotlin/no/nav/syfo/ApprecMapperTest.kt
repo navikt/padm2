@@ -19,10 +19,10 @@ internal class ApprecMapperTest {
         ) as XMLEIFellesformat
 
         val apprec = createApprec(felleformatDm, ApprecStatus.OK)
-        val apprecReceiverBlock = apprec.get<XMLMottakenhetBlokk>()
+        val apprecEmottakblokk = apprec.get<XMLMottakenhetBlokk>()
 
-        apprecReceiverBlock.ebAction shouldBeEqualTo "Bekreftelse"
-        apprecReceiverBlock.ebRole shouldBeEqualTo "Saksbehandler"
-        apprecReceiverBlock.ebService shouldBeEqualTo "ForesporselFraSaksbehandler"
+        apprecEmottakblokk.ebAction shouldBeEqualTo "Bekreftelse"
+        apprecEmottakblokk.ebRole shouldBeEqualTo "Saksbehandler"
+        apprecEmottakblokk.ebService shouldBeEqualTo "ForesporselFraSaksbehandler"
     }
 }

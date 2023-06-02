@@ -20,7 +20,7 @@ fun createArenaDialogNotat(
     legefnr: String,
     innbyggerident: String,
     msgHead: XMLMsgHead,
-    receiverBlock: XMLMottakenhetBlokk,
+    emottakblokk: XMLMottakenhetBlokk,
     dialogmelding: Dialogmelding
 ): ArenaDialogNotat =
     ArenaDialogNotat().apply {
@@ -32,7 +32,7 @@ fun createArenaDialogNotat(
                 dokumentTypeVersjon = "1.0"
                 dokumentNavn = msgHead.msgInfo.type.dn
                 dokumentreferanse = msgHead.msgInfo.msgId
-                ediLoggId = receiverBlock.ediLoggId
+                ediLoggId = emottakblokk.ediLoggId
                 dokumentDato = msgHead.msgInfo.genDate
             }
             avsender = createAvsender(legefnr, tssid, behandler)

@@ -88,11 +88,11 @@ class DialogmeldingProcessor(
     ) {
         val fellesformat = fellesformatUnmarshaller.unmarshal(StringReader(inputMessageText)) as XMLEIFellesformat
         val msgHead: XMLMsgHead = fellesformat.get()
-        val receiverBlock = fellesformat.get<XMLMottakenhetBlokk>() // TODO: bytte navn til emottakblokk
-        val ediLoggId = receiverBlock.ediLoggId
+        val emottakblokk = fellesformat.get<XMLMottakenhetBlokk>() // TODO: Block?
+        val ediLoggId = emottakblokk.ediLoggId
         val msgId = msgHead.msgInfo.msgId
         val dialogmeldingXml = extractDialogmelding(fellesformat)
-        val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
+        val dialogmeldingType = findDialogmeldingType(emottakblokk.ebService, emottakblokk.ebAction)
         val xmlVedlegg = extractVedlegg(fellesformat)
         val sha256String = sha256hashstring(dialogmeldingXml, xmlVedlegg)
         val legekontorOrgNr = extractOrganisationNumberFromSender(fellesformat)?.id
@@ -123,7 +123,7 @@ class DialogmeldingProcessor(
         if (tssId != null && tssId.tssid.isNotBlank()) {
             emottakService.registerEmottakSubscription(
                 tssId = tssId,
-                partnerReferanse = receiverBlock.partnerReferanse,
+                partnerReferanse = emottakblokk.partnerReferanse,
                 sender = msgHead.msgInfo.sender,
                 msgId = msgHead.msgInfo.msgId,
                 loggingMeta = loggingMeta,
@@ -160,7 +160,7 @@ class DialogmeldingProcessor(
                 validationResult = validationResult,
                 vedleggListe = vedleggListe,
                 msgHead = msgHead,
-                receiverBlock = receiverBlock,
+                emottakblokk = emottakblokk,
                 pasientNavn = pasientNavn,
                 navnSignerendeLege = navnSignerendeLege,
                 tssId = tssId?.tssid ?: "",
@@ -207,13 +207,13 @@ class DialogmeldingProcessor(
         fellesformat: XMLEIFellesformat,
         inputMessageText: String,
     ): ReceivedDialogmelding {
-        val receiverBlock = fellesformat.get<XMLMottakenhetBlokk>()
+        val emottakblokk = fellesformat.get<XMLMottakenhetBlokk>()
         val msgHead: XMLMsgHead = fellesformat.get()
-        val legeIdent = receiverBlock.avsenderFnrFraDigSignatur
+        val legeIdent = emottakblokk.avsenderFnrFraDigSignatur
         val legekontorOrgName = extractSenderOrganisationName(fellesformat)
         val legekontorHerId = extractOrganisationHerNumberFromSender(fellesformat)?.id
         val dialogmeldingXml = extractDialogmelding(fellesformat)
-        val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
+        val dialogmeldingType = findDialogmeldingType(emottakblokk.ebService, emottakblokk.ebAction)
         val legeHpr = extractLegeHpr(dialogmeldingId, fellesformat)
         val behandlerNavn = extractBehandlerNavn(fellesformat)
         val behandlerIdent = extractIdentFromBehandler(fellesformat)
@@ -235,12 +235,12 @@ class DialogmeldingProcessor(
             dialogmelding = dialogmelding,
             personNrPasient = innbyggerIdent!!,
             personNrLege = legeIdent,
-            navLogId = receiverBlock.ediLoggId,
+            navLogId = emottakblokk.ediLoggId,
             msgId = msgHead.msgInfo.msgId,
             legekontorOrgNr = legekontorOrgNr,
             legekontorOrgName = legekontorOrgName,
             legekontorHerId = legekontorHerId,
-            mottattDato = receiverBlock.mottattDatotid.toGregorianCalendar().toZonedDateTime()
+            mottattDato = emottakblokk.mottattDatotid.toGregorianCalendar().toZonedDateTime()
                 .withZoneSameInstant(
                     ZoneId.of("Europe/Oslo")
                 ).toLocalDateTime(),

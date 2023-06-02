@@ -46,11 +46,11 @@ class FromKiropraktorTest {
             StringReader(getFileAsString("src/test/resources/dialogmelding_kiropraktor.xml"))
         ) as XMLEIFellesformat
         val msgHead: XMLMsgHead = fellesformat.get()
-        val receiverBlock = fellesformat.get<XMLMottakenhetBlokk>()
+        val emottakblokk = fellesformat.get<XMLMottakenhetBlokk>()
 
         val dialogmelding = extractDialogmelding(fellesformat).toDialogmelding(
             dialogmeldingId = UUID.randomUUID().toString(),
-            dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction),
+            dialogmeldingType = findDialogmeldingType(emottakblokk.ebService, emottakblokk.ebAction),
             signaturDato = LocalDateTime.of(2017, 11, 5, 0, 0, 0),
             navnHelsePersonellNavn = extractBehandlerNavn(fellesformat)
         )
@@ -58,10 +58,10 @@ class FromKiropraktorTest {
         val arenaDialogNotat = createArenaDialogNotat(
             fellesformat = fellesformat,
             tssid = TSS_ID,
-            legefnr = receiverBlock.avsenderFnrFraDigSignatur,
+            legefnr = emottakblokk.avsenderFnrFraDigSignatur,
             innbyggerident = extractInnbyggerident(fellesformat) ?: "",
             msgHead = msgHead,
-            receiverBlock = receiverBlock,
+            emottakblokk = emottakblokk,
             dialogmelding = dialogmelding
         )
 
