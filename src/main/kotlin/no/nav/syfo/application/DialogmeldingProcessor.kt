@@ -82,13 +82,13 @@ class DialogmeldingProcessor(
         clamAvClient = clamAvClient,
     )
 
-    suspend fun processMessage(
+    suspend fun process(
         dialogmeldingId: String,
         inputMessageText: String,
     ) {
         val fellesformat = fellesformatUnmarshaller.unmarshal(StringReader(inputMessageText)) as XMLEIFellesformat
         val msgHead: XMLMsgHead = fellesformat.get()
-        val emottakblokk = fellesformat.get<XMLMottakenhetBlokk>() // TODO: Block?
+        val emottakblokk = fellesformat.get<XMLMottakenhetBlokk>()
         val ediLoggId = emottakblokk.ediLoggId
         val msgId = msgHead.msgInfo.msgId
         val dialogmeldingXml = extractDialogmelding(fellesformat)

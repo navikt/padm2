@@ -82,7 +82,7 @@ class DialogmeldingProcessorTssSpek : Spek({
             coJustRun { emottakService.registerEmottakSubscription(any(), any(), any(), any(), any()) }
 
             runBlocking {
-                dialogmeldingProcessor.processMessage(msgId, dialogmeldingString)
+                dialogmeldingProcessor.process(msgId, dialogmeldingString)
             }
 
             coVerify(exactly = 1) { smtssClient.findBestTss(legePersonIdent, LEGEKONTOR_ORGNAME, msgId) }
@@ -101,7 +101,7 @@ class DialogmeldingProcessorTssSpek : Spek({
             coEvery { smtssClient.findBestTss(any(), any(), any()) } returns null
 
             runBlocking {
-                dialogmeldingProcessor.processMessage(msgId, dialogmeldingString)
+                dialogmeldingProcessor.process(msgId, dialogmeldingString)
             }
 
             coVerify(exactly = 1) { smtssClient.findBestTss(legePersonIdent, LEGEKONTOR_ORGNAME, msgId) }
@@ -113,7 +113,7 @@ class DialogmeldingProcessorTssSpek : Spek({
             coEvery { smtssClient.findBestTss(any(), any(), any()) } returns emptyTssId
 
             runBlocking {
-                dialogmeldingProcessor.processMessage(msgId, dialogmeldingString)
+                dialogmeldingProcessor.process(msgId, dialogmeldingString)
             }
 
             coVerify(exactly = 1) { smtssClient.findBestTss(legePersonIdent, LEGEKONTOR_ORGNAME, msgId) }

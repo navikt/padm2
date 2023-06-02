@@ -19,7 +19,7 @@ class RerunCronJob(
         database.hentIkkeFullforteDialogmeldinger().forEach { (dialogmeldingId, fellesformat, mottattDatetime) ->
             try {
                 logger.info("Attempting reprocessing of $dialogmeldingId")
-                dialogmeldingProcessor.processMessage(dialogmeldingId, fellesformat)
+                dialogmeldingProcessor.process(dialogmeldingId, fellesformat)
                 result.updated++
             } catch (e: Exception) {
                 logger.warn("Exception caught while reprocessing message, will try again later: ${e.message}", e)

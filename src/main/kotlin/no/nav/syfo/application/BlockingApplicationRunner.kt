@@ -35,12 +35,12 @@ class BlockingApplicationRunner(
                     delay(100)
                     continue
                 }
-                processMessageHandleException(message)
+                processMessage(message)
             }
         }
     }
 
-    suspend fun processMessageHandleException(message: Message): String? { // TODO: navnebytte, fjerne handle exception?
+    suspend fun processMessage(message: Message): String? {
         val inputMessageText = when (message) {
             is TextMessage -> message.text
             else -> throw RuntimeException("Incoming message needs to be a byte message or text message")
@@ -65,7 +65,7 @@ class BlockingApplicationRunner(
 
         try {
             if (inputMessageText != null && dialogmeldingId != null) {
-                dialogmeldingProcessor.processMessage(dialogmeldingId, inputMessageText)
+                dialogmeldingProcessor.process(dialogmeldingId, inputMessageText)
             }
         } catch (e: Exception) {
             logger.warn("Exception caught while processing message, will try again later: ${e.message}", e)
