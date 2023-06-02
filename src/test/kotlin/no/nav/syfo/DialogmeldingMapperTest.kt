@@ -27,9 +27,9 @@ internal class DialogmeldingMapperTest {
         val dialogmeldingId = UUID.randomUUID().toString()
         val signaturDato = LocalDateTime.of(2017, 11, 5, 0, 0, 0)
         val navnHelsePersonellNavn = "Per Hansen"
-        val receiverBlock = felleformatDm.get<XMLMottakenhetBlokk>()
+        val emottakblokk = felleformatDm.get<XMLMottakenhetBlokk>()
 
-        val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
+        val dialogmeldingType = findDialogmeldingType(emottakblokk.ebService, emottakblokk.ebAction)
 
         val dialogmelding = dialomeldingxml.toDialogmelding(
             dialogmeldingId = dialogmeldingId,
@@ -51,9 +51,9 @@ internal class DialogmeldingMapperTest {
         val dialogmeldingId = UUID.randomUUID().toString()
         val signaturDato = LocalDateTime.of(2017, 11, 5, 0, 0, 0)
         val navnHelsePersonellNavn = "Per Hansen"
-        val receiverBlock = felleformatDm.get<XMLMottakenhetBlokk>()
+        val emottakblokk = felleformatDm.get<XMLMottakenhetBlokk>()
 
-        val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
+        val dialogmeldingType = findDialogmeldingType(emottakblokk.ebService, emottakblokk.ebAction)
 
         val dialogmelding = dialomeldingxml.toDialogmelding(
             dialogmeldingId = dialogmeldingId,
@@ -75,9 +75,9 @@ internal class DialogmeldingMapperTest {
         val dialogmeldingId = UUID.randomUUID().toString()
         val signaturDato = LocalDateTime.of(2017, 11, 5, 0, 0, 0)
         val navnHelsePersonellNavn = "Per Hansen"
-        val receiverBlock = felleformatDm.get<XMLMottakenhetBlokk>()
+        val emottakblokk = felleformatDm.get<XMLMottakenhetBlokk>()
 
-        val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
+        val dialogmeldingType = findDialogmeldingType(emottakblokk.ebService, emottakblokk.ebAction)
 
         val dialogmelding = dialomeldingxml.toDialogmelding(
             dialogmeldingId = dialogmeldingId,
@@ -99,9 +99,9 @@ internal class DialogmeldingMapperTest {
         val dialogmeldingId = UUID.randomUUID().toString()
         val signaturDato = LocalDateTime.of(2017, 11, 5, 0, 0, 0)
         val navnHelsePersonellNavn = "Per Hansen"
-        val receiverBlock = felleformatDm.get<XMLMottakenhetBlokk>()
+        val emottakblokk = felleformatDm.get<XMLMottakenhetBlokk>()
 
-        val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
+        val dialogmeldingType = findDialogmeldingType(emottakblokk.ebService, emottakblokk.ebAction)
 
         val dialogmelding = dialomeldingxml.toDialogmelding(
             dialogmeldingId = dialogmeldingId,
@@ -128,9 +128,9 @@ internal class DialogmeldingMapperTest {
         val dialogmeldingId = UUID.randomUUID().toString()
         val signaturDato = LocalDateTime.of(2017, 11, 5, 0, 0, 0)
         val navnHelsePersonellNavn = "Per Hansen"
-        val receiverBlock = felleformatDm.get<XMLMottakenhetBlokk>()
+        val emottakblokk = felleformatDm.get<XMLMottakenhetBlokk>()
 
-        val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
+        val dialogmeldingType = findDialogmeldingType(emottakblokk.ebService, emottakblokk.ebAction)
 
         val dialogmelding = dialomeldingxml.toDialogmelding(
             dialogmeldingId = dialogmeldingId,

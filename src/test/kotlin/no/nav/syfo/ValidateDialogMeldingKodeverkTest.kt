@@ -21,9 +21,9 @@ internal class ValidateDialogMeldingKodeverkTest {
         ) as XMLEIFellesformat
 
         val dialomeldingxml = extractDialogmelding(felleformatDm)
-        val receiverBlock = felleformatDm.get<XMLMottakenhetBlokk>()
+        val emottakblokk = felleformatDm.get<XMLMottakenhetBlokk>()
 
-        val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
+        val dialogmeldingType = findDialogmeldingType(emottakblokk.ebService, emottakblokk.ebAction)
 
         val validateDialogMeldingKodeverk = isKodeverkValid(dialomeldingxml, dialogmeldingType)
 
@@ -37,9 +37,9 @@ internal class ValidateDialogMeldingKodeverkTest {
         ) as XMLEIFellesformat
 
         val dialomeldingxml = extractDialogmelding(felleformatDm)
-        val receiverBlock = felleformatDm.get<XMLMottakenhetBlokk>()
+        val emottakblokk = felleformatDm.get<XMLMottakenhetBlokk>()
 
-        val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
+        val dialogmeldingType = findDialogmeldingType(emottakblokk.ebService, emottakblokk.ebAction)
 
         val validateDialogMeldingKodeverk = isKodeverkValid(dialomeldingxml, dialogmeldingType)
 
@@ -55,9 +55,9 @@ internal class ValidateDialogMeldingKodeverkTest {
         val dialogmeldingxml = extractDialogmelding(fellesformatDm)
         dialogmeldingxml.notat.first().temaKodet.v = "INVALID"
 
-        val receiverBlock = fellesformatDm.get<XMLMottakenhetBlokk>()
+        val emottakblokk = fellesformatDm.get<XMLMottakenhetBlokk>()
 
-        val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
+        val dialogmeldingType = findDialogmeldingType(emottakblokk.ebService, emottakblokk.ebAction)
 
         val validateDialogMeldingKodeverk = isKodeverkValid(dialogmeldingxml, dialogmeldingType)
 

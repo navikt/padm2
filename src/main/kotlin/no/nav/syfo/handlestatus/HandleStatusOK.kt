@@ -29,7 +29,7 @@ suspend fun handleStatusOK(
     validationResult: ValidationResult,
     vedleggListe: List<Vedlegg>?,
     msgHead: XMLMsgHead,
-    receiverBlock: XMLMottakenhetBlokk,
+    emottakblokk: XMLMottakenhetBlokk,
     pasientNavn: String,
     navnSignerendeLege: String,
     tssId: String,
@@ -52,7 +52,7 @@ suspend fun handleStatusOK(
                 receivedDialogmelding.personNrLege,
                 receivedDialogmelding.personNrPasient,
                 msgHead,
-                receiverBlock,
+                emottakblokk,
                 receivedDialogmelding.dialogmelding,
             ),
             loggingMeta

@@ -164,16 +164,16 @@ internal class DialogmeldingProducerTest {
         fellesformat = fellesformatUnmarshaller.unmarshal(StringReader(inputMessageText)) as XMLEIFellesformat
 
         val dialogmeldingId = UUID.randomUUID().toString()
-        val receiverBlock = fellesformat.get<XMLMottakenhetBlokk>()
-        val ediLoggId = receiverBlock.ediLoggId
+        val emottakblokk = fellesformat.get<XMLMottakenhetBlokk>()
+        val ediLoggId = emottakblokk.ediLoggId
         val msgId = fellesformat.get<XMLMsgHead>().msgInfo.msgId
 
         val legekontorOrgNr = extractOrganisationNumberFromSender(fellesformat)?.id
         val innbyggerident = extractInnbyggerident(fellesformat)!!
-        val personNumberDoctor = receiverBlock.avsenderFnrFraDigSignatur
+        val personNumberDoctor = emottakblokk.avsenderFnrFraDigSignatur
         val legekontorOrgName = extractSenderOrganisationName(fellesformat)
         val legekontorHerId = extractOrganisationHerNumberFromSender(fellesformat)?.id
-        val dialogmeldingType = findDialogmeldingType(receiverBlock.ebService, receiverBlock.ebAction)
+        val dialogmeldingType = findDialogmeldingType(emottakblokk.ebService, emottakblokk.ebAction)
         val legeHpr = extractLegeHpr(dialogmeldingId, fellesformat)
 
         val dialomeldingxml = extractDialogmelding(fellesformat)
@@ -196,7 +196,7 @@ internal class DialogmeldingProducerTest {
             legekontorOrgNr = legekontorOrgNr,
             legekontorOrgName = legekontorOrgName,
             legekontorHerId = legekontorHerId,
-            mottattDato = receiverBlock.mottattDatotid.toGregorianCalendar().toZonedDateTime()
+            mottattDato = emottakblokk.mottattDatotid.toGregorianCalendar().toZonedDateTime()
                 .withZoneSameInstant(
                     ZoneOffset.UTC
                 ).toLocalDateTime(),
