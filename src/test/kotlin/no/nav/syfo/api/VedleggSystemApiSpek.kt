@@ -85,7 +85,7 @@ class VedleggSystemApiSpek : Spek({
                                 )
                             )
                         runBlocking {
-                            blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                            blockingApplicationRunner.processMessage(incomingMessage)
                         }
                         with(
                             handleRequest(HttpMethod.Get, url) {
@@ -106,7 +106,7 @@ class VedleggSystemApiSpek : Spek({
                                 )
                             )
                         runBlocking {
-                            blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                            blockingApplicationRunner.processMessage(incomingMessage)
                         }
                         with(
                             handleRequest(HttpMethod.Get, url) {

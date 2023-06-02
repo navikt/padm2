@@ -72,7 +72,7 @@ class BlockingApplicationRunnerSpek : Spek({
                         getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
                     every { incomingMessage.text } returns(fellesformat)
                     val dialogmeldingId = runBlocking {
-                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                        blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
@@ -87,7 +87,7 @@ class BlockingApplicationRunnerSpek : Spek({
                         getFileAsString("src/test/resources/dialogmelding_dialog_notat_ukjent_behandler.xml")
                     every { incomingMessage.text } returns(fellesformat)
                     runBlocking {
-                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                        blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
@@ -100,7 +100,7 @@ class BlockingApplicationRunnerSpek : Spek({
                             .replace("<MsgId>37340D30-FE14-42B5-985F-A8FF8FFA0CB5</MsgId>", "<MsgId>syfomock-37340D30-FE14-42B5-985F-A8FF8FFA0CB5</MsgId>")
                     every { incomingMessage.text } returns(fellesformat)
                     runBlocking {
-                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                        blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 0) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
@@ -113,7 +113,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     every { incomingMessage.text } returns(fellesformat)
                     externalMockEnvironment.pdfgenMock.alwaysFail = true
                     runBlocking {
-                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                        blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 0) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
@@ -136,7 +136,7 @@ class BlockingApplicationRunnerSpek : Spek({
                             .replace("<TekstNotatInnhold xsi:type=\"xsd:string\">Hei,Det gjelder pas. Sender som vedlegg epikrisen</TekstNotatInnhold>", "")
                     every { incomingMessage.text } returns(fellesformat)
                     runBlocking {
-                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                        blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
@@ -150,7 +150,7 @@ class BlockingApplicationRunnerSpek : Spek({
                             .replace("<GivenName>Inga</GivenName>", "")
                     every { incomingMessage.text } returns(fellesformat)
                     runBlocking {
-                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                        blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
@@ -162,7 +162,7 @@ class BlockingApplicationRunnerSpek : Spek({
                         getFileAsString("src/test/resources/dialogmelding_dialog_svar_foresporsel_om_pasient_invalid.xml")
                     every { incomingMessage.text } returns(fellesformat)
                     runBlocking {
-                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                        blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
@@ -174,7 +174,7 @@ class BlockingApplicationRunnerSpek : Spek({
                         .replace("<Id>1234567</Id>", "<Id>-1234567</Id>")
                     every { incomingMessage.text } returns(fellesformat)
                     runBlocking {
-                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                        blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
@@ -187,7 +187,7 @@ class BlockingApplicationRunnerSpek : Spek({
                             .replace("Et vedlegg fra lege", "problem file")
                     every { incomingMessage.text } returns(fellesformat)
                     val dialogmeldingId = runBlocking {
-                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                        blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
@@ -202,14 +202,14 @@ class BlockingApplicationRunnerSpek : Spek({
                         getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
                     every { incomingMessage.text } returns(fellesformat)
                     runBlocking {
-                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                        blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
                     verify(exactly = 1) { mqSender.sendArena(any()) }
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                     val dialogmeldingId = runBlocking {
-                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                        blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 2) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
@@ -224,14 +224,14 @@ class BlockingApplicationRunnerSpek : Spek({
                         getFileAsString("src/test/resources/dialogmelding_dialog_notat_vedlegg.xml")
                     every { incomingMessage.text } returns(fellesformat)
                     runBlocking {
-                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                        blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
                     verify(exactly = 1) { mqSender.sendArena(any()) }
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                     runBlocking {
-                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                        blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 2) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
@@ -243,7 +243,7 @@ class BlockingApplicationRunnerSpek : Spek({
                         getFileAsString("src/test/resources/dialogmelding_dialog_notat_mange_vedlegg.xml")
                     every { incomingMessage.text } returns(fellesformat)
                     runBlocking {
-                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                        blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
@@ -251,7 +251,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                     every { incomingMessage.text } returns(fellesformat.replace("Et siste bilde fra lege", "Et aller siste bilde fra lege"))
                     runBlocking {
-                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                        blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 2) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
@@ -263,7 +263,7 @@ class BlockingApplicationRunnerSpek : Spek({
                         getFileAsString("src/test/resources/dialogmelding_dialog_notat_veldig_mange_vedlegg.xml")
                     every { incomingMessage.text } returns(fellesformat)
                     runBlocking {
-                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                        blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
@@ -271,7 +271,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                     every { incomingMessage.text } returns(fellesformat.replace("Et siste bilde fra lege", "Et aller siste bilde fra lege"))
                     runBlocking {
-                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                        blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 2) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
@@ -283,7 +283,7 @@ class BlockingApplicationRunnerSpek : Spek({
                         getFileAsStringISO88591("src/test/resources/dialogmelding_dialog_notat_vedlegg.xml")
                     every { incomingMessage.text } returns(fellesformat)
                     runBlocking {
-                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                        blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
@@ -294,7 +294,7 @@ class BlockingApplicationRunnerSpek : Spek({
                             .replace("Et vedlegg fra lege", "Et vedlegg fra lege nesten likt")
                     every { incomingMessage.text } returns(fellesformatNestenDuplikat)
                     runBlocking {
-                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                        blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 2) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
@@ -306,7 +306,7 @@ class BlockingApplicationRunnerSpek : Spek({
                         .replace("01010142365", "")
                     every { incomingMessage.text } returns(fellesformat)
                     runBlocking {
-                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                        blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
@@ -318,7 +318,7 @@ class BlockingApplicationRunnerSpek : Spek({
                         .replace("01010142365", "0101014236")
                     every { incomingMessage.text } returns(fellesformat)
                     runBlocking {
-                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                        blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
@@ -330,7 +330,7 @@ class BlockingApplicationRunnerSpek : Spek({
                         .replace("01010142365", "01010142366")
                     every { incomingMessage.text } returns(fellesformat)
                     runBlocking {
-                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                        blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
@@ -342,7 +342,7 @@ class BlockingApplicationRunnerSpek : Spek({
                         .replace("01010142365", "01010142366")
                     every { incomingMessage.text } returns(fellesformatUgyldig)
                     runBlocking {
-                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                        blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
@@ -352,7 +352,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     val fellesformatGyldigMenSammeShaString = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
                     every { incomingMessage.text } returns(fellesformatGyldigMenSammeShaString)
                     runBlocking {
-                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                        blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 2) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
@@ -365,7 +365,7 @@ class BlockingApplicationRunnerSpek : Spek({
                         .replace("01010142365", UserConstants.PATIENT_FNR_PDFGEN_FAIL)
                     every { incomingMessage.text } returns(fellesformat)
                     runBlocking {
-                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                        blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 0) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
@@ -388,7 +388,7 @@ class BlockingApplicationRunnerSpek : Spek({
                         .replace("01010142365", UserConstants.PATIENT_FNR_PDFGEN_FAIL)
                     every { incomingMessage.text } returns(fellesformat)
                     runBlocking {
-                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                        blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 0) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
@@ -410,7 +410,7 @@ class BlockingApplicationRunnerSpek : Spek({
                         .replace("mottattDatotid=\"2019-01-16T21:57:43\"", "mottattDatotid=\"${java.time.Instant.now()}\"")
                     every { incomingMessage.text } returns(fellesformat)
                     runBlocking {
-                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                        blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 0) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
@@ -432,7 +432,7 @@ class BlockingApplicationRunnerSpek : Spek({
                         .replace("01010142365", UserConstants.PATIENT_FNR_NO_AKTOER_ID)
                     every { incomingMessage.text } returns(fellesformat)
                     runBlocking {
-                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                        blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
@@ -444,7 +444,7 @@ class BlockingApplicationRunnerSpek : Spek({
                         .replace("01010142365", UserConstants.PATIENT_FNR_JP_CONFLICT)
                     every { incomingMessage.text } returns(fellesformat)
                     runBlocking {
-                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                        blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
@@ -456,7 +456,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     every { incomingMessage.text } returns(fellesformat)
                     externalMockEnvironment.pdlMock.pdlAlwaysFail = true
                     runBlocking {
-                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                        blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 0) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
@@ -476,7 +476,7 @@ class BlockingApplicationRunnerSpek : Spek({
                         .replace("01010112377", UserConstants.BEHANDLER_FNR_UGYLDIG)
                     every { incomingMessage.text } returns(fellesformat)
                     runBlocking {
-                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                        blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
@@ -488,7 +488,7 @@ class BlockingApplicationRunnerSpek : Spek({
                         .replace("01010112377", UserConstants.BEHANDLER_FNR_IKKE_AUTORISERT)
                     every { incomingMessage.text } returns(fellesformat)
                     runBlocking {
-                        blockingApplicationRunner.processMessageHandleException(incomingMessage)
+                        blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
