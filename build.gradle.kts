@@ -42,7 +42,7 @@ plugins {
     java
     kotlin("jvm") version "1.8.21"
     id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("org.jlleitschuh.gradle.ktlint") version "11.3.2"
+    id("org.jlleitschuh.gradle.ktlint") version "11.4.0"
 }
 
 val githubUser: String by project
