@@ -18,7 +18,7 @@ object Versions {
     const val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
     const val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
     const val kluentVersion = "1.68"
-    const val ktorVersion = "2.3.0"
+    const val ktorVersion = "2.3.1"
     const val logbackVersion = "1.4.4"
     const val logstashEncoderVersion = "7.2"
     const val javaxAnnotationApiVersion = "1.3.2"
@@ -40,9 +40,9 @@ object Versions {
 
 plugins {
     java
-    kotlin("jvm") version "1.8.21"
+    kotlin("jvm") version "1.8.22"
     id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("org.jlleitschuh.gradle.ktlint") version "11.3.2"
+    id("org.jlleitschuh.gradle.ktlint") version "11.4.0"
 }
 
 val githubUser: String by project
