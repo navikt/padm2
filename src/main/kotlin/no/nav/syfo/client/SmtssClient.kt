@@ -10,7 +10,6 @@ import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.domain.PersonIdent
 import no.nav.syfo.logger
 import no.nav.syfo.util.bearerHeader
-import java.io.IOException
 
 class SmtssClient(
     private val azureAdV2Client: AzureAdV2Client,
@@ -48,8 +47,12 @@ class SmtssClient(
                 }
 
                 else -> {
-                    logger.error("Fant ikke tssId i smtss, noe feilet med status: ${exception.response.status}, requestId: $dialogmeldingId")
-                    throw IOException("Vi fikk en uventet feil fra smtss, prøver på nytt! ${exception.response.bodyAsChannel()}, requestId: $dialogmeldingId")
+                    logger.error(
+                        "Fant ikke tssId i smtss, noe feilet med status: ${exception.response.status}, " +
+                            "body: ${exception.response.bodyAsText()}, " +
+                            "requestId: $dialogmeldingId"
+                    )
+                    null
                 }
             }
         }
