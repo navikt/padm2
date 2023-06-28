@@ -29,11 +29,14 @@ class SmtssClient(
             ?: throw RuntimeException("Failed to send request to smtss: No token was found")
 
         return try {
+            val dashes = "[–—]"
+            val hyphen = "-"
+            val kontorOrgNameNoIllegalChars = legekontorOrgName.replace(regex = Regex(dashes), hyphen)
             val response = httpClient.get("$smtssUrl$path") {
                 contentType(ContentType.Application.Json)
                 accept(ContentType.Application.Json)
                 header("samhandlerFnr", legePersonIdent.value)
-                header("samhandlerOrgName", legekontorOrgName)
+                header("samhandlerOrgName", kontorOrgNameNoIllegalChars)
                 header(HttpHeaders.Authorization, bearerHeader(token.accessToken))
                 header("requestId", dialogmeldingId)
             }
@@ -46,7 +49,6 @@ class SmtssClient(
                     logger.info("Fant ikke tssId i smtss, fikk 404, requestId: $dialogmeldingId")
                     null
                 }
-
                 else -> {
                     logger.error("Fant ikke tssId i smtss, noe feilet med status: ${exception.response.status}, requestId: $dialogmeldingId")
                     throw IOException("Vi fikk en uventet feil fra smtss, prøver på nytt! ${exception.response.bodyAsChannel()}, requestId: $dialogmeldingId")
