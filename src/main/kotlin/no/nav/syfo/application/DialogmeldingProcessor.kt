@@ -54,7 +54,7 @@ class DialogmeldingProcessor(
     val syfohelsenettproxyClient = SyfohelsenettproxyClient(
         azureAdV2Client = azureAdV2Client,
         endpointUrl = env.syfohelsenettproxyEndpointURL,
-        httpClient = httpClient,
+        httpClient = httpClientRetryAll,
         helsenettClientId = env.syfohelsenettproxyClientId,
     )
     val legeSuspensjonClient = LegeSuspensjonClient(
