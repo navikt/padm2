@@ -23,6 +23,19 @@ val commonConfig: HttpClientConfig<out HttpClientEngineConfig>.() -> Unit = {
     expectSuccess = true
 }
 
+val retryAllConfig: HttpClientConfig<out HttpClientEngineConfig>.() -> Unit = {
+    install(ContentNegotiation) {
+        jackson { configure() }
+    }
+    install(HttpRequestRetry) {
+        retryOnExceptionIf(2) { _, cause ->
+            cause is ServerResponseException || cause is ClientRequestException
+        }
+        constantDelay(500L)
+    }
+    expectSuccess = true
+}
+
 val proxyConfig: HttpClientConfig<ApacheEngineConfig>.() -> Unit = {
     this.commonConfig()
     engine {
@@ -33,4 +46,5 @@ val proxyConfig: HttpClientConfig<ApacheEngineConfig>.() -> Unit = {
 }
 
 val httpClient = HttpClient(Apache, commonConfig)
+val httpClientRetryAll = HttpClient(Apache, retryAllConfig)
 val httpClientWithProxy = HttpClient(Apache, proxyConfig)
