@@ -198,7 +198,7 @@ fun createTitleJournalpost(
     return if (validationResult.status == Status.INVALID) {
         "Avvist Dialogmelding ${formaterDato(signaturDato)}"
     } else {
-        "Dialogmelding ${formaterDato(signaturDato)}"
+        "Dialogmelding fra behandler ${formaterDato(signaturDato)}"
     }
 }
 
