@@ -7,37 +7,34 @@ metadata:
     team: teamsykefravr
 spec:
   groups:
-    - name: padm2-alert
+    - name: padm2-alerts
       rules:
         - alert: PADM2-DOWN
-          expr: sum(up{app="padm2", job="kubernetes-pods"}) == 0
+          expr: kube_deployment_status_replicas_available{deployment="padm2"} == 0
           for: 30s
           annotations:
             consequence: Application is unavailable
-            summary: |-
-              Det er ingen pods for app kjørende i namespace og dermed er appen nede.
-              Undersøk hvorfor pods er nede og få den kjørende igjen!
+            action: "Undersøk hvorfor pods er nede og få den kjørende igjen!"
+            summary: "Det er ingen pods for app kjørende i namespace og dermed er appen nede."
           labels:
             namespace: teamsykefravr
             severity: critical
         - alert: PADM2-BACKOUT
-          expr: sum(increase(padm2_message_sent_to_boq{app="padm2"} [1h])) > 0
+          expr: sum(increase(padm2_message_sent_to_boq_total{app="padm2"} [1h])) > 0
           for: 5m
           annotations:
             consequence: PADM2 sendte melding til backout-queue
-            summary: |-
-              Prosessering av minst 1 melding feilet og ble sendt til MQ backout queue.
-              Undersøk om det er noe feil med meldingene som er persistert i databasen
+            action: "Undersøk om det er noe feil med meldingene som er persistert i databasen"
+            summary: "Prosessering av minst 1 melding feilet og ble sendt til MQ backout queue."
           labels:
             namespace: teamsykefravr
             severity: danger
         - alert: PADM2-CRONJOB
-          expr: sum(increase(padm2_messages_still_fail_after_1h{app="padm2"} [1h])) > 0
+          expr: sum(increase(padm2_messages_still_fail_after_1h_total{app="padm2"} [1h])) > 0
           for: 5m
           annotations:
             consequence: PADM2 cronjob klarer ikke å ferdigstille meldinger
-            summary: |-
-              Prosessering av minst 1 melding feilet og ble ikke fullført selv om cronjob'en har forsøkt flere ganger
+            summary: "Prosessering av minst 1 melding feilet og ble ikke fullført selv om cronjob'en har forsøkt flere ganger"
           labels:
             namespace: teamsykefravr
             severity: danger
