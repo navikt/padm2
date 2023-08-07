@@ -10,7 +10,7 @@ spec:
     - name: padm2-alert
       rules:
         - alert: PADM2-DOWN
-          expr: sum(up{app="padm2", job="kubernetes-pods"}) == 0
+          expr: kube_deployment_status_replicas_available{deployment="padm2"} == 0
           for: 30s
           annotations:
             consequence: Application is unavailable
@@ -21,7 +21,7 @@ spec:
             namespace: teamsykefravr
             severity: critical
         - alert: PADM2-BACKOUT
-          expr: sum(increase(padm2_message_sent_to_boq{app="padm2"} [1h])) > 0
+          expr: sum(increase(padm2_message_sent_to_boq_total{app="padm2"} [1h])) > 0
           for: 5m
           annotations:
             consequence: PADM2 sendte melding til backout-queue
@@ -32,7 +32,7 @@ spec:
             namespace: teamsykefravr
             severity: danger
         - alert: PADM2-CRONJOB
-          expr: sum(increase(padm2_messages_still_fail_after_1h{app="padm2"} [1h])) > 0
+          expr: sum(increase(padm2_messages_still_fail_after_1h_total{app="padm2"} [1h])) > 0
           for: 5m
           annotations:
             consequence: PADM2 cronjob klarer ikke å ferdigstille meldinger
