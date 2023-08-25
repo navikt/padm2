@@ -69,25 +69,31 @@ spec:
       tenant: trygdeetaten.no
   envFrom:
     - secret: padm2-serviceuser
+    - secret: padm2-keystore-pwd
+  filesFrom:
+    - mountPath: /var/run/keystore
+      secret: padm2-keystore
   kafka:
     pool: nav-dev
   env:
     - name: MQ_HOST_NAME
-      value: b27apvl222.preprod.local
+      value: "b27apvl222.preprod.local"
     - name: MQ_PORT
-      value: '1413'
+      value: "1413"
     - name: MQ_GATEWAY_NAME
-      value: MQLS04
+      value: "MQLS04"
     - name: MQ_CHANNEL_NAME
-      value: Q1_PADM
+      value: "Q1_PADM"
+    - name: MQ_KEYSTORE_PATH
+      value: "/var/run/keystore/padm2-keystore.jks"
     - name: MQ_INPUT_QUEUE_NAME
-      value: QA.Q1_PADM.INPUT
+      value: "QA.Q1_PADM.INPUT"
     - name: MQ_INPUT_BOQ_QUEUE_NAME
-      value: QA.Q1_PADM.INPUT_BOQ
+      value: "QA.Q1_PADM.INPUT_BOQ"
     - name: ARENA_OUTBOUND_QUEUENAME
-      value: QA.Q1_414.AO01_SKJEMA_MOTTAK
+      value: "QA.Q1_414.AO01_SKJEMA_MOTTAK"
     - name: MQ_APPREC_QUEUE_NAME
-      value: QA.Q414.IU03_UTSENDING
+      value: "QA.Q414.IU03_UTSENDING"
     - name: CLAMAV_URL
       value: http://clamav.nais-system
     - name: DOKARKIV_CLIENT_ID
