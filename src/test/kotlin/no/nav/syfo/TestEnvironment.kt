@@ -44,6 +44,8 @@ fun testEnvironment(
     mqPort = 1234,
     mqGatewayName = "mqGateway",
     mqChannelName = "mqChannel",
+    mqKeystorePassword = "pw",
+    mqKeystorePath = "",
     inputQueueName = "inputQueue",
     arenaQueueName = "arenaQueue",
     apprecQueueName = "apprecQueue",

@@ -19,13 +19,15 @@ import org.apache.kafka.clients.producer.KafkaProducer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
-import javax.jms.Session
 
 val logger: Logger = LoggerFactory.getLogger("no.nav.syfo.padm2")
 
 fun main() {
     logger.info("Padm2 starting with java version: " + Runtime.version())
     val env = Environment()
+
+    setMQTlsProperties(env)
+
     val applicationState = ApplicationState()
 
     val wellKnownInternalAzureAD = getWellKnown(
@@ -128,7 +130,7 @@ fun launchListeners(
         smtssClient = smtssClient,
         emottakService = emottakService,
     )
-
+/*
     launchBackgroundTask(
         applicationState = applicationState,
     ) {
@@ -149,7 +151,7 @@ fun launchListeners(
             blockingApplicationRunner.run()
         }
     }
-
+*/
     launchBackgroundTask(
         applicationState = applicationState,
     ) {
@@ -161,4 +163,10 @@ fun launchListeners(
             applicationState = applicationState,
         ).start(cronjob = rerunCronJob)
     }
+}
+
+private fun setMQTlsProperties(env: Environment) {
+    System.setProperty("javax.net.ssl.keyStore", env.mqKeystorePath)
+    System.setProperty("javax.net.ssl.keyStorePassword", env.mqKeystorePassword)
+    System.setProperty("javax.net.ssl.keyStoreType", "jks")
 }
