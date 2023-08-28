@@ -131,7 +131,7 @@ fun launchListeners(
         smtssClient = smtssClient,
         emottakService = emottakService,
     )
-
+/*
     launchBackgroundTask(
         applicationState = applicationState,
     ) {
@@ -152,7 +152,7 @@ fun launchListeners(
             blockingApplicationRunner.run()
         }
     }
-
+*/
     launchBackgroundTask(
         applicationState = applicationState,
     ) {
