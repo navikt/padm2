@@ -19,6 +19,7 @@ import org.apache.kafka.clients.producer.KafkaProducer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
+import javax.jms.Session
 
 val logger: Logger = LoggerFactory.getLogger("no.nav.syfo.padm2")
 
@@ -130,7 +131,6 @@ fun launchListeners(
         smtssClient = smtssClient,
         emottakService = emottakService,
     )
-/*
     launchBackgroundTask(
         applicationState = applicationState,
     ) {
@@ -151,7 +151,6 @@ fun launchListeners(
             blockingApplicationRunner.run()
         }
     }
-*/
     launchBackgroundTask(
         applicationState = applicationState,
     ) {
