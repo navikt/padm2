@@ -52,16 +52,16 @@ fun XMLNotat.toHenvendelseFraLegeHenvendelse(): HenvendelseFraLegeHenvendelse? {
                     },
                     person = if (rollerRelatertNotat.firstOrNull()?.person != null) {
                         Person(
-                            rollerRelatertNotat.first().person.givenName,
-                            rollerRelatertNotat.first().person.familyName
+                            rollerRelatertNotat.first().person.givenName ?: "",
+                            rollerRelatertNotat.first().person.familyName ?: "",
                         )
                     } else {
                         null
                     },
                     helsepersonell = if (rollerRelatertNotat.firstOrNull()?.healthcareProfessional != null) {
                         Helsepersonell(
-                            rollerRelatertNotat.first().healthcareProfessional.givenName,
-                            rollerRelatertNotat.first().healthcareProfessional.familyName
+                            rollerRelatertNotat.first().healthcareProfessional.givenName ?: "",
+                            rollerRelatertNotat.first().healthcareProfessional.familyName ?: "",
                         )
                     } else {
                         null
