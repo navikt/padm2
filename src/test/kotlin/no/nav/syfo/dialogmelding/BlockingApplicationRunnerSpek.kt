@@ -82,6 +82,21 @@ class BlockingApplicationRunnerSpek : Spek({
                     val journalpostId = database.hentDialogmeldingOpplysningerJournalpostId(dialogmeldingId!!)
                     journalpostId shouldNotBe null
                 }
+                it("Prosesserer innkommet melding (melding mangler navn)") {
+                    val fellesformat =
+                        getFileAsString("src/test/resources/dialogmelding_dialog_notat_missing_givenname.xml")
+                    every { incomingMessage.text } returns(fellesformat)
+                    val dialogmeldingId = runBlocking {
+                        blockingApplicationRunner.processMessage(incomingMessage)
+                    }
+                    verify(exactly = 1) { mqSender.sendReceipt(any()) }
+                    verify(exactly = 0) { mqSender.sendBackout(any()) }
+                    verify(exactly = 1) { mqSender.sendArena(any()) }
+                    verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
+                    dialogmeldingId shouldNotBe null
+                    val journalpostId = database.hentDialogmeldingOpplysningerJournalpostId(dialogmeldingId!!)
+                    journalpostId shouldNotBe null
+                }
                 it("Prosesserer innkommet melding (ukjent behandler)") {
                     val fellesformat =
                         getFileAsString("src/test/resources/dialogmelding_dialog_notat_ukjent_behandler.xml")
