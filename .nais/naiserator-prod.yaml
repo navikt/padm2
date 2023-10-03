@@ -53,7 +53,6 @@ spec:
               port: 1414
               protocol: TCP
         - host: "dokarkiv.prod-fss-pub.nais.io"
-        - host: "syfohelsenettproxy.prod-fss-pub.nais.io"
         - host: "isproxy.prod-fss-pub.nais.io"
         - host: "pdl-api.prod-fss-pub.nais.io"
       rules:
@@ -61,6 +60,8 @@ spec:
         - application: clamav
           namespace: nais-system
         - application: smtss
+          namespace: teamsykmelding
+        - application: syfohelsenettproxy
           namespace: teamsykmelding
   azure:
     application:
@@ -107,9 +108,9 @@ spec:
     - name: PDL_ENDPOINT_URL
       value: https://pdl-api.prod-fss-pub.nais.io/graphql
     - name: HELSENETT_CLIENT_ID
-      value: prod-fss.teamsykmelding.syfohelsenettproxy
+      value: prod-gcp.teamsykmelding.syfohelsenettproxy
     - name: HELSENETT_ENDPOINT_URL
-      value: https://syfohelsenettproxy.prod-fss-pub.nais.io
+      value: https://syfohelsenettproxy
     - name: LEGE_SUSPENSJON_CLIENT_ID
       value: prod-fss.teamsykefravr.isproxy
     - name: LEGE_SUSPENSJON_ENDPOINT_URL
