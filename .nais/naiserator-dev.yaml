@@ -110,7 +110,7 @@ spec:
     - name: HELSENETT_CLIENT_ID
       value: dev-gcp.teamsykmelding.syfohelsenettproxy
     - name: HELSENETT_ENDPOINT_URL
-      value: http://syfohelsenettproxy
+      value: http://syfohelsenettproxy.teamsykmelding
     - name: LEGE_SUSPENSJON_CLIENT_ID
       value: dev-fss.teamsykefravr.isproxy
     - name: LEGE_SUSPENSJON_ENDPOINT_URL
