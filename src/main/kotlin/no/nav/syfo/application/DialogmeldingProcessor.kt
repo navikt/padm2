@@ -61,6 +61,7 @@ class DialogmeldingProcessor(
         azureAdV2Client = azureAdV2Client,
         endpointUrl = env.legeSuspensjonEndpointURL,
         endpointClientId = env.legeSuspensjonClientId,
+        applicationName = env.applicationName,
         httpClient = httpClient,
     )
     val padm2ReglerService = RuleService(

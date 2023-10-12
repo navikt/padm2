@@ -13,7 +13,8 @@ class LegeSuspensjonClient(
     private val azureAdV2Client: AzureAdV2Client,
     private val endpointUrl: String,
     private val endpointClientId: String,
-    private val httpClient: HttpClient
+    private val httpClient: HttpClient,
+    private val applicationName: String,
 ) {
 
     suspend fun sjekkSuspensjon(
@@ -24,10 +25,11 @@ class LegeSuspensjonClient(
         val token = azureAdV2Client.getSystemToken(endpointClientId)
             ?: throw RuntimeException("Failed to sjekk suspensjon: No token was found")
 
-        val httpResponse: HttpResponse = httpClient.get("$endpointUrl/api/v1/btsys/suspensjon/status") {
+        val httpResponse: HttpResponse = httpClient.get("$endpointUrl/api/v1/suspensjon/status") {
             accept(ContentType.Application.Json)
             headers {
                 append("Nav-Call-Id", ediloggid)
+                append("Nav-Consumer-Id", applicationName)
                 append("Nav-Personident", behandlerId)
                 append("Authorization", "Bearer ${token.accessToken}")
             }
@@ -35,8 +37,8 @@ class LegeSuspensjonClient(
         }
 
         if (httpResponse.status != HttpStatusCode.OK) {
-            logger.error("Btsys (via isproxy) svarte med kode {} for ediloggId {}, {}", httpResponse.status, ediloggid)
-            throw IOException("Btsys svarte (via isproxy) med uventet kode ${httpResponse.status} for $ediloggid")
+            logger.error("Btsys svarte med kode {} for ediloggId {}", httpResponse.status, ediloggid)
+            throw IOException("Btsys svarte med uventet kode ${httpResponse.status} for $ediloggid")
         }
 
         return httpResponse.call.response.body()
