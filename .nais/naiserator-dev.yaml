@@ -53,8 +53,8 @@ spec:
               port: 1413
               protocol: TCP
         - host: "dokarkiv.dev-fss-pub.nais.io"
-        - host: "isproxy.dev-fss-pub.nais.io"
         - host: "pdl-api.dev-fss-pub.nais.io"
+        - host: "btsys.dev-fss-pub.nais.io"
       rules:
         - application: padm2pdfgen
         - application: clamav
@@ -112,9 +112,9 @@ spec:
     - name: HELSENETT_ENDPOINT_URL
       value: http://syfohelsenettproxy.teamsykmelding
     - name: LEGE_SUSPENSJON_CLIENT_ID
-      value: dev-fss.teamsykefravr.isproxy
+      value: dev-fss.team-rocket.btsys
     - name: LEGE_SUSPENSJON_ENDPOINT_URL
-      value: https://isproxy.dev-fss-pub.nais.io
+      value: https://btsys.dev-fss-pub.nais.io
     - name: SMTSS_CLIENT_ID
       value: dev-gcp.teamsykmelding.smtss
     - name: SMTSS_URL
