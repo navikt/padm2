@@ -1,9 +1,7 @@
 package no.nav.syfo
 
-import java.io.StringReader
 import java.time.LocalDateTime
 import java.util.UUID
-import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.client.createArenaDialogNotat
@@ -23,9 +21,9 @@ internal class CreateArenaDialogNotatTest {
 
     @Test
     internal fun `Tester mapping fra fellesformat til ArenaDialogNotat svar foresporsel pasient`() {
-        val felleformatDm = fellesformatUnmarshaller.unmarshal(
-            StringReader(getFileAsString("src/test/resources/dialogmelding_dialog_svar_foresporsel_om_pasient.xml"))
-        ) as XMLEIFellesformat
+        val felleformatDm = safeUnmarshal(
+            getFileAsString("src/test/resources/dialogmelding_dialog_svar_foresporsel_om_pasient.xml")
+        )
 
         val msgHead: XMLMsgHead = felleformatDm.get()
         val emottakblokk = felleformatDm.get<XMLMottakenhetBlokk>()
@@ -95,9 +93,9 @@ internal class CreateArenaDialogNotatTest {
 
     @Test
     internal fun `Tester mapping fra fellesformat til ArenaDialogNotat svar innkalling dialogmote`() {
-        val felleformatDm = fellesformatUnmarshaller.unmarshal(
-            StringReader(getFileAsString("src/test/resources/dialogmelding_dialog_svar_innkalling_dialogmote.xml"))
-        ) as XMLEIFellesformat
+        val felleformatDm = safeUnmarshal(
+            getFileAsString("src/test/resources/dialogmelding_dialog_svar_innkalling_dialogmote.xml")
+        )
 
         val msgHead: XMLMsgHead = felleformatDm.get()
         val emottakblokk = felleformatDm.get<XMLMottakenhetBlokk>()
@@ -157,9 +155,9 @@ internal class CreateArenaDialogNotatTest {
 
     @Test
     internal fun `Tester mapping fra fellesformat til ArenaDialogNotat notat`() {
-        val felleformatDm = fellesformatUnmarshaller.unmarshal(
-            StringReader(getFileAsStringISO88591("src/test/resources/dialogmelding_dialog_notat.xml"))
-        ) as XMLEIFellesformat
+        val felleformatDm = safeUnmarshal(
+            getFileAsStringISO88591("src/test/resources/dialogmelding_dialog_notat.xml")
+        )
 
         val msgHead: XMLMsgHead = felleformatDm.get()
         val emottakblokk = felleformatDm.get<XMLMottakenhetBlokk>()
@@ -216,9 +214,9 @@ internal class CreateArenaDialogNotatTest {
 
     @Test
     internal fun `Tester mapping fra fellesformat til ArenaDialogNotat notat, med dnr for pasient i stedet for fnr`() {
-        val felleformatDm = fellesformatUnmarshaller.unmarshal(
-            StringReader(getFileAsStringISO88591("src/test/resources/dialogmelding_dialog_notat_dnr.xml"))
-        ) as XMLEIFellesformat
+        val felleformatDm = safeUnmarshal(
+            getFileAsStringISO88591("src/test/resources/dialogmelding_dialog_notat_dnr.xml")
+        )
 
         val msgHead: XMLMsgHead = felleformatDm.get()
         val emottakblokk = felleformatDm.get<XMLMottakenhetBlokk>()
@@ -255,9 +253,9 @@ internal class CreateArenaDialogNotatTest {
 
     @Test
     internal fun `Tester mapping av arena biten`() {
-        val felleformatDm = fellesformatUnmarshaller.unmarshal(
-            StringReader(getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml"))
-        ) as XMLEIFellesformat
+        val felleformatDm = safeUnmarshal(
+            getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
+        )
 
         val msgHead: XMLMsgHead = felleformatDm.get()
         val emottakblokk = felleformatDm.get<XMLMottakenhetBlokk>()
@@ -296,9 +294,9 @@ internal class CreateArenaDialogNotatTest {
 
     @Test
     internal fun `Tester mapping av arena tekstNotatInnhold`() {
-        val felleformatDm = fellesformatUnmarshaller.unmarshal(
-            StringReader(getFileAsString("src/test/resources/dialogmelding_dialog_notat_vedlegg.xml"))
-        ) as XMLEIFellesformat
+        val felleformatDm = safeUnmarshal(
+            getFileAsString("src/test/resources/dialogmelding_dialog_notat_vedlegg.xml")
+        )
 
         val msgHead: XMLMsgHead = felleformatDm.get()
         val emottakblokk = felleformatDm.get<XMLMottakenhetBlokk>()

@@ -1,6 +1,5 @@
 package no.nav.syfo
 
-import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.client.createArenaDialogNotat
@@ -11,7 +10,6 @@ import no.nav.syfo.model.toDialogmelding
 import no.nav.syfo.util.*
 import org.amshove.kluent.shouldBeEqualTo
 import org.junit.Test
-import java.io.StringReader
 import java.math.BigInteger
 import java.time.LocalDateTime
 import java.util.*
@@ -26,9 +24,9 @@ class FromKiropraktorTest {
     @Test
     internal fun `Find behandler in Notat instead of HeadMsg`() {
         // We need to support behandler details in Notat instead of msgHead, because it was allowed in Eia
-        val fellesformat = fellesformatUnmarshaller.unmarshal(
-            StringReader(getFileAsString("src/test/resources/dialogmelding_kiropraktor.xml"))
-        ) as XMLEIFellesformat
+        val fellesformat = safeUnmarshal(
+            getFileAsString("src/test/resources/dialogmelding_kiropraktor.xml")
+        )
         val behandler = extractBehandler(fellesformat)
 
         val avsender = createAvsender(BEHANDLER_FNR, null, behandler)
@@ -42,9 +40,9 @@ class FromKiropraktorTest {
 
     @Test
     internal fun `Create ArenaDialogNotat from Kiropraktor message`() {
-        val fellesformat = fellesformatUnmarshaller.unmarshal(
-            StringReader(getFileAsString("src/test/resources/dialogmelding_kiropraktor.xml"))
-        ) as XMLEIFellesformat
+        val fellesformat = safeUnmarshal(
+            getFileAsString("src/test/resources/dialogmelding_kiropraktor.xml")
+        )
         val msgHead: XMLMsgHead = fellesformat.get()
         val emottakblokk = fellesformat.get<XMLMottakenhetBlokk>()
 

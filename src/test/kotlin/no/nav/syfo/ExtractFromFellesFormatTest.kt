@@ -1,14 +1,12 @@
 package no.nav.syfo
 
-import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.util.extractIdentFromBehandler
-import no.nav.syfo.util.fellesformatUnmarshaller
 import no.nav.syfo.util.get
 import no.nav.syfo.util.getFileAsString
+import no.nav.syfo.util.safeUnmarshal
 import org.amshove.kluent.shouldBeEqualTo
 import org.junit.Test
-import java.io.StringReader
 import java.time.LocalDateTime
 
 class ExtractFromFellesFormatTest {
@@ -16,9 +14,9 @@ class ExtractFromFellesFormatTest {
 
     @Test
     internal fun `Extract behandlerident`() {
-        val fellesformat = fellesformatUnmarshaller.unmarshal(
-            StringReader(getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml"))
-        ) as XMLEIFellesformat
+        val fellesformat = safeUnmarshal(
+            getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
+        )
 
         val behandlerIdent = extractIdentFromBehandler(fellesformat)
 
@@ -27,9 +25,9 @@ class ExtractFromFellesFormatTest {
 
     @Test
     internal fun `Extract behandlerident and return null if it doesn't exist`() {
-        val fellesformat = fellesformatUnmarshaller.unmarshal(
-            StringReader(getFileAsString("src/test/resources/dialogmelding_dialog_svar_foresporsel_om_pasient.xml"))
-        ) as XMLEIFellesformat
+        val fellesformat = safeUnmarshal(
+            getFileAsString("src/test/resources/dialogmelding_dialog_svar_foresporsel_om_pasient.xml")
+        )
 
         val behandlerIdent = extractIdentFromBehandler(fellesformat)
 
@@ -39,9 +37,9 @@ class ExtractFromFellesFormatTest {
     @Test
     internal fun `Does not find behandlerident in RollerRelatertNotat`() {
         // We might want to support this at some point
-        val fellesformat = fellesformatUnmarshaller.unmarshal(
-            StringReader(getFileAsString("src/test/resources/dialogmelding_kiropraktor.xml"))
-        ) as XMLEIFellesformat
+        val fellesformat = safeUnmarshal(
+            getFileAsString("src/test/resources/dialogmelding_kiropraktor.xml")
+        )
 
         val behandlerIdent = extractIdentFromBehandler(fellesformat)
 
@@ -54,7 +52,7 @@ class ExtractFromFellesFormatTest {
         val inputDate = "2019-01-16T21:57:36"
         val dialogNotat = generateDialogNotat(inputDate)
 
-        val fellesformat = fellesformatUnmarshaller.unmarshal(StringReader(dialogNotat)) as XMLEIFellesformat
+        val fellesformat = safeUnmarshal(dialogNotat)
 
         val msgHead: XMLMsgHead = fellesformat.get()
         val genDate = msgHead.msgInfo.genDate
@@ -67,7 +65,7 @@ class ExtractFromFellesFormatTest {
         val inputDate = "2019-01-16T22:51:35.5317672z"
         val dialogNotat = generateDialogNotat(inputDate)
 
-        val fellesformat = fellesformatUnmarshaller.unmarshal(StringReader(dialogNotat)) as XMLEIFellesformat
+        val fellesformat = safeUnmarshal(dialogNotat)
 
         val msgHead: XMLMsgHead = fellesformat.get()
         val date = msgHead.msgInfo.genDate
@@ -80,7 +78,7 @@ class ExtractFromFellesFormatTest {
         val inputDate = "2019-01-16T22:51:35.5317672+01:00"
         val dialogNotat = generateDialogNotat(inputDate)
 
-        val fellesformat = fellesformatUnmarshaller.unmarshal(StringReader(dialogNotat)) as XMLEIFellesformat
+        val fellesformat = safeUnmarshal(dialogNotat)
 
         val msgHead: XMLMsgHead = fellesformat.get()
         val genDate = msgHead.msgInfo.genDate
@@ -93,7 +91,7 @@ class ExtractFromFellesFormatTest {
         val inputDate = "2020-09-30T19:00:31.4764563+03:00"
         val dialogNotat = generateDialogNotat(inputDate)
 
-        val fellesformat = fellesformatUnmarshaller.unmarshal(StringReader(dialogNotat)) as XMLEIFellesformat
+        val fellesformat = safeUnmarshal(dialogNotat)
 
         val msgHead: XMLMsgHead = fellesformat.get()
         val genDate = msgHead.msgInfo.genDate

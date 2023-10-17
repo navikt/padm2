@@ -5,18 +5,16 @@ import io.mockk.coJustRun
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
-import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.client.SmgcpClient
 import no.nav.syfo.client.TssId
 import no.nav.syfo.util.LoggingMeta
-import no.nav.syfo.util.fellesformatUnmarshaller
 import no.nav.syfo.util.get
 import no.nav.syfo.util.getFileAsString
+import no.nav.syfo.util.safeUnmarshal
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
-import java.io.StringReader
 
 class EmottakServiceSpek : Spek({
 
@@ -24,9 +22,9 @@ class EmottakServiceSpek : Spek({
         val smgcpClient = mockk<SmgcpClient>(relaxed = true)
         val emottakService = EmottakService(smgcpClient = smgcpClient)
 
-        val felleformat = fellesformatUnmarshaller.unmarshal(
-            StringReader(getFileAsString("src/test/resources/dialogmelding_dialog_svar_foresporsel_om_pasient.xml"))
-        ) as XMLEIFellesformat
+        val felleformat = safeUnmarshal(
+            getFileAsString("src/test/resources/dialogmelding_dialog_svar_foresporsel_om_pasient.xml")
+        )
 
         val msgHead: XMLMsgHead = felleformat.get()
         val emottakBlokk = felleformat.get<XMLMottakenhetBlokk>()

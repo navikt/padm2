@@ -71,7 +71,7 @@ class DialogmeldingProducer(
     }
 
     fun cloneAndPrune(fellesformatString: String): String {
-        val fellesformat = (fellesformatUnmarshaller.unmarshal(StringReader(fellesformatString)) as XMLEIFellesformat).also {
+        val fellesformat = safeUnmarshal(fellesformatString).also {
             it.removeVedlegg()
         }
         return StringWriter().use {
