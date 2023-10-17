@@ -12,6 +12,7 @@ import no.nav.syfo.logger
 import no.nav.syfo.metrics.INCOMING_MESSAGE_COUNTER
 import no.nav.syfo.metrics.INVALID_PDF_VEDLEGG
 import no.nav.syfo.metrics.MESSAGES_SENT_TO_BOQ
+import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.persistering.persistReceivedMessage
 import no.nav.syfo.util.*
 import java.util.*
@@ -106,7 +107,7 @@ class BlockingApplicationRunner(
 
         val dialogmeldingId = UUID.randomUUID().toString()
 
-        val receivedDialogmelding = dialogmeldingProcessor.createReceivedDialogmelding(
+        val receivedDialogmelding = ReceivedDialogmelding.create(
             dialogmeldingId = dialogmeldingId,
             fellesformat = fellesformat,
             inputMessageText = inputMessageText,
