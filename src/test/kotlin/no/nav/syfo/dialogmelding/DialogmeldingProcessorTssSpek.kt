@@ -37,7 +37,7 @@ class DialogmeldingProcessorTssSpek : Spek({
         coJustRun {
             handleStatusOK(
                 any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(),
-                any(), any(), any()
+                any(), any(), any(), any()
             )
         }
         justRun { persistRecivedMessageValidation(any(), any(), any()) }

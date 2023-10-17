@@ -166,6 +166,7 @@ class DialogmeldingProcessor(
                 pasientNavn = pasientNavn,
                 navnSignerendeLege = navnSignerendeLege,
                 tssId = tssId?.tssid ?: "",
+                useCronjobToPublishToArena = env.useCronjobToPublishToArena,
             )
 
             Status.INVALID -> handleStatusINVALID(

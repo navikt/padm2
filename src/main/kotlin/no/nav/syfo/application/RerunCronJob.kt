@@ -1,6 +1,8 @@
 package no.nav.syfo.application
 
 import net.logstash.logback.argument.StructuredArguments
+import no.nav.syfo.application.cronjob.Cronjob
+import no.nav.syfo.application.cronjob.CronjobResult
 import no.nav.syfo.db.DatabaseInterface
 import no.nav.syfo.logger
 import no.nav.syfo.metrics.MESSAGES_STILL_FAIL_AFTER_1H
@@ -36,8 +38,3 @@ class RerunCronJob(
         )
     }
 }
-
-data class CronjobResult(
-    var updated: Int = 0,
-    var failed: Int = 0
-)

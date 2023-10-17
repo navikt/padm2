@@ -5,6 +5,7 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import no.nav.syfo.application.*
 import no.nav.syfo.application.api.apiModule
+import no.nav.syfo.application.cronjob.launchCronjobs
 import no.nav.syfo.application.mq.*
 import no.nav.syfo.client.SmgcpClient
 import no.nav.syfo.client.SmtssClient
@@ -14,6 +15,7 @@ import no.nav.syfo.client.httpClientWithProxy
 import no.nav.syfo.client.wellknown.getWellKnown
 import no.nav.syfo.db.Database
 import no.nav.syfo.kafka.*
+import no.nav.syfo.services.ArenaDialogmeldingService
 import no.nav.syfo.services.EmottakService
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.slf4j.Logger
@@ -131,6 +133,13 @@ fun launchListeners(
         smtssClient = smtssClient,
         emottakService = emottakService,
     )
+    
+    val arenaDialogmeldingService = ArenaDialogmeldingService(
+        mqSender = mqSender,
+        smtssClient = smtssClient,
+        emottakService = emottakService,
+    )
+    
     launchBackgroundTask(
         applicationState = applicationState,
     ) {
@@ -151,17 +160,14 @@ fun launchListeners(
             blockingApplicationRunner.run()
         }
     }
-    launchBackgroundTask(
+    
+    launchCronjobs(
         applicationState = applicationState,
-    ) {
-        val rerunCronJob = RerunCronJob(
-            database = database,
-            dialogmeldingProcessor = dialogmeldingProcessor,
-        )
-        CronjobRunner(
-            applicationState = applicationState,
-        ).start(cronjob = rerunCronJob)
-    }
+        database = database,
+        environment = env,
+        dialogmeldingProcessor = dialogmeldingProcessor,
+        arenaDialogmeldingService = arenaDialogmeldingService,
+    )
 }
 
 private fun setMQTlsProperties(env: Environment) {

@@ -60,6 +60,7 @@ fun testEnvironment(
     smtssApiUrl = smtssUrl,
     smgcpProxyClientId = "smgcp",
     smgcpProxyUrl = smgcpUrl,
+    useCronjobToPublishToArena = true,
 )
 
 fun testAppState() = ApplicationState(
