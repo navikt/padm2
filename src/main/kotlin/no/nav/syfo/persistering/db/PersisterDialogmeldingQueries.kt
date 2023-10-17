@@ -150,39 +150,46 @@ fun DatabaseInterface.hentDialogmeldingOpplysningerJournalpostId(dialogmeldingid
         }
     }
 
+private const val queryGetArena = """
+    SELECT arena
+    FROM DIALOGMELDINGOPPLYSNINGER
+    WHERE id=?;
+"""
+
 fun DatabaseInterface.erDialogmeldingOpplysningerSendtArena(dialogmeldingid: String) =
     connection.use { connection ->
-        connection.prepareStatement(
-            """
-                SELECT arena
-                FROM DIALOGMELDINGOPPLYSNINGER
-                WHERE id=?;
-                """
-        ).use {
-            it.setString(1, dialogmeldingid)
-            val list = it.executeQuery().toList { getTimestamp("arena") }
-            list.isNotEmpty() && list.firstOrNull() != null
-        }
+        connection.erDialogmeldingOpplysningerSendtArena(dialogmeldingid)
     }
+
+fun Connection.erDialogmeldingOpplysningerSendtArena(dialogmeldingid: String) =
+    prepareStatement(queryGetArena).use {
+        it.setString(1, dialogmeldingid)
+        val list = it.executeQuery().toList { getTimestamp("arena") }
+        list.isNotEmpty() && list.firstOrNull() != null
+    }
+
+private const val queryUpdateArenaSendt = """
+    UPDATE DIALOGMELDINGOPPLYSNINGER
+    SET ARENA=?
+    WHERE ID=?;
+"""
 
 fun DatabaseInterface.lagreSendtArena(dialogmeldingid: String) {
     connection.use { connection ->
-        connection.prepareStatement(
-            """
-                UPDATE DIALOGMELDINGOPPLYSNINGER 
-                SET ARENA=?
-                WHERE ID=?;
-                """
-        ).use {
-            it.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()))
-            it.setString(2, dialogmeldingid)
-            val updated = it.executeUpdate()
-            if (updated != 1) {
-                throw SQLException("Expected a single row to be updated, got update count $updated")
-            }
-        }
-        connection.commit()
+        connection.lagreSendtArena(dialogmeldingid)
     }
+}
+
+fun Connection.lagreSendtArena(dialogmeldingId: String) {
+    prepareStatement(queryUpdateArenaSendt).use {
+        it.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()))
+        it.setString(2, dialogmeldingId)
+        val updated = it.executeUpdate()
+        if (updated != 1) {
+            throw SQLException("Expected a single row to be updated, got update count $updated")
+        }
+    }
+    commit()
 }
 
 fun DatabaseInterface.erDialogmeldingOpplysningerSendtKafka(dialogmeldingid: String) =
@@ -325,6 +332,27 @@ fun DatabaseInterface.hasSavedDialogmeldingDokument(dialogmeldingId: String, sha
             it.executeQuery().next()
         }
     }
+
+// TODO: Noe for å håndtere de gamle meldingene?
+fun Connection.getUnpublishedArenaMeldinger(): List<Pair<String, String>> =
+    prepareStatement(
+    """
+        SELECT id, fellesformat
+        FROM dialogmeldingopplysninger
+        WHERE arena IS NULL AND
+            apprec IS NOT NULL AND
+            apprec < (NOW() - INTERVAL '10 minutes') AND
+            dialogmelding_published IS NOT NULL;
+        """
+    ).use { connection ->
+        connection.executeQuery().toList {
+            Pair(
+                first = getString("id"),
+                second = getString("fellesformat")
+            )
+        }
+    }
+
 
 fun Dialogmelding.toPGObject() = PGobject().also {
     it.type = "json"
