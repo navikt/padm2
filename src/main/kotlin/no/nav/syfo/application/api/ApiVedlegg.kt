@@ -4,14 +4,12 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.syfo.application.api.access.APIConsumerAccessService
 import no.nav.syfo.db.DatabaseInterface
 import no.nav.syfo.model.toPDFVedlegg
 import no.nav.syfo.model.toVedlegg
 import no.nav.syfo.persistering.db.hentFellesformat
 import no.nav.syfo.util.*
-import java.io.StringReader
 
 const val vedleggSystemApiV1Path = "/api/system/v1/vedlegg"
 const val vedleggSystemApiMsgIdParam = "msgid"
@@ -36,7 +34,7 @@ fun Route.registerVedleggSystemApi(
             if (fellesformatString.isNullOrEmpty()) {
                 call.respond(HttpStatusCode.NoContent)
             } else {
-                val fellesformat = fellesformatUnmarshaller.unmarshal(StringReader(fellesformatString)) as XMLEIFellesformat
+                val fellesformat = safeUnmarshal(fellesformatString)
 
                 call.respond(
                     extractVedlegg(fellesformat)

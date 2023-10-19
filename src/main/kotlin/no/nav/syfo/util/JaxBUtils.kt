@@ -14,6 +14,11 @@ import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.helse.msgHead.XMLSender
+import org.xml.sax.InputSource
+import java.io.StringReader
+import javax.xml.parsers.SAXParserFactory
+import javax.xml.transform.Source
+import javax.xml.transform.sax.SAXSource
 
 val fellesformatJaxBContext: JAXBContext = JAXBContext.newInstance(
     XMLEIFellesformat::class.java,
@@ -23,10 +28,6 @@ val fellesformatJaxBContext: JAXBContext = JAXBContext.newInstance(
     Base64Container::class.java,
     XMLAppRec::class.java,
 )
-val fellesformatUnmarshaller: Unmarshaller = fellesformatJaxBContext.createUnmarshaller().apply {
-    setAdapter(LocalDateTimeXmlAdapter::class.java, XMLDateTimeAdapter())
-    setAdapter(LocalDateXmlAdapter::class.java, XMLDateAdapter())
-}
 
 val senderMarshaller: Marshaller = JAXBContext.newInstance(XMLSender::class.java).createMarshaller()
     .apply { setProperty(Marshaller.JAXB_ENCODING, "ISO-8859-1") }
@@ -37,7 +38,26 @@ val apprecMarshaller: Marshaller = apprecJaxBContext.createMarshaller()
 val arenaDialogNotatJaxBContext: JAXBContext = JAXBContext.newInstance(ArenaDialogNotat::class.java)
 val arenaDialogNotatMarshaller: Marshaller = arenaDialogNotatJaxBContext.createMarshaller()
 
+private val fellesformatUnmarshaller: Unmarshaller = fellesformatJaxBContext.createUnmarshaller().apply {
+    setAdapter(LocalDateTimeXmlAdapter::class.java, XMLDateTimeAdapter())
+    setAdapter(LocalDateXmlAdapter::class.java, XMLDateAdapter())
+}
+
 fun Marshaller.toString(input: Any): String = StringWriter().use {
     marshal(input, it)
     it.toString()
+}
+
+fun safeUnmarshal(inputMessageText: String): XMLEIFellesformat {
+    // Disable XXE
+    val spf: SAXParserFactory = SAXParserFactory.newInstance()
+    spf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
+    spf.isNamespaceAware = true
+
+    val xmlSource: Source =
+        SAXSource(
+            spf.newSAXParser().xmlReader,
+            InputSource(StringReader(inputMessageText)),
+        )
+    return fellesformatUnmarshaller.unmarshal(xmlSource) as XMLEIFellesformat
 }

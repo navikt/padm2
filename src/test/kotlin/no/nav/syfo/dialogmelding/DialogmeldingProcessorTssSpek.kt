@@ -2,7 +2,6 @@ package no.nav.syfo.dialogmelding
 
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
-import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.syfo.ExternalMockEnvironment
 import no.nav.syfo.application.DialogmeldingProcessor
@@ -16,12 +15,11 @@ import no.nav.syfo.kafka.DialogmeldingProducer
 import no.nav.syfo.persistering.persistRecivedMessageValidation
 import no.nav.syfo.services.EmottakService
 import no.nav.syfo.util.LoggingMeta
-import no.nav.syfo.util.fellesformatUnmarshaller
 import no.nav.syfo.util.get
 import no.nav.syfo.util.getFileAsString
+import no.nav.syfo.util.safeUnmarshal
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
-import java.io.StringReader
 
 class DialogmeldingProcessorTssSpek : Spek({
 
@@ -67,9 +65,7 @@ class DialogmeldingProcessorTssSpek : Spek({
         val LEGEKONTOR_ORGNAME = "Kule helsetjenester AS"
 
         val dialogmeldingString = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
-        val fellesformat = fellesformatUnmarshaller.unmarshal(
-            StringReader(dialogmeldingString)
-        ) as XMLEIFellesformat
+        val fellesformat = safeUnmarshal(dialogmeldingString)
 
         val emottakBlokk = fellesformat.get<XMLMottakenhetBlokk>()
         val personNumberDoctor = emottakBlokk.avsenderFnrFraDigSignatur

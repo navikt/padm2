@@ -1,7 +1,6 @@
 package no.nav.syfo.kafka
 
 import io.mockk.*
-import java.io.StringReader
 import java.time.LocalDateTime
 import java.util.UUID
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
@@ -104,7 +103,7 @@ internal class DialogmeldingProducerTest {
         dialogmeldingForKafka.msgType shouldBeEqualTo "DIALOG_NOTAT"
         dialogmeldingForKafka.antallVedlegg shouldBe 2
 
-        val fellesformatFromKafkaMessage = fellesformatUnmarshaller.unmarshal(StringReader(dialogmeldingForKafka.fellesformatXML)) as XMLEIFellesformat
+        val fellesformatFromKafkaMessage = safeUnmarshal(dialogmeldingForKafka.fellesformatXML)
         fellesformatFromKafkaMessage.calculateNumberOfVedlegg() shouldBe 0
     }
 
@@ -132,7 +131,7 @@ internal class DialogmeldingProducerTest {
         dialogmeldingForKafka.msgType shouldBeEqualTo "DIALOG_NOTAT"
         dialogmeldingForKafka.antallVedlegg shouldBe 2
 
-        val fellesformatFromKafkaMessage = fellesformatUnmarshaller.unmarshal(StringReader(dialogmeldingForKafka.fellesformatXML)) as XMLEIFellesformat
+        val fellesformatFromKafkaMessage = safeUnmarshal(dialogmeldingForKafka.fellesformatXML)
         fellesformatFromKafkaMessage.calculateNumberOfVedlegg() shouldBe 0
     }
 
@@ -161,7 +160,7 @@ internal class DialogmeldingProducerTest {
     }
 
     fun setupTestData(inputMessageText: String) {
-        fellesformat = fellesformatUnmarshaller.unmarshal(StringReader(inputMessageText)) as XMLEIFellesformat
+        fellesformat = safeUnmarshal(inputMessageText)
 
         val dialogmeldingId = UUID.randomUUID().toString()
         val emottakblokk = fellesformat.get<XMLMottakenhetBlokk>()

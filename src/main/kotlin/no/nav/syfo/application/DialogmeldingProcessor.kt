@@ -23,7 +23,6 @@ import no.nav.syfo.persistering.persistRecivedMessageValidation
 import no.nav.syfo.services.*
 import no.nav.syfo.util.*
 import no.nav.syfo.validation.isKodeverkValid
-import java.io.StringReader
 import java.time.Duration
 import java.time.ZoneId
 
@@ -87,7 +86,7 @@ class DialogmeldingProcessor(
         dialogmeldingId: String,
         inputMessageText: String,
     ) {
-        val fellesformat = fellesformatUnmarshaller.unmarshal(StringReader(inputMessageText)) as XMLEIFellesformat
+        val fellesformat = safeUnmarshal(inputMessageText)
         val msgHead: XMLMsgHead = fellesformat.get()
         val emottakblokk = fellesformat.get<XMLMottakenhetBlokk>()
         val ediLoggId = emottakblokk.ediLoggId

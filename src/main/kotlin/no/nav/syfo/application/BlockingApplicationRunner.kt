@@ -2,7 +2,6 @@ package no.nav.syfo.application
 
 import kotlinx.coroutines.delay
 import net.logstash.logback.argument.StructuredArguments
-import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.application.mq.MQSenderInterface
@@ -14,7 +13,6 @@ import no.nav.syfo.metrics.INCOMING_MESSAGE_COUNTER
 import no.nav.syfo.metrics.MESSAGES_SENT_TO_BOQ
 import no.nav.syfo.persistering.persistReceivedMessage
 import no.nav.syfo.util.*
-import java.io.StringReader
 import java.util.*
 import javax.jms.Message
 import javax.jms.MessageConsumer
@@ -76,7 +74,7 @@ class BlockingApplicationRunner(
     private fun storeMessage(
         inputMessageText: String
     ): String? {
-        val fellesformat = fellesformatUnmarshaller.unmarshal(StringReader(inputMessageText)) as XMLEIFellesformat
+        val fellesformat = safeUnmarshal(inputMessageText)
         val msgHead: XMLMsgHead = fellesformat.get()
         val emottakblokk = fellesformat.get<XMLMottakenhetBlokk>()
         val ediLoggId = emottakblokk.ediLoggId

@@ -1,16 +1,10 @@
 package no.nav.syfo
 
-import java.io.StringReader
 import java.time.LocalDateTime
 import java.util.UUID
-import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.syfo.model.*
-import no.nav.syfo.util.extractDialogmelding
-import no.nav.syfo.util.extractVedlegg
-import no.nav.syfo.util.fellesformatUnmarshaller
-import no.nav.syfo.util.get
-import no.nav.syfo.util.getFileAsString
+import no.nav.syfo.util.*
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEqualTo
 import org.junit.Test
@@ -19,9 +13,9 @@ internal class DialogmeldingMapperTest {
 
     @Test
     internal fun `Tester mapping fra fellesformat til dialogmelding svar innkalling dialogmote`() {
-        val felleformatDm = fellesformatUnmarshaller.unmarshal(
-            StringReader(getFileAsString("src/test/resources/dialogmelding_dialog_svar_innkalling_dialogmote.xml"))
-        ) as XMLEIFellesformat
+        val felleformatDm = safeUnmarshal(
+            getFileAsString("src/test/resources/dialogmelding_dialog_svar_innkalling_dialogmote.xml")
+        )
 
         val dialomeldingxml = extractDialogmelding(felleformatDm)
         val dialogmeldingId = UUID.randomUUID().toString()
@@ -43,9 +37,9 @@ internal class DialogmeldingMapperTest {
 
     @Test
     internal fun `Tester mapping fra fellesformat til dialogmelding  svar foresporsel om pasient`() {
-        val felleformatDm = fellesformatUnmarshaller.unmarshal(
-            StringReader(getFileAsString("src/test/resources/dialogmelding_dialog_svar_foresporsel_om_pasient.xml"))
-        ) as XMLEIFellesformat
+        val felleformatDm = safeUnmarshal(
+            getFileAsString("src/test/resources/dialogmelding_dialog_svar_foresporsel_om_pasient.xml")
+        )
 
         val dialomeldingxml = extractDialogmelding(felleformatDm)
         val dialogmeldingId = UUID.randomUUID().toString()
@@ -67,9 +61,9 @@ internal class DialogmeldingMapperTest {
 
     @Test
     internal fun `Tester mapping fra fellesformat til dialogmelding notat`() {
-        val felleformatDm = fellesformatUnmarshaller.unmarshal(
-            StringReader(getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml"))
-        ) as XMLEIFellesformat
+        val felleformatDm = safeUnmarshal(
+            getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
+        )
 
         val dialomeldingxml = extractDialogmelding(felleformatDm)
         val dialogmeldingId = UUID.randomUUID().toString()
@@ -91,9 +85,9 @@ internal class DialogmeldingMapperTest {
 
     @Test
     internal fun `Tester mapping fra fellesformat til dialogmelding notat med vedlegg`() {
-        val felleformatDm = fellesformatUnmarshaller.unmarshal(
-            StringReader(getFileAsString("src/test/resources/dialogmelding_dialog_notat_vedlegg.xml"))
-        ) as XMLEIFellesformat
+        val felleformatDm = safeUnmarshal(
+            getFileAsString("src/test/resources/dialogmelding_dialog_notat_vedlegg.xml")
+        )
 
         val dialomeldingxml = extractDialogmelding(felleformatDm)
         val dialogmeldingId = UUID.randomUUID().toString()
@@ -120,9 +114,9 @@ internal class DialogmeldingMapperTest {
 
     @Test
     internal fun `Tester mapping fra fellesformat til dialogmelding notat med vedlegg der description mangler`() {
-        val felleformatDm = fellesformatUnmarshaller.unmarshal(
-            StringReader(getFileAsString("src/test/resources/dialogmelding_dialog_notat_vedlegg_missing_description.xml"))
-        ) as XMLEIFellesformat
+        val felleformatDm = safeUnmarshal(
+            getFileAsString("src/test/resources/dialogmelding_dialog_notat_vedlegg_missing_description.xml")
+        )
 
         val dialomeldingxml = extractDialogmelding(felleformatDm)
         val dialogmeldingId = UUID.randomUUID().toString()
