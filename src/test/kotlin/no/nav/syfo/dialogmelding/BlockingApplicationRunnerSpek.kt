@@ -212,6 +212,41 @@ class BlockingApplicationRunnerSpek : Spek({
                     val journalpostId = database.hentDialogmeldingOpplysningerJournalpostId(dialogmeldingId!!)
                     journalpostId shouldBe null
                 }
+                it("Prosesserer innkommet melding (vedlegg ok)") {
+                    val fellesformat =
+                        getFileAsString("src/test/resources/dialogmelding_dialog_notat_vedlegg.xml")
+                    every { incomingMessage.text } returns(fellesformat)
+                    val dialogmeldingId = runBlocking {
+                        blockingApplicationRunner.processMessage(incomingMessage)
+                    }
+                    verify(exactly = 1) { mqSender.sendReceipt(any()) }
+                    verify(exactly = 0) { mqSender.sendBackout(any()) }
+                    verify(exactly = 1) { mqSender.sendArena(any()) }
+                    val antallVedleggSlot = slot<Int>()
+                    verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), capture(antallVedleggSlot)) }
+                    dialogmeldingId shouldNotBe null
+                    val journalpostId = database.hentDialogmeldingOpplysningerJournalpostId(dialogmeldingId!!)
+                    journalpostId shouldNotBe null
+                    antallVedleggSlot.captured shouldBeEqualTo 2
+                }
+                it("Prosesserer innkommet melding (vedlegg med mismatch type)") {
+                    val fellesformat =
+                        getFileAsString("src/test/resources/dialogmelding_dialog_notat_vedlegg.xml")
+                            .replace("<MimeType>image/jpeg</MimeType>", "<MimeType>application/pdf</MimeType>")
+                    every { incomingMessage.text } returns(fellesformat)
+                    val dialogmeldingId = runBlocking {
+                        blockingApplicationRunner.processMessage(incomingMessage)
+                    }
+                    verify(exactly = 1) { mqSender.sendReceipt(any()) }
+                    verify(exactly = 0) { mqSender.sendBackout(any()) }
+                    verify(exactly = 1) { mqSender.sendArena(any()) }
+                    val antallVedleggSlot = slot<Int>()
+                    verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), capture(antallVedleggSlot)) }
+                    dialogmeldingId shouldNotBe null
+                    val journalpostId = database.hentDialogmeldingOpplysningerJournalpostId(dialogmeldingId!!)
+                    journalpostId shouldNotBe null
+                    antallVedleggSlot.captured shouldBeEqualTo 1
+                }
                 it("Prosesserer innkommet melding (duplikat)") {
                     val fellesformat =
                         getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")

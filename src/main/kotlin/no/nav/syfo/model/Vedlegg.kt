@@ -13,14 +13,14 @@ data class Vedlegg(
 )
 
 fun XMLDocument.toVedlegg(): Vedlegg {
-    val base64Container = refDoc.content.any[0] as Base64Container
-
     return Vedlegg(
         mimeType = refDoc.mimeType,
         beskrivelse = refDoc.description ?: "",
-        contentBase64 = base64Container.value
+        contentBase64 = toBase64Container().value
     )
 }
+
+fun XMLDocument.toBase64Container() = refDoc.content.any[0] as Base64Container
 
 fun Vedlegg.toPDFVedlegg(): Vedlegg {
     if (findFiltype() == "PDFA") return this

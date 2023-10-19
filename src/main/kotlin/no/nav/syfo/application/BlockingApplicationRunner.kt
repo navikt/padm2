@@ -10,6 +10,7 @@ import no.nav.syfo.domain.elevenDigits
 import no.nav.syfo.handlestatus.handlePatientMissing
 import no.nav.syfo.logger
 import no.nav.syfo.metrics.INCOMING_MESSAGE_COUNTER
+import no.nav.syfo.metrics.INVALID_PDF_VEDLEGG
 import no.nav.syfo.metrics.MESSAGES_SENT_TO_BOQ
 import no.nav.syfo.persistering.persistReceivedMessage
 import no.nav.syfo.util.*
@@ -79,7 +80,10 @@ class BlockingApplicationRunner(
         val emottakblokk = fellesformat.get<XMLMottakenhetBlokk>()
         val ediLoggId = emottakblokk.ediLoggId
         val dialogmeldingXml = extractDialogmelding(fellesformat)
-        val vedlegg = extractVedlegg(fellesformat)
+        val vedlegg = extractValidVedlegg(fellesformat)
+        if (vedlegg.size < extractAllVedlegg(fellesformat).size) {
+            INVALID_PDF_VEDLEGG.increment()
+        }
         val sha256String = sha256hashstring(dialogmeldingXml, vedlegg)
 
         val innbyggerIdent = extractInnbyggerident(fellesformat)

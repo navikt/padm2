@@ -103,7 +103,7 @@ internal class DialogmeldingMapperTest {
             signaturDato = signaturDato,
             navnHelsePersonellNavn = navnHelsePersonellNavn
         )
-        val extractVedlegg = extractVedlegg(felleformatDm)
+        val extractVedlegg = extractValidVedlegg(felleformatDm)
         val vedleggListe = extractVedlegg.map { it.toVedlegg() }
 
         dialogmelding.id shouldBeEqualTo dialogmeldingId
@@ -132,7 +132,7 @@ internal class DialogmeldingMapperTest {
             signaturDato = signaturDato,
             navnHelsePersonellNavn = navnHelsePersonellNavn
         )
-        val extractVedlegg = extractVedlegg(felleformatDm)
+        val extractVedlegg = extractValidVedlegg(felleformatDm)
         val vedleggListe = extractVedlegg.map { it.toVedlegg() }
 
         dialogmelding.id shouldBeEqualTo dialogmeldingId

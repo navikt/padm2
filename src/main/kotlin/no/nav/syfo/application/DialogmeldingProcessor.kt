@@ -93,7 +93,7 @@ class DialogmeldingProcessor(
         val msgId = msgHead.msgInfo.msgId
         val dialogmeldingXml = extractDialogmelding(fellesformat)
         val dialogmeldingType = findDialogmeldingType(emottakblokk.ebService, emottakblokk.ebAction)
-        val xmlVedlegg = extractVedlegg(fellesformat)
+        val xmlVedlegg = extractValidVedlegg(fellesformat)
         val sha256String = sha256hashstring(dialogmeldingXml, xmlVedlegg)
         val legekontorOrgNr = extractOrganisationNumberFromSender(fellesformat)?.id
         val pasientNavn = extractPasientNavn(fellesformat)

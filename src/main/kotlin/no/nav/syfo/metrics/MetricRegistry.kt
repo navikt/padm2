@@ -29,6 +29,11 @@ val INVALID_MESSAGE_NO_NOTICE: Counter = Counter
     .description("Counts the number of messages, that has not enough information to be sendt to the rule engine ")
     .register(METRICS_REGISTRY)
 
+val INVALID_PDF_VEDLEGG: Counter = Counter
+    .builder("${METRICS_NS}_invalid_pdf_vedlegg")
+    .description("Counts the number of invalid pdf vedlegg")
+    .register(METRICS_REGISTRY)
+
 val TEST_FNR_IN_PROD: Counter = Counter
     .builder("${METRICS_NS}_test_fnr_in_prod")
     .description("Counts the number of messages that contains a test fnr i prod")

@@ -3,23 +3,36 @@ package no.nav.syfo.util
 import no.nav.helse.dialogmelding.XMLDialogmelding
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.msgHead.*
+import no.nav.syfo.logger
 import no.nav.syfo.model.Behandler
 import no.nav.syfo.model.getName
-import no.nav.syfo.logger
+import no.nav.syfo.model.toBase64Container
+import java.util.HexFormat
+
+private val PDF_MAGIC_NUMBER: ByteArray = HexFormat.of().parseHex("255044462D")
 
 fun extractDialogmelding(fellesformat: XMLEIFellesformat): XMLDialogmelding =
     fellesformat.get<XMLMsgHead>().document.first {
         it.refDoc.msgType.v == "XML"
     }.refDoc.content.any[0] as XMLDialogmelding
 
-fun extractVedlegg(fellesformat: XMLEIFellesformat) = fellesformat.get<XMLMsgHead>().document.filter {
+fun extractValidVedlegg(fellesformat: XMLEIFellesformat) = fellesformat.get<XMLMsgHead>().document.filter {
+    it.isVedlegg() && it.pdfContentMatchesMimeType()
+}
+
+fun extractAllVedlegg(fellesformat: XMLEIFellesformat) = fellesformat.get<XMLMsgHead>().document.filter {
     it.isVedlegg()
 }
 
-fun XMLDocument.isVedlegg(): Boolean {
-    return this.refDoc.msgType.v == "A" &&
+fun XMLDocument.isVedlegg() =
+    this.refDoc.msgType.v == "A" &&
         listOf("application/pdf", "image/tiff", "image/png", "image/jpeg", "image/jpg").contains(this.refDoc.mimeType)
-}
+
+private fun XMLDocument.pdfContentMatchesMimeType() =
+    this.refDoc.mimeType != "application/pdf" || toBase64Container().value.binaryContentIsPdf()
+
+private fun ByteArray.binaryContentIsPdf() =
+    copyOf(PDF_MAGIC_NUMBER.size) contentEquals PDF_MAGIC_NUMBER
 
 fun extractOrganisationNumberFromSender(fellesformat: XMLEIFellesformat): XMLIdent? =
     fellesformat.get<XMLMsgHead>().msgInfo.sender.organisation.ident.find {
