@@ -9,7 +9,7 @@ import no.nav.syfo.model.getName
 import no.nav.syfo.model.toBase64Container
 import java.util.HexFormat
 
-private val PDF_MAGIC_NUMBER: ByteArray = HexFormat.of().parseHex("255044462D")
+private val PDF_MAGIC_NUMBER: ByteArray = HexFormat.of().parseHex("255044462D") // binary "%PDF-"
 
 fun extractDialogmelding(fellesformat: XMLEIFellesformat): XMLDialogmelding =
     fellesformat.get<XMLMsgHead>().document.first {
