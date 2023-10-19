@@ -136,7 +136,7 @@ internal class DialogmeldingMapperTest {
         val vedleggListe = extractVedlegg.map { it.toVedlegg() }
 
         dialogmelding.id shouldBeEqualTo dialogmeldingId
-        vedleggListe.size.shouldBe(2)
+        vedleggListe.size shouldBeEqualTo 2
         vedleggListe[0].beskrivelse shouldBeEqualTo ""
         vedleggListe[1].beskrivelse shouldBeEqualTo "Et bilde fra lege"
     }
