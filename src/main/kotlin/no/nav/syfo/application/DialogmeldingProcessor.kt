@@ -92,6 +92,7 @@ class DialogmeldingProcessor(
         val ediLoggId = emottakblokk.ediLoggId
         val msgId = msgHead.msgInfo.msgId
         val dialogmeldingXml = extractDialogmelding(fellesformat)
+        val patientXml = extractPatient(fellesformat)
         val dialogmeldingType = findDialogmeldingType(emottakblokk.ebService, emottakblokk.ebAction)
         val xmlVedlegg = extractValidVedlegg(fellesformat)
         val sha256String = sha256hashstring(dialogmeldingXml, xmlVedlegg)
@@ -135,7 +136,7 @@ class DialogmeldingProcessor(
             msgId = msgId,
             loggingMeta = loggingMeta,
         )
-        val vedleggListe = xmlVedlegg.map { xmlVedlegg -> xmlVedlegg.toVedlegg() }
+        val vedleggListe = xmlVedlegg.map { xml -> xml.toVedlegg() }
 
         val validationResult = validateMessage(
             sha256String = sha256String,

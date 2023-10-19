@@ -247,6 +247,31 @@ class BlockingApplicationRunnerSpek : Spek({
                     journalpostId shouldNotBe null
                     antallVedleggSlot.captured shouldBeEqualTo 1
                 }
+                it("Prosesserer innkommet melding (ikke duplikat siden pasient forskjellig)") {
+                    val fellesformat =
+                        getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
+                    every { incomingMessage.text } returns(fellesformat)
+                    runBlocking {
+                        blockingApplicationRunner.processMessage(incomingMessage)
+                    }
+                    verify(exactly = 1) { mqSender.sendReceipt(any()) }
+                    verify(exactly = 0) { mqSender.sendBackout(any()) }
+                    verify(exactly = 1) { mqSender.sendArena(any()) }
+                    verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
+                    every { incomingMessage.text } returns(
+                            fellesformat.replace("<Id>01010142365</Id>", "<Id>45088649080</Id>")
+                            )
+                    val dialogmeldingId = runBlocking {
+                        blockingApplicationRunner.processMessage(incomingMessage)
+                    }
+                    verify(exactly = 2) { mqSender.sendReceipt(any()) }
+                    verify(exactly = 0) { mqSender.sendBackout(any()) }
+                    verify(exactly = 2) { mqSender.sendArena(any()) }
+                    verify(exactly = 2) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
+                    dialogmeldingId shouldNotBe null
+                    val journalpostId = database.hentDialogmeldingOpplysningerJournalpostId(dialogmeldingId!!)
+                    journalpostId shouldNotBe null
+                }
                 it("Prosesserer innkommet melding (duplikat)") {
                     val fellesformat =
                         getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")

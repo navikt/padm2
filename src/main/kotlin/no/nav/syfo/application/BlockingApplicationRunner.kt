@@ -80,11 +80,12 @@ class BlockingApplicationRunner(
         val emottakblokk = fellesformat.get<XMLMottakenhetBlokk>()
         val ediLoggId = emottakblokk.ediLoggId
         val dialogmeldingXml = extractDialogmelding(fellesformat)
+        val patientXml = extractPatient(fellesformat)
         val vedlegg = extractValidVedlegg(fellesformat)
         if (vedlegg.size < extractAllVedlegg(fellesformat).size) {
             INVALID_PDF_VEDLEGG.increment()
         }
-        val sha256String = sha256hashstring(dialogmeldingXml, vedlegg)
+        val sha256String = sha256hashstring(dialogmeldingXml, patientXml, vedlegg)
 
         val innbyggerIdent = extractInnbyggerident(fellesformat)
         val legekontorOrgNr = extractOrganisationNumberFromSender(fellesformat)?.id
