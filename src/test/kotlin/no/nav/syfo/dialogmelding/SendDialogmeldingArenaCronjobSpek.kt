@@ -16,8 +16,8 @@ import no.nav.syfo.persistering.db.*
 import no.nav.syfo.services.ArenaDialogmeldingService
 import no.nav.syfo.services.EmottakService
 import no.nav.syfo.updateSendtApprec
-import no.nav.syfo.util.getFellesformatXMLFromString
 import no.nav.syfo.util.getFileAsString
+import no.nav.syfo.util.safeUnmarshal
 import org.amshove.kluent.shouldBeEqualTo
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
@@ -57,7 +57,7 @@ class SendDialogmeldingArenaCronjobSpek : Spek({
 
                 val fellesformat =
                     getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
-                val fellesformatXml = getFellesformatXMLFromString(fellesformat)
+                val fellesformatXml = safeUnmarshal(fellesformat)
                 val receivedDialogmelding = ReceivedDialogmelding.create(
                     dialogmeldingId = UUID.randomUUID().toString(),
                     fellesformat = fellesformatXml,

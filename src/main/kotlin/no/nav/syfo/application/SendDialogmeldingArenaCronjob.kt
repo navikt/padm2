@@ -8,7 +8,7 @@ import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.persistering.db.getUnpublishedArenaMeldinger
 import no.nav.syfo.persistering.db.lagreSendtArena
 import no.nav.syfo.services.ArenaDialogmeldingService
-import no.nav.syfo.util.getFellesformatXMLFromString
+import no.nav.syfo.util.safeUnmarshal
 import org.slf4j.LoggerFactory
 
 class SendDialogmeldingArenaCronjob(
@@ -33,7 +33,7 @@ class SendDialogmeldingArenaCronjob(
         try {
             unpublishedArenaMeldinger.forEach { (dialogmeldingId, fellesformat) ->
                 database.connection.use { connection ->
-                    val fellesformatXml = getFellesformatXMLFromString(fellesformat)
+                    val fellesformatXml = safeUnmarshal(fellesformat)
                     val receivedDialogmelding = ReceivedDialogmelding.create(
                         dialogmeldingId = dialogmeldingId,
                         fellesformat = fellesformatXml,
