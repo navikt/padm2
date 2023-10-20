@@ -221,7 +221,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
-                    verify(exactly = 1) { mqSender.sendArena(any()) }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
                     val antallVedleggSlot = slot<Int>()
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), capture(antallVedleggSlot)) }
                     dialogmeldingId shouldNotBe null
@@ -239,7 +239,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
-                    verify(exactly = 1) { mqSender.sendArena(any()) }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
                     val antallVedleggSlot = slot<Int>()
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), capture(antallVedleggSlot)) }
                     dialogmeldingId shouldNotBe null
@@ -256,7 +256,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
-                    verify(exactly = 1) { mqSender.sendArena(any()) }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                     every { incomingMessage.text } returns(
                         fellesformat.replace("<Id>01010142365</Id>", "<Id>45088649080</Id>")
@@ -266,7 +266,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     }
                     verify(exactly = 2) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
-                    verify(exactly = 2) { mqSender.sendArena(any()) }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
                     verify(exactly = 2) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                     dialogmeldingId shouldNotBe null
                     val journalpostId = database.hentDialogmeldingOpplysningerJournalpostId(dialogmeldingId!!)
