@@ -259,8 +259,8 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 1) { mqSender.sendArena(any()) }
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                     every { incomingMessage.text } returns(
-                            fellesformat.replace("<Id>01010142365</Id>", "<Id>45088649080</Id>")
-                            )
+                        fellesformat.replace("<Id>01010142365</Id>", "<Id>45088649080</Id>")
+                        )
                     val dialogmeldingId = runBlocking {
                         blockingApplicationRunner.processMessage(incomingMessage)
                     }
