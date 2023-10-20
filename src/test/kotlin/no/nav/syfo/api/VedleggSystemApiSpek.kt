@@ -99,15 +99,16 @@ class VedleggSystemApiSpek : Spek({
                     }
                     it("should only get valid vedlegg") {
                         every { incomingMessage.text } returns(
-                                getFileAsString("src/test/resources/dialogmelding_dialog_notat_vedlegg.xml")
-                                    .replace(
-                                        "<MimeType>image/jpeg</MimeType>",
-                                        "<MimeType>application/pdf</MimeType>",)
-                                    .replace(
-                                        "<MsgId>37340D30-FE14-42B5-985F-A8FF8FFA0CB5</MsgId>",
-                                        "<MsgId>$msgId</MsgId>",
-                                    )
+                            getFileAsString("src/test/resources/dialogmelding_dialog_notat_vedlegg.xml")
+                                .replace(
+                                    "<MimeType>image/jpeg</MimeType>",
+                                    "<MimeType>application/pdf</MimeType>",
                                 )
+                                .replace(
+                                    "<MsgId>37340D30-FE14-42B5-985F-A8FF8FFA0CB5</MsgId>",
+                                    "<MsgId>$msgId</MsgId>",
+                                )
+                            )
                         runBlocking {
                             blockingApplicationRunner.processMessage(incomingMessage)
                         }
