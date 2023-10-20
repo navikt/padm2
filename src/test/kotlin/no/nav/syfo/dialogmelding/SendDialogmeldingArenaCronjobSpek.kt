@@ -99,6 +99,7 @@ class SendDialogmeldingArenaCronjobSpek : Spek({
                         result.updated shouldBeEqualTo 1
                         result.failed shouldBeEqualTo 0
                     }
+                    verify(exactly = 1) { mqSender.sendArena(any()) }
                 }
 
                 it("Does not send when no apprec") {
@@ -111,6 +112,7 @@ class SendDialogmeldingArenaCronjobSpek : Spek({
                         result.updated shouldBeEqualTo 0
                         result.failed shouldBeEqualTo 0
                     }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
                 }
 
                 it("Does not send when dialogmelding already sent to arena") {
@@ -129,6 +131,7 @@ class SendDialogmeldingArenaCronjobSpek : Spek({
                         result.updated shouldBeEqualTo 0
                         result.failed shouldBeEqualTo 0
                     }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
                 }
 
                 it("Does not send when no new dialogmelding received") {
@@ -138,6 +141,7 @@ class SendDialogmeldingArenaCronjobSpek : Spek({
                         result.updated shouldBeEqualTo 0
                         result.failed shouldBeEqualTo 0
                     }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
                 }
 
                 it("Does not send when apprec sent within 10 minutes") {
@@ -155,6 +159,7 @@ class SendDialogmeldingArenaCronjobSpek : Spek({
                         result.updated shouldBeEqualTo 0
                         result.failed shouldBeEqualTo 0
                     }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
                 }
 
                 it("Does not send when not published to kafka") {
@@ -171,6 +176,7 @@ class SendDialogmeldingArenaCronjobSpek : Spek({
                         result.updated shouldBeEqualTo 0
                         result.failed shouldBeEqualTo 0
                     }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
                 }
 
                 it("Does not send if melding has apprec = INVALID") {
@@ -191,6 +197,7 @@ class SendDialogmeldingArenaCronjobSpek : Spek({
                         result.updated shouldBeEqualTo 0
                         result.failed shouldBeEqualTo 0
                     }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
                 }
 
                 it("Fails when sending on MQ throws error") {
@@ -210,6 +217,7 @@ class SendDialogmeldingArenaCronjobSpek : Spek({
                         result.updated shouldBeEqualTo 0
                         result.failed shouldBeEqualTo 1
                     }
+                    verify(exactly = 1) { mqSender.sendArena(any()) }
                 }
             }
         }
