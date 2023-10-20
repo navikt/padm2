@@ -344,11 +344,16 @@ fun Connection.getUnpublishedArenaMeldinger(): List<Pair<String, String>> =
     prepareStatement(
     """
         SELECT id, fellesformat
-        FROM dialogmeldingopplysninger
-        WHERE arena IS NULL AND
-            apprec IS NOT NULL AND
-            apprec < (NOW() - INTERVAL '10 minutes') AND
-            dialogmelding_published IS NOT NULL;
+        FROM dialogmeldingopplysninger d
+        WHERE arena IS NULL
+            AND apprec IS NOT NULL
+            AND apprec < (NOW() - INTERVAL '10 minutes')
+            AND dialogmelding_published IS NOT NULL
+            AND EXISTS (
+                SELECT 1
+                FROM behandlingsutfall b
+                WHERE b.id = d.id AND behandlingsutfall ->> 'status' = 'OK'
+            );
         """
     ).use { connection ->
         connection.executeQuery().toList {

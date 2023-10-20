@@ -10,6 +10,8 @@ import no.nav.syfo.client.SmtssClient
 import no.nav.syfo.client.TssId
 import no.nav.syfo.dropData
 import no.nav.syfo.model.ReceivedDialogmelding
+import no.nav.syfo.model.Status
+import no.nav.syfo.model.ValidationResult
 import no.nav.syfo.persistering.db.*
 import no.nav.syfo.services.ArenaDialogmeldingService
 import no.nav.syfo.services.EmottakService
@@ -62,10 +64,20 @@ class SendDialogmeldingArenaCronjobSpek: Spek ({
                     inputMessageText = fellesformat,
                 )
                 
-                fun createDialogmeldingOpplysning(receivedDialogmelding: ReceivedDialogmelding): String {
+                fun createDialogmeldingOpplysning(
+                    receivedDialogmelding: ReceivedDialogmelding,
+                    apprecStatus: Status = Status.OK
+                ): String {
                     database.connection.use {
                         val id = it.opprettDialogmeldingOpplysninger(
                             receivedDialogmelding = receivedDialogmelding,
+                        )
+                        it.opprettBehandlingsutfall(
+                            validationResult = ValidationResult(
+                                status = apprecStatus,
+                                ruleHits = emptyList(),
+                            ),
+                            dialogmeldingid = id,
                         )
                         it.commit()
                         return id
@@ -147,6 +159,26 @@ class SendDialogmeldingArenaCronjobSpek: Spek ({
                 
                 it("Does not send when not published to kafka") {
                     val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmelding)
+                    database.lagreSendtApprec(dialogmeldingId)
+                    database.updateSendtApprec(
+                        dialogmeldingId = dialogmeldingId,
+                        timestamp = Timestamp.valueOf(LocalDateTime.now().minusHours(3)),
+                    )
+                    
+                    runBlocking {
+                        val result = sendDialogmeldingArenaCronjob.runJob()
+                        
+                        result.updated shouldBeEqualTo 0
+                        result.failed shouldBeEqualTo 0
+                    }
+                }
+                
+                it("Does not send if melding has apprec = INVALID") {
+                    val dialogmeldingId = createDialogmeldingOpplysning(
+                        receivedDialogmelding = receivedDialogmelding,
+                        apprecStatus = Status.INVALID,
+                    )
+                    database.lagreSendtKafka(dialogmeldingId)
                     database.lagreSendtApprec(dialogmeldingId)
                     database.updateSendtApprec(
                         dialogmeldingId = dialogmeldingId,
