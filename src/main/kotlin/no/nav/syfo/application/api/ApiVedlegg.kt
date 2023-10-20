@@ -37,7 +37,7 @@ fun Route.registerVedleggSystemApi(
                 val fellesformat = safeUnmarshal(fellesformatString)
 
                 call.respond(
-                    extractVedlegg(fellesformat)
+                    extractValidVedlegg(fellesformat)
                         .map { it.toVedlegg() }
                         .map { it.toPDFVedlegg() }
                         .map { VedleggDTO(it.contentBase64) }

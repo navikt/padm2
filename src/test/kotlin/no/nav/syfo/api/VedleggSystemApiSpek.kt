@@ -97,6 +97,31 @@ class VedleggSystemApiSpek : Spek({
                             response.status() shouldBeEqualTo HttpStatusCode.OK
                         }
                     }
+                    it("should only get valid vedlegg") {
+                        every { incomingMessage.text } returns(
+                            getFileAsString("src/test/resources/dialogmelding_dialog_notat_vedlegg.xml")
+                                .replace(
+                                    "<MimeType>image/jpeg</MimeType>",
+                                    "<MimeType>application/pdf</MimeType>",
+                                )
+                                .replace(
+                                    "<MsgId>37340D30-FE14-42B5-985F-A8FF8FFA0CB5</MsgId>",
+                                    "<MsgId>$msgId</MsgId>",
+                                )
+                            )
+                        runBlocking {
+                            blockingApplicationRunner.processMessage(incomingMessage)
+                        }
+                        with(
+                            handleRequest(HttpMethod.Get, url) {
+                                addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                            }
+                        ) {
+                            val vedleggListe = objectMapper.readValue<List<VedleggDTO>>(response.content!!)
+                            vedleggListe.size shouldBeEqualTo 1
+                            response.status() shouldBeEqualTo HttpStatusCode.OK
+                        }
+                    }
                     it("should get plenty of vedlegg for msgId") {
                         every { incomingMessage.text } returns(
                             getFileAsString("src/test/resources/dialogmelding_dialog_notat_veldig_mange_vedlegg.xml")
