@@ -16,6 +16,9 @@ fun extractDialogmelding(fellesformat: XMLEIFellesformat): XMLDialogmelding =
         it.refDoc.msgType.v == "XML"
     }.refDoc.content.any[0] as XMLDialogmelding
 
+fun extractPatient(fellesformat: XMLEIFellesformat): XMLPatient =
+    fellesformat.get<XMLMsgHead>().msgInfo.patient
+
 fun extractValidVedlegg(fellesformat: XMLEIFellesformat) = fellesformat.get<XMLMsgHead>().document.filter {
     it.isVedlegg() && it.pdfContentMatchesMimeType()
 }
@@ -73,11 +76,11 @@ fun no.nav.helse.msgHead.XMLHealthcareProfessional.toBehandler(): Behandler = Be
 )
 
 fun extractBehandler(fellesformat: XMLEIFellesformat): Behandler? {
-    val behandlerInMsgHead = fellesformat.get<XMLMsgHead>().msgInfo.sender.organisation?.healthcareProfessional?.toBehandler() ?: null
+    val behandlerInMsgHead = fellesformat.get<XMLMsgHead>().msgInfo.sender.organisation?.healthcareProfessional?.toBehandler()
 
     return if (behandlerInMsgHead != null) behandlerInMsgHead else {
         val rollerListe = extractDialogmelding(fellesformat).notat.first().rollerRelatertNotat
-        if (rollerListe.isNullOrEmpty()) null else rollerListe.first().healthcareProfessional?.toBehandler() ?: null
+        if (rollerListe.isNullOrEmpty()) null else rollerListe.first().healthcareProfessional?.toBehandler()
     }
 }
 
