@@ -4,6 +4,8 @@ import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import no.nav.syfo.db.DatabaseInterface
 import org.flywaydb.core.Flyway
 import java.sql.Connection
+import java.sql.SQLException
+import java.sql.Timestamp
 
 class TestDatabase : DatabaseInterface {
     private lateinit var pg: EmbeddedPostgres
@@ -48,6 +50,26 @@ fun DatabaseInterface.dropData() {
     this.connection.use { connection ->
         queryList.forEach { query ->
             connection.prepareStatement(query).execute()
+        }
+        connection.commit()
+    }
+}
+
+fun DatabaseInterface.updateSendtApprec(dialogmeldingId: String, timestamp: Timestamp) {
+    connection.use { connection ->
+        connection.prepareStatement(
+            """
+                UPDATE DIALOGMELDINGOPPLYSNINGER
+                SET apprec=?
+                WHERE ID=?;
+                """
+        ).use {
+            it.setTimestamp(1, timestamp)
+            it.setString(2, dialogmeldingId)
+            val updated = it.executeUpdate()
+            if (updated != 1) {
+                throw SQLException("Expected a single row to be updated, got update count $updated")
+            }
         }
         connection.commit()
     }

@@ -37,8 +37,8 @@ fun ResultSet.toDialogmeldingTidspunkt(): DialogmeldingTidspunkt =
         mottattTidspunkt = getTimestamp("mottatt_tidspunkt").toLocalDateTime(),
     )
 
-private fun Connection.opprettDialogmeldingOpplysninger(receivedDialogmelding: ReceivedDialogmelding) {
-    this.prepareStatement(
+fun Connection.opprettDialogmeldingOpplysninger(receivedDialogmelding: ReceivedDialogmelding): String {
+    val ids = this.prepareStatement(
         """
             INSERT INTO DIALOGMELDINGOPPLYSNINGER(
                 id,
@@ -56,6 +56,7 @@ private fun Connection.opprettDialogmeldingOpplysninger(receivedDialogmelding: R
                 apprec
                 )
             VALUES  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            RETURNING id
             """
     ).use {
         it.setString(1, receivedDialogmelding.dialogmelding.id)
@@ -71,8 +72,13 @@ private fun Connection.opprettDialogmeldingOpplysninger(receivedDialogmelding: R
         it.setNull(11, Types.TIMESTAMP)
         it.setNull(12, Types.TIMESTAMP)
         it.setNull(13, Types.TIMESTAMP)
-        it.executeUpdate()
+        it.executeQuery().toList { getString("id") }
     }
+    
+    if (ids.size != 1) {
+        throw SQLException("Creating DIALOGMELDINGOPPLYSNINGER failed, no rows affected.")
+    }
+    return ids.first()
 }
 
 private fun Connection.opprettDialogmeldingDokument(dialogmelding: Dialogmelding, sha256String: String) {

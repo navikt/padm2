@@ -20,6 +20,15 @@ class SendDialogmeldingArenaCronjob(
     override val intervalDelayMinutes: Long = 10
     
     override suspend fun run() {
+        val result = runJob()
+        log.info(
+            "Completed sending dialogmelding to arena with result: {}, {}",
+            StructuredArguments.keyValue("failed", result.failed),
+            StructuredArguments.keyValue("updated", result.updated),
+        )
+    }
+    
+    suspend fun runJob(): CronjobResult {
         val result = CronjobResult()
         try {
             database.connection.use { connection ->
@@ -46,11 +55,7 @@ class SendDialogmeldingArenaCronjob(
             result.failed++
         }
         
-        log.info(
-            "Completed sending dialogmelding to arena with result: {}, {}",
-            StructuredArguments.keyValue("failed", result.failed),
-            StructuredArguments.keyValue("updated", result.updated),
-        )
+        return result
     }
     
     companion object {
