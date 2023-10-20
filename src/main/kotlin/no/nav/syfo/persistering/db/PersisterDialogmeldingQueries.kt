@@ -74,7 +74,7 @@ fun Connection.opprettDialogmeldingOpplysninger(receivedDialogmelding: ReceivedD
         it.setNull(13, Types.TIMESTAMP)
         it.executeQuery().toList { getString("id") }
     }
-    
+
     if (ids.size != 1) {
         throw SQLException("Creating DIALOGMELDINGOPPLYSNINGER failed, no rows affected.")
     }
@@ -164,14 +164,11 @@ private const val queryGetArena = """
 
 fun DatabaseInterface.erDialogmeldingOpplysningerSendtArena(dialogmeldingid: String) =
     connection.use { connection ->
-        connection.erDialogmeldingOpplysningerSendtArena(dialogmeldingid)
-    }
-
-fun Connection.erDialogmeldingOpplysningerSendtArena(dialogmeldingid: String) =
-    prepareStatement(queryGetArena).use {
-        it.setString(1, dialogmeldingid)
-        val list = it.executeQuery().toList { getTimestamp("arena") }
-        list.isNotEmpty() && list.firstOrNull() != null
+        connection.prepareStatement(queryGetArena).use {
+            it.setString(1, dialogmeldingid)
+            val list = it.executeQuery().toList { getTimestamp("arena") }
+            list.isNotEmpty() && list.firstOrNull() != null
+        }
     }
 
 private const val queryUpdateArenaSendt = """
@@ -182,11 +179,14 @@ private const val queryUpdateArenaSendt = """
 
 fun DatabaseInterface.lagreSendtArena(dialogmeldingid: String) {
     connection.use { connection ->
-        connection.lagreSendtArena(dialogmeldingid)
+        connection.lagreSendtArena(
+            dialogmeldingId = dialogmeldingid,
+            commit = true,
+        )
     }
 }
 
-fun Connection.lagreSendtArena(dialogmeldingId: String) {
+fun Connection.lagreSendtArena(dialogmeldingId: String, commit: Boolean = false) {
     prepareStatement(queryUpdateArenaSendt).use {
         it.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()))
         it.setString(2, dialogmeldingId)
@@ -195,7 +195,9 @@ fun Connection.lagreSendtArena(dialogmeldingId: String) {
             throw SQLException("Expected a single row to be updated, got update count $updated")
         }
     }
-    commit()
+    if (commit) {
+        commit()
+    }
 }
 
 fun DatabaseInterface.erDialogmeldingOpplysningerSendtKafka(dialogmeldingid: String) =
@@ -339,31 +341,31 @@ fun DatabaseInterface.hasSavedDialogmeldingDokument(dialogmeldingId: String, sha
         }
     }
 
-// TODO: Noe for å håndtere de gamle meldingene?
-fun Connection.getUnpublishedArenaMeldinger(): List<Pair<String, String>> =
-    prepareStatement(
-    """
-        SELECT id, fellesformat
-        FROM dialogmeldingopplysninger d
-        WHERE arena IS NULL
-            AND apprec IS NOT NULL
-            AND apprec < (NOW() - INTERVAL '10 minutes')
-            AND dialogmelding_published IS NOT NULL
-            AND EXISTS (
-                SELECT 1
-                FROM behandlingsutfall b
-                WHERE b.id = d.id AND behandlingsutfall ->> 'status' = 'OK'
-            );
-        """
-    ).use { connection ->
-        connection.executeQuery().toList {
-            Pair(
-                first = getString("id"),
-                second = getString("fellesformat")
-            )
+fun DatabaseInterface.getUnpublishedArenaMeldinger(): List<Pair<String, String>> =
+    connection.use { connection ->
+        connection.prepareStatement(
+            """
+            SELECT id, fellesformat
+            FROM dialogmeldingopplysninger d
+            WHERE arena IS NULL
+                AND apprec IS NOT NULL
+                AND apprec < (NOW() - INTERVAL '10 minutes')
+                AND dialogmelding_published IS NOT NULL
+                AND EXISTS (
+                    SELECT 1
+                    FROM behandlingsutfall b
+                    WHERE b.id = d.id AND behandlingsutfall ->> 'status' = 'OK'
+                );
+            """
+        ).use {
+            it.executeQuery().toList {
+                Pair(
+                    first = getString("id"),
+                    second = getString("fellesformat")
+                )
+            }
         }
     }
-
 
 fun Dialogmelding.toPGObject() = PGobject().also {
     it.type = "json"
