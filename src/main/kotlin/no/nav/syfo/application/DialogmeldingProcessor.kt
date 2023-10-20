@@ -95,7 +95,7 @@ class DialogmeldingProcessor(
         val patientXml = extractPatient(fellesformat)
         val dialogmeldingType = findDialogmeldingType(emottakblokk.ebService, emottakblokk.ebAction)
         val xmlVedlegg = extractValidVedlegg(fellesformat)
-        val sha256String = sha256hashstring(dialogmeldingXml, xmlVedlegg)
+        val sha256String = sha256hashstring(dialogmeldingXml, patientXml, xmlVedlegg)
         val legekontorOrgNr = extractOrganisationNumberFromSender(fellesformat)?.id
         val pasientNavn = extractPasientNavn(fellesformat)
 
