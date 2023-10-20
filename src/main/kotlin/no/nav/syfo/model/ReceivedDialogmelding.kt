@@ -39,18 +39,18 @@ data class ReceivedDialogmelding(
             val behandlerIdent = extractIdentFromBehandler(fellesformat)
             val innbyggerIdent = extractInnbyggerident(fellesformat)
             val legekontorOrgNr = extractOrganisationNumberFromSender(fellesformat)?.id
-            
+
             if (behandlerIdent != legeIdent) {
                 logger.info("Behandler and avsender are different in dialogmelding: $dialogmeldingId")
             }
-            
+
             val dialogmelding = dialogmeldingXml.toDialogmelding(
                 dialogmeldingId = dialogmeldingId,
                 dialogmeldingType = dialogmeldingType,
                 signaturDato = msgHead.msgInfo.genDate,
                 navnHelsePersonellNavn = behandlerNavn
             )
-            
+
             return ReceivedDialogmelding(
                 dialogmelding = dialogmelding,
                 personNrPasient = innbyggerIdent!!,

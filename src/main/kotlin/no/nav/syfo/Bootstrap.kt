@@ -133,13 +133,13 @@ fun launchListeners(
         smtssClient = smtssClient,
         emottakService = emottakService,
     )
-    
+
     val arenaDialogmeldingService = ArenaDialogmeldingService(
         mqSender = mqSender,
         smtssClient = smtssClient,
         emottakService = emottakService,
     )
-    
+
     launchBackgroundTask(
         applicationState = applicationState,
     ) {
@@ -160,7 +160,7 @@ fun launchListeners(
             blockingApplicationRunner.run()
         }
     }
-    
+
     launchCronjobs(
         applicationState = applicationState,
         database = database,

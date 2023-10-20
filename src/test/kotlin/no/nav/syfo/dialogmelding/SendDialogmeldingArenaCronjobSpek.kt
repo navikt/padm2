@@ -25,17 +25,17 @@ import java.sql.Timestamp
 import java.time.LocalDateTime
 import java.util.UUID
 
-class SendDialogmeldingArenaCronjobSpek: Spek ({
+class SendDialogmeldingArenaCronjobSpek : Spek({
     describe(SendDialogmeldingArenaCronjob::class.java.simpleName) {
         with(TestApplicationEngine()) {
             start()
-            
+
             val externalMockEnvironment = ExternalMockEnvironment.instance
             val database = externalMockEnvironment.database
             val mqSender = mockk<MQSenderInterface>(relaxed = true)
             val emottakService = mockk<EmottakService>(relaxed = true)
             val smtssClient = mockk<SmtssClient>(relaxed = true)
-            
+
             val arenaDialogmeldingService = ArenaDialogmeldingService(
                 mqSender = mqSender,
                 smtssClient = smtssClient,
@@ -45,7 +45,7 @@ class SendDialogmeldingArenaCronjobSpek: Spek ({
                 database = database,
                 arenaDialogmeldingService = arenaDialogmeldingService,
             )
-            
+
             describe("Send dialogmeldinger to Arena via cronjob") {
                 beforeEachTest {
                     database.dropData()
@@ -54,7 +54,7 @@ class SendDialogmeldingArenaCronjobSpek: Spek ({
                     coEvery { smtssClient.findBestTss(any(), any(), any()) } returns TssId("123")
                     coJustRun { emottakService.registerEmottakSubscription(any(), any(), any(), any(), any()) }
                 }
-                
+
                 val fellesformat =
                     getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
                 val fellesformatXml = getFellesformatXMLFromString(fellesformat)
@@ -63,7 +63,7 @@ class SendDialogmeldingArenaCronjobSpek: Spek ({
                     fellesformat = fellesformatXml,
                     inputMessageText = fellesformat,
                 )
-                
+
                 fun createDialogmeldingOpplysning(
                     receivedDialogmelding: ReceivedDialogmelding,
                     apprecStatus: Status = Status.OK
@@ -83,7 +83,7 @@ class SendDialogmeldingArenaCronjobSpek: Spek ({
                         return id
                     }
                 }
-                
+
                 it("Sends dialogmelding to arena") {
                     val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmelding)
                     database.lagreSendtKafka(dialogmeldingId)
@@ -92,27 +92,27 @@ class SendDialogmeldingArenaCronjobSpek: Spek ({
                         dialogmeldingId = dialogmeldingId,
                         timestamp = Timestamp.valueOf(LocalDateTime.now().minusHours(3)),
                     )
-                    
+
                     runBlocking {
                         val result = sendDialogmeldingArenaCronjob.runJob()
-                        
+
                         result.updated shouldBeEqualTo 1
                         result.failed shouldBeEqualTo 0
                     }
                 }
-                
+
                 it("Does not send when no apprec") {
                     val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmelding)
                     database.lagreSendtKafka(dialogmeldingId)
-                    
+
                     runBlocking {
                         val result = sendDialogmeldingArenaCronjob.runJob()
-                        
+
                         result.updated shouldBeEqualTo 0
                         result.failed shouldBeEqualTo 0
                     }
                 }
-                
+
                 it("Does not send when dialogmelding already sent to arena") {
                     val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmelding)
                     database.lagreSendtKafka(dialogmeldingId)
@@ -122,24 +122,24 @@ class SendDialogmeldingArenaCronjobSpek: Spek ({
                         timestamp = Timestamp.valueOf(LocalDateTime.now().minusHours(3)),
                     )
                     database.lagreSendtArena(dialogmeldingId)
-                    
+
                     runBlocking {
                         val result = sendDialogmeldingArenaCronjob.runJob()
-                        
+
                         result.updated shouldBeEqualTo 0
                         result.failed shouldBeEqualTo 0
                     }
                 }
-                
+
                 it("Does not send when no new dialogmelding received") {
                     runBlocking {
                         val result = sendDialogmeldingArenaCronjob.runJob()
-                        
+
                         result.updated shouldBeEqualTo 0
                         result.failed shouldBeEqualTo 0
                     }
                 }
-                
+
                 it("Does not send when apprec sent within 10 minutes") {
                     val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmelding)
                     database.lagreSendtKafka(dialogmeldingId)
@@ -148,15 +148,15 @@ class SendDialogmeldingArenaCronjobSpek: Spek ({
                         dialogmeldingId = dialogmeldingId,
                         timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(1)),
                     )
-                    
+
                     runBlocking {
                         val result = sendDialogmeldingArenaCronjob.runJob()
-                        
+
                         result.updated shouldBeEqualTo 0
                         result.failed shouldBeEqualTo 0
                     }
                 }
-                
+
                 it("Does not send when not published to kafka") {
                     val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmelding)
                     database.lagreSendtApprec(dialogmeldingId)
@@ -164,15 +164,15 @@ class SendDialogmeldingArenaCronjobSpek: Spek ({
                         dialogmeldingId = dialogmeldingId,
                         timestamp = Timestamp.valueOf(LocalDateTime.now().minusHours(3)),
                     )
-                    
+
                     runBlocking {
                         val result = sendDialogmeldingArenaCronjob.runJob()
-                        
+
                         result.updated shouldBeEqualTo 0
                         result.failed shouldBeEqualTo 0
                     }
                 }
-                
+
                 it("Does not send if melding has apprec = INVALID") {
                     val dialogmeldingId = createDialogmeldingOpplysning(
                         receivedDialogmelding = receivedDialogmelding,
@@ -184,15 +184,15 @@ class SendDialogmeldingArenaCronjobSpek: Spek ({
                         dialogmeldingId = dialogmeldingId,
                         timestamp = Timestamp.valueOf(LocalDateTime.now().minusHours(3)),
                     )
-                    
+
                     runBlocking {
                         val result = sendDialogmeldingArenaCronjob.runJob()
-                        
+
                         result.updated shouldBeEqualTo 0
                         result.failed shouldBeEqualTo 0
                     }
                 }
-                
+
                 it("Fails when sending on MQ throws error") {
                     val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmelding)
                     database.lagreSendtKafka(dialogmeldingId)
@@ -201,12 +201,12 @@ class SendDialogmeldingArenaCronjobSpek: Spek ({
                         dialogmeldingId = dialogmeldingId,
                         timestamp = Timestamp.valueOf(LocalDateTime.now().minusHours(3)),
                     )
-                    
+
                     every { mqSender.sendArena(any()) } throws Exception()
-                    
+
                     runBlocking {
                         val result = sendDialogmeldingArenaCronjob.runJob()
-                        
+
                         result.updated shouldBeEqualTo 0
                         result.failed shouldBeEqualTo 1
                     }

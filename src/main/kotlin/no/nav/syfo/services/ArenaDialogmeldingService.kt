@@ -32,7 +32,7 @@ class ArenaDialogmeldingService(
             emottakblokk = emottakBlokk,
             dialogmelding = receivedDialogmelding.dialogmelding,
         )
-        
+
         sendArenaDialogNotat(
             mqSender = mqSender,
             arenaDialogNotat = arenaDialogNotat,
@@ -43,7 +43,7 @@ class ArenaDialogmeldingService(
             )
         )
     }
-    
+
     private suspend fun getTssId(
         receivedDialogmelding: ReceivedDialogmelding,
         fellesformatXml: XMLEIFellesformat,
@@ -53,7 +53,7 @@ class ArenaDialogmeldingService(
             legekontorOrgName = receivedDialogmelding.legekontorOrgName,
             dialogmeldingId = receivedDialogmelding.msgId,
         )
-        
+
         if (tssId != null && tssId.tssid.isNotBlank()) {
             val msgHead: XMLMsgHead = fellesformatXml.get()
             val emottakBlokk = fellesformatXml.get<XMLMottakenhetBlokk>()
@@ -69,10 +69,10 @@ class ArenaDialogmeldingService(
                 ),
             )
         }
-        
+
         return tssId?.tssid ?: ""
     }
-    
+
     private fun getLoggingMeta(
         emottakBlokk: XMLMottakenhetBlokk,
         fellesformatXml: XMLEIFellesformat,

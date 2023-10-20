@@ -13,16 +13,16 @@ fun launchCronjobs(
     arenaDialogmeldingService: ArenaDialogmeldingService,
 ) {
     val cronjobRunner = CronjobRunner(applicationState)
-    
+
     val rerunCronJob = RerunCronJob(
         database = database,
         dialogmeldingProcessor = dialogmeldingProcessor,
     )
-    
+
     val allCronjobs = mutableListOf<Cronjob>(
         rerunCronJob,
     )
-    
+
     if (environment.useCronjobToPublishToArena) {
         val sendDialogmeldingArenaCronjob = SendDialogmeldingArenaCronjob(
             database = database,
@@ -30,7 +30,7 @@ fun launchCronjobs(
         )
         allCronjobs.add(sendDialogmeldingArenaCronjob)
     }
-    
+
     allCronjobs.forEach {
         launchBackgroundTask(applicationState) {
             cronjobRunner.start(cronjob = it)
