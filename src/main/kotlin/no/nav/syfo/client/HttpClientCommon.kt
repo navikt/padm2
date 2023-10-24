@@ -26,7 +26,7 @@ val commonConfig: HttpClientConfig<out HttpClientEngineConfig>.() -> Unit = {
 val pdfGenConfig: HttpClientConfig<out HttpClientEngineConfig>.() -> Unit = {
     this.commonConfig()
     install(HttpTimeout) {
-        requestTimeoutMillis = 120*1000
+        requestTimeoutMillis = 120 * 1000
     }
 }
 
