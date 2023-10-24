@@ -30,8 +30,8 @@ class SendDialogmeldingArenaCronjob(
     suspend fun runJob(): CronjobResult {
         val result = CronjobResult()
         val unpublishedArenaMeldinger = database.getUnpublishedArenaMeldinger()
-        try {
-            unpublishedArenaMeldinger.forEach { (dialogmeldingId, fellesformat) ->
+        unpublishedArenaMeldinger.forEach { (dialogmeldingId, fellesformat) ->
+            try {
                 val fellesformatXml = safeUnmarshal(fellesformat)
                 val receivedDialogmelding = ReceivedDialogmelding.create(
                     dialogmeldingId = dialogmeldingId,
@@ -44,10 +44,10 @@ class SendDialogmeldingArenaCronjob(
                 )
                 database.lagreSendtArena(dialogmeldingId)
                 result.updated++
+            } catch (e: Exception) {
+                log.error("Caught exception in sending dialogmelding to arena", e)
+                result.failed++
             }
-        } catch (e: Exception) {
-            log.error("Caught exception in sending dialogmelding to arena", e)
-            result.failed++
         }
 
         return result
