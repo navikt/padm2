@@ -1,5 +1,6 @@
 package no.nav.syfo.application
 
+import io.ktor.client.*
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.helse.dialogmelding.XMLDialogmelding
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
@@ -37,7 +38,7 @@ class DialogmeldingProcessor(
 ) {
     val pdfgenClient = PdfgenClient(
         url = env.syfopdfgen,
-        httpClient = httpClient,
+        httpClient = httpClientPdfgen,
     )
 
     val pdlClient = PdlClient(

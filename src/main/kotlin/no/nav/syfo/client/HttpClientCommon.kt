@@ -23,6 +23,13 @@ val commonConfig: HttpClientConfig<out HttpClientEngineConfig>.() -> Unit = {
     expectSuccess = true
 }
 
+val pdfGenConfig: HttpClientConfig<out HttpClientEngineConfig>.() -> Unit = {
+    this.commonConfig()
+    install(HttpTimeout) {
+        requestTimeoutMillis = 120 * 1000
+    }
+}
+
 val retryAllConfig: HttpClientConfig<out HttpClientEngineConfig>.() -> Unit = {
     install(ContentNegotiation) {
         jackson { configure() }
@@ -48,3 +55,4 @@ val proxyConfig: HttpClientConfig<ApacheEngineConfig>.() -> Unit = {
 val httpClient = HttpClient(Apache, commonConfig)
 val httpClientRetryAll = HttpClient(Apache, retryAllConfig)
 val httpClientWithProxy = HttpClient(Apache, proxyConfig)
+val httpClientPdfgen = HttpClient(Apache, pdfGenConfig)
