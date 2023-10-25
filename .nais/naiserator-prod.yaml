@@ -61,6 +61,7 @@ spec:
           namespace: teamsykmelding
         - application: syfohelsenettproxy
           namespace: teamsykmelding
+        - application: isbehandlerdialog
   azure:
     application:
       allowAllUsers: true
