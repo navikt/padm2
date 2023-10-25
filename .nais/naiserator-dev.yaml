@@ -49,9 +49,7 @@ spec:
         - host: "login.microsoftonline.com"
         - host: "b27apvl222.preprod.local"
           ports:
-            - name: MQ
-              port: 1413
-              protocol: TCP
+          - port: 1413
         - host: "dokarkiv.dev-fss-pub.nais.io"
         - host: "pdl-api.dev-fss-pub.nais.io"
         - host: "btsys.dev-fss-pub.nais.io"

@@ -49,9 +49,7 @@ spec:
         - host: "login.microsoftonline.com"
         - host: "mpls04.adeo.no"
           ports:
-            - name: MQ
-              port: 1414
-              protocol: TCP
+          - port: 1414
         - host: "dokarkiv.prod-fss-pub.nais.io"
         - host: "pdl-api.prod-fss-pub.nais.io"
         - host: "btsys.prod-fss-pub.nais.io"
