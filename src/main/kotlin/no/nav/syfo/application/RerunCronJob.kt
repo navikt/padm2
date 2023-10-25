@@ -13,7 +13,7 @@ class RerunCronJob(
     val database: DatabaseInterface,
     val dialogmeldingProcessor: DialogmeldingProcessor,
 ) : Cronjob {
-    override val initialDelayMinutes: Long = 2
+    override val initialDelayMinutes: Long = 7
     override val intervalDelayMinutes: Long = 10
 
     override suspend fun run() {
