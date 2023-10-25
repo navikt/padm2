@@ -30,23 +30,25 @@ class SendDialogmeldingArenaCronjob(
     suspend fun runJob(): CronjobResult {
         val result = CronjobResult()
         val unpublishedArenaMeldinger = database.getUnpublishedArenaMeldinger()
-        unpublishedArenaMeldinger.forEach { (dialogmeldingId, fellesformat) ->
+        unpublishedArenaMeldinger.forEach { (dialogmeldingId, fellesformat, msgId) ->
             try {
-                val fellesformatXml = safeUnmarshal(fellesformat)
-                val receivedDialogmelding = ReceivedDialogmelding.create(
-                    dialogmeldingId = dialogmeldingId,
-                    fellesformat = fellesformatXml,
-                    inputMessageText = fellesformat,
-                )
-                arenaDialogmeldingService.sendArenaDialogmeldingToMQ(
-                    receivedDialogmelding = receivedDialogmelding,
-                    fellesformatXml = fellesformatXml
-                )
-                database.lagreSendtArena(
-                    dialogmeldingid = dialogmeldingId,
-                    isSent = true,
-                )
-                result.updated++
+                if (!arenaDialogmeldingService.isMeldingStoredInModia(msgId)) {
+                    val fellesformatXml = safeUnmarshal(fellesformat)
+                    val receivedDialogmelding = ReceivedDialogmelding.create(
+                        dialogmeldingId = dialogmeldingId,
+                        fellesformat = fellesformatXml,
+                        inputMessageText = fellesformat,
+                    )
+                    arenaDialogmeldingService.sendArenaDialogmeldingToMQ(
+                        receivedDialogmelding = receivedDialogmelding,
+                        fellesformatXml = fellesformatXml
+                    )
+                    database.lagreSendtArena(
+                        dialogmeldingid = dialogmeldingId,
+                        isSent = true,
+                    )
+                    result.updated++
+                }
             } catch (e: Exception) {
                 log.error("Caught exception in sending dialogmelding to arena", e)
                 result.failed++
