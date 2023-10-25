@@ -12,6 +12,7 @@ import no.nav.syfo.client.SmtssClient
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.client.httpClient
 import no.nav.syfo.client.httpClientWithProxy
+import no.nav.syfo.client.isbehandlerdialog.BehandlerdialogClient
 import no.nav.syfo.client.wellknown.getWellKnown
 import no.nav.syfo.db.Database
 import no.nav.syfo.kafka.*
@@ -134,10 +135,17 @@ fun launchListeners(
         emottakService = emottakService,
     )
 
+    val behandlerdialogClient = BehandlerdialogClient(
+        azureAdV2Client = azureAdV2Client,
+        behandlerdialogClientId = env.isbehandlerdialogClientId,
+        behandlerdialogUrl = env.isbehandlerdialogUrl,
+    )
+
     val arenaDialogmeldingService = ArenaDialogmeldingService(
         mqSender = mqSender,
         smtssClient = smtssClient,
         emottakService = emottakService,
+        behandlerdialogClient = behandlerdialogClient,
     )
 
     launchBackgroundTask(

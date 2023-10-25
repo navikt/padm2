@@ -121,5 +121,9 @@ spec:
       value: prod-fss.teamsykmelding.smgcp-proxy
     - name: SMGCP_PROXY_URL
       value: https://smgcp-proxy.prod-fss-pub.nais.io
+    - name: ISBEHANDLERDIALOG_CLIENT_ID
+      value: "prod-gcp.teamsykefravr.isbehandlerdialog"
+    - name: ISBEHANDLERDIALOG_ENDPOINT_URL
+      value: "http://isbehandlerdialog"
     - name: USE_CRONJOB_TO_PUBLISH_TO_ARENA
       value: "true"

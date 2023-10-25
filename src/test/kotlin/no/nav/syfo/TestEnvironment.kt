@@ -16,6 +16,7 @@ fun testEnvironment(
     legeSuspensjonEndpointUrl: String,
     smtssUrl: String,
     smgcpUrl: String,
+    isbehandlerdialogUrl: String,
 ) = Environment(
     aadAppClient = "isdialogmote-client-id",
     aadAppSecret = "isdialogmote-secret",
@@ -60,6 +61,8 @@ fun testEnvironment(
     smtssApiUrl = smtssUrl,
     smgcpProxyClientId = "smgcp",
     smgcpProxyUrl = smgcpUrl,
+    isbehandlerdialogClientId = "isbehandlerdialog",
+    isbehandlerdialogUrl = isbehandlerdialogUrl,
     useCronjobToPublishToArena = true,
 )
 

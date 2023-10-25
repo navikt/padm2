@@ -6,6 +6,7 @@ import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.client.SmtssClient
 import no.nav.syfo.client.createArenaDialogNotat
+import no.nav.syfo.client.isbehandlerdialog.BehandlerdialogClient
 import no.nav.syfo.client.sendArenaDialogNotat
 import no.nav.syfo.domain.PersonIdent
 import no.nav.syfo.model.ReceivedDialogmelding
@@ -15,6 +16,7 @@ class ArenaDialogmeldingService(
     private val mqSender: MQSenderInterface,
     private val smtssClient: SmtssClient,
     private val emottakService: EmottakService,
+    private val behandlerdialogClient: BehandlerdialogClient,
 ) {
     suspend fun sendArenaDialogmeldingToMQ(
         receivedDialogmelding: ReceivedDialogmelding,

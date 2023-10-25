@@ -52,6 +52,8 @@ data class Environment(
     val smtssClientId: String = getEnvVar("SMTSS_CLIENT_ID"),
     val smgcpProxyUrl: String = getEnvVar("SMGCP_PROXY_URL"),
     val smgcpProxyClientId: String = getEnvVar("SMGCP_PROXY_CLIENT_ID"),
+    val isbehandlerdialogClientId: String = getEnvVar("ISBEHANDLERDIALOG_CLIENT_ID"),
+    val isbehandlerdialogUrl: String = getEnvVar("ISBEHANDLERDIALOG_ENDPOINT_URL"),
     val useCronjobToPublishToArena: Boolean = getEnvVar("USE_CRONJOB_TO_PUBLISH_TO_ARENA").toBoolean(),
 ) : MqConfig {
     fun jdbcUrl(): String {
