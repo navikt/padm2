@@ -33,6 +33,7 @@ suspend fun handleStatusOK(
     pasientNavn: String,
     navnSignerendeLege: String,
     tssId: String,
+    useCronjobToPublishToArena: Boolean,
 ) {
     val journalpostId = journalService.onJournalRequest(
         receivedDialogmelding,
@@ -43,7 +44,7 @@ suspend fun handleStatusOK(
         navnSignerendeLege
     )
 
-    if (!database.erDialogmeldingOpplysningerSendtArena(receivedDialogmelding.dialogmelding.id)) {
+    if (!useCronjobToPublishToArena && !database.erDialogmeldingOpplysningerSendtArena(receivedDialogmelding.dialogmelding.id)) {
         sendArenaDialogNotat(
             mqSender,
             createArenaDialogNotat(

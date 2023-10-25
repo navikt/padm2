@@ -37,8 +37,8 @@ fun ResultSet.toDialogmeldingTidspunkt(): DialogmeldingTidspunkt =
         mottattTidspunkt = getTimestamp("mottatt_tidspunkt").toLocalDateTime(),
     )
 
-private fun Connection.opprettDialogmeldingOpplysninger(receivedDialogmelding: ReceivedDialogmelding) {
-    this.prepareStatement(
+fun Connection.opprettDialogmeldingOpplysninger(receivedDialogmelding: ReceivedDialogmelding): String {
+    val ids = this.prepareStatement(
         """
             INSERT INTO DIALOGMELDINGOPPLYSNINGER(
                 id,
@@ -56,6 +56,7 @@ private fun Connection.opprettDialogmeldingOpplysninger(receivedDialogmelding: R
                 apprec
                 )
             VALUES  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            RETURNING id
             """
     ).use {
         it.setString(1, receivedDialogmelding.dialogmelding.id)
@@ -71,8 +72,13 @@ private fun Connection.opprettDialogmeldingOpplysninger(receivedDialogmelding: R
         it.setNull(11, Types.TIMESTAMP)
         it.setNull(12, Types.TIMESTAMP)
         it.setNull(13, Types.TIMESTAMP)
-        it.executeUpdate()
+        it.executeQuery().toList { getString("id") }
     }
+
+    if (ids.size != 1) {
+        throw SQLException("Creating DIALOGMELDINGOPPLYSNINGER failed, no rows affected.")
+    }
+    return ids.first()
 }
 
 private fun Connection.opprettDialogmeldingDokument(dialogmelding: Dialogmelding, sha256String: String) {
@@ -150,38 +156,47 @@ fun DatabaseInterface.hentDialogmeldingOpplysningerJournalpostId(dialogmeldingid
         }
     }
 
+private const val queryGetArena = """
+    SELECT arena
+    FROM DIALOGMELDINGOPPLYSNINGER
+    WHERE id=?;
+"""
+
 fun DatabaseInterface.erDialogmeldingOpplysningerSendtArena(dialogmeldingid: String) =
     connection.use { connection ->
-        connection.prepareStatement(
-            """
-                SELECT arena
-                FROM DIALOGMELDINGOPPLYSNINGER
-                WHERE id=?;
-                """
-        ).use {
+        connection.prepareStatement(queryGetArena).use {
             it.setString(1, dialogmeldingid)
             val list = it.executeQuery().toList { getTimestamp("arena") }
             list.isNotEmpty() && list.firstOrNull() != null
         }
     }
 
+private const val queryUpdateArenaSendt = """
+    UPDATE DIALOGMELDINGOPPLYSNINGER
+    SET ARENA=?
+    WHERE ID=?;
+"""
+
 fun DatabaseInterface.lagreSendtArena(dialogmeldingid: String) {
     connection.use { connection ->
-        connection.prepareStatement(
-            """
-                UPDATE DIALOGMELDINGOPPLYSNINGER 
-                SET ARENA=?
-                WHERE ID=?;
-                """
-        ).use {
-            it.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()))
-            it.setString(2, dialogmeldingid)
-            val updated = it.executeUpdate()
-            if (updated != 1) {
-                throw SQLException("Expected a single row to be updated, got update count $updated")
-            }
+        connection.lagreSendtArena(
+            dialogmeldingId = dialogmeldingid,
+            commit = true,
+        )
+    }
+}
+
+fun Connection.lagreSendtArena(dialogmeldingId: String, commit: Boolean = false) {
+    prepareStatement(queryUpdateArenaSendt).use {
+        it.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()))
+        it.setString(2, dialogmeldingId)
+        val updated = it.executeUpdate()
+        if (updated != 1) {
+            throw SQLException("Expected a single row to be updated, got update count $updated")
         }
-        connection.commit()
+    }
+    if (commit) {
+        commit()
     }
 }
 
@@ -323,6 +338,32 @@ fun DatabaseInterface.hasSavedDialogmeldingDokument(dialogmeldingId: String, sha
             it.setString(1, dialogmeldingId)
             it.setString(2, shaString)
             it.executeQuery().next()
+        }
+    }
+
+fun DatabaseInterface.getUnpublishedArenaMeldinger(): List<Pair<String, String>> =
+    connection.use { connection ->
+        connection.prepareStatement(
+            """
+            SELECT id, fellesformat
+            FROM dialogmeldingopplysninger d
+            WHERE arena IS NULL
+                AND apprec IS NOT NULL
+                AND apprec < (NOW() - INTERVAL '10 minutes')
+                AND dialogmelding_published IS NOT NULL
+                AND EXISTS (
+                    SELECT 1
+                    FROM behandlingsutfall b
+                    WHERE b.id = d.id AND behandlingsutfall ->> 'status' = 'OK'
+                );
+            """
+        ).use {
+            it.executeQuery().toList {
+                Pair(
+                    first = getString("id"),
+                    second = getString("fellesformat")
+                )
+            }
         }
     }
 

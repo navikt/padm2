@@ -1,9 +1,10 @@
-package no.nav.syfo.application
+package no.nav.syfo.application.cronjob
 
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.logstash.logback.argument.StructuredArguments
+import no.nav.syfo.application.ApplicationState
 import org.slf4j.LoggerFactory
 import java.time.Duration
 

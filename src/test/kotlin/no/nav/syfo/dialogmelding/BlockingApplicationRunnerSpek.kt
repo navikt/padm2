@@ -76,7 +76,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
-                    verify(exactly = 1) { mqSender.sendArena(any()) }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                     dialogmeldingId shouldNotBe null
                     val journalpostId = database.hentDialogmeldingOpplysningerJournalpostId(dialogmeldingId!!)
@@ -91,7 +91,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
-                    verify(exactly = 1) { mqSender.sendArena(any()) }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                     dialogmeldingId shouldNotBe null
                     val journalpostId = database.hentDialogmeldingOpplysningerJournalpostId(dialogmeldingId!!)
@@ -119,7 +119,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     }
                     verify(exactly = 0) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
-                    verify(exactly = 1) { mqSender.sendArena(any()) }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                 }
                 it("Prosesserer innkommet melding (melding ok, men pdf-gen feiler)") {
@@ -141,7 +141,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
-                    verify(exactly = 1) { mqSender.sendArena(any()) }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                 }
 
@@ -169,7 +169,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
-                    verify(exactly = 1) { mqSender.sendArena(any()) }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                 }
                 it("Prosesserer innkommet melding (ugyldig kodeverk)") {
@@ -193,7 +193,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
-                    verify(exactly = 1) { mqSender.sendArena(any()) }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                 }
                 it("Prosesserer innkommet melding (vedlegg som feiler virussjekk)") {
@@ -221,7 +221,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
-                    verify(exactly = 1) { mqSender.sendArena(any()) }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
                     val antallVedleggSlot = slot<Int>()
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), capture(antallVedleggSlot)) }
                     dialogmeldingId shouldNotBe null
@@ -239,7 +239,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
-                    verify(exactly = 1) { mqSender.sendArena(any()) }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
                     val antallVedleggSlot = slot<Int>()
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), capture(antallVedleggSlot)) }
                     dialogmeldingId shouldNotBe null
@@ -256,7 +256,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
-                    verify(exactly = 1) { mqSender.sendArena(any()) }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                     every { incomingMessage.text } returns(
                         fellesformat.replace("<Id>01010142365</Id>", "<Id>45088649080</Id>")
@@ -266,7 +266,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     }
                     verify(exactly = 2) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
-                    verify(exactly = 2) { mqSender.sendArena(any()) }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
                     verify(exactly = 2) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                     dialogmeldingId shouldNotBe null
                     val journalpostId = database.hentDialogmeldingOpplysningerJournalpostId(dialogmeldingId!!)
@@ -281,14 +281,14 @@ class BlockingApplicationRunnerSpek : Spek({
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
-                    verify(exactly = 1) { mqSender.sendArena(any()) }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                     val dialogmeldingId = runBlocking {
                         blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 2) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
-                    verify(exactly = 1) { mqSender.sendArena(any()) }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                     dialogmeldingId shouldNotBe null
                     val journalpostId = database.hentDialogmeldingOpplysningerJournalpostId(dialogmeldingId!!)
@@ -303,14 +303,14 @@ class BlockingApplicationRunnerSpek : Spek({
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
-                    verify(exactly = 1) { mqSender.sendArena(any()) }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                     runBlocking {
                         blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 2) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
-                    verify(exactly = 1) { mqSender.sendArena(any()) }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                 }
                 it("Prosesserer innkommet melding (ikke duplikat, mange vedlegg der det er en differanse i siste vedlegg)") {
@@ -322,7 +322,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
-                    verify(exactly = 1) { mqSender.sendArena(any()) }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                     every { incomingMessage.text } returns(fellesformat.replace("Et siste bilde fra lege", "Et aller siste bilde fra lege"))
                     runBlocking {
@@ -330,7 +330,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     }
                     verify(exactly = 2) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
-                    verify(exactly = 2) { mqSender.sendArena(any()) }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
                     verify(exactly = 2) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                 }
                 it("Prosesserer innkommet melding (ikke duplikat, men med så mange vedlegg at det blir duplikat likevel)") {
@@ -342,7 +342,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
-                    verify(exactly = 1) { mqSender.sendArena(any()) }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                     every { incomingMessage.text } returns(fellesformat.replace("Et siste bilde fra lege", "Et aller siste bilde fra lege"))
                     runBlocking {
@@ -350,7 +350,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     }
                     verify(exactly = 2) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
-                    verify(exactly = 1) { mqSender.sendArena(any()) }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                 }
                 it("Prosesserer innkommet melding (ikke duplikat, bare nesten)") {
@@ -362,7 +362,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
-                    verify(exactly = 1) { mqSender.sendArena(any()) }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                     val fellesformatNestenDuplikat =
                         getFileAsStringISO88591("src/test/resources/dialogmelding_dialog_notat_vedlegg.xml")
@@ -373,7 +373,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     }
                     verify(exactly = 2) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
-                    verify(exactly = 2) { mqSender.sendArena(any()) }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
                     verify(exactly = 2) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                 }
                 it("Prosesserer innkommet melding (manglende innbyggerid)") {
@@ -431,7 +431,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     }
                     verify(exactly = 2) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
-                    verify(exactly = 1) { mqSender.sendArena(any()) }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                 }
 
@@ -523,7 +523,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
-                    verify(exactly = 1) { mqSender.sendArena(any()) }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                 }
                 it("Prosesserer innkommet melding (PDL feiler)") {
@@ -543,7 +543,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     }
                     verify(exactly = 1) { mqSender.sendReceipt(any()) }
                     verify(exactly = 0) { mqSender.sendBackout(any()) }
-                    verify(exactly = 1) { mqSender.sendArena(any()) }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                 }
                 it("Prosesserer innkommet melding (lege ugyldig fnr)") {
