@@ -124,4 +124,4 @@ spec:
     - name: SMGCP_PROXY_URL
       value: https://smgcp-proxy.prod-fss-pub.nais.io
     - name: USE_CRONJOB_TO_PUBLISH_TO_ARENA
-      value: "false"
+      value: "true"
