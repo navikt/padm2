@@ -53,9 +53,10 @@ fun Connection.opprettDialogmeldingOpplysninger(receivedDialogmelding: ReceivedD
                 journalforing,
                 dialogmelding_published,
                 arena,
-                apprec
+                apprec,
+                is_sent_to_arena
                 )
-            VALUES  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             RETURNING id
             """
     ).use {
@@ -72,6 +73,7 @@ fun Connection.opprettDialogmeldingOpplysninger(receivedDialogmelding: ReceivedD
         it.setNull(11, Types.TIMESTAMP)
         it.setNull(12, Types.TIMESTAMP)
         it.setNull(13, Types.TIMESTAMP)
+        it.setBoolean(14, false)
         it.executeQuery().toList { getString("id") }
     }
 
