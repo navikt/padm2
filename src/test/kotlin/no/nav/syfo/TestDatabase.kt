@@ -80,7 +80,7 @@ fun DatabaseInterface.getSentToArena(dialogmeldingId: String): Pair<Timestamp, B
     connection.use { connection ->
         return connection.prepareStatement(
             """
-                SELECT arena, is_sent_to_arena
+                SELECT arena, sent_to_arena
                 FROM dialogmeldingopplysninger
                 WHERE id = ?;
                 """
@@ -89,7 +89,7 @@ fun DatabaseInterface.getSentToArena(dialogmeldingId: String): Pair<Timestamp, B
             it.executeQuery().toList {
                 Pair(
                     first = getTimestamp("arena"),
-                    second = getBoolean("is_sent_to_arena")
+                    second = getBoolean("sent_to_arena")
                 )
             }.firstOrNull()
         }

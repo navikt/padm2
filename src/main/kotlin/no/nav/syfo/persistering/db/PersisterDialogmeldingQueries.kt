@@ -54,7 +54,7 @@ fun Connection.opprettDialogmeldingOpplysninger(receivedDialogmelding: ReceivedD
                 dialogmelding_published,
                 arena,
                 apprec,
-                is_sent_to_arena
+                sent_to_arena
                 )
             VALUES  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             RETURNING id
@@ -175,7 +175,7 @@ fun DatabaseInterface.erDialogmeldingOpplysningerSendtArena(dialogmeldingid: Str
 
 private const val queryUpdateArenaSendt = """
     UPDATE DIALOGMELDINGOPPLYSNINGER
-    SET arena = ?, is_sent_to_arena = ?
+    SET arena = ?, sent_to_arena = ?
     WHERE id = ?;
 """
 
