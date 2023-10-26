@@ -2,6 +2,7 @@ package no.nav.syfo
 
 import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import no.nav.syfo.db.DatabaseInterface
+import no.nav.syfo.db.toList
 import org.flywaydb.core.Flyway
 import java.sql.Connection
 import java.sql.SQLException
@@ -72,5 +73,25 @@ fun DatabaseInterface.updateSendtApprec(dialogmeldingId: String, timestamp: Time
             }
         }
         connection.commit()
+    }
+}
+
+fun DatabaseInterface.getSentToArena(dialogmeldingId: String): Pair<Timestamp, Boolean>? {
+    connection.use { connection ->
+        return connection.prepareStatement(
+            """
+                SELECT arena, sent_to_arena
+                FROM dialogmeldingopplysninger
+                WHERE id = ?;
+                """
+        ).use {
+            it.setString(1, dialogmeldingId)
+            it.executeQuery().toList {
+                Pair(
+                    first = getTimestamp("arena"),
+                    second = getBoolean("sent_to_arena")
+                )
+            }.firstOrNull()
+        }
     }
 }

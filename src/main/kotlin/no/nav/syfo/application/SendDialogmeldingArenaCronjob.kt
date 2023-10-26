@@ -42,7 +42,10 @@ class SendDialogmeldingArenaCronjob(
                     receivedDialogmelding = receivedDialogmelding,
                     fellesformatXml = fellesformatXml
                 )
-                database.lagreSendtArena(dialogmeldingId)
+                database.lagreSendtArena(
+                    dialogmeldingid = dialogmeldingId,
+                    isSent = true,
+                )
                 result.updated++
             } catch (e: Exception) {
                 log.error("Caught exception in sending dialogmelding to arena", e)

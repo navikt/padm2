@@ -53,9 +53,10 @@ fun Connection.opprettDialogmeldingOpplysninger(receivedDialogmelding: ReceivedD
                 journalforing,
                 dialogmelding_published,
                 arena,
-                apprec
+                apprec,
+                sent_to_arena
                 )
-            VALUES  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             RETURNING id
             """
     ).use {
@@ -72,6 +73,7 @@ fun Connection.opprettDialogmeldingOpplysninger(receivedDialogmelding: ReceivedD
         it.setNull(11, Types.TIMESTAMP)
         it.setNull(12, Types.TIMESTAMP)
         it.setNull(13, Types.TIMESTAMP)
+        it.setBoolean(14, false)
         it.executeQuery().toList { getString("id") }
     }
 
@@ -173,23 +175,25 @@ fun DatabaseInterface.erDialogmeldingOpplysningerSendtArena(dialogmeldingid: Str
 
 private const val queryUpdateArenaSendt = """
     UPDATE DIALOGMELDINGOPPLYSNINGER
-    SET ARENA=?
-    WHERE ID=?;
+    SET arena = ?, sent_to_arena = ?
+    WHERE id = ?;
 """
 
-fun DatabaseInterface.lagreSendtArena(dialogmeldingid: String) {
+fun DatabaseInterface.lagreSendtArena(dialogmeldingid: String, isSent: Boolean) {
     connection.use { connection ->
         connection.lagreSendtArena(
             dialogmeldingId = dialogmeldingid,
+            isSent = isSent,
             commit = true,
         )
     }
 }
 
-fun Connection.lagreSendtArena(dialogmeldingId: String, commit: Boolean = false) {
+fun Connection.lagreSendtArena(dialogmeldingId: String, isSent: Boolean, commit: Boolean = false) {
     prepareStatement(queryUpdateArenaSendt).use {
         it.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()))
-        it.setString(2, dialogmeldingId)
+        it.setBoolean(2, isSent)
+        it.setString(3, dialogmeldingId)
         val updated = it.executeUpdate()
         if (updated != 1) {
             throw SQLException("Expected a single row to be updated, got update count $updated")
