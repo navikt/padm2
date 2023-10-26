@@ -3,23 +3,21 @@ package no.nav.syfo.dialogmelding
 import io.ktor.server.testing.*
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
-import no.nav.syfo.ExternalMockEnvironment
-import no.nav.syfo.UserConstants
+import no.nav.syfo.*
 import no.nav.syfo.application.SendDialogmeldingArenaCronjob
 import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.client.SmtssClient
 import no.nav.syfo.client.TssId
-import no.nav.syfo.dropData
 import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.model.Status
 import no.nav.syfo.model.ValidationResult
 import no.nav.syfo.persistering.db.*
 import no.nav.syfo.services.ArenaDialogmeldingService
 import no.nav.syfo.services.EmottakService
-import no.nav.syfo.updateSendtApprec
 import no.nav.syfo.util.getFileAsString
 import no.nav.syfo.util.safeUnmarshal
 import org.amshove.kluent.shouldBeEqualTo
+import org.amshove.kluent.shouldNotBeEqualTo
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import java.sql.Timestamp
@@ -101,6 +99,9 @@ class SendDialogmeldingArenaCronjobSpek : Spek({
                         result.failed shouldBeEqualTo 0
                     }
                     verify(exactly = 1) { mqSender.sendArena(any()) }
+                    val arena = database.getSentToArena(dialogmeldingId)
+                    arena?.first shouldNotBeEqualTo null
+                    arena?.second shouldBeEqualTo true
                 }
 
                 it("Does not send when no apprec") {
@@ -124,7 +125,10 @@ class SendDialogmeldingArenaCronjobSpek : Spek({
                         dialogmeldingId = dialogmeldingId,
                         timestamp = Timestamp.valueOf(LocalDateTime.now().minusHours(3)),
                     )
-                    database.lagreSendtArena(dialogmeldingId)
+                    database.lagreSendtArena(
+                        dialogmeldingid = dialogmeldingId,
+                        isSent = true,
+                    )
 
                     runBlocking {
                         val result = sendDialogmeldingArenaCronjob.runJob()
@@ -219,6 +223,10 @@ class SendDialogmeldingArenaCronjobSpek : Spek({
                         result.failed shouldBeEqualTo 1
                     }
                     verify(exactly = 1) { mqSender.sendArena(any()) }
+
+                    val arenaNotSent = database.getSentToArena(dialogmeldingId)
+                    arenaNotSent?.first shouldBeEqualTo null
+                    arenaNotSent?.second shouldBeEqualTo false
                 }
 
                 it("Does not fail the whole job when one erroneous melding, while other meldinger are OK") {
@@ -260,6 +268,14 @@ class SendDialogmeldingArenaCronjobSpek : Spek({
                         result.failed shouldBeEqualTo 1
                     }
                     verify(exactly = 2) { mqSender.sendArena(any()) }
+
+                    val arena = database.getSentToArena(dialogmeldingId)
+                    arena?.first shouldNotBeEqualTo null
+                    arena?.second shouldBeEqualTo true
+
+                    val arenaNotSent = database.getSentToArena(dialogmeldingIdWithError)
+                    arenaNotSent?.first shouldBeEqualTo null
+                    arenaNotSent?.second shouldBeEqualTo false
                 }
             }
         }

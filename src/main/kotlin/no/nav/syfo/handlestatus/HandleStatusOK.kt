@@ -58,7 +58,10 @@ suspend fun handleStatusOK(
             ),
             loggingMeta
         )
-        database.lagreSendtArena(receivedDialogmelding.dialogmelding.id)
+        database.lagreSendtArena(
+            dialogmeldingid = receivedDialogmelding.dialogmelding.id,
+            isSent = true,
+        )
     }
 
     if (!database.erDialogmeldingOpplysningerSendtKafka(receivedDialogmelding.dialogmelding.id)) {
