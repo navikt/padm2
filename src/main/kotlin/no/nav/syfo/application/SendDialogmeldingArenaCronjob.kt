@@ -32,7 +32,7 @@ class SendDialogmeldingArenaCronjob(
         val unpublishedArenaMeldinger = database.getUnpublishedArenaMeldinger()
         unpublishedArenaMeldinger.forEach { (dialogmeldingId, fellesformat, msgId) ->
             try {
-                if (!arenaDialogmeldingService.isMeldingStoredInModia(msgId)) {
+                if (!arenaDialogmeldingService.isMeldingStoredInBehandlerdialog(msgId)) {
                     val fellesformatXml = safeUnmarshal(fellesformat)
                     val receivedDialogmelding = ReceivedDialogmelding.create(
                         dialogmeldingId = dialogmeldingId,

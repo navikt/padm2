@@ -15,7 +15,7 @@ class BehandlerdialogClient(
 
     private val meldingUrl = "$behandlerdialogUrl/$MELDINGER_PATH"
 
-    suspend fun isMeldingInModia(msgId: String): Boolean {
+    suspend fun isMeldingInBehandlerdialog(msgId: String): Boolean {
         val systemToken = azureAdV2Client.getSystemToken(
             scopeClientId = behandlerdialogClientId,
         )?.accessToken ?: throw RuntimeException("Failed to get system token")

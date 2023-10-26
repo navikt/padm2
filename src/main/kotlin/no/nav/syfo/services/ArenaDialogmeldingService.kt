@@ -46,8 +46,8 @@ class ArenaDialogmeldingService(
         )
     }
 
-    suspend fun isMeldingStoredInModia(msgId: String): Boolean {
-        return behandlerdialogClient.isMeldingInModia(msgId)
+    suspend fun isMeldingStoredInBehandlerdialog(msgId: String): Boolean {
+        return behandlerdialogClient.isMeldingInBehandlerdialog(msgId)
     }
 
     private suspend fun getTssId(
