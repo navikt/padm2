@@ -215,21 +215,58 @@ class SendDialogmeldingArenaCronjobSpek : Spek({
                 }
 
                 it("Does not send when melding lagret in modia") {
-                    val fellesformatOtherMelding =
+                    val fellesformatMeldingInBehandlerdialog =
                         getFileAsString("src/test/resources/dialogmelding_dialog_notat_in_behandlerdialog.xml")
-                    val fellesformatXmlOtherMelding = safeUnmarshal(fellesformatOtherMelding)
-                    val receivedDialogmeldingStoredInModia = ReceivedDialogmelding.create(
+                    val fellesformatXmlMeldingInBehandlerdialog = safeUnmarshal(fellesformatMeldingInBehandlerdialog)
+                    val receivedDialogmeldingInBehandlerdialog = ReceivedDialogmelding.create(
                         dialogmeldingId = UUID.randomUUID().toString(),
-                        fellesformat = fellesformatXmlOtherMelding,
-                        inputMessageText = fellesformatOtherMelding,
+                        fellesformat = fellesformatXmlMeldingInBehandlerdialog,
+                        inputMessageText = fellesformatMeldingInBehandlerdialog,
                     )
-                    val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmeldingStoredInModia)
+                    val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmeldingInBehandlerdialog)
                     database.lagreSendtKafka(dialogmeldingId)
                     database.lagreSendtApprec(dialogmeldingId)
                     database.updateSendtApprec(
                         dialogmeldingId = dialogmeldingId,
                         timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(11)),
                     )
+
+                    runBlocking {
+                        val result = sendDialogmeldingArenaCronjob.runJob()
+
+                        result.updated shouldBeEqualTo 1
+                        result.failed shouldBeEqualTo 0
+                    }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
+                }
+
+                it("Does not process dialogmelding when already checked whether it should be sent to arena") {
+                    val fellesformatMeldingInBehandlerdialog =
+                        getFileAsString("src/test/resources/dialogmelding_dialog_notat_in_behandlerdialog.xml")
+                    val fellesformatXmlMeldingInBehandlerdialog = safeUnmarshal(fellesformatMeldingInBehandlerdialog)
+                    val receivedDialogmeldingMeldingInBehandlerdialog = ReceivedDialogmelding.create(
+                        dialogmeldingId = UUID.randomUUID().toString(),
+                        fellesformat = fellesformatXmlMeldingInBehandlerdialog,
+                        inputMessageText = fellesformatMeldingInBehandlerdialog,
+                    )
+                    val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmeldingMeldingInBehandlerdialog)
+                    database.lagreSendtKafka(dialogmeldingId)
+                    database.lagreSendtApprec(dialogmeldingId)
+                    database.updateSendtApprec(
+                        dialogmeldingId = dialogmeldingId,
+                        timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(11)),
+                    )
+
+                    runBlocking {
+                        val result = sendDialogmeldingArenaCronjob.runJob()
+
+                        result.updated shouldBeEqualTo 1
+                        result.failed shouldBeEqualTo 0
+                    }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
+                    val arena = database.getSentToArena(dialogmeldingId)
+                    arena?.first shouldNotBeEqualTo null
+                    arena?.second shouldBeEqualTo false
 
                     runBlocking {
                         val result = sendDialogmeldingArenaCronjob.runJob()

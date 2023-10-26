@@ -32,7 +32,8 @@ class SendDialogmeldingArenaCronjob(
         val unpublishedArenaMeldinger = database.getUnpublishedArenaMeldinger()
         unpublishedArenaMeldinger.forEach { (dialogmeldingId, fellesformat, msgId) ->
             try {
-                if (!arenaDialogmeldingService.isMeldingStoredInBehandlerdialog(msgId)) {
+                val sendToArena = !arenaDialogmeldingService.isMeldingStoredInBehandlerdialog(msgId)
+                if (sendToArena) {
                     val fellesformatXml = safeUnmarshal(fellesformat)
                     val receivedDialogmelding = ReceivedDialogmelding.create(
                         dialogmeldingId = dialogmeldingId,
@@ -43,12 +44,12 @@ class SendDialogmeldingArenaCronjob(
                         receivedDialogmelding = receivedDialogmelding,
                         fellesformatXml = fellesformatXml
                     )
-                    database.lagreSendtArena(
-                        dialogmeldingid = dialogmeldingId,
-                        isSent = true,
-                    )
-                    result.updated++
                 }
+                database.lagreSendtArena(
+                    dialogmeldingid = dialogmeldingId,
+                    isSent = sendToArena,
+                )
+                result.updated++
             } catch (e: Exception) {
                 log.error("Caught exception in sending dialogmelding to arena", e)
                 result.failed++
