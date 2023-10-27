@@ -239,7 +239,7 @@ class SendDialogmeldingArenaCronjobSpek : Spek({
                     }
                     verify(exactly = 0) { mqSender.sendArena(any()) }
                 }
-                it("Does not send when melding if is svar på dialogmøteinnkalling") {
+                it("Does not send when melding is svar på dialogmøteinnkalling") {
                     val fellesformatMeldingSvarMoteinnkalling =
                         getFileAsString("src/test/resources/dialogmelding_dialog_svar_innkalling_dialogmote.xml")
                     val fellesformatXmlMeldingInBehandlerdialog = safeUnmarshal(fellesformatMeldingSvarMoteinnkalling)
