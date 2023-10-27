@@ -345,11 +345,11 @@ fun DatabaseInterface.hasSavedDialogmeldingDokument(dialogmeldingId: String, sha
         }
     }
 
-fun DatabaseInterface.getUnpublishedArenaMeldinger(): List<Pair<String, String>> =
+fun DatabaseInterface.getUnpublishedArenaMeldinger(): List<Triple<String, String, String>> =
     connection.use { connection ->
         connection.prepareStatement(
             """
-            SELECT id, fellesformat
+            SELECT id, fellesformat, msg_id
             FROM dialogmeldingopplysninger d
             WHERE arena IS NULL
                 AND apprec IS NOT NULL
@@ -363,9 +363,10 @@ fun DatabaseInterface.getUnpublishedArenaMeldinger(): List<Pair<String, String>>
             """
         ).use {
             it.executeQuery().toList {
-                Pair(
+                Triple(
                     first = getString("id"),
-                    second = getString("fellesformat")
+                    second = getString("fellesformat"),
+                    third = getString("msg_id"),
                 )
             }
         }

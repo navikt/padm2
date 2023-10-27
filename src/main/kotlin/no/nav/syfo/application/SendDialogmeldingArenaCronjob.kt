@@ -30,21 +30,24 @@ class SendDialogmeldingArenaCronjob(
     suspend fun runJob(): CronjobResult {
         val result = CronjobResult()
         val unpublishedArenaMeldinger = database.getUnpublishedArenaMeldinger()
-        unpublishedArenaMeldinger.forEach { (dialogmeldingId, fellesformat) ->
+        unpublishedArenaMeldinger.forEach { (dialogmeldingId, fellesformat, msgId) ->
             try {
-                val fellesformatXml = safeUnmarshal(fellesformat)
-                val receivedDialogmelding = ReceivedDialogmelding.create(
-                    dialogmeldingId = dialogmeldingId,
-                    fellesformat = fellesformatXml,
-                    inputMessageText = fellesformat,
-                )
-                arenaDialogmeldingService.sendArenaDialogmeldingToMQ(
-                    receivedDialogmelding = receivedDialogmelding,
-                    fellesformatXml = fellesformatXml
-                )
+                val sendToArena = !arenaDialogmeldingService.isMeldingStoredInBehandlerdialog(msgId)
+                if (sendToArena) {
+                    val fellesformatXml = safeUnmarshal(fellesformat)
+                    val receivedDialogmelding = ReceivedDialogmelding.create(
+                        dialogmeldingId = dialogmeldingId,
+                        fellesformat = fellesformatXml,
+                        inputMessageText = fellesformat,
+                    )
+                    arenaDialogmeldingService.sendArenaDialogmeldingToMQ(
+                        receivedDialogmelding = receivedDialogmelding,
+                        fellesformatXml = fellesformatXml
+                    )
+                }
                 database.lagreSendtArena(
                     dialogmeldingid = dialogmeldingId,
-                    isSent = true,
+                    isSent = sendToArena,
                 )
                 result.updated++
             } catch (e: Exception) {

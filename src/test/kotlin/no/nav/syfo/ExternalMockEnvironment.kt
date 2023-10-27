@@ -22,6 +22,7 @@ class ExternalMockEnvironment private constructor() {
     val legeSuspensjonEndpointMock = LegeSuspensjonEndpointMock()
     val smtssMock = SmtssMock()
     val smgcpMock = SmgcpMock()
+    val behandlerdialogMock = BehandlerdialogMock()
 
     val externalApplicationMockMap = hashMapOf(
         azureAdV2Mock.name to azureAdV2Mock.server,
@@ -33,6 +34,7 @@ class ExternalMockEnvironment private constructor() {
         legeSuspensjonEndpointMock.name to legeSuspensjonEndpointMock.server,
         smtssMock.name to smtssMock.server,
         smgcpMock.name to smgcpMock.server,
+        behandlerdialogMock.name to behandlerdialogMock.server,
     )
 
     var environment = testEnvironment(
@@ -46,6 +48,7 @@ class ExternalMockEnvironment private constructor() {
         legeSuspensjonEndpointUrl = legeSuspensjonEndpointMock.url,
         smtssUrl = smtssMock.url,
         smgcpUrl = smgcpMock.url,
+        isbehandlerdialogUrl = behandlerdialogMock.url,
     )
 
     companion object {

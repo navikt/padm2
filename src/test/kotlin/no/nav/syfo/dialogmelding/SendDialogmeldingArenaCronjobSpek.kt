@@ -8,6 +8,9 @@ import no.nav.syfo.application.SendDialogmeldingArenaCronjob
 import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.client.SmtssClient
 import no.nav.syfo.client.TssId
+import no.nav.syfo.client.azuread.v2.AzureAdV2Client
+import no.nav.syfo.client.isbehandlerdialog.BehandlerdialogClient
+import no.nav.syfo.dropData
 import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.model.Status
 import no.nav.syfo.model.ValidationResult
@@ -34,11 +37,17 @@ class SendDialogmeldingArenaCronjobSpek : Spek({
             val mqSender = mockk<MQSenderInterface>(relaxed = true)
             val emottakService = mockk<EmottakService>(relaxed = true)
             val smtssClient = mockk<SmtssClient>(relaxed = true)
+            val azureAdV2ClientMock = mockk<AzureAdV2Client>(relaxed = true)
 
             val arenaDialogmeldingService = ArenaDialogmeldingService(
                 mqSender = mqSender,
                 smtssClient = smtssClient,
                 emottakService = emottakService,
+                behandlerdialogClient = BehandlerdialogClient(
+                    azureAdV2Client = azureAdV2ClientMock,
+                    behandlerdialogClientId = externalMockEnvironment.environment.isbehandlerdialogClientId,
+                    behandlerdialogUrl = externalMockEnvironment.environment.isbehandlerdialogUrl,
+                )
             )
             val sendDialogmeldingArenaCronjob = SendDialogmeldingArenaCronjob(
                 database = database,
@@ -83,7 +92,7 @@ class SendDialogmeldingArenaCronjobSpek : Spek({
                     }
                 }
 
-                it("Sends dialogmelding to arena when melding is sent to kafka, and has sent a positive apprec which is older than 10min") {
+                it("Sends dialogmelding to arena when melding is sent to kafka, and has sent a positive apprec which is older than 10min, and not stored in Modia") {
                     val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmelding)
                     database.lagreSendtKafka(dialogmeldingId)
                     database.lagreSendtApprec(dialogmeldingId)
@@ -123,7 +132,7 @@ class SendDialogmeldingArenaCronjobSpek : Spek({
                     database.lagreSendtApprec(dialogmeldingId)
                     database.updateSendtApprec(
                         dialogmeldingId = dialogmeldingId,
-                        timestamp = Timestamp.valueOf(LocalDateTime.now().minusHours(3)),
+                        timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(11)),
                     )
                     database.lagreSendtArena(
                         dialogmeldingid = dialogmeldingId,
@@ -172,7 +181,7 @@ class SendDialogmeldingArenaCronjobSpek : Spek({
                     database.lagreSendtApprec(dialogmeldingId)
                     database.updateSendtApprec(
                         dialogmeldingId = dialogmeldingId,
-                        timestamp = Timestamp.valueOf(LocalDateTime.now().minusHours(3)),
+                        timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(11)),
                     )
 
                     runBlocking {
@@ -193,7 +202,7 @@ class SendDialogmeldingArenaCronjobSpek : Spek({
                     database.lagreSendtApprec(dialogmeldingId)
                     database.updateSendtApprec(
                         dialogmeldingId = dialogmeldingId,
-                        timestamp = Timestamp.valueOf(LocalDateTime.now().minusHours(3)),
+                        timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(11)),
                     )
 
                     runBlocking {
@@ -205,13 +214,102 @@ class SendDialogmeldingArenaCronjobSpek : Spek({
                     verify(exactly = 0) { mqSender.sendArena(any()) }
                 }
 
+                it("Does not send when melding lagret in modia") {
+                    val fellesformatMeldingInBehandlerdialog =
+                        getFileAsString("src/test/resources/dialogmelding_dialog_notat_in_behandlerdialog.xml")
+                    val fellesformatXmlMeldingInBehandlerdialog = safeUnmarshal(fellesformatMeldingInBehandlerdialog)
+                    val receivedDialogmeldingInBehandlerdialog = ReceivedDialogmelding.create(
+                        dialogmeldingId = UUID.randomUUID().toString(),
+                        fellesformat = fellesformatXmlMeldingInBehandlerdialog,
+                        inputMessageText = fellesformatMeldingInBehandlerdialog,
+                    )
+                    val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmeldingInBehandlerdialog)
+                    database.lagreSendtKafka(dialogmeldingId)
+                    database.lagreSendtApprec(dialogmeldingId)
+                    database.updateSendtApprec(
+                        dialogmeldingId = dialogmeldingId,
+                        timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(11)),
+                    )
+
+                    runBlocking {
+                        val result = sendDialogmeldingArenaCronjob.runJob()
+
+                        result.updated shouldBeEqualTo 1
+                        result.failed shouldBeEqualTo 0
+                    }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
+                }
+
+                it("Does not process dialogmelding when already checked whether it should be sent to arena") {
+                    val fellesformatMeldingInBehandlerdialog =
+                        getFileAsString("src/test/resources/dialogmelding_dialog_notat_in_behandlerdialog.xml")
+                    val fellesformatXmlMeldingInBehandlerdialog = safeUnmarshal(fellesformatMeldingInBehandlerdialog)
+                    val receivedDialogmeldingMeldingInBehandlerdialog = ReceivedDialogmelding.create(
+                        dialogmeldingId = UUID.randomUUID().toString(),
+                        fellesformat = fellesformatXmlMeldingInBehandlerdialog,
+                        inputMessageText = fellesformatMeldingInBehandlerdialog,
+                    )
+                    val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmeldingMeldingInBehandlerdialog)
+                    database.lagreSendtKafka(dialogmeldingId)
+                    database.lagreSendtApprec(dialogmeldingId)
+                    database.updateSendtApprec(
+                        dialogmeldingId = dialogmeldingId,
+                        timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(11)),
+                    )
+
+                    runBlocking {
+                        val result = sendDialogmeldingArenaCronjob.runJob()
+
+                        result.updated shouldBeEqualTo 1
+                        result.failed shouldBeEqualTo 0
+                    }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
+                    val arena = database.getSentToArena(dialogmeldingId)
+                    arena?.first shouldNotBeEqualTo null
+                    arena?.second shouldBeEqualTo false
+
+                    runBlocking {
+                        val result = sendDialogmeldingArenaCronjob.runJob()
+
+                        result.updated shouldBeEqualTo 0
+                        result.failed shouldBeEqualTo 0
+                    }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
+                }
+
+                it("Fails when behandlerdialog gives InternalServerError") {
+                    val fellesformatMeldingThrowsError =
+                        getFileAsString("src/test/resources/dialogmelding_dialog_notat_in_behandlerdialog_with_error.xml")
+                    val fellesformatXmlMeldingThrowsError = safeUnmarshal(fellesformatMeldingThrowsError)
+                    val receivedDialogmeldingThrowsError = ReceivedDialogmelding.create(
+                        dialogmeldingId = UUID.randomUUID().toString(),
+                        fellesformat = fellesformatXmlMeldingThrowsError,
+                        inputMessageText = fellesformatMeldingThrowsError,
+                    )
+                    val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmeldingThrowsError)
+                    database.lagreSendtKafka(dialogmeldingId)
+                    database.lagreSendtApprec(dialogmeldingId)
+                    database.updateSendtApprec(
+                        dialogmeldingId = dialogmeldingId,
+                        timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(11)),
+                    )
+
+                    runBlocking {
+                        val result = sendDialogmeldingArenaCronjob.runJob()
+
+                        result.updated shouldBeEqualTo 0
+                        result.failed shouldBeEqualTo 1
+                    }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
+                }
+
                 it("Fails when sending on MQ throws error") {
                     val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmelding)
                     database.lagreSendtKafka(dialogmeldingId)
                     database.lagreSendtApprec(dialogmeldingId)
                     database.updateSendtApprec(
                         dialogmeldingId = dialogmeldingId,
-                        timestamp = Timestamp.valueOf(LocalDateTime.now().minusHours(3)),
+                        timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(11)),
                     )
 
                     every { mqSender.sendArena(any()) } throws Exception()
@@ -244,13 +342,13 @@ class SendDialogmeldingArenaCronjobSpek : Spek({
                     database.lagreSendtApprec(dialogmeldingIdWithError)
                     database.updateSendtApprec(
                         dialogmeldingId = dialogmeldingIdWithError,
-                        timestamp = Timestamp.valueOf(LocalDateTime.now().minusHours(3)),
+                        timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(11)),
                     )
                     database.lagreSendtKafka(dialogmeldingId)
                     database.lagreSendtApprec(dialogmeldingId)
                     database.updateSendtApprec(
                         dialogmeldingId = dialogmeldingId,
-                        timestamp = Timestamp.valueOf(LocalDateTime.now().minusHours(3)),
+                        timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(11)),
                     )
 
                     every {
