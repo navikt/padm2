@@ -30,6 +30,12 @@ fun launchCronjobs(
         )
         allCronjobs.add(sendDialogmeldingArenaCronjob)
     }
+    // TODO: Remove after it has run once in prod
+    val sendDialogmeldingArenaAdhocCronjob = SendDialogmeldingArenaAdhocCronjob(
+        database = database,
+        arenaDialogmeldingService = arenaDialogmeldingService,
+    )
+    allCronjobs.add(sendDialogmeldingArenaAdhocCronjob)
 
     allCronjobs.forEach {
         launchBackgroundTask(applicationState) {
