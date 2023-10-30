@@ -239,6 +239,31 @@ class SendDialogmeldingArenaCronjobSpek : Spek({
                     }
                     verify(exactly = 0) { mqSender.sendArena(any()) }
                 }
+                it("Does not send when melding is svar på dialogmøteinnkalling") {
+                    val fellesformatMeldingSvarMoteinnkalling =
+                        getFileAsString("src/test/resources/dialogmelding_dialog_svar_innkalling_dialogmote.xml")
+                    val fellesformatXmlMeldingInBehandlerdialog = safeUnmarshal(fellesformatMeldingSvarMoteinnkalling)
+                    val receivedDialogmeldingInBehandlerdialog = ReceivedDialogmelding.create(
+                        dialogmeldingId = UUID.randomUUID().toString(),
+                        fellesformat = fellesformatXmlMeldingInBehandlerdialog,
+                        inputMessageText = fellesformatMeldingSvarMoteinnkalling,
+                    )
+                    val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmeldingInBehandlerdialog)
+                    database.lagreSendtKafka(dialogmeldingId)
+                    database.lagreSendtApprec(dialogmeldingId)
+                    database.updateSendtApprec(
+                        dialogmeldingId = dialogmeldingId,
+                        timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(11)),
+                    )
+
+                    runBlocking {
+                        val result = sendDialogmeldingArenaCronjob.runJob()
+
+                        result.updated shouldBeEqualTo 1
+                        result.failed shouldBeEqualTo 0
+                    }
+                    verify(exactly = 0) { mqSender.sendArena(any()) }
+                }
 
                 it("Does not process dialogmelding when already checked whether it should be sent to arena") {
                     val fellesformatMeldingInBehandlerdialog =
