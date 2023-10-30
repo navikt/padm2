@@ -6,7 +6,6 @@ import no.nav.syfo.application.cronjob.CronjobResult
 import no.nav.syfo.db.DatabaseInterface
 import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.persistering.db.getAdhocArenaMeldinger
-import no.nav.syfo.persistering.db.getUnpublishedArenaMeldinger
 import no.nav.syfo.persistering.db.lagreSendtArena
 import no.nav.syfo.services.ArenaDialogmeldingService
 import no.nav.syfo.util.safeUnmarshal
