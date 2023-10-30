@@ -29,19 +29,14 @@ val fellesformatJaxBContext: JAXBContext = JAXBContext.newInstance(
     XMLAppRec::class.java,
 )
 
-val senderMarshaller: Marshaller = JAXBContext.newInstance(XMLSender::class.java).createMarshaller()
+fun getSenderMarshaller(): Marshaller = JAXBContext.newInstance(XMLSender::class.java).createMarshaller()
     .apply { setProperty(Marshaller.JAXB_ENCODING, "ISO-8859-1") }
 
 val apprecJaxBContext: JAXBContext = JAXBContext.newInstance(XMLEIFellesformat::class.java, XMLAppRec::class.java)
-val apprecMarshaller: Marshaller = apprecJaxBContext.createMarshaller()
+fun getApprecMarshaller(): Marshaller = apprecJaxBContext.createMarshaller()
 
 val arenaDialogNotatJaxBContext: JAXBContext = JAXBContext.newInstance(ArenaDialogNotat::class.java)
-val arenaDialogNotatMarshaller: Marshaller = arenaDialogNotatJaxBContext.createMarshaller()
-
-private val fellesformatUnmarshaller: Unmarshaller = fellesformatJaxBContext.createUnmarshaller().apply {
-    setAdapter(LocalDateTimeXmlAdapter::class.java, XMLDateTimeAdapter())
-    setAdapter(LocalDateXmlAdapter::class.java, XMLDateAdapter())
-}
+fun getArenaDialogNotatMarshaller(): Marshaller = arenaDialogNotatJaxBContext.createMarshaller()
 
 fun Marshaller.toString(input: Any): String = StringWriter().use {
     marshal(input, it)
@@ -59,5 +54,11 @@ fun safeUnmarshal(inputMessageText: String): XMLEIFellesformat {
             spf.newSAXParser().xmlReader,
             InputSource(StringReader(inputMessageText)),
         )
-    return fellesformatUnmarshaller.unmarshal(xmlSource) as XMLEIFellesformat
+    return getFellesformatUnmarshaller().unmarshal(xmlSource) as XMLEIFellesformat
+}
+
+// Unmarshaller is not thread safe - do not "optimize"
+private fun getFellesformatUnmarshaller(): Unmarshaller = fellesformatJaxBContext.createUnmarshaller().apply {
+    setAdapter(LocalDateTimeXmlAdapter::class.java, XMLDateTimeAdapter())
+    setAdapter(LocalDateXmlAdapter::class.java, XMLDateAdapter())
 }

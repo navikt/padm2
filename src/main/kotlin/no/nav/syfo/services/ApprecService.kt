@@ -9,8 +9,8 @@ import no.nav.syfo.apprec.ApprecStatus
 import no.nav.syfo.apprec.createApprec
 import no.nav.syfo.logger
 import no.nav.syfo.metrics.APPREC_COUNTER
-import no.nav.syfo.util.apprecMarshaller
 import no.nav.syfo.util.get
+import no.nav.syfo.util.getApprecMarshaller
 import no.nav.syfo.util.toString
 
 fun sendReceipt(
@@ -27,7 +27,7 @@ fun sendReceipt(
         val apprec = createApprec(fellesformat, apprecStatus)
         apprec.get<XMLAppRec>().error.addAll(apprecErrors)
         mqSender.sendReceipt(
-            payload = apprecMarshaller.toString(apprec)
+            payload = getApprecMarshaller().toString(apprec)
         )
         APPREC_COUNTER.increment()
     }
