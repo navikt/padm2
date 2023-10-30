@@ -378,7 +378,7 @@ fun DatabaseInterface.getAdhocArenaMeldinger(): List<Triple<String, String, Stri
             """
             SELECT id, fellesformat, msg_id
             FROM dialogmeldingopplysninger d
-            WHERE !sent_to_arena
+            WHERE NOT sent_to_arena
                 AND msg_id in (
                 '675f2f92-7186-4e4c-a07c-64f179eddb3e',
                 '460f7781-2f5c-4b30-b29a-b0a800d44210',
