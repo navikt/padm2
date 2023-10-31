@@ -29,7 +29,8 @@ val fellesformatJaxBContext: JAXBContext = JAXBContext.newInstance(
     XMLAppRec::class.java,
 )
 
-fun getSenderMarshaller(): Marshaller = JAXBContext.newInstance(XMLSender::class.java).createMarshaller()
+val xmlSenderJaxBContext = JAXBContext.newInstance(XMLSender::class.java)
+fun getSenderMarshaller(): Marshaller = xmlSenderJaxBContext.createMarshaller()
     .apply { setProperty(Marshaller.JAXB_ENCODING, "ISO-8859-1") }
 
 val apprecJaxBContext: JAXBContext = JAXBContext.newInstance(XMLEIFellesformat::class.java, XMLAppRec::class.java)
