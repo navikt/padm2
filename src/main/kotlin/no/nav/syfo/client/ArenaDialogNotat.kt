@@ -138,7 +138,7 @@ fun sendArenaDialogNotat(
     loggingMeta: LoggingMeta
 ) {
     mqSender.sendArena(
-        payload = arenaDialogNotatMarshaller.toString(arenaDialogNotat)
+        payload = getArenaDialogNotatMarshaller().toString(arenaDialogNotat)
     )
     logger.info("Message is sent to arena {}", fields(loggingMeta))
 }

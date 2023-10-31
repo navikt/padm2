@@ -9,7 +9,7 @@ import no.nav.helse.msgHead.XMLSender
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.logger
 import no.nav.syfo.util.bearerHeader
-import no.nav.syfo.util.senderMarshaller
+import no.nav.syfo.util.getSenderMarshaller
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 
@@ -50,7 +50,7 @@ class SmgcpClient(
 
     private fun convertSenderToBase64(sender: XMLSender): ByteArray =
         ByteArrayOutputStream().use {
-            senderMarshaller.marshal(sender, it)
+            getSenderMarshaller().marshal(sender, it)
             it
         }.toByteArray()
 }
