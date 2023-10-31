@@ -1,6 +1,5 @@
 package no.nav.syfo.application.cronjob
 
-import no.nav.syfo.Environment
 import no.nav.syfo.application.*
 import no.nav.syfo.db.DatabaseInterface
 import no.nav.syfo.services.ArenaDialogmeldingService
@@ -8,7 +7,6 @@ import no.nav.syfo.services.ArenaDialogmeldingService
 fun launchCronjobs(
     applicationState: ApplicationState,
     database: DatabaseInterface,
-    environment: Environment,
     dialogmeldingProcessor: DialogmeldingProcessor,
     arenaDialogmeldingService: ArenaDialogmeldingService,
 ) {
@@ -18,18 +16,14 @@ fun launchCronjobs(
         database = database,
         dialogmeldingProcessor = dialogmeldingProcessor,
     )
-
-    val allCronjobs = mutableListOf<Cronjob>(
-        rerunCronJob,
+    val sendDialogmeldingArenaCronjob = SendDialogmeldingArenaCronjob(
+        database = database,
+        arenaDialogmeldingService = arenaDialogmeldingService,
     )
-
-    if (environment.useCronjobToPublishToArena) {
-        val sendDialogmeldingArenaCronjob = SendDialogmeldingArenaCronjob(
-            database = database,
-            arenaDialogmeldingService = arenaDialogmeldingService,
-        )
-        allCronjobs.add(sendDialogmeldingArenaCronjob)
-    }
+    val allCronjobs = mutableListOf(
+        rerunCronJob,
+        sendDialogmeldingArenaCronjob,
+    )
 
     allCronjobs.forEach {
         launchBackgroundTask(applicationState) {

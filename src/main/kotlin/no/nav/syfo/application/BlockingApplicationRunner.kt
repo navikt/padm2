@@ -79,7 +79,6 @@ class BlockingApplicationRunner(
         val fellesformat = safeUnmarshal(inputMessageText)
         val msgHead: XMLMsgHead = fellesformat.get()
         val emottakblokk = fellesformat.get<XMLMottakenhetBlokk>()
-        val ediLoggId = emottakblokk.ediLoggId
         val dialogmeldingXml = extractDialogmelding(fellesformat)
         val patientXml = extractPatient(fellesformat)
         val vedlegg = extractValidVedlegg(fellesformat)
@@ -89,11 +88,10 @@ class BlockingApplicationRunner(
         val sha256String = sha256hashstring(dialogmeldingXml, patientXml, vedlegg)
 
         val innbyggerIdent = extractInnbyggerident(fellesformat)
-        val legekontorOrgNr = extractOrganisationNumberFromSender(fellesformat)?.id
-        val loggingMeta = LoggingMeta(
-            mottakId = ediLoggId,
-            orgNr = legekontorOrgNr,
-            msgId = msgHead.msgInfo.msgId,
+        val loggingMeta = LoggingMeta.create(
+            emottakBlokk = emottakblokk,
+            fellesformatXml = fellesformat,
+            msgHead = msgHead,
         )
         logger.info("Received message, {}", StructuredArguments.fields(loggingMeta))
         if (innbyggerIdent.isNullOrEmpty() || !elevenDigits.matches(innbyggerIdent)) {

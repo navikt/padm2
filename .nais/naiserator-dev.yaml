@@ -126,5 +126,3 @@ spec:
       value: "dev-gcp.teamsykefravr.isbehandlerdialog"
     - name: ISBEHANDLERDIALOG_ENDPOINT_URL
       value: "http://isbehandlerdialog"
-    - name: USE_CRONJOB_TO_PUBLISH_TO_ARENA
-      value: "true"
