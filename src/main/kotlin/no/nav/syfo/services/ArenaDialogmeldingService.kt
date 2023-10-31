@@ -24,7 +24,17 @@ class ArenaDialogmeldingService(
     ) {
         val msgHead: XMLMsgHead = fellesformatXml.get()
         val emottakBlokk = fellesformatXml.get<XMLMottakenhetBlokk>()
-        val tssId = getTssId(receivedDialogmelding, fellesformatXml)
+        val loggingMeta = LoggingMeta.create(
+            emottakBlokk = emottakBlokk,
+            fellesformatXml = fellesformatXml,
+            msgHead = msgHead,
+        )
+        val tssId = getTssId(
+            receivedDialogmelding = receivedDialogmelding,
+            loggingMeta = loggingMeta,
+            msgHead = msgHead,
+            emottakBlokk = emottakBlokk,
+        )
         val arenaDialogNotat = createArenaDialogNotat(
             fellesformat = fellesformatXml,
             tssid = tssId,
@@ -38,11 +48,7 @@ class ArenaDialogmeldingService(
         sendArenaDialogNotat(
             mqSender = mqSender,
             arenaDialogNotat = arenaDialogNotat,
-            loggingMeta = getLoggingMeta(
-                emottakBlokk = emottakBlokk,
-                fellesformatXml = fellesformatXml,
-                msgHead = msgHead,
-            )
+            loggingMeta = loggingMeta
         )
     }
 
@@ -52,7 +58,9 @@ class ArenaDialogmeldingService(
 
     private suspend fun getTssId(
         receivedDialogmelding: ReceivedDialogmelding,
-        fellesformatXml: XMLEIFellesformat,
+        msgHead: XMLMsgHead,
+        emottakBlokk: XMLMottakenhetBlokk,
+        loggingMeta: LoggingMeta,
     ): String {
         val tssId = smtssClient.findBestTss(
             legePersonIdent = PersonIdent(receivedDialogmelding.personNrLege),
@@ -61,35 +69,15 @@ class ArenaDialogmeldingService(
         )
 
         if (tssId != null && tssId.tssid.isNotBlank()) {
-            val msgHead: XMLMsgHead = fellesformatXml.get()
-            val emottakBlokk = fellesformatXml.get<XMLMottakenhetBlokk>()
             emottakService.registerEmottakSubscription(
                 tssId = tssId,
                 partnerReferanse = emottakBlokk.partnerReferanse,
                 sender = msgHead.msgInfo.sender,
                 msgId = msgHead.msgInfo.msgId,
-                loggingMeta = getLoggingMeta(
-                    emottakBlokk = emottakBlokk,
-                    fellesformatXml = fellesformatXml,
-                    msgHead = msgHead,
-                ),
+                loggingMeta = loggingMeta,
             )
         }
 
         return tssId?.tssid ?: ""
-    }
-
-    private fun getLoggingMeta(
-        emottakBlokk: XMLMottakenhetBlokk,
-        fellesformatXml: XMLEIFellesformat,
-        msgHead: XMLMsgHead,
-    ): LoggingMeta {
-        val ediLoggId = emottakBlokk.ediLoggId
-        val legekontorOrgNr = extractOrganisationNumberFromSender(fellesformatXml)?.id
-        return LoggingMeta(
-            mottakId = ediLoggId,
-            orgNr = legekontorOrgNr,
-            msgId = msgHead.msgInfo.msgId,
-        )
     }
 }

@@ -40,8 +40,6 @@ class BlockingApplicationRunnerSpek : Spek({
                 mqSender = mqSender,
                 dialogmeldingProducer = dialogmeldingProducer,
                 azureAdV2Client = azureAdV2Client,
-                smtssClient = smtssClient,
-                emottakService = emottakService,
             )
             val blockingApplicationRunner = BlockingApplicationRunner(
                 applicationState = externalMockEnvironment.applicationState,

@@ -131,8 +131,6 @@ fun launchListeners(
         mqSender = mqSender,
         dialogmeldingProducer = dialogmeldingProducer,
         azureAdV2Client = azureAdV2Client,
-        smtssClient = smtssClient,
-        emottakService = emottakService,
     )
 
     val behandlerdialogClient = BehandlerdialogClient(
@@ -172,7 +170,6 @@ fun launchListeners(
     launchCronjobs(
         applicationState = applicationState,
         database = database,
-        environment = env,
         dialogmeldingProcessor = dialogmeldingProcessor,
         arenaDialogmeldingService = arenaDialogmeldingService,
     )

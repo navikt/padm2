@@ -2,7 +2,6 @@ package no.nav.syfo.handlestatus
 
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
-import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.apprec.ApprecStatus
@@ -29,11 +28,8 @@ suspend fun handleStatusOK(
     validationResult: ValidationResult,
     vedleggListe: List<Vedlegg>?,
     msgHead: XMLMsgHead,
-    emottakblokk: XMLMottakenhetBlokk,
     pasientNavn: String,
     navnSignerendeLege: String,
-    tssId: String,
-    useCronjobToPublishToArena: Boolean,
 ) {
     val journalpostId = journalService.onJournalRequest(
         receivedDialogmelding,
@@ -43,26 +39,6 @@ suspend fun handleStatusOK(
         pasientNavn,
         navnSignerendeLege
     )
-
-    if (!useCronjobToPublishToArena && !database.erDialogmeldingOpplysningerSendtArena(receivedDialogmelding.dialogmelding.id)) {
-        sendArenaDialogNotat(
-            mqSender,
-            createArenaDialogNotat(
-                fellesformat,
-                tssId,
-                receivedDialogmelding.personNrLege,
-                receivedDialogmelding.personNrPasient,
-                msgHead,
-                emottakblokk,
-                receivedDialogmelding.dialogmelding,
-            ),
-            loggingMeta
-        )
-        database.lagreSendtArena(
-            dialogmeldingid = receivedDialogmelding.dialogmelding.id,
-            isSent = true,
-        )
-    }
 
     if (!database.erDialogmeldingOpplysningerSendtKafka(receivedDialogmelding.dialogmelding.id)) {
         dialogmeldingProducer.sendDialogmelding(

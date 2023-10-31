@@ -63,7 +63,6 @@ fun testEnvironment(
     smgcpProxyUrl = smgcpUrl,
     isbehandlerdialogClientId = "isbehandlerdialog",
     isbehandlerdialogUrl = isbehandlerdialogUrl,
-    useCronjobToPublishToArena = true,
 )
 
 fun testAppState() = ApplicationState(

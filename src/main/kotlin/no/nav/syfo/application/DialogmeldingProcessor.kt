@@ -1,6 +1,5 @@
 package no.nav.syfo.application
 
-import io.ktor.client.*
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.helse.dialogmelding.XMLDialogmelding
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
@@ -10,7 +9,6 @@ import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.client.*
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.client.pdl.PdlClient
-import no.nav.syfo.client.SmtssClient
 import no.nav.syfo.db.DatabaseInterface
 import no.nav.syfo.domain.PersonIdent
 import no.nav.syfo.handlestatus.*
@@ -31,8 +29,6 @@ class DialogmeldingProcessor(
     val mqSender: MQSenderInterface,
     val dialogmeldingProducer: DialogmeldingProducer,
     val azureAdV2Client: AzureAdV2Client,
-    val smtssClient: SmtssClient,
-    val emottakService: EmottakService,
 ) {
     val pdfgenClient = PdfgenClient(
         url = env.syfopdfgen,
@@ -88,20 +84,18 @@ class DialogmeldingProcessor(
         val fellesformat = safeUnmarshal(inputMessageText)
         val msgHead: XMLMsgHead = fellesformat.get()
         val emottakblokk = fellesformat.get<XMLMottakenhetBlokk>()
-        val ediLoggId = emottakblokk.ediLoggId
         val msgId = msgHead.msgInfo.msgId
         val dialogmeldingXml = extractDialogmelding(fellesformat)
         val patientXml = extractPatient(fellesformat)
         val dialogmeldingType = findDialogmeldingType(emottakblokk.ebService, emottakblokk.ebAction)
         val xmlVedlegg = extractValidVedlegg(fellesformat)
         val sha256String = sha256hashstring(dialogmeldingXml, patientXml, xmlVedlegg)
-        val legekontorOrgNr = extractOrganisationNumberFromSender(fellesformat)?.id
         val pasientNavn = extractPasientNavn(fellesformat)
 
-        val loggingMeta = LoggingMeta(
-            mottakId = ediLoggId,
-            orgNr = legekontorOrgNr,
-            msgId = msgHead.msgInfo.msgId,
+        val loggingMeta = LoggingMeta.create(
+            emottakBlokk = emottakblokk,
+            fellesformatXml = fellesformat,
+            msgHead = msgHead,
         )
         val starttime = System.currentTimeMillis()
 
@@ -113,22 +107,6 @@ class DialogmeldingProcessor(
 
         val innbyggerOK = pdlClient.personEksisterer(PersonIdent(receivedDialogmelding.personNrPasient))
         val legeOK = pdlClient.personEksisterer(PersonIdent(receivedDialogmelding.personNrLege))
-
-        val tssId = smtssClient.findBestTss(
-            legePersonIdent = PersonIdent(receivedDialogmelding.personNrLege),
-            legekontorOrgName = receivedDialogmelding.legekontorOrgName,
-            dialogmeldingId = receivedDialogmelding.msgId,
-        )
-
-        if (tssId != null && tssId.tssid.isNotBlank()) {
-            emottakService.registerEmottakSubscription(
-                tssId = tssId,
-                partnerReferanse = emottakblokk.partnerReferanse,
-                sender = msgHead.msgInfo.sender,
-                msgId = msgHead.msgInfo.msgId,
-                loggingMeta = loggingMeta,
-            )
-        }
 
         val navnSignerendeLege = signerendeLegeService.signerendeLegeNavn(
             signerendeLegeFnr = receivedDialogmelding.personNrLege,
@@ -160,11 +138,8 @@ class DialogmeldingProcessor(
                 validationResult = validationResult,
                 vedleggListe = vedleggListe,
                 msgHead = msgHead,
-                emottakblokk = emottakblokk,
                 pasientNavn = pasientNavn,
                 navnSignerendeLege = navnSignerendeLege,
-                tssId = tssId?.tssid ?: "",
-                useCronjobToPublishToArena = env.useCronjobToPublishToArena,
             )
 
             Status.INVALID -> handleStatusINVALID(

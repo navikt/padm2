@@ -1,19 +1,14 @@
-package no.nav.syfo.dialogmelding
+package no.nav.syfo.services
 
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
-import no.nav.syfo.ExternalMockEnvironment
-import no.nav.syfo.application.DialogmeldingProcessor
 import no.nav.syfo.application.mq.MQSenderInterface
-import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.client.SmtssClient
 import no.nav.syfo.client.TssId
+import no.nav.syfo.client.isbehandlerdialog.BehandlerdialogClient
 import no.nav.syfo.domain.PersonIdent
-import no.nav.syfo.handlestatus.handleStatusOK
-import no.nav.syfo.kafka.DialogmeldingProducer
-import no.nav.syfo.persistering.persistRecivedMessageValidation
-import no.nav.syfo.services.EmottakService
+import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.util.LoggingMeta
 import no.nav.syfo.util.get
 import no.nav.syfo.util.getFileAsString
@@ -21,51 +16,36 @@ import no.nav.syfo.util.safeUnmarshal
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 
-class DialogmeldingProcessorTssSpek : Spek({
+class ArenaDialogmeldingServiceSpek : Spek({
 
-    val externalMockEnvironment = ExternalMockEnvironment.instance
-    val database = externalMockEnvironment.database
-    val dialogmeldingProducer = mockk<DialogmeldingProducer>(relaxed = true)
-    val mqSender = mockk<MQSenderInterface>(relaxed = true)
-    val azureAdV2Client = mockk<AzureAdV2Client>(relaxed = true)
     val emottakService = mockk<EmottakService>(relaxed = true)
     val smtssClient = mockk<SmtssClient>(relaxed = true)
+    val mqSender = mockk<MQSenderInterface>(relaxed = true)
+    val behandlerdialogClient = mockk<BehandlerdialogClient>(relaxed = true)
 
-    beforeEachTest {
-        mockkStatic("no.nav.syfo.handlestatus.HandleStatusOKKt")
-        mockkStatic("no.nav.syfo.persistering.HandleRecivedMessageKt")
-        coJustRun {
-            handleStatusOK(
-                any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(),
-                any(), any(), any(), any()
-            )
-        }
-        justRun { persistRecivedMessageValidation(any(), any(), any()) }
-    }
-
-    afterEachTest {
-        unmockkStatic("no.nav.syfo.handlestatus.HandleStatusOKKt")
-        unmockkStatic("no.nav.syfo.persistering.HandleRecivedMessageKt")
-        clearMocks(dialogmeldingProducer, mqSender, azureAdV2Client, emottakService, smtssClient)
-    }
-
-    val dialogmeldingProcessor = DialogmeldingProcessor(
-        database = database,
-        env = externalMockEnvironment.environment,
+    val arenaDialogmeldingService = ArenaDialogmeldingService(
         mqSender = mqSender,
-        dialogmeldingProducer = dialogmeldingProducer,
-        azureAdV2Client = azureAdV2Client,
         smtssClient = smtssClient,
         emottakService = emottakService,
+        behandlerdialogClient = behandlerdialogClient
     )
 
-    describe("Get and handle TSS ident") {
+    afterEachTest {
+        clearMocks(mqSender, emottakService, smtssClient)
+    }
+
+    describe("sendArenaDialogmeldingToMQ()") {
         val tssId = TssId("123")
         val msgId = "37340D30-FE14-42B5-985F-A8FF8FFA0CB5"
-        val LEGEKONTOR_ORGNAME = "Kule helsetjenester AS"
+        val legekontorOrgName = "Kule helsetjenester AS"
 
         val dialogmeldingString = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
         val fellesformat = safeUnmarshal(dialogmeldingString)
+        val receivedDialogmelding = ReceivedDialogmelding.create(
+            dialogmeldingId = msgId,
+            fellesformat = fellesformat,
+            inputMessageText = dialogmeldingString,
+        )
 
         val emottakBlokk = fellesformat.get<XMLMottakenhetBlokk>()
         val personNumberDoctor = emottakBlokk.avsenderFnrFraDigSignatur
@@ -78,10 +58,10 @@ class DialogmeldingProcessorTssSpek : Spek({
             coJustRun { emottakService.registerEmottakSubscription(any(), any(), any(), any(), any()) }
 
             runBlocking {
-                dialogmeldingProcessor.process(msgId, dialogmeldingString)
+                arenaDialogmeldingService.sendArenaDialogmeldingToMQ(receivedDialogmelding, fellesformat)
             }
 
-            coVerify(exactly = 1) { smtssClient.findBestTss(legePersonIdent, LEGEKONTOR_ORGNAME, msgId) }
+            coVerify(exactly = 1) { smtssClient.findBestTss(legePersonIdent, legekontorOrgName, msgId) }
             coVerify(exactly = 1) {
                 emottakService.registerEmottakSubscription(
                     tssId,
@@ -97,10 +77,10 @@ class DialogmeldingProcessorTssSpek : Spek({
             coEvery { smtssClient.findBestTss(any(), any(), any()) } returns null
 
             runBlocking {
-                dialogmeldingProcessor.process(msgId, dialogmeldingString)
+                arenaDialogmeldingService.sendArenaDialogmeldingToMQ(receivedDialogmelding, fellesformat)
             }
 
-            coVerify(exactly = 1) { smtssClient.findBestTss(legePersonIdent, LEGEKONTOR_ORGNAME, msgId) }
+            coVerify(exactly = 1) { smtssClient.findBestTss(legePersonIdent, legekontorOrgName, msgId) }
             coVerify(exactly = 0) { emottakService.registerEmottakSubscription(any(), any(), any(), any(), any()) }
         }
 
@@ -109,10 +89,10 @@ class DialogmeldingProcessorTssSpek : Spek({
             coEvery { smtssClient.findBestTss(any(), any(), any()) } returns emptyTssId
 
             runBlocking {
-                dialogmeldingProcessor.process(msgId, dialogmeldingString)
+                arenaDialogmeldingService.sendArenaDialogmeldingToMQ(receivedDialogmelding, fellesformat)
             }
 
-            coVerify(exactly = 1) { smtssClient.findBestTss(legePersonIdent, LEGEKONTOR_ORGNAME, msgId) }
+            coVerify(exactly = 1) { smtssClient.findBestTss(legePersonIdent, legekontorOrgName, msgId) }
             coVerify(exactly = 0) { emottakService.registerEmottakSubscription(any(), any(), any(), any(), any()) }
         }
     }

@@ -1,5 +1,9 @@
 package no.nav.syfo.util
 
+import no.nav.helse.eiFellesformat2.XMLEIFellesformat
+import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
+import no.nav.helse.msgHead.XMLMsgHead
+
 enum class LogType {
     INVALID_MESSAGE,
     TEST_FNR_IN_PRODUCTION
@@ -35,7 +39,23 @@ data class LoggingMeta(
     val orgNr: String?,
     val msgId: String,
     val dialogmeldingId: String = ""
-)
+) {
+    companion object {
+        fun create(
+            emottakBlokk: XMLMottakenhetBlokk,
+            fellesformatXml: XMLEIFellesformat,
+            msgHead: XMLMsgHead
+        ): LoggingMeta {
+            val ediLoggId = emottakBlokk.ediLoggId
+            val legekontorOrgNr = extractOrganisationNumberFromSender(fellesformatXml)?.id
+            return LoggingMeta(
+                mottakId = ediLoggId,
+                orgNr = legekontorOrgNr,
+                msgId = msgHead.msgInfo.msgId,
+            )
+        }
+    }
+}
 
 class TrackableException(override val cause: Throwable) : RuntimeException()
 
