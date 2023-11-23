@@ -23,7 +23,7 @@ class ClamAvClient(
                         value = vedlegg.contentBase64,
                         headers = Headers.build {
                             append(HttpHeaders.ContentType, vedlegg.mimeType)
-                            append(HttpHeaders.ContentDisposition, "filename=${vedlegg.beskrivelse}")
+                            append(HttpHeaders.ContentDisposition, "filename=${vedlegg.beskrivelse.replaceCRLF()}")
                         }
                     )
                 }
@@ -37,6 +37,9 @@ class ClamAvClient(
         }
     }
 }
+
+private fun String.replaceCRLF() =
+    this.replace("\r\n", " ").replace("\n", " ")
 
 data class ScanResult(
     @JsonAlias("Filename")
