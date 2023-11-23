@@ -38,7 +38,7 @@ class ClamAvClient(
     }
 }
 
-fun String.replaceCRLF() =
+private fun String.replaceCRLF() =
     this.replace("\r\n", " ").replace("\n", " ")
 
 data class ScanResult(
