@@ -54,9 +54,10 @@ fun Connection.opprettDialogmeldingOpplysninger(receivedDialogmelding: ReceivedD
                 dialogmelding_published,
                 arena,
                 apprec,
-                sent_to_arena
+                sent_to_arena,
+                created_at
                 )
-            VALUES  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             RETURNING id
             """
     ).use {
@@ -74,6 +75,7 @@ fun Connection.opprettDialogmeldingOpplysninger(receivedDialogmelding: ReceivedD
         it.setNull(12, Types.TIMESTAMP)
         it.setNull(13, Types.TIMESTAMP)
         it.setBoolean(14, false)
+        it.setTimestamp(15, Timestamp.valueOf(LocalDateTime.now()))
         it.executeQuery().toList { getString("id") }
     }
 
@@ -278,17 +280,17 @@ fun DatabaseInterface.hentIkkeFullforteDialogmeldinger() =
     connection.use { connection ->
         connection.prepareStatement(
             """
-                SELECT id, fellesformat, mottatt_tidspunkt
+                SELECT id, fellesformat, created_at
                 FROM dialogmeldingopplysninger
-                WHERE apprec IS NULL AND mottatt_tidspunkt < (NOW() - INTERVAL '10 minutes')
-                ORDER BY mottatt_tidspunkt ASC
+                WHERE apprec IS NULL AND created_at < (NOW() - INTERVAL '10 minutes')
+                ORDER BY created_at ASC
                 """
         ).use {
             it.executeQuery().toList {
                 Triple(
                     first = getString("id"),
                     second = getString("fellesformat"),
-                    third = getTimestamp("mottatt_tidspunkt").toLocalDateTime(),
+                    third = getTimestamp("created_at").toLocalDateTime(),
                 )
             }
         }
