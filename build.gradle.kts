@@ -1,7 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.apache.tools.ant.taskdefs.condition.Os
-import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.exclude
-import org.jetbrains.kotlin.js.translate.context.Namer.kotlin
 
 group = "no.nav.syfo"
 version = "1.0.0"
