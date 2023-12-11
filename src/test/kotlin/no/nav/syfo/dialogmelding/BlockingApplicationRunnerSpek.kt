@@ -17,6 +17,8 @@ import no.nav.syfo.util.*
 import org.amshove.kluent.*
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
+import java.sql.Timestamp
+import java.time.LocalDateTime
 import javax.jms.*
 
 class BlockingApplicationRunnerSpek : Spek({
@@ -125,7 +127,7 @@ class BlockingApplicationRunnerSpek : Spek({
                         getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
                     every { incomingMessage.text } returns(fellesformat)
                     externalMockEnvironment.pdfgenMock.alwaysFail = true
-                    runBlocking {
+                    val dialogmeldingId = runBlocking {
                         blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 0) { mqSender.sendReceipt(any()) }
@@ -134,6 +136,10 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
 
                     externalMockEnvironment.pdfgenMock.alwaysFail = false
+                    database.updateCreatedAt(
+                        dialogmeldingId!!,
+                        Timestamp.valueOf(LocalDateTime.now().minusMinutes(20L))
+                    )
                     runBlocking {
                         rerunCronJob.run()
                     }
@@ -433,11 +439,11 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                 }
 
-                it("Prosesserer innkommet melding (pdfgen feiler, gammel mottattdato)") {
+                it("Prosesserer innkommet melding (pdfgen feiler, gammel created-at)") {
                     val fellesformat = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
                         .replace("01010142365", UserConstants.PATIENT_FNR_PDFGEN_FAIL)
                     every { incomingMessage.text } returns(fellesformat)
-                    runBlocking {
+                    val dialogmeldingId = runBlocking {
                         blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 0) { mqSender.sendReceipt(any()) }
@@ -446,6 +452,10 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                     MESSAGES_STILL_FAIL_AFTER_1H.count() shouldBeEqualTo 0.0
                     externalMockEnvironment.pdfgenMock.allowFail = false
+                    database.updateCreatedAt(
+                        dialogmeldingId!!,
+                        Timestamp.valueOf(LocalDateTime.now().minusMinutes(20L))
+                    )
                     runBlocking {
                         rerunCronJob.run()
                     }
@@ -456,11 +466,11 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                     MESSAGES_STILL_FAIL_AFTER_1H.count() shouldBeEqualTo 0.0
                 }
-                it("Prosesserer innkommet melding (pdfgen feiler, gammel mottattdato, feiler også ved rerun)") {
+                it("Prosesserer innkommet melding (pdfgen feiler, gammel created-at, feiler også ved rerun)") {
                     val fellesformat = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
                         .replace("01010142365", UserConstants.PATIENT_FNR_PDFGEN_FAIL)
                     every { incomingMessage.text } returns(fellesformat)
-                    runBlocking {
+                    val dialogmeldingId = runBlocking {
                         blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 0) { mqSender.sendReceipt(any()) }
@@ -468,6 +478,10 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 0) { mqSender.sendArena(any()) }
                     verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                     MESSAGES_STILL_FAIL_AFTER_1H.count() shouldBeEqualTo 0.0
+                    database.updateCreatedAt(
+                        dialogmeldingId!!,
+                        Timestamp.valueOf(LocalDateTime.now().minusMinutes(90L))
+                    )
                     runBlocking {
                         rerunCronJob.run()
                     }
@@ -477,12 +491,12 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                     MESSAGES_STILL_FAIL_AFTER_1H.count() shouldBeEqualTo 1.0
                 }
-                it("Prosesserer innkommet melding (pdfgen feiler, mottattdato nå)") {
+                it("Prosesserer innkommet melding (pdfgen feiler, created-at nå)") {
                     val fellesformat = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
                         .replace("01010142365", UserConstants.PATIENT_FNR_PDFGEN_FAIL)
                         .replace("mottattDatotid=\"2019-01-16T21:57:43\"", "mottattDatotid=\"${java.time.Instant.now()}\"")
                     every { incomingMessage.text } returns(fellesformat)
-                    runBlocking {
+                    val dialogmeldingId = runBlocking {
                         blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 0) { mqSender.sendReceipt(any()) }
@@ -490,6 +504,10 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 0) { mqSender.sendArena(any()) }
                     verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                     externalMockEnvironment.pdfgenMock.allowFail = false
+                    database.updateCreatedAt(
+                        dialogmeldingId!!,
+                        Timestamp.valueOf(LocalDateTime.now().minusMinutes(8L))
+                    )
                     runBlocking {
                         // Meldingen må være ti minutter gammel for å bli plukket opp av cronjobben
                         rerunCronJob.run()
@@ -528,7 +546,7 @@ class BlockingApplicationRunnerSpek : Spek({
                     val fellesformat = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
                     every { incomingMessage.text } returns(fellesformat)
                     externalMockEnvironment.pdlMock.pdlAlwaysFail = true
-                    runBlocking {
+                    val dialogmeldingId = runBlocking {
                         blockingApplicationRunner.processMessage(incomingMessage)
                     }
                     verify(exactly = 0) { mqSender.sendReceipt(any()) }
@@ -536,6 +554,10 @@ class BlockingApplicationRunnerSpek : Spek({
                     verify(exactly = 0) { mqSender.sendArena(any()) }
                     verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
                     externalMockEnvironment.pdlMock.pdlAlwaysFail = false
+                    database.updateCreatedAt(
+                        dialogmeldingId!!,
+                        Timestamp.valueOf(LocalDateTime.now().minusMinutes(20L))
+                    )
                     runBlocking {
                         rerunCronJob.run()
                     }

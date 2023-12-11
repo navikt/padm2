@@ -76,6 +76,26 @@ fun DatabaseInterface.updateSendtApprec(dialogmeldingId: String, timestamp: Time
     }
 }
 
+fun DatabaseInterface.updateCreatedAt(dialogmeldingId: String, timestamp: Timestamp) {
+    connection.use { connection ->
+        connection.prepareStatement(
+            """
+                UPDATE DIALOGMELDINGOPPLYSNINGER
+                SET created_at=?
+                WHERE ID=?;
+                """
+        ).use {
+            it.setTimestamp(1, timestamp)
+            it.setString(2, dialogmeldingId)
+            val updated = it.executeUpdate()
+            if (updated != 1) {
+                throw SQLException("Expected a single row to be updated, got update count $updated")
+            }
+        }
+        connection.commit()
+    }
+}
+
 fun DatabaseInterface.getSentToArena(dialogmeldingId: String): Pair<Timestamp, Boolean>? {
     connection.use { connection ->
         return connection.prepareStatement(
