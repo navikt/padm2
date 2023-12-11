@@ -1,5 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.apache.tools.ant.taskdefs.condition.Os
+import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.exclude
+import org.jetbrains.kotlin.js.translate.context.Namer.kotlin
 
 group = "no.nav.syfo"
 version = "1.0.0"
@@ -9,17 +11,17 @@ object Versions {
     const val base64containerVersion = "1.5ac2176"
     const val dialogmeldingVersion = "1.5d21db9"
     const val fellesformat2Version = "1.0329dd1"
-    const val flywayVersion = "9.20.0"
+    const val flywayVersion = "9.22.3"
     const val hikariVersion = "5.0.1"
     const val ibmMqVersion = "9.3.3.0"
     const val jacksonVersion = "2.15.2"
     const val javaTimeAdapterVersion = "1.1.3"
     const val kafkaEmbeddedVersion = "3.2.1"
-    const val kafkaVersion = "3.3.2"
+    const val kafkaVersion = "3.6.0"
     const val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
     const val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
     const val kluentVersion = "1.73"
-    const val ktorVersion = "2.3.2"
+    const val ktorVersion = "2.3.7"
     const val logbackVersion = "1.4.7"
     const val logstashEncoderVersion = "7.3"
     const val javaxAnnotationApiVersion = "1.3.2"
@@ -30,8 +32,8 @@ object Versions {
     const val jaxwsToolsVersion = "2.3.4"
     const val junitJupiterVersion = "5.8.2"
     const val micrometerRegistry = "1.11.0"
-    const val mockkVersion = "1.12.4"
-    const val nimbusJoseJwt = "9.25.3"
+    const val mockkVersion = "1.13.5"
+    const val nimbusJoseJwt = "9.31"
     const val pdfboxVersion = "2.0.24"
     val postgresEmbedded = if (Os.isFamily(Os.FAMILY_MAC)) "1.0.0" else "0.13.4"
     const val postgresVersion = "42.5.1"
@@ -41,7 +43,7 @@ object Versions {
 
 plugins {
     java
-    kotlin("jvm") version "1.9.20"
+    kotlin("jvm") version "1.9.21"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("org.jlleitschuh.gradle.ktlint") version "11.4.2"
 }
