@@ -11,8 +11,8 @@ object Versions {
     const val fellesformat2Version = "1.0329dd1"
     const val flywayVersion = "9.22.3"
     const val hikariVersion = "5.0.1"
-    const val ibmMqVersion = "9.3.3.0"
-    const val jacksonVersion = "2.15.2"
+    const val ibmMqVersion = "9.3.4.1"
+    const val jacksonVersion = "2.16.0"
     const val javaTimeAdapterVersion = "1.1.3"
     const val kafkaEmbeddedVersion = "3.2.1"
     const val kafkaVersion = "3.6.0"
@@ -20,21 +20,21 @@ object Versions {
     const val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
     const val kluentVersion = "1.73"
     const val ktorVersion = "2.3.7"
-    const val logbackVersion = "1.4.7"
-    const val logstashEncoderVersion = "7.3"
+    const val logbackVersion = "1.4.14"
+    const val logstashEncoderVersion = "7.4"
     const val javaxAnnotationApiVersion = "1.3.2"
     const val javaxActivationVersion = "1.2.0"
     const val jaxbApiVersion = "2.4.0-b180830.0359"
     const val jaxbRuntimeVersion = "2.4.0-b180830.0438"
     const val jaxwsApiVersion = "2.3.1"
-    const val jaxwsToolsVersion = "2.3.4"
+    const val jaxwsToolsVersion = "2.3.7"
     const val junitJupiterVersion = "5.8.2"
-    const val micrometerRegistry = "1.11.0"
-    const val mockkVersion = "1.13.5"
-    const val nimbusJoseJwt = "9.31"
+    const val micrometerRegistry = "1.12.0"
+    const val mockkVersion = "1.13.8"
+    const val nimbusJoseJwt = "9.37.2"
     const val pdfboxVersion = "2.0.24"
     val postgresEmbedded = if (Os.isFamily(Os.FAMILY_MAC)) "1.0.0" else "0.13.4"
-    const val postgresVersion = "42.5.1"
+    const val postgresVersion = "42.6.0"
     const val scala = "2.13.9"
     const val spek = "2.0.19"
 }
@@ -115,6 +115,12 @@ dependencies {
     }
     implementation("org.apache.kafka:kafka_2.13:${Versions.kafkaVersion}", excludeLog4j)
     constraints {
+        implementation("org.apache.zookeeper:zookeeper") {
+            because("org.apache.kafka:kafka_2.13:${Versions.kafkaVersion} -> https://www.cve.org/CVERecord?id=CVE-2023-44981")
+            version {
+                require("3.8.3")
+            }
+        }
         implementation("org.scala-lang:scala-library") {
             because("org.apache.kafka:kafka_2.13:${Versions.kafkaVersion} -> https://www.cve.org/CVERecord?id=CVE-2022-36944")
             version {
