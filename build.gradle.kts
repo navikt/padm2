@@ -10,16 +10,16 @@ object Versions {
     const val dialogmeldingVersion = "1.5d21db9"
     const val fellesformat2Version = "1.0329dd1"
     const val flywayVersion = "9.22.3"
-    const val hikariVersion = "5.0.1"
+    const val hikariVersion = "5.1.0"
     const val ibmMqVersion = "9.3.4.1"
     const val jacksonVersion = "2.16.0"
     const val javaTimeAdapterVersion = "1.1.3"
-    const val kafkaEmbeddedVersion = "3.2.1"
-    const val kafkaVersion = "3.6.0"
+    const val kafkaEmbeddedVersion = "3.2.3"
+    const val kafkaVersion = "3.6.1"
     const val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
     const val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
     const val kluentVersion = "1.73"
-    const val ktorVersion = "2.3.7"
+    const val ktorVersion = "2.3.8"
     const val logbackVersion = "1.4.14"
     const val logstashEncoderVersion = "7.4"
     const val javaxAnnotationApiVersion = "1.3.2"
@@ -29,19 +29,19 @@ object Versions {
     const val jaxwsApiVersion = "2.3.1"
     const val jaxwsToolsVersion = "2.3.7"
     const val junitJupiterVersion = "5.8.2"
-    const val micrometerRegistry = "1.12.0"
+    const val micrometerRegistry = "1.12.2"
     const val mockkVersion = "1.13.8"
     const val nimbusJoseJwt = "9.37.2"
     const val pdfboxVersion = "2.0.24"
     val postgresEmbedded = if (Os.isFamily(Os.FAMILY_MAC)) "1.0.0" else "0.13.4"
-    const val postgresVersion = "42.6.0"
+    const val postgresVersion = "42.7.2"
     const val scala = "2.13.9"
     const val spek = "2.0.19"
 }
 
 plugins {
     java
-    kotlin("jvm") version "1.9.21"
+    kotlin("jvm") version "1.9.22"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("org.jlleitschuh.gradle.ktlint") version "11.4.2"
 }
@@ -139,7 +139,7 @@ dependencies {
         implementation("org.eclipse.jetty.http2:http2-server") {
             because("no.nav:kafka-embedded-env:${Versions.kafkaEmbeddedVersion} -> https://advisory.checkmarx.net/advisory/vulnerability/CVE-2022-2048/")
             version {
-                require("9.4.48.v20220622")
+                require("9.4.54.v20240208")
             }
         }
         implementation("com.google.protobuf:protobuf-java") {
