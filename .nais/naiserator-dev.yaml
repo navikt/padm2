@@ -75,6 +75,10 @@ spec:
       secret: padm2-keystore
   kafka:
     pool: nav-dev
+  observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: java
   env:
     - name: MQ_HOST_NAME
       value: "b27apvl222.preprod.local"
