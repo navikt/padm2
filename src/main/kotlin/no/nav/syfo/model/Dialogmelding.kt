@@ -7,7 +7,7 @@ data class Dialogmelding(
     val innkallingMoterespons: InnkallingMoterespons?,
     val foresporselFraSaksbehandlerForesporselSvar: ForesporselFraSaksbehandlerForesporselSvar?,
     val henvendelseFraLegeHenvendelse: HenvendelseFraLegeHenvendelse?,
-    val navnHelsepersonell: String, // TODO: Til journalforing
+    val navnHelsepersonell: String,
     val signaturDato: LocalDateTime
 )
 
