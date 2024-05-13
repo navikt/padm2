@@ -6,4 +6,4 @@ data class Behandler(
     val mellomnavn: String?
 )
 
-fun Behandler.getName(): String = if (mellomnavn == null) "$etternavn, $fornavn" else "$etternavn, $fornavn $mellomnavn"
+fun Behandler.getName(): String = if (mellomnavn == null) "$fornavn $etternavn" else "$fornavn $mellomnavn $etternavn"
