@@ -1,7 +1,6 @@
 package no.nav.syfo
 
 import io.ktor.server.netty.*
-import no.nav.common.KafkaEnvironment
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.client.wellknown.WellKnown
 import no.nav.syfo.mock.*
@@ -10,7 +9,6 @@ import java.nio.file.Paths
 class ExternalMockEnvironment private constructor() {
     val applicationState: ApplicationState = testAppState()
     val database = TestDatabase()
-    val embeddedEnvironment: KafkaEnvironment = testKafka()
     val wellKnownInternalAzureAD = wellKnownInternalAzureAD()
 
     val azureAdV2Mock = AzureAdV2Mock()
@@ -38,7 +36,6 @@ class ExternalMockEnvironment private constructor() {
     )
 
     var environment = testEnvironment(
-        kafkaBootstrapServers = embeddedEnvironment.brokersURL,
         azureTokenEndpoint = azureAdV2Mock.url,
         clamAvURL = clamAvMock.url,
         dokarkivUrl = dokarkivMock.url,
@@ -72,13 +69,11 @@ fun wellKnownInternalAzureAD(): WellKnown {
 fun ExternalMockEnvironment.startExternalMocks() {
     this.externalApplicationMockMap.start()
     this.database.start()
-    this.embeddedEnvironment.start()
 }
 
 fun ExternalMockEnvironment.stopExternalMocks() {
     this.externalApplicationMockMap.stop()
     this.database.stop()
-    this.embeddedEnvironment.tearDown()
 }
 
 fun HashMap<String, NettyApplicationEngine>.start() {

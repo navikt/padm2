@@ -6,7 +6,6 @@ import no.nav.syfo.util.configuredJacksonMapper
 import java.net.ServerSocket
 
 fun testEnvironment(
-    kafkaBootstrapServers: String,
     azureTokenEndpoint: String = "azureTokenEndpoint",
     clamAvURL: String,
     dokarkivUrl: String,
@@ -30,7 +29,7 @@ fun testEnvironment(
     databasePassword = "password",
     cluster = "dev-gcp",
     kafka = ApplicationEnvironmentKafka(
-        bootstrapServers = kafkaBootstrapServers,
+        bootstrapServers = "kafkaBootstrapServers",
         aivenCredstorePassword = "credstorepassord",
         aivenTruststoreLocation = "truststore",
         aivenKeystoreLocation = "keystore",
