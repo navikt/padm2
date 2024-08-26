@@ -32,7 +32,7 @@ class DialogmeldingProducer(
                     dialogmeldingForKafka.msgId,
                     dialogmeldingForKafka,
                 )
-            ).get()
+            ).also { it.get() }
         } catch (e: Exception) {
             log.error(
                 "Exception was thrown when attempting to send dialogmelding with id {}: ${e.message}",
