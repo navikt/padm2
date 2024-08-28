@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory
 
 private val log: Logger = LoggerFactory.getLogger("no.nav.syfo.application")
 
+@OptIn(DelicateCoroutinesApi::class)
 fun launchBackgroundTask(
     applicationState: ApplicationState,
     action: suspend CoroutineScope.() -> Unit

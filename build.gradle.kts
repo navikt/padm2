@@ -1,4 +1,3 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.apache.tools.ant.taskdefs.condition.Os
 
 group = "no.nav.syfo"
@@ -35,27 +34,21 @@ val postgresEmbedded = if (Os.isFamily(Os.FAMILY_MAC)) "1.0.0" else "0.13.4"
 val postgresVersion = "42.7.2"
 val scala = "2.13.9"
 val spek = "2.0.19"
+val commonsCompressVersion = "1.27.0"
 
 plugins {
     java
     kotlin("jvm") version "2.0.10"
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("com.gradleup.shadow") version "8.3.0"
     id("org.jlleitschuh.gradle.ktlint") version "11.4.2"
 }
-
-val githubUser: String by project
-val githubPassword: String by project
 
 repositories {
     mavenCentral()
     maven(url = "https://packages.confluent.io/maven/")
     maven(url = "https://jitpack.io")
     maven {
-        url = uri("https://maven.pkg.github.com/navikt/syfo-xml-codegen")
-        credentials {
-            username = githubUser
-            password = githubPassword
-        }
+        url = uri("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
     }
 }
 
@@ -135,6 +128,11 @@ dependencies {
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("io.ktor:ktor-client-mock:$ktorVersion")
     testImplementation("com.opentable.components:otj-pg-embedded:$postgresEmbedded")
+    constraints {
+        testImplementation("org.apache.commons:commons-compress:$commonsCompressVersion") {
+            because("overrides vulnerable dependency from com.opentable.components:otj-pg-embedded")
+        }
+    }
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation("org.spekframework.spek2:spek-dsl-jvm:$spek") {
         exclude(group = "org.jetbrains.kotlin")
@@ -150,28 +148,24 @@ kotlin {
 }
 
 tasks {
-    withType<Jar> {
+
+    jar {
         manifest.attributes["Main-Class"] = "no.nav.syfo.BootstrapKt"
     }
 
-    create("printVersion") {
-        doLast {
-            println(project.version)
-        }
-    }
-
-    withType<ShadowJar> {
+    shadowJar {
         archiveBaseName.set("app")
         archiveClassifier.set("")
         archiveVersion.set("")
     }
 
-    withType<Test> {
+    test {
         useJUnitPlatform {
             includeEngines("spek2", "junit-vintage")
         }
         testLogging {
             showStandardStreams = true
+            exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
         }
     }
 }
