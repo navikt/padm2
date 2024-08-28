@@ -7,7 +7,8 @@ import io.ktor.server.auth.jwt.*
 import net.logstash.logback.argument.StructuredArguments
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.net.URL
+import java.net.URI
+import java.time.Duration
 import java.util.concurrent.TimeUnit
 
 private val log: Logger = LoggerFactory.getLogger("no.nav.syfo.application.api.authentication")
@@ -27,8 +28,8 @@ fun Application.installJwtAuthentication(
 fun AuthenticationConfig.configureJwt(
     jwtIssuer: JwtIssuer,
 ) {
-    val jwkProvider = JwkProviderBuilder(URL(jwtIssuer.wellKnown.jwksUri))
-        .cached(10, 24, TimeUnit.HOURS)
+    val jwkProvider = JwkProviderBuilder(URI.create(jwtIssuer.wellKnown.jwksUri).toURL())
+        .cached(10, Duration.ofHours(24))
         .rateLimited(10, 1, TimeUnit.MINUTES)
         .build()
     jwt(name = jwtIssuer.jwtIssuerType.name) {

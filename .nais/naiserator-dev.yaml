@@ -40,6 +40,7 @@ spec:
         databases:
           - name: padm2-db
         diskAutoresize: true
+        tier: db-f1-micro
   accessPolicy:
     inbound:
       rules:
