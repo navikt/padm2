@@ -45,6 +45,8 @@ spec:
     inbound:
       rules:
         - application: isbehandlerdialog
+        - application: dokumentinnhenting
+          namespace: aap
     outbound:
       external:
         - host: "login.microsoftonline.com"
