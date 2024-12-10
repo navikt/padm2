@@ -67,12 +67,12 @@ fun wellKnownInternalAzureAD(): WellKnown {
 }
 
 fun ExternalMockEnvironment.startExternalMocks() {
-    this.externalApplicationMockMap.start()
+    this.externalApplicationMockMap.forEach { it.value.start() }
     this.database.start()
 }
 
 fun ExternalMockEnvironment.stopExternalMocks() {
-    this.externalApplicationMockMap.stop()
+    this.externalApplicationMockMap.forEach { it.value.stop() }
     this.database.stop()
 }
 

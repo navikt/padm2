@@ -1,5 +1,3 @@
-import org.apache.tools.ant.taskdefs.condition.Os
-
 group = "no.nav.syfo"
 version = "1.0.0"
 
@@ -7,17 +5,17 @@ val arenaDialogNotatVersion = "1.e1999cf"
 val base64containerVersion = "1.5ac2176"
 val dialogmeldingVersion = "1.5d21db9"
 val fellesformat2Version = "1.0329dd1"
-val flywayVersion = "9.22.3"
+val flywayVersion = "10.17.2"
 val hikariVersion = "5.1.0"
 val ibmMqVersion = "9.3.4.1"
-val jacksonVersion = "2.16.0"
+val jacksonVersion = "2.18.0"
 val javaTimeAdapterVersion = "1.1.3"
-val kafkaVersion = "3.6.1"
+val kafkaVersion = "3.9.0"
 val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
 val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
 val kluentVersion = "1.73"
-val ktorVersion = "2.3.8"
-val logbackVersion = "1.4.14"
+val ktorVersion = "3.0.2"
+val logbackVersion = "1.5.12"
 val logstashEncoderVersion = "7.4"
 val javaxAnnotationApiVersion = "1.3.2"
 val javaxActivationVersion = "1.2.0"
@@ -25,22 +23,21 @@ val jaxbApiVersion = "2.4.0-b180830.0359"
 val jaxbRuntimeVersion = "2.4.0-b180830.0438"
 val jaxwsApiVersion = "2.3.1"
 val jaxwsToolsVersion = "2.3.7"
-val junitJupiterVersion = "5.8.2"
-val micrometerRegistry = "1.12.2"
-val mockkVersion = "1.13.8"
-val nimbusJoseJwt = "9.37.2"
+val junitJupiterVersion = "5.11.3"
+val micrometerRegistry = "1.12.8"
+val mockkVersion = "1.13.12"
+val nimbusJoseJwt = "9.47"
 val pdfboxVersion = "2.0.24"
-val postgresEmbedded = if (Os.isFamily(Os.FAMILY_MAC)) "1.0.0" else "0.13.4"
-val postgresVersion = "42.7.2"
-val scala = "2.13.9"
+val postgresEmbedded = "2.0.7"
+val postgresVersion = "42.7.4"
 val spek = "2.0.19"
-val commonsCompressVersion = "1.27.0"
+val commonsCompressVersion = "1.27.1"
 
 plugins {
     java
-    kotlin("jvm") version "2.0.10"
-    id("com.gradleup.shadow") version "8.3.0"
-    id("org.jlleitschuh.gradle.ktlint") version "11.4.2"
+    kotlin("jvm") version "2.0.21"
+    id("com.gradleup.shadow") version "8.3.2"
+    id("org.jlleitschuh.gradle.ktlint") version "11.6.1"
 }
 
 repositories {
@@ -86,7 +83,7 @@ dependencies {
 
     implementation("org.postgresql:postgresql:$postgresVersion")
     implementation("com.zaxxer:HikariCP:$hikariVersion")
-    implementation("org.flywaydb:flyway-core:$flywayVersion")
+    implementation("org.flywaydb:flyway-database-postgresql:$flywayVersion")
 
     implementation("javax.xml.ws:jaxws-api:$jaxwsApiVersion")
     implementation("javax.annotation:javax.annotation-api:$javaxAnnotationApiVersion")
@@ -108,13 +105,19 @@ dependencies {
         implementation("org.apache.zookeeper:zookeeper") {
             because("org.apache.kafka:kafka_2.13:$kafkaVersion -> https://www.cve.org/CVERecord?id=CVE-2023-44981")
             version {
-                require("3.8.3")
+                require("3.9.3")
             }
         }
-        implementation("org.scala-lang:scala-library") {
-            because("org.apache.kafka:kafka_2.13:$kafkaVersion -> https://www.cve.org/CVERecord?id=CVE-2022-36944")
+        implementation("org.bitbucket.b_c:jose4j") {
+            because("org.apache.kafka:kafka_2.13:$kafkaVersion -> https://github.com/advisories/GHSA-6qvw-249j-h44c")
             version {
-                require(scala)
+                require("0.9.6")
+            }
+        }
+        implementation("org.apache.commons:commons-compress") {
+            because("org.apache.commons:commons-compress:1.22 -> https://www.cve.org/CVERecord?id=CVE-2012-2098")
+            version {
+                require(commonsCompressVersion)
             }
         }
     }
@@ -127,12 +130,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("io.ktor:ktor-client-mock:$ktorVersion")
-    testImplementation("com.opentable.components:otj-pg-embedded:$postgresEmbedded")
-    constraints {
-        testImplementation("org.apache.commons:commons-compress:$commonsCompressVersion") {
-            because("overrides vulnerable dependency from com.opentable.components:otj-pg-embedded")
-        }
-    }
+    testImplementation("io.zonky.test:embedded-postgres:$postgresEmbedded")
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation("org.spekframework.spek2:spek-dsl-jvm:$spek") {
         exclude(group = "org.jetbrains.kotlin")
@@ -154,6 +152,7 @@ tasks {
     }
 
     shadowJar {
+        mergeServiceFiles()
         archiveBaseName.set("app")
         archiveClassifier.set("")
         archiveVersion.set("")
@@ -161,7 +160,7 @@ tasks {
 
     test {
         useJUnitPlatform {
-            includeEngines("spek2", "junit-vintage")
+            includeEngines("spek2", "junit-jupiter")
         }
         testLogging {
             showStandardStreams = true

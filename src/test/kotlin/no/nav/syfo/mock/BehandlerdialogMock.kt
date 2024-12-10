@@ -24,7 +24,7 @@ class BehandlerdialogMock {
 
     private fun mockBehandlerdialogServer(
         port: Int
-    ): NettyApplicationEngine {
+    ): EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration> {
         return embeddedServer(
             factory = Netty,
             port = port

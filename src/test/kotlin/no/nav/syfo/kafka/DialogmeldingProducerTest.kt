@@ -11,7 +11,8 @@ import no.nav.syfo.util.*
 import org.amshove.kluent.*
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
-import org.junit.*
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import java.time.ZoneOffset
 
 internal class DialogmeldingProducerTest {
@@ -23,7 +24,7 @@ internal class DialogmeldingProducerTest {
     lateinit var msgHead: XMLMsgHead
     lateinit var journalpostId: String
 
-    @Before
+    @BeforeEach
     fun before() {
         kafkaProducerMock = mockk<KafkaProducer<String, DialogmeldingForKafka>>(relaxed = true)
         dialogmeldingProducer = DialogmeldingProducer(

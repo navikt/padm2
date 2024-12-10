@@ -6,7 +6,7 @@ import no.nav.syfo.util.get
 import no.nav.syfo.util.getFileAsString
 import no.nav.syfo.util.safeUnmarshal
 import org.amshove.kluent.shouldBeEqualTo
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
 class ExtractFromFellesFormatTest {

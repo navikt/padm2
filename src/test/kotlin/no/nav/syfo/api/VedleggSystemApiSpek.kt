@@ -1,8 +1,11 @@
 package no.nav.syfo.api
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.request.*
 import io.ktor.http.*
+import io.ktor.serialization.jackson.*
 import io.ktor.server.testing.*
 import io.mockk.every
 import io.mockk.mockk
@@ -16,6 +19,7 @@ import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.kafka.DialogmeldingProducer
 import no.nav.syfo.util.*
+import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEqualTo
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
@@ -23,54 +27,61 @@ import java.util.*
 import javax.jms.TextMessage
 
 class VedleggSystemApiSpek : Spek({
-    val objectMapper: ObjectMapper = configuredJacksonMapper()
+    val externalMockEnvironment = ExternalMockEnvironment.instance
+    val database = externalMockEnvironment.database
+    val mqSender = mockk<MQSenderInterface>(relaxed = true)
+    val dialogmeldingProducer = mockk<DialogmeldingProducer>(relaxed = true)
+    val incomingMessage = mockk<TextMessage>(relaxed = true)
+    val azureAdV2Client = mockk<AzureAdV2Client>(relaxed = true)
 
-    with(TestApplicationEngine()) {
-        start()
+    val dialogmeldingProcessor = DialogmeldingProcessor(
+        database = database,
+        env = externalMockEnvironment.environment,
+        mqSender = mqSender,
+        dialogmeldingProducer = dialogmeldingProducer,
+        azureAdV2Client = azureAdV2Client,
+    )
 
-        val externalMockEnvironment = ExternalMockEnvironment.instance
-        val database = externalMockEnvironment.database
-        val mqSender = mockk<MQSenderInterface>(relaxed = true)
-        val dialogmeldingProducer = mockk<DialogmeldingProducer>(relaxed = true)
-        val incomingMessage = mockk<TextMessage>(relaxed = true)
-        val azureAdV2Client = mockk<AzureAdV2Client>(relaxed = true)
+    val blockingApplicationRunner = BlockingApplicationRunner(
+        applicationState = externalMockEnvironment.applicationState,
+        database = database,
+        inputconsumer = mockk(),
+        mqSender = mqSender,
+        dialogmeldingProcessor = dialogmeldingProcessor,
+    )
 
-        val dialogmeldingProcessor = DialogmeldingProcessor(
-            database = database,
-            env = externalMockEnvironment.environment,
-            mqSender = mqSender,
-            dialogmeldingProducer = dialogmeldingProducer,
-            azureAdV2Client = azureAdV2Client,
-        )
-
-        val blockingApplicationRunner = BlockingApplicationRunner(
-            applicationState = externalMockEnvironment.applicationState,
-            database = database,
-            inputconsumer = mockk(),
-            mqSender = mqSender,
-            dialogmeldingProcessor = dialogmeldingProcessor,
-        )
-
-        application.testApiModule(
-            externalMockEnvironment = externalMockEnvironment,
-        )
-
-        beforeEachTest {
-            database.dropData()
+    fun ApplicationTestBuilder.setupApiAndClient(): HttpClient {
+        application {
+            testApiModule(
+                externalMockEnvironment = externalMockEnvironment,
+            )
         }
+        val client = createClient {
+            install(ContentNegotiation) {
+                jackson { configure() }
+            }
+        }
+        return client
+    }
 
-        describe(VedleggSystemApiSpek::class.java.simpleName) {
-            describe("Get vedlegg for msgId") {
-                val msgId = UUID.randomUUID().toString()
-                val url = "$vedleggSystemApiV1Path/$msgId"
-                val validToken = generateJWT(
-                    audience = externalMockEnvironment.environment.aadAppClient,
-                    azp = testIsBehandlerDialogClientId,
-                    issuer = externalMockEnvironment.wellKnownInternalAzureAD.issuer,
-                )
+    beforeEachTest {
+        database.dropData()
+    }
 
-                describe("Happy path") {
-                    it("should get vedlegg for msgId") {
+    describe(VedleggSystemApiSpek::class.java.simpleName) {
+        describe("Get vedlegg for msgId") {
+            val msgId = UUID.randomUUID().toString()
+            val url = "$vedleggSystemApiV1Path/$msgId"
+            val validToken = generateJWT(
+                audience = externalMockEnvironment.environment.aadAppClient,
+                azp = testIsBehandlerDialogClientId,
+                issuer = externalMockEnvironment.wellKnownInternalAzureAD.issuer,
+            )
+
+            describe("Happy path") {
+                it("should get vedlegg for msgId") {
+                    testApplication {
+                        val client = setupApiAndClient()
                         every { incomingMessage.text } returns(
                             getFileAsString("src/test/resources/dialogmelding_dialog_notat_vedlegg.xml")
                                 .replace(
@@ -81,18 +92,19 @@ class VedleggSystemApiSpek : Spek({
                         runBlocking {
                             blockingApplicationRunner.processMessage(incomingMessage)
                         }
-                        with(
-                            handleRequest(HttpMethod.Get, url) {
-                                addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
-                            }
-                        ) {
-                            val vedleggListe = objectMapper.readValue<List<VedleggDTO>>(response.content!!)
-                            vedleggListe.size shouldBeEqualTo 2
-                            response.status() shouldBeEqualTo HttpStatusCode.OK
+                        val response = client.get(url) {
+                            bearerAuth(validToken)
+                            header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                         }
+                        response.status shouldBe HttpStatusCode.OK
+                        val vedleggListe = response.body<List<VedleggDTO>>()
+                        vedleggListe.size shouldBeEqualTo 2
                     }
-                    it("should only get valid vedlegg") {
-                        every { incomingMessage.text } returns(
+                }
+                it("should only get valid vedlegg") {
+                    testApplication {
+                        val client = setupApiAndClient()
+                        every { incomingMessage.text } returns (
                             getFileAsString("src/test/resources/dialogmelding_dialog_notat_vedlegg.xml")
                                 .replace(
                                     "<MimeType>image/jpeg</MimeType>",
@@ -106,17 +118,18 @@ class VedleggSystemApiSpek : Spek({
                         runBlocking {
                             blockingApplicationRunner.processMessage(incomingMessage)
                         }
-                        with(
-                            handleRequest(HttpMethod.Get, url) {
-                                addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
-                            }
-                        ) {
-                            val vedleggListe = objectMapper.readValue<List<VedleggDTO>>(response.content!!)
-                            vedleggListe.size shouldBeEqualTo 1
-                            response.status() shouldBeEqualTo HttpStatusCode.OK
+                        val response = client.get(url) {
+                            bearerAuth(validToken)
+                            header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                         }
+                        response.status shouldBe HttpStatusCode.OK
+                        val vedleggListe = response.body<List<VedleggDTO>>()
+                        vedleggListe.size shouldBeEqualTo 1
                     }
-                    it("should get plenty of vedlegg for msgId") {
+                }
+                it("should get plenty of vedlegg for msgId") {
+                    testApplication {
+                        val client = setupApiAndClient()
                         every { incomingMessage.text } returns(
                             getFileAsString("src/test/resources/dialogmelding_dialog_notat_veldig_mange_vedlegg.xml")
                                 .replace(
@@ -127,48 +140,49 @@ class VedleggSystemApiSpek : Spek({
                         runBlocking {
                             blockingApplicationRunner.processMessage(incomingMessage)
                         }
-                        with(
-                            handleRequest(HttpMethod.Get, url) {
-                                addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
-                            }
-                        ) {
-                            val vedleggListe = objectMapper.readValue<List<VedleggDTO>>(response.content!!)
-                            vedleggListe.size shouldBeEqualTo 45
-                            response.status() shouldBeEqualTo HttpStatusCode.OK
+                        val response = client.get(url) {
+                            bearerAuth(validToken)
+                            header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                         }
-                    }
-                    it("should return 204 when unknown msgId") {
-                        with(
-                            handleRequest(HttpMethod.Get, url) {
-                                addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
-                            }
-                        ) {
-                            response.status() shouldBeEqualTo HttpStatusCode.NoContent
-                        }
+                        response.status shouldBe HttpStatusCode.OK
+                        val vedleggListe = response.body<List<VedleggDTO>>()
+                        vedleggListe.size shouldBeEqualTo 45
                     }
                 }
-                describe("Unhappy paths") {
-                    it("should return status Unauthorized if no token is supplied") {
-                        with(
-                            handleRequest(HttpMethod.Get, url) {}
-                        ) {
-                            response.status() shouldBeEqualTo HttpStatusCode.Unauthorized
+                it("should return 204 when unknown msgId") {
+                    testApplication {
+                        val client = setupApiAndClient()
+                        val response = client.get(url) {
+                            bearerAuth(validToken)
+                            header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                         }
+                        response.status shouldBe HttpStatusCode.NoContent
                     }
+                }
+            }
+            describe("Unhappy paths") {
+                it("should return status Unauthorized if no token is supplied") {
+                    testApplication {
+                        val client = setupApiAndClient()
+                        val response = client.get(url) {
+                        }
+                        response.status shouldBe HttpStatusCode.Unauthorized
+                    }
+                }
 
-                    it("should return status Forbidden if wrong azp") {
+                it("should return status Forbidden if wrong azp") {
+                    testApplication {
+                        val client = setupApiAndClient()
                         val invalidToken = generateJWT(
                             audience = externalMockEnvironment.environment.aadAppClient,
                             azp = "isdialogmote-client-id",
                             issuer = externalMockEnvironment.wellKnownInternalAzureAD.issuer,
                         )
-                        with(
-                            handleRequest(HttpMethod.Get, url) {
-                                addHeader(HttpHeaders.Authorization, bearerHeader(invalidToken))
-                            }
-                        ) {
-                            response.status() shouldBeEqualTo HttpStatusCode.Forbidden
+                        val response = client.get(url) {
+                            bearerAuth(invalidToken)
+                            header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                         }
+                        response.status shouldBe HttpStatusCode.Forbidden
                     }
                 }
             }

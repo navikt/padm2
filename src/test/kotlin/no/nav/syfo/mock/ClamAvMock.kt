@@ -1,5 +1,6 @@
 package no.nav.syfo.mock
 
+import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
@@ -37,7 +38,7 @@ class ClamAvMock {
 
     private fun mockClamAvServer(
         port: Int
-    ): NettyApplicationEngine {
+    ): EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration> {
         return embeddedServer(
             factory = Netty,
             port = port
@@ -47,8 +48,11 @@ class ClamAvMock {
             }
             routing {
                 post("/scan") {
-                    val content = call.receiveMultipart().readAllParts()
-                    val firstDisposiotion = content[0].contentDisposition!!
+                    val content = mutableListOf<ContentDisposition?>()
+                    call.receiveMultipart().forEachPart {
+                        content.add(it.contentDisposition)
+                    }
+                    val firstDisposiotion = content[0]!!
                     call.respond(
                         if (firstDisposiotion.parameter("filename") == "problem file")
                             clamAvResponseUnsuccessful

@@ -1,6 +1,8 @@
 package no.nav.syfo
 
+import com.typesafe.config.ConfigFactory
 import io.ktor.server.application.*
+import io.ktor.server.config.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import no.nav.syfo.application.*
@@ -26,6 +28,8 @@ import javax.jms.Session
 
 val logger: Logger = LoggerFactory.getLogger("no.nav.syfo.padm2")
 
+const val applicationPort = 8080
+
 fun main() {
     logger.info("Padm2 starting with java version: " + Runtime.version())
     val env = Environment()
@@ -42,40 +46,41 @@ fun main() {
         env = env,
     )
 
-    val applicationEngineEnvironment = applicationEngineEnvironment {
+    val applicationEnvironment = applicationEnvironment {
         log = logger
-        connector {
-            port = env.applicationPort
-        }
-        module {
+        config = HoconApplicationConfig(ConfigFactory.load())
+    }
+    val server = embeddedServer(
+        Netty,
+        environment = applicationEnvironment,
+        configure = {
+            connector {
+                port = applicationPort
+            }
+            connectionGroupSize = 8
+            workerGroupSize = 8
+            callGroupSize = 16
+        },
+
+        module = {
             apiModule(
                 applicationState = applicationState,
                 database = database,
                 environment = env,
                 wellKnownInternalAzureAD = wellKnownInternalAzureAD,
             )
+            monitor.subscribe(ApplicationStarted) {
+                applicationState.ready = true
+                logger.info("Application is ready, running Java VM ${Runtime.version()}")
+
+                launchListeners(
+                    applicationState = applicationState,
+                    env = env,
+                    database = database,
+                )
+            }
         }
-    }
-
-    applicationEngineEnvironment.monitor.subscribe(ApplicationStarted) {
-        applicationState.ready = true
-        logger.info("Application is ready")
-
-        launchListeners(
-            applicationState = applicationState,
-            env = env,
-            database = database,
-        )
-    }
-
-    val server = embeddedServer(
-        factory = Netty,
-        environment = applicationEngineEnvironment,
-    ) {
-        connectionGroupSize = 8
-        workerGroupSize = 8
-        callGroupSize = 16
-    }
+    )
 
     Runtime.getRuntime().addShutdownHook(
         Thread {

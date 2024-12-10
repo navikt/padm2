@@ -26,7 +26,7 @@ class SyfohelsenettproxyMock {
 
     private fun mockSyfohelsenettproxy(
         port: Int
-    ): NettyApplicationEngine {
+    ): EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration> {
         return embeddedServer(
             factory = Netty,
             port = port

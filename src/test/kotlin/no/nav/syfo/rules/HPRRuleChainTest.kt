@@ -7,7 +7,7 @@ import no.nav.syfo.client.Kode
 import no.nav.syfo.model.Dialogmelding
 import no.nav.syfo.model.HelsepersonellKategori
 import org.amshove.kluent.shouldBeEqualTo
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 internal class HPRRuleChainTest {
 
