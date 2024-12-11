@@ -1,6 +1,6 @@
 package no.nav.syfo
 
-import com.opentable.db.postgres.embedded.EmbeddedPostgres
+import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
 import no.nav.syfo.db.DatabaseInterface
 import no.nav.syfo.db.toList
 import org.flywaydb.core.Flyway

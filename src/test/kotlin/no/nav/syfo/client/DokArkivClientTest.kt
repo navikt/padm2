@@ -18,8 +18,8 @@ import no.nav.syfo.util.LoggingMeta
 import no.nav.syfo.util.configure
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEqualTo
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 import kotlin.test.assertFailsWith
 
@@ -39,7 +39,7 @@ internal class DokArkivClientTest {
     @MockK
     lateinit var httpResponse: HttpResponse
 
-    @Before
+    @BeforeEach
     fun setUp() {
         MockKAnnotations.init(this, relaxUnitFun = true)
         coEvery {

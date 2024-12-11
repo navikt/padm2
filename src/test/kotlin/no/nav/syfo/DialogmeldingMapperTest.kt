@@ -7,7 +7,7 @@ import no.nav.syfo.model.*
 import no.nav.syfo.util.*
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEqualTo
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 internal class DialogmeldingMapperTest {
 

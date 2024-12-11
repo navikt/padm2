@@ -8,7 +8,7 @@ import no.nav.syfo.util.getFileAsString
 import no.nav.syfo.util.safeUnmarshal
 import no.nav.syfo.validation.isKodeverkValid
 import org.amshove.kluent.shouldBe
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 internal class ValidateDialogMeldingKodeverkTest {
 

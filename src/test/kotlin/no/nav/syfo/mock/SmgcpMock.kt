@@ -23,7 +23,7 @@ class SmgcpMock {
 
     private fun mockSmgcpServer(
         port: Int
-    ): NettyApplicationEngine {
+    ): EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration> {
         return embeddedServer(
             factory = Netty,
             port = port

@@ -33,7 +33,7 @@ class DokarkivMock {
 
     private fun mockDokarkivServer(
         port: Int
-    ): NettyApplicationEngine {
+    ): EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration> {
         return embeddedServer(
             factory = Netty,
             port = port

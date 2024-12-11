@@ -3,7 +3,7 @@ package no.nav.syfo.rules
 import io.mockk.mockk
 import no.nav.syfo.model.Dialogmelding
 import org.amshove.kluent.shouldBeEqualTo
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 internal class LegesuspensjonRuleChainTest {
 

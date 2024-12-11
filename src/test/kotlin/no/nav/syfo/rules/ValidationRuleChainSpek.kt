@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 import no.nav.syfo.model.Dialogmelding
 import no.nav.syfo.model.RuleMetadata
 import org.amshove.kluent.shouldBeEqualTo
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 internal class ValidationRuleChainSpek {
 

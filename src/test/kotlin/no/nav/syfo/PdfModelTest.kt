@@ -3,9 +3,9 @@ package no.nav.syfo
 import no.nav.syfo.model.*
 import no.nav.syfo.util.objectMapper
 import org.amshove.kluent.shouldBeEqualTo
+import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 import java.util.UUID
-import org.junit.Test
 
 internal class PdfModelTest {
 

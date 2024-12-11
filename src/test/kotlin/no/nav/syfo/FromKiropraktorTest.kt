@@ -9,7 +9,7 @@ import no.nav.syfo.model.findDialogmeldingType
 import no.nav.syfo.model.toDialogmelding
 import no.nav.syfo.util.*
 import org.amshove.kluent.shouldBeEqualTo
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.math.BigInteger
 import java.time.LocalDateTime
 import java.util.*

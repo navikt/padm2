@@ -24,7 +24,7 @@ class SmtssMock {
 
     private fun mockSmtssServer(
         port: Int
-    ): NettyApplicationEngine {
+    ): EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration> {
         return embeddedServer(
             factory = Netty,
             port = port

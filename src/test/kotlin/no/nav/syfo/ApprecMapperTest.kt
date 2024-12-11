@@ -7,7 +7,7 @@ import no.nav.syfo.util.get
 import no.nav.syfo.util.getFileAsStringISO88591
 import no.nav.syfo.util.safeUnmarshal
 import org.amshove.kluent.shouldBeEqualTo
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 internal class ApprecMapperTest {
     @Test
