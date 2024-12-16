@@ -66,6 +66,7 @@ class DialogmeldingProcessor(
         dokArkivClient = dokArkivClient,
         pdfgenClient = pdfgenClient,
         database = database,
+        jpRetryEnabled = env.jpRetryEnabled,
     )
     val signerendeLegeService = SignerendeLegeService(
         syfohelsenettproxyClient = syfohelsenettproxyClient,
