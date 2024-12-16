@@ -13,7 +13,7 @@ class JournalService(
     private val dokArkivClient: DokArkivClient,
     private val pdfgenClient: PdfgenClient,
     private val database: DatabaseInterface,
-    private val retryJPEnabled: Boolean = true,
+    private val jpRetryEnabled: Boolean = true,
 ) {
     suspend fun onJournalRequest(
         receivedDialogmelding: ReceivedDialogmelding,
@@ -54,7 +54,7 @@ class JournalService(
             val journalpost = try {
                 dokArkivClient.createJournalpost(journalpostPayload, loggingMeta)
             } catch (exc: Exception) {
-                if (retryJPEnabled) {
+                if (jpRetryEnabled) {
                     throw exc
                 } else {
                     logger.warn("Journalføring failed, skipping retry: ", exc)
