@@ -80,6 +80,8 @@ spec:
   kafka:
     pool: nav-prod
   env:
+    - name: JP_RETRY_ENABLED
+      value: "true"
     - name: MQ_HOST_NAME
       value: "mpls04.adeo.no"
     - name: MQ_PORT

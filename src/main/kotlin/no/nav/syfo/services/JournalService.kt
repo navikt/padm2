@@ -13,6 +13,7 @@ class JournalService(
     private val dokArkivClient: DokArkivClient,
     private val pdfgenClient: PdfgenClient,
     private val database: DatabaseInterface,
+    private val retryJPEnabled: Boolean = true,
 ) {
     suspend fun onJournalRequest(
         receivedDialogmelding: ReceivedDialogmelding,
@@ -50,19 +51,28 @@ class JournalService(
                 receivedDialogmelding.personNrPasient,
                 vedleggListe
             )
-            val journalpost = dokArkivClient.createJournalpost(journalpostPayload, loggingMeta)
-
+            val journalpost = try {
+                dokArkivClient.createJournalpost(journalpostPayload, loggingMeta)
+            } catch (exc: Exception) {
+                if (retryJPEnabled) {
+                    throw exc
+                } else {
+                    logger.warn("Journalføring failed, skipping retry: ", exc)
+                }
+                null
+            }
+            val journalpostId = journalpost?.journalpostId ?: "0"
             MELDING_LAGER_I_JOARK.increment()
             logger.info(
                 "Melding lagret i Joark med journalpostId {}, {}",
-                journalpost.journalpostId,
+                journalpostId,
                 StructuredArguments.fields(loggingMeta)
             )
             database.lagreJournalforing(
                 dialogmeldingid = receivedDialogmelding.dialogmelding.id,
-                journalpostId = journalpost.journalpostId,
+                journalpostId = journalpostId,
             )
-            journalpost.journalpostId
+            journalpostId
         } else {
             journalpostId
         }
