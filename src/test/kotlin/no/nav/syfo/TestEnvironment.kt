@@ -62,6 +62,7 @@ fun testEnvironment(
     smgcpProxyUrl = smgcpUrl,
     isbehandlerdialogClientId = "isbehandlerdialog",
     isbehandlerdialogUrl = isbehandlerdialogUrl,
+    jpRetryEnabled = true,
 )
 
 fun testAppState() = ApplicationState(

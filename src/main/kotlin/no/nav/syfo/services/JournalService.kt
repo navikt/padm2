@@ -13,6 +13,7 @@ class JournalService(
     private val dokArkivClient: DokArkivClient,
     private val pdfgenClient: PdfgenClient,
     private val database: DatabaseInterface,
+    private val jpRetryEnabled: Boolean = true,
 ) {
     suspend fun onJournalRequest(
         receivedDialogmelding: ReceivedDialogmelding,
@@ -50,19 +51,31 @@ class JournalService(
                 receivedDialogmelding.personNrPasient,
                 vedleggListe
             )
-            val journalpost = dokArkivClient.createJournalpost(journalpostPayload, loggingMeta)
-
+            val journalpost = try {
+                dokArkivClient.createJournalpost(journalpostPayload, loggingMeta)
+            } catch (exc: Exception) {
+                if (jpRetryEnabled) {
+                    throw exc
+                } else {
+                    logger.error("Journalføring failed, skipping retry (should only happen in dev-gcp)", exc)
+                }
+                null
+            }
+            // Defaulting'en til "0" skal bare forekomme i dev-gcp:
+            // Har dette fordi vi ellers spammer ned dokarkiv med forsøk på å journalføre
+            // på personer som mangler aktør-id.
+            val journalpostId = journalpost?.journalpostId ?: "0"
             MELDING_LAGER_I_JOARK.increment()
             logger.info(
                 "Melding lagret i Joark med journalpostId {}, {}",
-                journalpost.journalpostId,
+                journalpostId,
                 StructuredArguments.fields(loggingMeta)
             )
             database.lagreJournalforing(
                 dialogmeldingid = receivedDialogmelding.dialogmelding.id,
-                journalpostId = journalpost.journalpostId,
+                journalpostId = journalpostId,
             )
-            journalpost.journalpostId
+            journalpostId
         } else {
             journalpostId
         }

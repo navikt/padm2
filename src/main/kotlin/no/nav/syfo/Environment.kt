@@ -22,6 +22,7 @@ data class Environment(
     val inputBackoutQueueName: String = getEnvVar("MQ_INPUT_BOQ_QUEUE_NAME"),
     val dokArkivClientId: String = getEnvVar("DOKARKIV_CLIENT_ID"),
     val dokArkivUrl: String = getEnvVar("DOK_ARKIV_URL"),
+    val jpRetryEnabled: Boolean = getEnvVar("JP_RETRY_ENABLED").toBoolean(),
     val syfopdfgen: String = getEnvVar("PDF_GEN_URL"),
     val arenaQueueName: String = getEnvVar("ARENA_OUTBOUND_QUEUENAME"),
     val databaseHost: String = getEnvVar("NAIS_DATABASE_PADM2_PADM2_DB_HOST"),
