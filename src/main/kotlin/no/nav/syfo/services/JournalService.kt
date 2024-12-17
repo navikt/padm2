@@ -57,10 +57,13 @@ class JournalService(
                 if (jpRetryEnabled) {
                     throw exc
                 } else {
-                    logger.warn("Journalføring failed, skipping retry: ", exc)
+                    logger.error("Journalføring failed, skipping retry (should only happen in dev-gcp)", exc)
                 }
                 null
             }
+            // Defaulting'en til "0" skal bare forekomme i dev-gcp:
+            // Har dette fordi vi ellers spammer ned dokarkiv med forsøk på å journalføre
+            // på personer som mangler aktør-id.
             val journalpostId = journalpost?.journalpostId ?: "0"
             MELDING_LAGER_I_JOARK.increment()
             logger.info(
