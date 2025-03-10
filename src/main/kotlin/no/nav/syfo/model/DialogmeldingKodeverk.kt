@@ -9,6 +9,14 @@ enum class DialogmeldingKodeverk(
     val arenaNotatTittel: String
 ) {
     PRODUKSJON_AV_NOTAT_FORFATTER("2.16.578.1.12.4.1.1.9057", "Forfatter", "1", "", "", ""),
+    INNKALLING_DIALOGMOTE_KODEVERK(
+        "2.16.578.1.12.4.1.1.8125",
+        "",
+        "",
+        "",
+        "",
+        ""
+    ),
     SVAR_PAA_INNKALLING_DIALOGMOTE_JA_JEG_KOMMER(
         "2.16.578.1.12.4.1.1.8126",
         "Ja, jeg kommer",
