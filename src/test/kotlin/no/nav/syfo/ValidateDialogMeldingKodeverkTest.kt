@@ -9,8 +9,11 @@ import no.nav.syfo.util.safeUnmarshal
 import no.nav.syfo.validation.isKodeverkValid
 import org.amshove.kluent.shouldBe
 import org.junit.jupiter.api.Test
+import java.util.*
 
 internal class ValidateDialogMeldingKodeverkTest {
+
+    val msgId = UUID.randomUUID().toString()
 
     @Test
     internal fun `Should be invalid dialogmeldingkodeverk combo`() {
@@ -23,7 +26,7 @@ internal class ValidateDialogMeldingKodeverkTest {
 
         val dialogmeldingType = findDialogmeldingType(emottakblokk.ebService, emottakblokk.ebAction)
 
-        val validateDialogMeldingKodeverk = isKodeverkValid(dialomeldingxml, dialogmeldingType)
+        val validateDialogMeldingKodeverk = isKodeverkValid(msgId, dialomeldingxml, dialogmeldingType)
 
         validateDialogMeldingKodeverk shouldBe false
     }
@@ -39,7 +42,7 @@ internal class ValidateDialogMeldingKodeverkTest {
 
         val dialogmeldingType = findDialogmeldingType(emottakblokk.ebService, emottakblokk.ebAction)
 
-        val validateDialogMeldingKodeverk = isKodeverkValid(dialomeldingxml, dialogmeldingType)
+        val validateDialogMeldingKodeverk = isKodeverkValid(msgId, dialomeldingxml, dialogmeldingType)
 
         validateDialogMeldingKodeverk shouldBe true
     }
@@ -57,7 +60,7 @@ internal class ValidateDialogMeldingKodeverkTest {
 
         val dialogmeldingType = findDialogmeldingType(emottakblokk.ebService, emottakblokk.ebAction)
 
-        val validateDialogMeldingKodeverk = isKodeverkValid(dialogmeldingxml, dialogmeldingType)
+        val validateDialogMeldingKodeverk = isKodeverkValid(msgId, dialogmeldingxml, dialogmeldingType)
 
         validateDialogMeldingKodeverk shouldBe false
     }

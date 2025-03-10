@@ -117,6 +117,7 @@ class DialogmeldingProcessor(
         val vedleggListe = xmlVedlegg.map { xml -> xml.toVedlegg() }
 
         val validationResult = validateMessage(
+            msgId = msgId,
             sha256String = sha256String,
             loggingMeta = loggingMeta,
             innbyggerOK = innbyggerOK,
@@ -180,6 +181,7 @@ class DialogmeldingProcessor(
     }
 
     suspend fun validateMessage(
+        msgId: String,
         sha256String: String,
         loggingMeta: LoggingMeta,
         innbyggerOK: Boolean,
@@ -205,7 +207,7 @@ class DialogmeldingProcessor(
                 handleTestFnrInProd(loggingMeta)
             } else if (dialogmeldingType.isHenvendelseFraLegeOrForesporselSvar() && dialogmeldingXml.notat.first().tekstNotatInnhold.isNullOrEmpty()) {
                 handleMeldingsTekstMangler(loggingMeta)
-            } else if (!isKodeverkValid(dialogmeldingXml, dialogmeldingType)) {
+            } else if (!isKodeverkValid(msgId, dialogmeldingXml, dialogmeldingType)) {
                 handleInvalidDialogMeldingKodeverk(loggingMeta)
             } else if (virusScanService.vedleggContainsVirus(vedlegg)) {
                 handleVedleggMayContainVirus(loggingMeta)
