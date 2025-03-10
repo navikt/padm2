@@ -11,7 +11,7 @@ enum class DialogmeldingKodeverk(
     PRODUKSJON_AV_NOTAT_FORFATTER("2.16.578.1.12.4.1.1.9057", "Forfatter", "1", "", "", ""),
     INNKALLING_DIALOGMOTE_KODEVERK(
         "2.16.578.1.12.4.1.1.8125",
-        "",
+        "Innkalling dialogmøte",
         "",
         "",
         "",
