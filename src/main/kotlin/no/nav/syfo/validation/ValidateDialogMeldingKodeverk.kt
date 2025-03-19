@@ -22,7 +22,7 @@ fun isKodeverkValid(msgId: String, xmlDialogmelding: XMLDialogmelding, dialogmel
             val kodeverkOID = xmlDialogmelding.notat.first().temaKodet.s
             val versjon = xmlDialogmelding.notat.first().temaKodet.v
             val xmlDialogmeldingKodeverk = findDialogmeldingKodeverk(kodeverkOID, versjon)
-            val foresporselKodeverk = xmlDialogmelding.foresporsel.firstOrNull()?.typeForesp?.s
+            val foresporselKodeverk = xmlDialogmelding.notat.first().foresporsel?.typeForesp?.s
             if (foresporselKodeverk == DialogmeldingKodeverk.INNKALLING_DIALOGMOTE_KODEVERK.kodeverkOID) {
                 logger.warn("Invalid kodeverk: Received foresporselsvar for foresporsel with dialogmotekodeverk: $msgId")
             }
