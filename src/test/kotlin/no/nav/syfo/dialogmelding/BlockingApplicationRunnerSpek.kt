@@ -106,6 +106,30 @@ class BlockingApplicationRunnerSpek : Spek({
                 verify(exactly = 0) { mqSender.sendArena(any()) }
                 verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
             }
+            it("Prosesserer innkommet dialogmotesvar (ok)") {
+                val fellesformat =
+                    getFileAsString("src/test/resources/dialogmelding_dialog_svar_innkalling_dialogmote.xml")
+                every { incomingMessage.text } returns(fellesformat)
+                runBlocking {
+                    blockingApplicationRunner.processMessage(incomingMessage)
+                }
+                verify(exactly = 1) { mqSender.sendReceipt(any()) }
+                verify(exactly = 0) { mqSender.sendBackout(any()) }
+                verify(exactly = 0) { mqSender.sendArena(any()) }
+                verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
+            }
+            it("Prosesserer innkommet dialogmotesvar (ugyldig kodeverk)") {
+                val fellesformat =
+                    getFileAsString("src/test/resources/dialogmelding_dialog_svar_innkalling_dialogmote_invalid.xml")
+                every { incomingMessage.text } returns(fellesformat)
+                runBlocking {
+                    blockingApplicationRunner.processMessage(incomingMessage)
+                }
+                verify(exactly = 1) { mqSender.sendReceipt(any()) }
+                verify(exactly = 0) { mqSender.sendBackout(any()) }
+                verify(exactly = 0) { mqSender.sendArena(any()) }
+                verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
+            }
             it("Prosesserer innkommet test-melding fra syfomock (melding ok)") {
                 val fellesformat =
                     getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")

@@ -25,6 +25,7 @@ fun isKodeverkValid(msgId: String, xmlDialogmelding: XMLDialogmelding, dialogmel
             val foresporselKodeverk = xmlDialogmelding.notat.first().foresporsel?.typeForesp?.s
             if (foresporselKodeverk == DialogmeldingKodeverk.INNKALLING_DIALOGMOTE_KODEVERK.kodeverkOID) {
                 logger.warn("Invalid kodeverk: Received foresporselsvar for foresporsel with dialogmotekodeverk: $msgId")
+                return false
             }
             val gyldigeDialogmeldingKodeverk = DialogmeldingType.DIALOGMELDING_FORESPORSEL_FRA_SAKSBEHANDLER_FORESPORSEL_SVAR.dialogmeldingKodeverk
             return gyldigeDialogmeldingKodeverk.contains(xmlDialogmeldingKodeverk)
