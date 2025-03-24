@@ -139,7 +139,7 @@ internal class CreateArenaDialogNotatTest {
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.tssId.shouldBeEqualTo(tssid.toBigInteger())
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.fornavn shouldBeEqualTo "Inga"
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.etternavn shouldBeEqualTo "Valda"
-        arenaDialogNotat.pasientData.person.personFnr shouldBeEqualTo "3143242342"
+        arenaDialogNotat.pasientData.person.personFnr shouldBeEqualTo "01010142365"
         arenaDialogNotat.pasientData.person.personNavn.fornavn shouldBeEqualTo "Etternavn"
         arenaDialogNotat.pasientData.person.personNavn.mellomnavn shouldBeEqualTo ""
         arenaDialogNotat.pasientData.person.personNavn.etternavn shouldBeEqualTo "Test"
