@@ -135,7 +135,7 @@ internal class CreateArenaDialogNotatTest {
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.year shouldBeEqualTo 2020
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.monthValue shouldBeEqualTo 9
         arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.dayOfMonth shouldBeEqualTo 21
-        arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeFnr shouldBeEqualTo "12312414234"
+        arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeFnr shouldBeEqualTo "01010112377"
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.tssId.shouldBeEqualTo(tssid.toBigInteger())
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.fornavn shouldBeEqualTo "Inga"
         arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.etternavn shouldBeEqualTo "Valda"
