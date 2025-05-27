@@ -36,7 +36,7 @@ spec:
     - "https://padm2.intern.nav.no"
   gcp:
     sqlInstances:
-      - type: POSTGRES_14
+      - type: POSTGRES_17
         databases:
           - name: padm2-db
         diskAutoresize: true
