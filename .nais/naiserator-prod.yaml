@@ -66,6 +66,13 @@ spec:
         - application: isbehandlerdialog
         - application: btsys-api
           namespace: team-rocket
+  observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: java
+    logging:
+      destinations:
+        - id: elastic
   azure:
     application:
       allowAllUsers: true
