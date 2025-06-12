@@ -72,6 +72,7 @@ spec:
       runtime: java
     logging:
       destinations:
+        - id: loki
         - id: elastic
   azure:
     application:
