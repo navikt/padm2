@@ -3,7 +3,7 @@ version = "1.0.0"
 
 val arenaDialogNotatVersion = "1.e1999cf"
 val base64containerVersion = "1.5ac2176"
-val dialogmeldingVersion = "1.5d21db9"
+val dialogmeldingVersion = "2.0.1"
 val fellesformat2Version = "1.0329dd1"
 val flywayVersion = "11.4.1"
 val hikariVersion = "6.3.0"
