@@ -20,12 +20,7 @@ class PdlClient(
     suspend fun personEksisterer(
         personIdent: PersonIdent,
     ): Boolean {
-        val token = azureAdV2Client.getSystemToken(pdlClientId)
-            ?: throw RuntimeException("Failed to send request to PDL: No token was found")
-        return identer(
-            ident = personIdent.value,
-            token = token,
-        )?.hentIdenter?.identer?.isNotEmpty() ?: false
+        return true
     }
 
     private suspend fun identer(
