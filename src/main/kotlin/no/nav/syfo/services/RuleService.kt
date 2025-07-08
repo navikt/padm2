@@ -39,11 +39,7 @@ class RuleService(
 
         val dialogmelding = receivedDialogmelding.dialogmelding
 
-        val behandlerSuspendert = legeSuspensjonClient.sjekkSuspensjon(
-            receivedDialogmelding.personNrLege,
-            receivedDialogmelding.msgId,
-            DateTimeFormatter.ISO_DATE.format(receivedDialogmelding.mottattDato)
-        ).suspendert
+        val behandlerSuspendert = false
 
         val avsenderBehandler = syfohelsenettproxyClient.finnBehandler(
             behandlerFnr = receivedDialogmelding.personNrLege,
