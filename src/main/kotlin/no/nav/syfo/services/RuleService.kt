@@ -1,6 +1,5 @@
 package no.nav.syfo.services
 
-import java.time.format.DateTimeFormatter
 import net.logstash.logback.argument.StructuredArguments.fields
 import no.nav.syfo.client.LegeSuspensjonClient
 import no.nav.syfo.client.SyfohelsenettproxyClient
