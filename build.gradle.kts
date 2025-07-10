@@ -30,6 +30,7 @@ val nimbusJoseJwt = "10.0.2"
 val pdfboxVersion = "2.0.24"
 val postgresEmbedded = "2.0.7"
 val postgresVersion = "42.7.5"
+val postgresRuntimeVersion = "17.5.0"
 val spek = "2.0.19"
 val commonsCompressVersion = "1.27.1"
 
@@ -131,6 +132,7 @@ dependencies {
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("io.ktor:ktor-client-mock:$ktorVersion")
     testImplementation("io.zonky.test:embedded-postgres:$postgresEmbedded")
+    testImplementation(platform("io.zonky.test.postgres:embedded-postgres-binaries-bom:$postgresRuntimeVersion"))
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation("org.spekframework.spek2:spek-dsl-jvm:$spek") {
         exclude(group = "org.jetbrains.kotlin")
