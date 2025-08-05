@@ -193,7 +193,7 @@ internal class DialogmeldingProducerTest {
             personNrLege = personNumberDoctor,
             navLogId = ediLoggId,
             msgId = msgId,
-            legekontorOrgNr = legekontorOrgNr,
+            legekontorOrgNr = legekontorOrgNr?.let { LegekontorOrgNummer(it) },
             legekontorOrgName = legekontorOrgName,
             legekontorHerId = legekontorHerId,
             mottattDato = emottakblokk.mottattDatotid.toGregorianCalendar().toZonedDateTime()

@@ -66,7 +66,7 @@ fun Connection.opprettDialogmeldingOpplysninger(receivedDialogmelding: ReceivedD
         it.setString(3, receivedDialogmelding.personNrLege)
         it.setString(4, receivedDialogmelding.navLogId)
         it.setString(5, receivedDialogmelding.msgId)
-        it.setString(6, receivedDialogmelding.legekontorOrgNr)
+        it.setString(6, receivedDialogmelding.legekontorOrgNr?.value)
         it.setString(7, receivedDialogmelding.legekontorHerId)
         it.setTimestamp(8, Timestamp.valueOf(receivedDialogmelding.mottattDato))
         it.setString(9, receivedDialogmelding.fellesformat)

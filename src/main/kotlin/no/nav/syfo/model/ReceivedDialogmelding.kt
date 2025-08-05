@@ -14,7 +14,7 @@ data class ReceivedDialogmelding(
     val personNrLege: String,
     val navLogId: String,
     val msgId: String,
-    val legekontorOrgNr: String?,
+    val legekontorOrgNr: LegekontorOrgNummer?,
     val legekontorHerId: String?,
     val legekontorOrgName: String,
     val mottattDato: LocalDateTime,
@@ -57,7 +57,7 @@ data class ReceivedDialogmelding(
                 personNrLege = legeIdent,
                 navLogId = emottakblokk.ediLoggId,
                 msgId = msgHead.msgInfo.msgId,
-                legekontorOrgNr = legekontorOrgNr,
+                legekontorOrgNr = legekontorOrgNr?.let { LegekontorOrgNummer(it) },
                 legekontorOrgName = legekontorOrgName,
                 legekontorHerId = legekontorHerId,
                 mottattDato = emottakblokk.mottattDatotid.toGregorianCalendar().toZonedDateTime()

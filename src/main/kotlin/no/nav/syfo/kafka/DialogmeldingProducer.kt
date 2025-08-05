@@ -59,7 +59,7 @@ class DialogmeldingProducer(
             parentRef = xmlMsgInfo.conversationRef?.refToParent,
             personIdentPasient = receivedDialogmelding.personNrPasient,
             personIdentBehandler = receivedDialogmelding.personNrLege,
-            legekontorOrgNr = receivedDialogmelding.legekontorOrgNr,
+            legekontorOrgNr = receivedDialogmelding.legekontorOrgNr?.value,
             legekontorHerId = receivedDialogmelding.legekontorHerId,
             legekontorOrgName = receivedDialogmelding.legekontorOrgName,
             legehpr = receivedDialogmelding.legehpr,

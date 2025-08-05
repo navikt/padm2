@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory
 
 class RuleService(
     val legeSuspensjonClient: LegeSuspensjonClient,
-    val syfohelsenettproxyClient: SyfohelsenettproxyClient
+    val syfohelsenettproxyClient: SyfohelsenettproxyClient,
 ) {
 
     private val log: Logger = LoggerFactory.getLogger("ruleservice")
@@ -30,7 +30,7 @@ class RuleService(
     ): ValidationResult {
         val loggingMeta = LoggingMeta(
             mottakId = receivedDialogmelding.navLogId,
-            orgNr = receivedDialogmelding.legekontorOrgNr,
+            orgNr = receivedDialogmelding.legekontorOrgNr?.value,
             msgId = receivedDialogmelding.msgId,
             dialogmeldingId = receivedDialogmelding.dialogmelding.id
         )
@@ -72,7 +72,7 @@ class RuleService(
                     receivedDate = receivedDialogmelding.mottattDato,
                     signatureDate = receivedDialogmelding.mottattDato,
                     innbyggerident = receivedDialogmelding.personNrPasient,
-                    legekontorOrgnr = receivedDialogmelding.legekontorOrgNr,
+                    legekontorOrgnr = receivedDialogmelding.legekontorOrgNr?.value,
                     avsenderfnr = receivedDialogmelding.personNrLege
                 )
             ),
