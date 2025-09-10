@@ -81,10 +81,6 @@ spec:
       tenant: trygdeetaten.no
   envFrom:
     - secret: padm2-serviceuser
-    - secret: padm2-keystore-pwd
-  filesFrom:
-    - mountPath: /var/run/keystore
-      secret: padm2-keystore
   kafka:
     pool: nav-dev
   env:
@@ -98,8 +94,6 @@ spec:
       value: "MQLS04"
     - name: MQ_CHANNEL_NAME
       value: "Q1_PADM"
-    - name: MQ_KEYSTORE_PATH
-      value: "/var/run/keystore/padm2-keystore.jks"
     - name: MQ_INPUT_QUEUE_NAME
       value: "QA.Q1_PADM.INPUT"
     - name: MQ_INPUT_BOQ_QUEUE_NAME

@@ -14,8 +14,6 @@ data class Environment(
     override val mqPort: Int = getEnvVar("MQ_PORT").toInt(),
     override val mqGatewayName: String = getEnvVar("MQ_GATEWAY_NAME"),
     override val mqChannelName: String = getEnvVar("MQ_CHANNEL_NAME"),
-    override val mqKeystorePassword: String = getEnvVar("MQ_KEYSTORE_PASSWORD"),
-    override val mqKeystorePath: String = getEnvVar("MQ_KEYSTORE_PATH"),
     val inputQueueName: String = getEnvVar("MQ_INPUT_QUEUE_NAME"),
     val apprecQueueName: String = getEnvVar("MQ_APPREC_QUEUE_NAME"),
     val cluster: String = getEnvVar("NAIS_CLUSTER_NAME"),
