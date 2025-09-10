@@ -81,10 +81,6 @@ spec:
       tenant: nav.no
   envFrom:
     - secret: padm2-serviceuser
-    - secret: padm2-keystore-pwd
-  filesFrom:
-    - mountPath: /var/run/keystore
-      secret: padm2-keystore
   kafka:
     pool: nav-prod
   env:
@@ -98,8 +94,6 @@ spec:
       value: "MPLS04"
     - name: MQ_CHANNEL_NAME
       value: "P_PADM"
-    - name: MQ_KEYSTORE_PATH
-      value: "/var/run/keystore/padm2-keystore.jks"
     - name: MQ_INPUT_QUEUE_NAME
       value: "QA.P_PADM.INPUT"
     - name: MQ_INPUT_BOQ_QUEUE_NAME
