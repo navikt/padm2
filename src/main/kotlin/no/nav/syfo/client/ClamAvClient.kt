@@ -23,7 +23,7 @@ class ClamAvClient(
                         value = vedlegg.contentBase64,
                         headers = Headers.build {
                             append(HttpHeaders.ContentType, vedlegg.mimeType)
-                            append(HttpHeaders.ContentDisposition, "filename=${vedlegg.beskrivelse.replaceCRLF()}")
+                            append(HttpHeaders.ContentDisposition, "filename=\"${vedlegg.beskrivelse.replaceCRLF()}\"")
                         }
                     )
                 }
