@@ -5,8 +5,7 @@ import java.util.UUID
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.syfo.model.*
 import no.nav.syfo.util.*
-import org.amshove.kluent.shouldBe
-import org.amshove.kluent.shouldBeEqualTo
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 internal class DialogmeldingMapperTest {
@@ -32,7 +31,7 @@ internal class DialogmeldingMapperTest {
             navnHelsePersonellNavn = navnHelsePersonellNavn
         )
 
-        dialogmelding.id shouldBeEqualTo dialogmeldingId
+        assertEquals(dialogmeldingId, dialogmelding.id)
     }
 
     @Test
@@ -56,7 +55,7 @@ internal class DialogmeldingMapperTest {
             navnHelsePersonellNavn = navnHelsePersonellNavn
         )
 
-        dialogmelding.id shouldBeEqualTo dialogmeldingId
+        assertEquals(dialogmeldingId, dialogmelding.id)
     }
 
     @Test
@@ -80,7 +79,7 @@ internal class DialogmeldingMapperTest {
             navnHelsePersonellNavn = navnHelsePersonellNavn
         )
 
-        dialogmelding.id shouldBeEqualTo dialogmeldingId
+        assertEquals(dialogmeldingId, dialogmelding.id)
     }
 
     @Test
@@ -106,10 +105,10 @@ internal class DialogmeldingMapperTest {
         val extractVedlegg = extractValidVedlegg(felleformatDm)
         val vedleggListe = extractVedlegg.map { it.toVedlegg() }
 
-        dialogmelding.id shouldBeEqualTo dialogmeldingId
-        vedleggListe.size.shouldBe(2)
-        vedleggListe[0].beskrivelse shouldBeEqualTo "Et vedlegg fra lege"
-        vedleggListe[1].beskrivelse shouldBeEqualTo "Et bilde fra lege"
+        assertEquals(dialogmeldingId, dialogmelding.id)
+        assertEquals(2, vedleggListe.size)
+        assertEquals("Et vedlegg fra lege", vedleggListe[0].beskrivelse)
+        assertEquals("Et bilde fra lege", vedleggListe[1].beskrivelse)
     }
 
     @Test
@@ -135,9 +134,9 @@ internal class DialogmeldingMapperTest {
         val extractVedlegg = extractValidVedlegg(felleformatDm)
         val vedleggListe = extractVedlegg.map { it.toVedlegg() }
 
-        dialogmelding.id shouldBeEqualTo dialogmeldingId
-        vedleggListe.size shouldBeEqualTo 2
-        vedleggListe[0].beskrivelse shouldBeEqualTo ""
-        vedleggListe[1].beskrivelse shouldBeEqualTo "Et bilde fra lege"
+        assertEquals(dialogmeldingId, dialogmelding.id)
+        assertEquals(2, vedleggListe.size)
+        assertEquals("", vedleggListe[0].beskrivelse)
+        assertEquals("Et bilde fra lege", vedleggListe[1].beskrivelse)
     }
 }

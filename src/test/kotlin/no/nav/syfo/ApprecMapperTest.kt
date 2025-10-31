@@ -6,7 +6,7 @@ import no.nav.syfo.apprec.createApprec
 import no.nav.syfo.util.get
 import no.nav.syfo.util.getFileAsStringISO88591
 import no.nav.syfo.util.safeUnmarshal
-import org.amshove.kluent.shouldBeEqualTo
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 internal class ApprecMapperTest {
@@ -19,8 +19,8 @@ internal class ApprecMapperTest {
         val apprec = createApprec(felleformatDm, ApprecStatus.OK)
         val apprecEmottakblokk = apprec.get<XMLMottakenhetBlokk>()
 
-        apprecEmottakblokk.ebAction shouldBeEqualTo "Bekreftelse"
-        apprecEmottakblokk.ebRole shouldBeEqualTo "Saksbehandler"
-        apprecEmottakblokk.ebService shouldBeEqualTo "ForesporselFraSaksbehandler"
+        assertEquals("Bekreftelse", apprecEmottakblokk.ebAction)
+        assertEquals("Saksbehandler", apprecEmottakblokk.ebRole)
+        assertEquals("ForesporselFraSaksbehandler", apprecEmottakblokk.ebService)
     }
 }
