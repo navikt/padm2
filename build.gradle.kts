@@ -6,17 +6,17 @@ val base64containerVersion = "1.5ac2176"
 val dialogmeldingVersion = "1.5d21db9"
 val fellesformat2Version = "1.0329dd1"
 val flywayVersion = "11.15.0"
-val hikariVersion = "6.3.0"
+val hikariVersion = "7.0.2"
 val ibmMqVersion = "9.4.4.0"
 val jacksonVersion = "2.20.0"
 val javaTimeAdapterVersion = "1.1.3"
-val kafkaVersion = "3.9.0"
+val kafkaVersion = "3.9.1"
 val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
 val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
 val kluentVersion = "1.73"
 val ktorVersion = "3.3.1"
 val logbackVersion = "1.5.20"
-val logstashEncoderVersion = "8.0"
+val logstashEncoderVersion = "9.0"
 val javaxAnnotationApiVersion = "1.3.2"
 val javaxActivationVersion = "1.2.0"
 val jaxbApiVersion = "2.4.0-b180830.0359"
@@ -32,7 +32,7 @@ val postgresEmbedded = "2.1.1"
 val postgresVersion = "42.7.8"
 val postgresRuntimeVersion = "17.6.0"
 val spek = "2.0.19"
-val commonsCompressVersion = "1.27.1"
+val commonsCompressVersion = "1.28.0"
 
 plugins {
     java
@@ -103,12 +103,6 @@ dependencies {
     }
     implementation("org.apache.kafka:kafka_2.13:$kafkaVersion", excludeLog4j)
     constraints {
-        implementation("org.apache.zookeeper:zookeeper") {
-            because("org.apache.kafka:kafka_2.13:$kafkaVersion -> https://www.cve.org/CVERecord?id=CVE-2023-44981")
-            version {
-                require("3.9.3")
-            }
-        }
         implementation("org.bitbucket.b_c:jose4j") {
             because("org.apache.kafka:kafka_2.13:$kafkaVersion -> https://github.com/advisories/GHSA-6qvw-249j-h44c")
             version {
