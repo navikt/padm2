@@ -8,9 +8,10 @@ import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.model.*
 import no.nav.syfo.util.*
-import org.amshove.kluent.*
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.ZoneOffset
@@ -47,14 +48,14 @@ internal class DialogmeldingProducerTest {
         verify { kafkaProducerMock.send(capture(slot)) }
 
         val producerRecord = slot.captured
-        producerRecord.topic() shouldBeEqualTo "teamsykefravr.dialogmelding"
-        producerRecord.key() as String shouldBeEqualTo msgHead.msgInfo.msgId
+        assertEquals("teamsykefravr.dialogmelding", producerRecord.topic())
+        assertEquals(msgHead.msgInfo.msgId, producerRecord.key() as String)
         val dialogmeldingForKafka = producerRecord.value()
-        dialogmeldingForKafka.msgId shouldBeEqualTo msgHead.msgInfo.msgId
-        dialogmeldingForKafka.msgType shouldBeEqualTo "DIALOG_NOTAT"
-        dialogmeldingForKafka.antallVedlegg shouldBe 0
-        dialogmeldingForKafka.conversationRef shouldBe msgHead.msgInfo.conversationRef.refToConversation
-        dialogmeldingForKafka.parentRef shouldBe msgHead.msgInfo.conversationRef.refToParent
+        assertEquals(msgHead.msgInfo.msgId, dialogmeldingForKafka.msgId)
+        assertEquals("DIALOG_NOTAT", dialogmeldingForKafka.msgType)
+        assertEquals(0, dialogmeldingForKafka.antallVedlegg)
+        assertEquals(msgHead.msgInfo.conversationRef.refToConversation, dialogmeldingForKafka.conversationRef)
+        assertEquals(msgHead.msgInfo.conversationRef.refToParent, dialogmeldingForKafka.parentRef)
     }
 
     @Test
@@ -72,14 +73,14 @@ internal class DialogmeldingProducerTest {
         verify { kafkaProducerMock.send(capture(slot)) }
 
         val producerRecord = slot.captured
-        producerRecord.topic() shouldBeEqualTo "teamsykefravr.dialogmelding"
-        producerRecord.key() as String shouldBeEqualTo msgHead.msgInfo.msgId
+        assertEquals("teamsykefravr.dialogmelding", producerRecord.topic())
+        assertEquals(msgHead.msgInfo.msgId, producerRecord.key() as String)
         val dialogmeldingForKafka = producerRecord.value()
-        dialogmeldingForKafka.msgId shouldBeEqualTo msgHead.msgInfo.msgId
-        dialogmeldingForKafka.msgType shouldBeEqualTo "DIALOG_NOTAT"
-        dialogmeldingForKafka.antallVedlegg shouldBe 0
-        dialogmeldingForKafka.conversationRef shouldBe null
-        dialogmeldingForKafka.parentRef shouldBe null
+        assertEquals(msgHead.msgInfo.msgId, dialogmeldingForKafka.msgId)
+        assertEquals("DIALOG_NOTAT", dialogmeldingForKafka.msgType)
+        assertEquals(0, dialogmeldingForKafka.antallVedlegg)
+        assertNull(dialogmeldingForKafka.conversationRef)
+        assertNull(dialogmeldingForKafka.parentRef)
     }
 
     @Test
@@ -97,15 +98,15 @@ internal class DialogmeldingProducerTest {
         verify { kafkaProducerMock.send(capture(slot)) }
 
         val producerRecord = slot.captured
-        producerRecord.topic() shouldBeEqualTo "teamsykefravr.dialogmelding"
-        producerRecord.key() as String shouldBeEqualTo msgHead.msgInfo.msgId
+        assertEquals("teamsykefravr.dialogmelding", producerRecord.topic())
+        assertEquals(msgHead.msgInfo.msgId, producerRecord.key() as String)
         val dialogmeldingForKafka = producerRecord.value()
-        dialogmeldingForKafka.msgId shouldBeEqualTo msgHead.msgInfo.msgId
-        dialogmeldingForKafka.msgType shouldBeEqualTo "DIALOG_NOTAT"
-        dialogmeldingForKafka.antallVedlegg shouldBe 2
+        assertEquals(msgHead.msgInfo.msgId, dialogmeldingForKafka.msgId)
+        assertEquals("DIALOG_NOTAT", dialogmeldingForKafka.msgType)
+        assertEquals(2, dialogmeldingForKafka.antallVedlegg)
 
         val fellesformatFromKafkaMessage = safeUnmarshal(dialogmeldingForKafka.fellesformatXML)
-        fellesformatFromKafkaMessage.calculateNumberOfVedlegg() shouldBe 0
+        assertEquals(0, fellesformatFromKafkaMessage.calculateNumberOfVedlegg())
     }
 
     @Test
@@ -125,15 +126,15 @@ internal class DialogmeldingProducerTest {
         verify { kafkaProducerMock.send(capture(slot)) }
 
         val producerRecord = slot.captured
-        producerRecord.topic() shouldBeEqualTo "teamsykefravr.dialogmelding"
-        producerRecord.key() as String shouldBeEqualTo msgHead.msgInfo.msgId
+        assertEquals("teamsykefravr.dialogmelding", producerRecord.topic())
+        assertEquals(msgHead.msgInfo.msgId, producerRecord.key() as String)
         val dialogmeldingForKafka = producerRecord.value()
-        dialogmeldingForKafka.msgId shouldBeEqualTo msgHead.msgInfo.msgId
-        dialogmeldingForKafka.msgType shouldBeEqualTo "DIALOG_NOTAT"
-        dialogmeldingForKafka.antallVedlegg shouldBe 2
+        assertEquals(msgHead.msgInfo.msgId, dialogmeldingForKafka.msgId)
+        assertEquals("DIALOG_NOTAT", dialogmeldingForKafka.msgType)
+        assertEquals(2, dialogmeldingForKafka.antallVedlegg)
 
         val fellesformatFromKafkaMessage = safeUnmarshal(dialogmeldingForKafka.fellesformatXML)
-        fellesformatFromKafkaMessage.calculateNumberOfVedlegg() shouldBe 0
+        assertEquals(0, fellesformatFromKafkaMessage.calculateNumberOfVedlegg())
     }
 
     @Test
@@ -151,13 +152,13 @@ internal class DialogmeldingProducerTest {
         verify { kafkaProducerMock.send(capture(slot)) }
 
         val producerRecord = slot.captured
-        producerRecord.topic() shouldBeEqualTo "teamsykefravr.dialogmelding"
-        producerRecord.key() as String shouldBeEqualTo msgHead.msgInfo.msgId
+        assertEquals("teamsykefravr.dialogmelding", producerRecord.topic())
+        assertEquals(msgHead.msgInfo.msgId, producerRecord.key() as String)
         val dialogmeldingForKafka = producerRecord.value()
-        dialogmeldingForKafka.msgId shouldBeEqualTo msgHead.msgInfo.msgId
-        dialogmeldingForKafka.msgType shouldBeEqualTo "DIALOG_SVAR"
-        dialogmeldingForKafka.antallVedlegg shouldBe 0
-        dialogmeldingForKafka.dialogmelding.innkallingMoterespons!!.temaKode.v shouldBeEqualTo "1"
+        assertEquals(msgHead.msgInfo.msgId, dialogmeldingForKafka.msgId)
+        assertEquals("DIALOG_SVAR", dialogmeldingForKafka.msgType)
+        assertEquals(0, dialogmeldingForKafka.antallVedlegg)
+        assertEquals("1", dialogmeldingForKafka.dialogmelding.innkallingMoterespons!!.temaKode.v)
     }
 
     fun setupTestData(inputMessageText: String) {
