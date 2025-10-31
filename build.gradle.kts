@@ -1,3 +1,5 @@
+import com.adarshr.gradle.testlogger.theme.ThemeType
+
 group = "no.nav.syfo"
 version = "1.0.0"
 
@@ -13,7 +15,6 @@ val javaTimeAdapterVersion = "1.1.3"
 val kafkaVersion = "3.9.0"
 val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
 val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
-val kluentVersion = "1.73"
 val ktorVersion = "3.1.2"
 val logbackVersion = "1.5.18"
 val logstashEncoderVersion = "8.0"
@@ -23,7 +24,6 @@ val jaxbApiVersion = "2.4.0-b180830.0359"
 val jaxbRuntimeVersion = "2.4.0-b180830.0438"
 val jaxwsApiVersion = "2.3.1"
 val jaxwsToolsVersion = "2.3.7"
-val junitJupiterVersion = "5.11.3"
 val micrometerRegistry = "1.12.13"
 val mockkVersion = "1.13.17"
 val nimbusJoseJwt = "10.0.2"
@@ -31,7 +31,6 @@ val pdfboxVersion = "2.0.24"
 val postgresEmbedded = "2.0.7"
 val postgresVersion = "42.7.5"
 val postgresRuntimeVersion = "17.5.0"
-val spek = "2.0.19"
 val commonsCompressVersion = "1.27.1"
 
 plugins {
@@ -39,6 +38,7 @@ plugins {
     kotlin("jvm") version "2.1.20"
     id("com.gradleup.shadow") version "8.3.6"
     id("org.jlleitschuh.gradle.ktlint") version "11.6.1"
+    id("com.adarshr.test-logger") version "4.0.0"
 }
 
 repositories {
@@ -125,22 +125,11 @@ dependencies {
 
     testImplementation(kotlin("test"))
     testImplementation("com.nimbusds:nimbus-jose-jwt:$nimbusJoseJwt")
-    testImplementation("org.amshove.kluent:kluent:$kluentVersion")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion")
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("io.ktor:ktor-client-mock:$ktorVersion")
     testImplementation("io.zonky.test:embedded-postgres:$postgresEmbedded")
     testImplementation(platform("io.zonky.test.postgres:embedded-postgres-binaries-bom:$postgresRuntimeVersion"))
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
-    testImplementation("org.spekframework.spek2:spek-dsl-jvm:$spek") {
-        exclude(group = "org.jetbrains.kotlin")
-    }
-    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:$junitJupiterVersion")
-    testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:$spek") {
-        exclude(group = "org.jetbrains.kotlin")
-    }
 }
 
 kotlin {
@@ -161,12 +150,11 @@ tasks {
     }
 
     test {
-        useJUnitPlatform {
-            includeEngines("spek2", "junit-jupiter")
-        }
-        testLogging {
-            showStandardStreams = true
-            exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+        useJUnitPlatform()
+        testlogger {
+            theme = ThemeType.STANDARD_PARALLEL
+            showFullStackTraces = true
+            showPassed = false
         }
     }
 }

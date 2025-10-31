@@ -8,7 +8,7 @@ import no.nav.syfo.model.DialogmeldingKodeverk
 import no.nav.syfo.model.findDialogmeldingType
 import no.nav.syfo.model.toDialogmelding
 import no.nav.syfo.util.*
-import org.amshove.kluent.shouldBeEqualTo
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.math.BigInteger
 import java.time.LocalDateTime
@@ -31,11 +31,11 @@ class FromKiropraktorTest {
 
         val avsender = createAvsender(BEHANDLER_FNR, null, behandler)
 
-        avsender.lege.legeFnr shouldBeEqualTo BEHANDLER_FNR
-        avsender.lege.tssId shouldBeEqualTo BigInteger("0")
-        avsender.lege.legeNavn.etternavn shouldBeEqualTo BEHANDLER_ETTERNAVN
-        avsender.lege.legeNavn.fornavn shouldBeEqualTo BEHANDLER_FORNAVN
-        avsender.lege.legeNavn.mellomnavn shouldBeEqualTo ""
+        assertEquals(BEHANDLER_FNR, avsender.lege.legeFnr)
+        assertEquals(BigInteger("0"), avsender.lege.tssId)
+        assertEquals(BEHANDLER_ETTERNAVN, avsender.lege.legeNavn.etternavn)
+        assertEquals(BEHANDLER_FORNAVN, avsender.lege.legeNavn.fornavn)
+        assertEquals("", avsender.lege.legeNavn.mellomnavn)
     }
 
     @Test
@@ -63,21 +63,21 @@ class FromKiropraktorTest {
             dialogmelding = dialogmelding
         )
 
-        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentNavn shouldBeEqualTo "Henvendelse til NAV"
-        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentreferanse shouldBeEqualTo "0f1daa95-45d0-4a18-8d5d-b79bd069d3b7"
-        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.ediLoggId shouldBeEqualTo "2102090840kiro66788.1"
-        arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeFnr shouldBeEqualTo "10108000398"
-        arenaDialogNotat.eiaDokumentInfo.avsender.lege.tssId.shouldBeEqualTo(TSS_ID.toBigInteger())
-        arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.fornavn shouldBeEqualTo "Lisa"
-        arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.etternavn shouldBeEqualTo "Kiropraktorsen"
-        arenaDialogNotat.pasientData.person.personFnr shouldBeEqualTo "01234567890"
-        arenaDialogNotat.pasientData.person.personNavn.fornavn shouldBeEqualTo "Nakke"
-        arenaDialogNotat.pasientData.person.personNavn.mellomnavn shouldBeEqualTo ""
-        arenaDialogNotat.pasientData.person.personNavn.etternavn shouldBeEqualTo "Kinken"
-        arenaDialogNotat.notatKategori shouldBeEqualTo "3"
-        arenaDialogNotat.notatKode shouldBeEqualTo "31"
-        arenaDialogNotat.notatTittel shouldBeEqualTo DialogmeldingKodeverk.HENVENDELSE_OM_PASIENT_HENVENDELSE_OM_SYKEFRAVARSOPPFOLGING.arenaNotatTittel
-        arenaDialogNotat.notatTekst shouldBeEqualTo "Kink i nakken.\n                                Mvh Lisa Kiropraktorsen"
-        arenaDialogNotat.notatDato.shouldBeEqualTo(LocalDateTime.of(2021, 2, 9, 8, 32, 3))
+        assertEquals("Henvendelse til NAV", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentNavn)
+        assertEquals("0f1daa95-45d0-4a18-8d5d-b79bd069d3b7", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentreferanse)
+        assertEquals("2102090840kiro66788.1", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.ediLoggId)
+        assertEquals("10108000398", arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeFnr)
+        assertEquals(TSS_ID.toBigInteger(), arenaDialogNotat.eiaDokumentInfo.avsender.lege.tssId)
+        assertEquals("Lisa", arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.fornavn)
+        assertEquals("Kiropraktorsen", arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.etternavn)
+        assertEquals("01234567890", arenaDialogNotat.pasientData.person.personFnr)
+        assertEquals("Nakke", arenaDialogNotat.pasientData.person.personNavn.fornavn)
+        assertEquals("", arenaDialogNotat.pasientData.person.personNavn.mellomnavn)
+        assertEquals("Kinken", arenaDialogNotat.pasientData.person.personNavn.etternavn)
+        assertEquals("3", arenaDialogNotat.notatKategori)
+        assertEquals("31", arenaDialogNotat.notatKode)
+        assertEquals(DialogmeldingKodeverk.HENVENDELSE_OM_PASIENT_HENVENDELSE_OM_SYKEFRAVARSOPPFOLGING.arenaNotatTittel, arenaDialogNotat.notatTittel)
+        assertEquals("Kink i nakken.\n                                Mvh Lisa Kiropraktorsen", arenaDialogNotat.notatTekst)
+        assertEquals(LocalDateTime.of(2021, 2, 9, 8, 32, 3), arenaDialogNotat.notatDato)
     }
 }
