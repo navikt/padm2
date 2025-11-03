@@ -5,7 +5,8 @@ import no.nav.syfo.util.extractIdentFromBehandler
 import no.nav.syfo.util.get
 import no.nav.syfo.util.getFileAsString
 import no.nav.syfo.util.safeUnmarshal
-import org.amshove.kluent.shouldBeEqualTo
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
@@ -20,7 +21,7 @@ class ExtractFromFellesFormatTest {
 
         val behandlerIdent = extractIdentFromBehandler(fellesformat)
 
-        behandlerIdent shouldBeEqualTo BEHANDLER_FNR
+        assertEquals(BEHANDLER_FNR, behandlerIdent)
     }
 
     @Test
@@ -31,7 +32,7 @@ class ExtractFromFellesFormatTest {
 
         val behandlerIdent = extractIdentFromBehandler(fellesformat)
 
-        behandlerIdent shouldBeEqualTo null
+        assertNull(behandlerIdent)
     }
 
     @Test
@@ -43,7 +44,7 @@ class ExtractFromFellesFormatTest {
 
         val behandlerIdent = extractIdentFromBehandler(fellesformat)
 
-        behandlerIdent shouldBeEqualTo null
+        assertNull(behandlerIdent)
     }
 
     @Test
@@ -56,7 +57,7 @@ class ExtractFromFellesFormatTest {
 
         val msgHead: XMLMsgHead = fellesformat.get()
         val genDate = msgHead.msgInfo.genDate
-        genDate shouldBeEqualTo localDateTime
+        assertEquals(localDateTime, genDate)
     }
 
     @Test
@@ -69,7 +70,7 @@ class ExtractFromFellesFormatTest {
 
         val msgHead: XMLMsgHead = fellesformat.get()
         val date = msgHead.msgInfo.genDate
-        date shouldBeEqualTo localDateTime
+        assertEquals(localDateTime, date)
     }
 
     @Test
@@ -82,7 +83,7 @@ class ExtractFromFellesFormatTest {
 
         val msgHead: XMLMsgHead = fellesformat.get()
         val genDate = msgHead.msgInfo.genDate
-        genDate shouldBeEqualTo localDateTime
+        assertEquals(localDateTime, genDate)
     }
 
     @Test
@@ -95,7 +96,7 @@ class ExtractFromFellesFormatTest {
 
         val msgHead: XMLMsgHead = fellesformat.get()
         val genDate = msgHead.msgInfo.genDate
-        genDate shouldBeEqualTo localDateTime
+        assertEquals(localDateTime, genDate)
     }
 }
 

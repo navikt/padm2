@@ -7,7 +7,8 @@ import no.nav.syfo.util.get
 import no.nav.syfo.util.getFileAsString
 import no.nav.syfo.util.safeUnmarshal
 import no.nav.syfo.validation.isKodeverkValid
-import org.amshove.kluent.shouldBe
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.util.*
 
@@ -28,7 +29,7 @@ internal class ValidateDialogMeldingKodeverkTest {
 
         val validateDialogMeldingKodeverk = isKodeverkValid(msgId, dialomeldingxml, dialogmeldingType)
 
-        validateDialogMeldingKodeverk shouldBe false
+        assertFalse(validateDialogMeldingKodeverk!!)
     }
 
     @Test
@@ -44,7 +45,7 @@ internal class ValidateDialogMeldingKodeverkTest {
 
         val validateDialogMeldingKodeverk = isKodeverkValid(msgId, dialomeldingxml, dialogmeldingType)
 
-        validateDialogMeldingKodeverk shouldBe true
+        assertTrue(validateDialogMeldingKodeverk!!)
     }
 
     @Test
@@ -62,6 +63,6 @@ internal class ValidateDialogMeldingKodeverkTest {
 
         val validateDialogMeldingKodeverk = isKodeverkValid(msgId, dialogmeldingxml, dialogmeldingType)
 
-        validateDialogMeldingKodeverk shouldBe false
+        assertFalse(validateDialogMeldingKodeverk!!)
     }
 }

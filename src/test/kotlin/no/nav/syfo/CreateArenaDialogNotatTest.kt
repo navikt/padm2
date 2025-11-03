@@ -11,7 +11,7 @@ import no.nav.syfo.model.DialogmeldingKodeverk
 import no.nav.syfo.model.findDialogmeldingType
 import no.nav.syfo.model.toDialogmelding
 import no.nav.syfo.util.*
-import org.amshove.kluent.shouldBeEqualTo
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.math.BigInteger
 
@@ -55,40 +55,40 @@ internal class CreateArenaDialogNotatTest {
             dialogmelding
         )
 
-        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentType shouldBeEqualTo "DM"
-        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentTypeVersjon shouldBeEqualTo "1.0"
-        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentNavn shouldBeEqualTo "Svar på forespørsel"
-        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentreferanse shouldBeEqualTo "b62016eb-6c2d-417a-8ecc-157b3c5ee2ca"
-        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.ediLoggId shouldBeEqualTo "FiktivTestdata0001"
-        arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeFnr shouldBeEqualTo FASTLEGE_FNR
-        arenaDialogNotat.eiaDokumentInfo.avsender.lege.tssId.shouldBeEqualTo(tssid.toBigInteger())
-        arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.fornavn shouldBeEqualTo "Inga"
-        arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.etternavn shouldBeEqualTo "Valda"
-        arenaDialogNotat.pasientData.person.personFnr shouldBeEqualTo "3143242342"
-        arenaDialogNotat.pasientData.person.personNavn.fornavn shouldBeEqualTo "Etternavn"
-        arenaDialogNotat.pasientData.person.personNavn.mellomnavn shouldBeEqualTo ""
-        arenaDialogNotat.pasientData.person.personNavn.etternavn shouldBeEqualTo "Test"
-        arenaDialogNotat.notatKategori shouldBeEqualTo "2"
-        arenaDialogNotat.notatKode shouldBeEqualTo "25"
-        arenaDialogNotat.notatTittel shouldBeEqualTo DialogmeldingKodeverk.OVERFORING_EPJ_INFORMASJON_SVAR_PAA_FORESPORSEL_OM_PASIENT.arenaNotatTittel
-        arenaDialogNotat.notatTekst shouldBeEqualTo "Pasieten har masse info her"
-        arenaDialogNotat.svarReferanse shouldBeEqualTo "OD1812186729156"
+        assertEquals("DM", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentType)
+        assertEquals("1.0", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentTypeVersjon)
+        assertEquals("Svar på forespørsel", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentNavn)
+        assertEquals("b62016eb-6c2d-417a-8ecc-157b3c5ee2ca", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentreferanse)
+        assertEquals("FiktivTestdata0001", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.ediLoggId)
+        assertEquals(FASTLEGE_FNR, arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeFnr)
+        assertEquals(tssid.toBigInteger(), arenaDialogNotat.eiaDokumentInfo.avsender.lege.tssId)
+        assertEquals("Inga", arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.fornavn)
+        assertEquals("Valda", arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.etternavn)
+        assertEquals("3143242342", arenaDialogNotat.pasientData.person.personFnr)
+        assertEquals("Etternavn", arenaDialogNotat.pasientData.person.personNavn.fornavn)
+        assertEquals("", arenaDialogNotat.pasientData.person.personNavn.mellomnavn)
+        assertEquals("Test", arenaDialogNotat.pasientData.person.personNavn.etternavn)
+        assertEquals("2", arenaDialogNotat.notatKategori)
+        assertEquals("25", arenaDialogNotat.notatKode)
+        assertEquals(DialogmeldingKodeverk.OVERFORING_EPJ_INFORMASJON_SVAR_PAA_FORESPORSEL_OM_PASIENT.arenaNotatTittel, arenaDialogNotat.notatTittel)
+        assertEquals("Pasieten har masse info her", arenaDialogNotat.notatTekst)
+        assertEquals("OD1812186729156", arenaDialogNotat.svarReferanse)
     }
 
     @Test
     internal fun `Default to 0 when tss id is empty string`() {
         val behandler = Behandler(etternavn = "Etternavn", fornavn = "Fornavn", mellomnavn = "Mellomnavn")
         val avsender = createAvsender(FASTLEGE_FNR, "", behandler)
-        avsender.lege.legeFnr shouldBeEqualTo FASTLEGE_FNR
-        avsender.lege.tssId shouldBeEqualTo BigInteger("0")
+        assertEquals(FASTLEGE_FNR, avsender.lege.legeFnr)
+        assertEquals(BigInteger("0"), avsender.lege.tssId)
     }
 
     @Test
     internal fun `Default to 0 when tss id is null`() {
         val behandler = Behandler("Etternavn", "Fornavn", "Mellomnavn")
         val avsender = createAvsender(FASTLEGE_FNR, null, behandler)
-        avsender.lege.legeFnr shouldBeEqualTo FASTLEGE_FNR
-        avsender.lege.tssId shouldBeEqualTo BigInteger("0")
+        assertEquals(FASTLEGE_FNR, avsender.lege.legeFnr)
+        assertEquals(BigInteger("0"), avsender.lege.tssId)
     }
 
     @Test
@@ -127,30 +127,30 @@ internal class CreateArenaDialogNotatTest {
             dialogmelding
         )
 
-        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentType shouldBeEqualTo "DM"
-        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentTypeVersjon shouldBeEqualTo "1.0"
-        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentNavn shouldBeEqualTo "Svar p.. foresp..rsel"
-        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentreferanse shouldBeEqualTo "9be88bc5-4219-473e-954b-c0dd115ff4e0"
-        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.ediLoggId shouldBeEqualTo "1901162204amsa22108.1"
-        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.year shouldBeEqualTo 2020
-        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.monthValue shouldBeEqualTo 9
-        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.dayOfMonth shouldBeEqualTo 21
-        arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeFnr shouldBeEqualTo "01010112377"
-        arenaDialogNotat.eiaDokumentInfo.avsender.lege.tssId.shouldBeEqualTo(tssid.toBigInteger())
-        arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.fornavn shouldBeEqualTo "Inga"
-        arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.etternavn shouldBeEqualTo "Valda"
-        arenaDialogNotat.pasientData.person.personFnr shouldBeEqualTo "01010142365"
-        arenaDialogNotat.pasientData.person.personNavn.fornavn shouldBeEqualTo "Etternavn"
-        arenaDialogNotat.pasientData.person.personNavn.mellomnavn shouldBeEqualTo ""
-        arenaDialogNotat.pasientData.person.personNavn.etternavn shouldBeEqualTo "Test"
-        arenaDialogNotat.notatKategori shouldBeEqualTo "1"
-        arenaDialogNotat.notatKode shouldBeEqualTo "11"
-        arenaDialogNotat.notatTittel shouldBeEqualTo DialogmeldingKodeverk.SVAR_PAA_INNKALLING_DIALOGMOTE_JA_JEG_KOMMER.arenaNotatTittel
-        arenaDialogNotat.notatTekst shouldBeEqualTo "Ta gjerne kontakt ang hvilket telefonnummer jeg skal ringe. Mvh Inga F. Valda."
-        arenaDialogNotat.svarReferanse shouldBeEqualTo "OD2009169905747"
-        arenaDialogNotat.notatDato.year shouldBeEqualTo 2020
-        arenaDialogNotat.notatDato.monthValue shouldBeEqualTo 9
-        arenaDialogNotat.notatDato.dayOfMonth shouldBeEqualTo 21
+        assertEquals("DM", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentType)
+        assertEquals("1.0", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentTypeVersjon)
+        assertEquals("Svar p.. foresp..rsel", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentNavn)
+        assertEquals("9be88bc5-4219-473e-954b-c0dd115ff4e0", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentreferanse)
+        assertEquals("1901162204amsa22108.1", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.ediLoggId)
+        assertEquals(2020, arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.year)
+        assertEquals(9, arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.monthValue)
+        assertEquals(21, arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.dayOfMonth)
+        assertEquals("01010112377", arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeFnr)
+        assertEquals(tssid.toBigInteger(), arenaDialogNotat.eiaDokumentInfo.avsender.lege.tssId)
+        assertEquals("Inga", arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.fornavn)
+        assertEquals("Valda", arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.etternavn)
+        assertEquals("01010142365", arenaDialogNotat.pasientData.person.personFnr)
+        assertEquals("Etternavn", arenaDialogNotat.pasientData.person.personNavn.fornavn)
+        assertEquals("", arenaDialogNotat.pasientData.person.personNavn.mellomnavn)
+        assertEquals("Test", arenaDialogNotat.pasientData.person.personNavn.etternavn)
+        assertEquals("1", arenaDialogNotat.notatKategori)
+        assertEquals("11", arenaDialogNotat.notatKode)
+        assertEquals(DialogmeldingKodeverk.SVAR_PAA_INNKALLING_DIALOGMOTE_JA_JEG_KOMMER.arenaNotatTittel, arenaDialogNotat.notatTittel)
+        assertEquals("Ta gjerne kontakt ang hvilket telefonnummer jeg skal ringe. Mvh Inga F. Valda.", arenaDialogNotat.notatTekst)
+        assertEquals("OD2009169905747", arenaDialogNotat.svarReferanse)
+        assertEquals(2020, arenaDialogNotat.notatDato.year)
+        assertEquals(9, arenaDialogNotat.notatDato.monthValue)
+        assertEquals(21, arenaDialogNotat.notatDato.dayOfMonth)
     }
 
     @Test
@@ -190,26 +190,26 @@ internal class CreateArenaDialogNotatTest {
             dialogmelding
         )
 
-        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentType shouldBeEqualTo "DM"
-        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentTypeVersjon shouldBeEqualTo "1.0"
-        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentNavn shouldBeEqualTo "Notat"
-        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentreferanse shouldBeEqualTo "37340D30-FE14-42B5-985F-A8FF8FFA0CB5"
-        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.ediLoggId shouldBeEqualTo "1901162157lege21826.1"
-        arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.shouldBeEqualTo(localDateTime)
-        arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeFnr shouldBeEqualTo "01010112377"
-        arenaDialogNotat.eiaDokumentInfo.avsender.lege.tssId.shouldBeEqualTo(tssid.toBigInteger())
-        arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.fornavn shouldBeEqualTo "Inga"
-        arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.etternavn shouldBeEqualTo "Valda"
-        arenaDialogNotat.pasientData.person.personFnr shouldBeEqualTo "01010142365"
-        arenaDialogNotat.pasientData.person.personNavn.fornavn shouldBeEqualTo "Etternavn"
-        arenaDialogNotat.pasientData.person.personNavn.mellomnavn shouldBeEqualTo ""
-        arenaDialogNotat.pasientData.person.personNavn.etternavn shouldBeEqualTo "Test"
-        arenaDialogNotat.notatKategori shouldBeEqualTo "3"
-        arenaDialogNotat.notatKode shouldBeEqualTo "31"
-        arenaDialogNotat.notatTittel shouldBeEqualTo DialogmeldingKodeverk.HENVENDELSE_OM_PASIENT_HENVENDELSE_OM_SYKEFRAVARSOPPFOLGING.arenaNotatTittel
-        arenaDialogNotat.notatTekst shouldBeEqualTo "Hei,Det gjelder pas. Sender som vedlegg epikrisen"
-        arenaDialogNotat.svarReferanse shouldBeEqualTo "A1578B81-0042-453B-8527-6CF182BDA6C7"
-        arenaDialogNotat.notatDato.shouldBeEqualTo(localDateTime)
+        assertEquals("DM", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentType)
+        assertEquals("1.0", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentTypeVersjon)
+        assertEquals("Notat", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentNavn)
+        assertEquals("37340D30-FE14-42B5-985F-A8FF8FFA0CB5", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentreferanse)
+        assertEquals("1901162157lege21826.1", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.ediLoggId)
+        assertEquals(localDateTime, arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato)
+        assertEquals("01010112377", arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeFnr)
+        assertEquals(tssid.toBigInteger(), arenaDialogNotat.eiaDokumentInfo.avsender.lege.tssId)
+        assertEquals("Inga", arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.fornavn)
+        assertEquals("Valda", arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.etternavn)
+        assertEquals("01010142365", arenaDialogNotat.pasientData.person.personFnr)
+        assertEquals("Etternavn", arenaDialogNotat.pasientData.person.personNavn.fornavn)
+        assertEquals("", arenaDialogNotat.pasientData.person.personNavn.mellomnavn)
+        assertEquals("Test", arenaDialogNotat.pasientData.person.personNavn.etternavn)
+        assertEquals("3", arenaDialogNotat.notatKategori)
+        assertEquals("31", arenaDialogNotat.notatKode)
+        assertEquals(DialogmeldingKodeverk.HENVENDELSE_OM_PASIENT_HENVENDELSE_OM_SYKEFRAVARSOPPFOLGING.arenaNotatTittel, arenaDialogNotat.notatTittel)
+        assertEquals("Hei,Det gjelder pas. Sender som vedlegg epikrisen", arenaDialogNotat.notatTekst)
+        assertEquals("A1578B81-0042-453B-8527-6CF182BDA6C7", arenaDialogNotat.svarReferanse)
+        assertEquals(localDateTime, arenaDialogNotat.notatDato)
     }
 
     @Test
@@ -248,7 +248,7 @@ internal class CreateArenaDialogNotatTest {
             dialogmelding
         )
 
-        arenaDialogNotat.pasientData.person.personFnr shouldBeEqualTo "45088649080"
+        assertEquals("45088649080", arenaDialogNotat.pasientData.person.personFnr)
     }
 
     @Test
@@ -287,9 +287,9 @@ internal class CreateArenaDialogNotatTest {
             dialogmelding
         )
 
-        arenaDialogNotat.notatKategori shouldBeEqualTo "3"
-        arenaDialogNotat.notatKode shouldBeEqualTo "31"
-        arenaDialogNotat.notatTittel shouldBeEqualTo DialogmeldingKodeverk.HENVENDELSE_OM_PASIENT_HENVENDELSE_OM_SYKEFRAVARSOPPFOLGING.arenaNotatTittel
+        assertEquals("3", arenaDialogNotat.notatKategori)
+        assertEquals("31", arenaDialogNotat.notatKode)
+        assertEquals(DialogmeldingKodeverk.HENVENDELSE_OM_PASIENT_HENVENDELSE_OM_SYKEFRAVARSOPPFOLGING.arenaNotatTittel, arenaDialogNotat.notatTittel)
     }
 
     @Test
@@ -328,6 +328,6 @@ internal class CreateArenaDialogNotatTest {
             dialogmelding
         )
 
-        arenaDialogNotat.notatTekst shouldBeEqualTo "Hei,Det gjelder pas. Sender sm2013 som vedlegg"
+        assertEquals("Hei,Det gjelder pas. Sender sm2013 som vedlegg", arenaDialogNotat.notatTekst)
     }
 }
