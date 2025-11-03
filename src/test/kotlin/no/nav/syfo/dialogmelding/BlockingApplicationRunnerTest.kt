@@ -532,7 +532,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
         verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
-        assertEquals(0.0, MESSAGES_STILL_FAIL_AFTER_1H.count())
+        val failedMessages = MESSAGES_STILL_FAIL_AFTER_1H.count()
         externalMockEnvironment.pdfgenMock.allowFail = false
         database.updateCreatedAt(
             dialogmeldingId!!,
@@ -546,7 +546,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
         verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
-        assertEquals(0.0, MESSAGES_STILL_FAIL_AFTER_1H.count())
+        assertEquals(failedMessages, MESSAGES_STILL_FAIL_AFTER_1H.count())
     }
 
     @Test
@@ -561,7 +561,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
         verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
-        assertEquals(0.0, MESSAGES_STILL_FAIL_AFTER_1H.count())
+        val failedMessages = MESSAGES_STILL_FAIL_AFTER_1H.count()
         database.updateCreatedAt(
             dialogmeldingId!!,
             Timestamp.valueOf(LocalDateTime.now().minusMinutes(90L))
@@ -573,7 +573,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
         verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
-        assertEquals(1.0, MESSAGES_STILL_FAIL_AFTER_1H.count())
+        assertEquals(failedMessages + 1.0, MESSAGES_STILL_FAIL_AFTER_1H.count())
     }
 
     @Test
