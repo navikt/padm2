@@ -12,7 +12,7 @@ val hikariVersion = "7.0.2"
 val ibmMqVersion = "9.4.4.0"
 val jacksonVersion = "2.20.0"
 val javaTimeAdapterVersion = "1.1.3"
-val kafkaVersion = "3.9.1"
+val kafkaVersion = "4.1.0"
 val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
 val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
 val ktorVersion = "3.3.1"
@@ -100,6 +100,7 @@ dependencies {
 
     val excludeLog4j = fun ExternalModuleDependency.() {
         exclude(group = "log4j")
+        exclude(group = "org.apache.logging.log4j")
     }
     implementation("org.apache.kafka:kafka_2.13:$kafkaVersion", excludeLog4j)
     constraints {
@@ -113,6 +114,12 @@ dependencies {
             because("org.apache.commons:commons-compress:1.22 -> https://www.cve.org/CVERecord?id=CVE-2012-2098")
             version {
                 require(commonsCompressVersion)
+            }
+        }
+        implementation("commons-beanutils:commons-beanutils") {
+            because("org.apache.kafka:kafka_2.13:$kafkaVersion -> https://www.cve.org/CVERecord?id=CVE-2025-48734")
+            version {
+                require("1.11.0")
             }
         }
     }
