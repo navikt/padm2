@@ -4,7 +4,7 @@ group = "no.nav.syfo"
 version = "1.0.0"
 
 val arenaDialogNotatVersion = "1.e1999cf"
-val base64containerVersion = "1.5ac2176"
+val base64containerVersion = "2.0.1"
 val dialogmeldingVersion = "1.5d21db9"
 val fellesformat2Version = "1.0329dd1"
 val flywayVersion = "11.15.0"
