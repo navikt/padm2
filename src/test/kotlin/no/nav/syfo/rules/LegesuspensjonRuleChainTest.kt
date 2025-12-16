@@ -2,7 +2,8 @@ package no.nav.syfo.rules
 
 import io.mockk.mockk
 import no.nav.syfo.model.Dialogmelding
-import org.amshove.kluent.shouldBeEqualTo
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 internal class LegesuspensjonRuleChainTest {
@@ -18,13 +19,13 @@ internal class LegesuspensjonRuleChainTest {
     internal fun `Should check rule BEHANDLER_SUSPENDERT, should trigger rule`() {
         val suspended = true
 
-        LegesuspensjonRuleChain.BEHANDLER_SUSPENDERT(ruleData(dialogmelding, suspended)) shouldBeEqualTo true
+        assertTrue(LegesuspensjonRuleChain.BEHANDLER_SUSPENDERT(ruleData(dialogmelding, suspended)))
     }
 
     @Test
     internal fun `Should check rule BEHANDLER_SUSPENDERT, should NOT trigger rule`() {
         val suspended = false
 
-        LegesuspensjonRuleChain.BEHANDLER_SUSPENDERT(ruleData(dialogmelding, suspended)) shouldBeEqualTo false
+        assertFalse(LegesuspensjonRuleChain.BEHANDLER_SUSPENDERT(ruleData(dialogmelding, suspended)))
     }
 }

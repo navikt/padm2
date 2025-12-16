@@ -11,8 +11,7 @@ import io.ktor.server.testing.*
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.api.registerNaisApi
 import no.nav.syfo.util.configure
-import org.amshove.kluent.shouldBe
-import org.amshove.kluent.shouldBeEqualTo
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 internal class SelfTest {
@@ -40,8 +39,8 @@ internal class SelfTest {
             applicationState.alive = true
             val client = setupApiAndClient(applicationState)
             val response = client.get("/is_alive") {}
-            response.status shouldBe HttpStatusCode.OK
-            response.body<String>() shouldBeEqualTo "I'm alive! :)"
+            assertEquals(HttpStatusCode.OK, response.status)
+            assertEquals("I'm alive! :)", response.body<String>())
         }
     }
 
@@ -53,8 +52,8 @@ internal class SelfTest {
             applicationState.alive = true
             val client = setupApiAndClient(applicationState)
             val response = client.get("/is_ready") {}
-            response.status shouldBe HttpStatusCode.OK
-            response.body<String>() shouldBeEqualTo "I'm ready! :)"
+            assertEquals(HttpStatusCode.OK, response.status)
+            assertEquals("I'm ready! :)", response.body<String>())
         }
     }
 
@@ -66,8 +65,8 @@ internal class SelfTest {
             applicationState.alive = false
             val client = setupApiAndClient(applicationState)
             val response = client.get("/is_alive") {}
-            response.status shouldBeEqualTo HttpStatusCode.InternalServerError
-            response.body<String>() shouldBeEqualTo "I'm dead x_x"
+            assertEquals(HttpStatusCode.InternalServerError, response.status)
+            assertEquals("I'm dead x_x", response.body<String>())
         }
     }
 
@@ -79,8 +78,8 @@ internal class SelfTest {
             applicationState.alive = false
             val client = setupApiAndClient(applicationState)
             val response = client.get("/is_ready") {}
-            response.status shouldBeEqualTo HttpStatusCode.InternalServerError
-            response.body<String>() shouldBeEqualTo "Please wait! I'm not ready :("
+            assertEquals(HttpStatusCode.InternalServerError, response.status)
+            assertEquals("Please wait! I'm not ready :(", response.body<String>())
         }
     }
 }

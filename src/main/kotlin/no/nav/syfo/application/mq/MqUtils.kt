@@ -13,8 +13,6 @@ interface MqConfig {
     val mqPort: Int
     val mqGatewayName: String
     val mqChannelName: String
-    val mqKeystorePassword: String
-    val mqKeystorePath: String
 }
 
 fun connectionFactory(config: MqConfig) = MQConnectionFactory().apply {

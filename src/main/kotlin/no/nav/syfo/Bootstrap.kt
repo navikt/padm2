@@ -34,8 +34,6 @@ fun main() {
     logger.info("Padm2 starting with java version: " + Runtime.version())
     val env = Environment()
 
-    setMQTlsProperties(env)
-
     val applicationState = ApplicationState()
 
     val wellKnownInternalAzureAD = getWellKnown(
@@ -178,10 +176,4 @@ fun launchListeners(
         dialogmeldingProcessor = dialogmeldingProcessor,
         arenaDialogmeldingService = arenaDialogmeldingService,
     )
-}
-
-private fun setMQTlsProperties(env: Environment) {
-    System.setProperty("javax.net.ssl.keyStore", env.mqKeystorePath)
-    System.setProperty("javax.net.ssl.keyStorePassword", env.mqKeystorePassword)
-    System.setProperty("javax.net.ssl.keyStoreType", "jks")
 }

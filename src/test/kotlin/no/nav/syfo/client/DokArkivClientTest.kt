@@ -16,12 +16,12 @@ import no.nav.syfo.client.azuread.v2.AzureAdV2Token
 import no.nav.syfo.model.*
 import no.nav.syfo.util.LoggingMeta
 import no.nav.syfo.util.configure
-import org.amshove.kluent.shouldBe
-import org.amshove.kluent.shouldBeEqualTo
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
-import kotlin.test.assertFailsWith
 
 internal class DokArkivClientTest {
 
@@ -67,11 +67,13 @@ internal class DokArkivClientTest {
                             HttpStatusCode.OK,
                             responseHeaders
                         )
+
                         HttpStatusCode.Created -> respond(
                             journalpostOKResponseAsJson,
                             HttpStatusCode.Created,
                             responseHeaders
                         )
+
                         else -> respondError(statusCode, statusCode.description, responseHeaders)
                     }
                 }
@@ -81,22 +83,19 @@ internal class DokArkivClientTest {
 
     @Test
     fun `Feilkode fra journalpostoppretting kaster RuntimeException`() {
-        assertFailsWith<RuntimeException>(
-            message = "Fikk ikke exception",
-            block = {
-                val dokArkivClient =
-                    DokArkivClient(
-                        azureAdV2Client,
-                        dokarkivClientId,
-                        "Test",
-                        createClient(HttpStatusCode.InternalServerError)
-                    )
-                runBlocking {
-                    dokArkivClient
-                        .createJournalpost(journalpostRequest, LoggingMeta("1", "2", "3"))
-                }
+        assertThrows(RuntimeException::class.java) {
+            val dokArkivClient =
+                DokArkivClient(
+                    azureAdV2Client,
+                    dokarkivClientId,
+                    "Test",
+                    createClient(HttpStatusCode.InternalServerError)
+                )
+            runBlocking {
+                dokArkivClient
+                    .createJournalpost(journalpostRequest, LoggingMeta("1", "2", "3"))
             }
-        )
+        }
     }
 
     @Test
@@ -113,7 +112,7 @@ internal class DokArkivClientTest {
                 .createJournalpost(journalpostRequest, LoggingMeta("1", "2", "3"))
         }
 
-        response.journalpostId shouldBeEqualTo journalpostOKResponse.journalpostId
+        assertEquals(journalpostOKResponse.journalpostId, response.journalpostId)
     }
 
     @Test
@@ -130,7 +129,7 @@ internal class DokArkivClientTest {
                 .createJournalpost(journalpostRequest, LoggingMeta("1", "2", "3"))
         }
 
-        response.journalpostId shouldBeEqualTo journalpostOKResponse.journalpostId
+        assertEquals(journalpostOKResponse.journalpostId, response.journalpostId)
     }
 
     @Test
@@ -149,9 +148,9 @@ internal class DokArkivClientTest {
             vedleggListe = null,
         )
 
-        journalpostRequest.avsenderMottaker!!.id shouldBeEqualTo "0000$hprNrWithFiveDigits"
-        journalpostRequest.avsenderMottaker?.idType shouldBe IdType.HPR.value
-        journalpostRequest.avsenderMottaker?.navn shouldBe dialogmelding.navnHelsepersonell
+        assertEquals("0000$hprNrWithFiveDigits", journalpostRequest.avsenderMottaker!!.id)
+        assertEquals(IdType.HPR.value, journalpostRequest.avsenderMottaker?.idType)
+        assertEquals(dialogmelding.navnHelsepersonell, journalpostRequest.avsenderMottaker?.navn)
     }
 
     @Test
@@ -168,9 +167,9 @@ internal class DokArkivClientTest {
             vedleggListe = null,
         )
 
-        journalpostRequest.avsenderMottaker?.id shouldBe null
-        journalpostRequest.avsenderMottaker?.idType shouldBe null
-        journalpostRequest.avsenderMottaker?.navn shouldBe dialogmelding.navnHelsepersonell
+        assertNull(journalpostRequest.avsenderMottaker?.id)
+        assertNull(journalpostRequest.avsenderMottaker?.idType)
+        assertEquals(dialogmelding.navnHelsepersonell, journalpostRequest.avsenderMottaker?.navn)
     }
 
     @Test
@@ -189,9 +188,9 @@ internal class DokArkivClientTest {
             vedleggListe = null,
         )
 
-        journalpostRequest.avsenderMottaker?.id shouldBe validDnr
-        journalpostRequest.avsenderMottaker?.idType shouldBe IdType.PERSON_IDENT.value
-        journalpostRequest.avsenderMottaker?.navn shouldBe dialogmelding.navnHelsepersonell
+        assertEquals(validDnr, journalpostRequest.avsenderMottaker?.id)
+        assertEquals(IdType.PERSON_IDENT.value, journalpostRequest.avsenderMottaker?.idType)
+        assertEquals(dialogmelding.navnHelsepersonell, journalpostRequest.avsenderMottaker?.navn)
     }
 
     val dialogmelding = Dialogmelding(
