@@ -30,7 +30,7 @@ val nimbusJoseJwt = "10.6"
 val pdfboxVersion = "2.0.24"
 val postgresEmbedded = "2.1.1"
 val postgresVersion = "42.7.8"
-val postgresRuntimeVersion = "17.6.0"
+val postgresRuntimeVersion = "18.1.0"
 val commonsCompressVersion = "1.28.0"
 
 plugins {
