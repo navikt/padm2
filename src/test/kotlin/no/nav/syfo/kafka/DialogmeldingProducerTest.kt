@@ -138,6 +138,34 @@ internal class DialogmeldingProducerTest {
     }
 
     @Test
+    internal fun `Tester mapping fra fellesformat til Kafka topic med vedlegg med mimetype pjpeg`() {
+        setupTestData(
+            getFileAsStringISO88591("src/test/resources/dialogmelding_dialog_notat_vedlegg_pjpeg.xml")
+        )
+
+        dialogmeldingProducer.sendDialogmelding(
+            receivedDialogmelding = receivedDialogmelding,
+            msgHead = msgHead,
+            journalpostId = journalpostId,
+            antallVedlegg = fellesformat.calculateNumberOfVedlegg(),
+        )
+        val slot = slot<ProducerRecord<String, DialogmeldingForKafka>>()
+
+        verify { kafkaProducerMock.send(capture(slot)) }
+
+        val producerRecord = slot.captured
+        assertEquals("teamsykefravr.dialogmelding", producerRecord.topic())
+        assertEquals(msgHead.msgInfo.msgId, producerRecord.key() as String)
+        val dialogmeldingForKafka = producerRecord.value()
+        assertEquals(msgHead.msgInfo.msgId, dialogmeldingForKafka.msgId)
+        assertEquals("DIALOG_NOTAT", dialogmeldingForKafka.msgType)
+        assertEquals(2, dialogmeldingForKafka.antallVedlegg)
+
+        val fellesformatFromKafkaMessage = safeUnmarshal(dialogmeldingForKafka.fellesformatXML)
+        assertEquals(0, fellesformatFromKafkaMessage.calculateNumberOfVedlegg())
+    }
+
+    @Test
     internal fun `Tester mapping fra fellesformat til Kafka topic for svar dialogmote`() {
         setupTestData(getFileAsStringISO88591("src/test/resources/dialogmelding_dialog_svar_innkalling_dialogmote.xml"))
 

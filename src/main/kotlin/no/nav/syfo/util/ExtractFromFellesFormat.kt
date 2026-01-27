@@ -29,7 +29,7 @@ fun extractAllVedlegg(fellesformat: XMLEIFellesformat) = fellesformat.get<XMLMsg
 
 fun XMLDocument.isVedlegg() =
     this.refDoc.msgType.v == "A" &&
-        listOf("application/pdf", "image/tiff", "image/png", "image/jpeg", "image/jpg").contains(this.refDoc.mimeType)
+        listOf("application/pdf", "image/tiff", "image/png", "image/jpeg", "image/pjpeg", "image/jpg", "image/pjpg").contains(this.refDoc.mimeType)
 
 private fun XMLDocument.pdfContentMatchesMimeType() =
     this.refDoc.mimeType != "application/pdf" || toBase64Container().value.binaryContentIsPdf()

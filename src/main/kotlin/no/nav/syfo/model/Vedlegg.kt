@@ -45,6 +45,8 @@ fun Vedlegg.findFiltype(): String =
         "image/tiff" -> "TIFF"
         "image/png" -> "PNG"
         "image/jpeg" -> "JPEG"
+        "image/pjpeg" -> "JPEG"
         "image/jpg" -> "JPEG"
+        "image/pjpg" -> "JPEG"
         else -> throw RuntimeException("Vedlegget er av ukjent mimeType ${this.mimeType}")
     }
