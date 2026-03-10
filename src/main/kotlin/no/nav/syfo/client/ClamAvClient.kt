@@ -1,6 +1,7 @@
 package no.nav.syfo.client
 
 import com.fasterxml.jackson.annotation.JsonAlias
+import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.formData
@@ -11,10 +12,11 @@ import no.nav.syfo.model.Vedlegg
 import java.io.IOException
 
 class ClamAvClient(
-    private val endpointUrl: String
+    private val endpointUrl: String,
+    private val httpClient: HttpClient = no.nav.syfo.client.httpClient,
 ) {
     suspend fun virusScanVedlegg(vedleggList: List<Vedlegg>): List<ScanResult> {
-        val httpResponse: HttpResponse = httpClient.submitFormWithBinaryData(
+        val httpResponse: HttpResponse = this.httpClient.submitFormWithBinaryData(
             url = "$endpointUrl/scan",
             formData = formData {
                 vedleggList.forEachIndexed { index, vedlegg ->

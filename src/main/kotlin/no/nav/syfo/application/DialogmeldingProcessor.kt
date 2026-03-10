@@ -21,6 +21,7 @@ import no.nav.syfo.persistering.persistRecivedMessageValidation
 import no.nav.syfo.services.*
 import no.nav.syfo.util.*
 import no.nav.syfo.validation.isKodeverkValid
+import io.ktor.client.HttpClient
 import java.time.Duration
 
 class DialogmeldingProcessor(
@@ -29,26 +30,30 @@ class DialogmeldingProcessor(
     val mqSender: MQSenderInterface,
     val dialogmeldingProducer: DialogmeldingProducer,
     val azureAdV2Client: AzureAdV2Client,
+    httpClient: HttpClient = no.nav.syfo.client.httpClient,
+    pdfgenHttpClient: HttpClient = no.nav.syfo.client.httpClientPdfgen,
 ) {
     val pdfgenClient = PdfgenClient(
         url = env.syfopdfgen,
-        httpClient = httpClientPdfgen,
+        httpClient = pdfgenHttpClient,
     )
 
     val pdlClient = PdlClient(
         azureAdV2Client = azureAdV2Client,
         pdlClientId = env.pdlClientId,
         pdlUrl = env.pdlUrl,
+        httpClient = httpClient,
     )
     val dokArkivClient = DokArkivClient(
         azureAdV2Client = azureAdV2Client,
         dokArkivClientId = env.dokArkivClientId,
         url = env.dokArkivUrl,
+        configuredHttpClient = httpClient,
     )
     val syfohelsenettproxyClient = SyfohelsenettproxyClient(
         azureAdV2Client = azureAdV2Client,
         endpointUrl = env.syfohelsenettproxyEndpointURL,
-        httpClient = httpClientRetryAll,
+        httpClient = httpClient,
         helsenettClientId = env.syfohelsenettproxyClientId,
     )
     val legeSuspensjonClient = LegeSuspensjonClient(
@@ -73,6 +78,7 @@ class DialogmeldingProcessor(
     )
     val clamAvClient = ClamAvClient(
         endpointUrl = env.clamavURL,
+        httpClient = httpClient,
     )
     val virusScanService = VirusScanService(
         clamAvClient = clamAvClient,

@@ -37,6 +37,8 @@ class BlockingApplicationRunnerTest {
         mqSender = mqSender,
         dialogmeldingProducer = dialogmeldingProducer,
         azureAdV2Client = azureAdV2Client,
+        httpClient = externalMockEnvironment.mockHttpClient,
+        pdfgenHttpClient = externalMockEnvironment.mockHttpClient,
     )
     private val blockingApplicationRunner = BlockingApplicationRunner(
         applicationState = externalMockEnvironment.applicationState,

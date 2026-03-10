@@ -1,75 +1,18 @@
 package no.nav.syfo.mock
 
-import io.ktor.http.*
-import io.ktor.http.content.*
-import io.ktor.serialization.jackson.*
-import io.ktor.server.application.*
-import io.ktor.server.engine.*
-import io.ktor.server.netty.*
-import io.ktor.server.plugins.contentnegotiation.*
-import io.ktor.server.request.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
-import no.nav.syfo.getRandomPort
-import no.nav.syfo.util.configure
+import io.ktor.client.engine.mock.*
+import io.ktor.client.request.*
+import no.nav.syfo.client.ScanResult
+import no.nav.syfo.client.ScanStatus
 
-class ClamAvMock {
-    private val port = getRandomPort()
-    val url = "http://localhost:$port"
+val clamAvSuccessResponse = listOf(ScanResult(filename = "file1", result = ScanStatus.OK))
+val clamAvVirusFoundResponse = listOf(ScanResult(filename = "file1", result = ScanStatus.FOUND))
 
-    val clamAvResponseSuccessful = listOf(
-        MyScanResult(
-            Filename = "file1",
-            Result = MyScanStatus.OK,
-        ),
-    )
-
-    val clamAvResponseUnsuccessful = listOf(
-        MyScanResult(
-            Filename = "file1",
-            Result = MyScanStatus.FOUND,
-        ),
-    )
-
-    val name = "clamav"
-    val server = mockClamAvServer(
-        port
-    )
-
-    private fun mockClamAvServer(
-        port: Int
-    ): EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration> {
-        return embeddedServer(
-            factory = Netty,
-            port = port
-        ) {
-            install(ContentNegotiation) {
-                jackson { configure() }
-            }
-            routing {
-                post("/scan") {
-                    val content = mutableListOf<ContentDisposition?>()
-                    call.receiveMultipart().forEachPart {
-                        content.add(it.contentDisposition)
-                    }
-                    val firstDisposiotion = content[0]!!
-                    call.respond(
-                        if (firstDisposiotion.parameter("filename") == "problem file")
-                            clamAvResponseUnsuccessful
-                        else
-                            clamAvResponseSuccessful
-                    )
-                }
-            }
-        }
-    }
-
-    data class MyScanResult(
-        val Filename: String,
-        val Result: MyScanStatus,
-    )
-
-    enum class MyScanStatus {
-        FOUND, OK, ERROR
+suspend fun MockRequestHandleScope.clamAvMockResponse(request: HttpRequestData): HttpResponseData {
+    val bodyText = request.body.toByteArray().decodeToString()
+    return if (bodyText.contains("""filename="problem file"""")) {
+        respond(clamAvVirusFoundResponse)
+    } else {
+        respond(clamAvSuccessResponse)
     }
 }

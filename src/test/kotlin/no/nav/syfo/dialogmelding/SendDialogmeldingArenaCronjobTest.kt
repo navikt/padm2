@@ -41,6 +41,7 @@ class SendDialogmeldingArenaCronjobTest {
             azureAdV2Client = azureAdV2ClientMock,
             behandlerdialogClientId = externalMockEnvironment.environment.isbehandlerdialogClientId,
             behandlerdialogUrl = externalMockEnvironment.environment.isbehandlerdialogUrl,
+            httpClient = externalMockEnvironment.mockHttpClient,
         )
     )
     private val sendDialogmeldingArenaCronjob = SendDialogmeldingArenaCronjob(

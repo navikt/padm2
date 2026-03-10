@@ -1,5 +1,6 @@
 package no.nav.syfo.client.pdl
 
+import io.ktor.client.HttpClient
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -15,6 +16,7 @@ class PdlClient(
     private val azureAdV2Client: AzureAdV2Client,
     private val pdlClientId: String,
     private val pdlUrl: String,
+    private val httpClient: HttpClient = no.nav.syfo.client.httpClient,
 ) {
 
     suspend fun personEksisterer(
@@ -44,7 +46,7 @@ class PdlClient(
             )
         )
 
-        val response: HttpResponse = httpClient.post(pdlUrl) {
+        val response: HttpResponse = this.httpClient.post(pdlUrl) {
             setBody(request)
             header(HttpHeaders.ContentType, "application/json")
             header(HttpHeaders.Authorization, bearerHeader(token.accessToken))
