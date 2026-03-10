@@ -140,6 +140,7 @@ fun launchListeners(
         azureAdV2Client = azureAdV2Client,
         behandlerdialogClientId = env.isbehandlerdialogClientId,
         behandlerdialogUrl = env.isbehandlerdialogUrl,
+        httpClient = httpClient,
     )
 
     val arenaDialogmeldingService = ArenaDialogmeldingService(

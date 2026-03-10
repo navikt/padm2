@@ -20,7 +20,7 @@ class DokArkivClient(
     private val azureAdV2Client: AzureAdV2Client,
     private val dokArkivClientId: String,
     private val url: String,
-    private val configuredHttpClient: HttpClient = httpClient,
+    private val httpClient: HttpClient,
 ) {
     suspend fun createJournalpost(
         journalpostRequest: JournalpostRequest,
@@ -36,7 +36,7 @@ class DokArkivClient(
             val accessToken = azureAdV2Client.getSystemToken(dokArkivClientId)?.accessToken
                 ?: throw RuntimeException("Failed to send request to DokArkiv: No token was found")
 
-            val response: HttpResponse = configuredHttpClient.post(url) {
+            val response: HttpResponse = httpClient.post(url) {
                 header("Authorization", "Bearer $accessToken")
                 header("Nav-Callid", journalpostRequest.eksternReferanseId)
                 setBody(journalpostRequest)

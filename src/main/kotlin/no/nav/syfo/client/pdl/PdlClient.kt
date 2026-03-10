@@ -16,7 +16,7 @@ class PdlClient(
     private val azureAdV2Client: AzureAdV2Client,
     private val pdlClientId: String,
     private val pdlUrl: String,
-    private val httpClient: HttpClient = no.nav.syfo.client.httpClient,
+    private val httpClient: HttpClient,
 ) {
 
     suspend fun personEksisterer(

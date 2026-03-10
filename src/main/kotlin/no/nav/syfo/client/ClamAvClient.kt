@@ -13,10 +13,10 @@ import java.io.IOException
 
 class ClamAvClient(
     private val endpointUrl: String,
-    private val httpClient: HttpClient = no.nav.syfo.client.httpClient,
+    private val httpClient: HttpClient,
 ) {
     suspend fun virusScanVedlegg(vedleggList: List<Vedlegg>): List<ScanResult> {
-        val httpResponse: HttpResponse = this.httpClient.submitFormWithBinaryData(
+        val httpResponse: HttpResponse = httpClient.submitFormWithBinaryData(
             url = "$endpointUrl/scan",
             formData = formData {
                 vedleggList.forEachIndexed { index, vedlegg ->

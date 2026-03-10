@@ -48,7 +48,7 @@ class DialogmeldingProcessor(
         azureAdV2Client = azureAdV2Client,
         dokArkivClientId = env.dokArkivClientId,
         url = env.dokArkivUrl,
-        configuredHttpClient = httpClient,
+        httpClient = httpClient,
     )
     val syfohelsenettproxyClient = SyfohelsenettproxyClient(
         azureAdV2Client = azureAdV2Client,

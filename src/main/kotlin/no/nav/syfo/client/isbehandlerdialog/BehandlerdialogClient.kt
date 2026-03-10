@@ -12,7 +12,7 @@ class BehandlerdialogClient(
     private val azureAdV2Client: AzureAdV2Client,
     private val behandlerdialogClientId: String,
     behandlerdialogUrl: String,
-    private val httpClient: HttpClient = no.nav.syfo.client.httpClient,
+    private val httpClient: HttpClient,
 ) {
 
     private val meldingUrl = "$behandlerdialogUrl/$MELDINGER_PATH"
@@ -23,7 +23,7 @@ class BehandlerdialogClient(
         )?.accessToken ?: throw RuntimeException("Failed to get system token")
 
         return try {
-            val response = this.httpClient.get("$meldingUrl/$msgId") {
+            val response = httpClient.get("$meldingUrl/$msgId") {
                 header(HttpHeaders.Authorization, bearerHeader(systemToken))
                 accept(ContentType.Application.Json)
             }

@@ -12,7 +12,7 @@ import no.nav.syfo.model.sanitizeForPdfGen
 
 class PdfgenClient constructor(
     private val url: String,
-    private val httpClient: HttpClient
+    private val httpClient: HttpClient,
 ) {
     suspend fun createPdf(payload: PdfModel): ByteArray {
         val response: HttpResponse = httpClient.post(url) {
