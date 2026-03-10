@@ -46,7 +46,7 @@ class PdlClient(
             )
         )
 
-        val response: HttpResponse = this.httpClient.post(pdlUrl) {
+        val response: HttpResponse = httpClient.post(pdlUrl) {
             setBody(request)
             header(HttpHeaders.ContentType, "application/json")
             header(HttpHeaders.Authorization, bearerHeader(token.accessToken))

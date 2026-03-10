@@ -30,12 +30,12 @@ class DialogmeldingProcessor(
     val mqSender: MQSenderInterface,
     val dialogmeldingProducer: DialogmeldingProducer,
     val azureAdV2Client: AzureAdV2Client,
-    httpClient: HttpClient = no.nav.syfo.client.httpClient,
-    pdfgenHttpClient: HttpClient = no.nav.syfo.client.httpClientPdfgen,
+    val httpClient: HttpClient,
+    val httpClientPdfgen: HttpClient,
 ) {
     val pdfgenClient = PdfgenClient(
         url = env.syfopdfgen,
-        httpClient = pdfgenHttpClient,
+        httpClient = httpClientPdfgen,
     )
 
     val pdlClient = PdlClient(
@@ -53,8 +53,8 @@ class DialogmeldingProcessor(
     val syfohelsenettproxyClient = SyfohelsenettproxyClient(
         azureAdV2Client = azureAdV2Client,
         endpointUrl = env.syfohelsenettproxyEndpointURL,
-        httpClient = httpClient,
         helsenettClientId = env.syfohelsenettproxyClientId,
+        httpClient = httpClient,
     )
     val legeSuspensjonClient = LegeSuspensjonClient(
         azureAdV2Client = azureAdV2Client,
