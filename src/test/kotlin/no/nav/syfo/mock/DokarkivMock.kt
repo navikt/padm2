@@ -1,63 +1,31 @@
 package no.nav.syfo.mock
 
+import io.ktor.client.engine.mock.*
+import io.ktor.client.request.*
 import io.ktor.http.*
-import io.ktor.serialization.jackson.*
-import io.ktor.server.application.*
-import io.ktor.server.engine.*
-import io.ktor.server.netty.*
-import io.ktor.server.plugins.contentnegotiation.*
-import io.ktor.server.request.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
 import no.nav.syfo.UserConstants
-import no.nav.syfo.getRandomPort
 import no.nav.syfo.model.JournalpostRequest
 import no.nav.syfo.model.JournalpostResponse
-import no.nav.syfo.util.configure
 
-class DokarkivMock {
-    private val port = getRandomPort()
-    val url = "http://localhost:$port"
+val dokarkivJournalpostResponse = JournalpostResponse(
+    journalpostId = "12345678",
+    journalstatus = "journalstatus",
+    journalpostferdigstilt = true,
+    dokumenter = emptyList(),
+)
 
-    val journalpostResponse = JournalpostResponse(
-        journalpostId = "12345678",
-        journalstatus = "journalstatus",
-        journalpostferdigstilt = true,
-        dokumenter = emptyList(),
-    )
-
-    val name = "dokarkiv"
-    val server = mockDokarkivServer(
-        port
-    )
-
-    private fun mockDokarkivServer(
-        port: Int
-    ): EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration> {
-        return embeddedServer(
-            factory = Netty,
-            port = port
-        ) {
-            install(ContentNegotiation) {
-                jackson { configure() }
-            }
-            routing {
-                post {
-                    val journalpostRequest = call.receive<JournalpostRequest>()
-                    if (
-                        journalpostRequest.bruker!!.id != UserConstants.PATIENT_FNR_NO_AKTOER_ID &&
-                        !journalpostRequest.avsenderMottaker!!.id!!.contains('-')
-                    ) {
-                        if (journalpostRequest.bruker!!.id == UserConstants.PATIENT_FNR_JP_CONFLICT) {
-                            call.respond(HttpStatusCode.Conflict, journalpostResponse)
-                        } else {
-                            call.respond(journalpostResponse)
-                        }
-                    } else {
-                        call.respond(HttpStatusCode.InternalServerError)
-                    }
-                }
-            }
+suspend fun MockRequestHandleScope.dokarkivMockResponse(request: HttpRequestData): HttpResponseData {
+    val journalpostRequest = request.receiveBody<JournalpostRequest>()
+    return if (
+        journalpostRequest.bruker!!.id != UserConstants.PATIENT_FNR_NO_AKTOER_ID &&
+        !journalpostRequest.avsenderMottaker!!.id!!.contains('-')
+    ) {
+        if (journalpostRequest.bruker!!.id == UserConstants.PATIENT_FNR_JP_CONFLICT) {
+            respond(dokarkivJournalpostResponse, HttpStatusCode.Conflict)
+        } else {
+            respond(dokarkivJournalpostResponse)
         }
+    } else {
+        respond(content = "", status = HttpStatusCode.InternalServerError, headers = headersOf())
     }
 }

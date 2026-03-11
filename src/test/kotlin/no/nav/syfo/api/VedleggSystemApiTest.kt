@@ -42,6 +42,8 @@ class VedleggSystemApiTest {
         mqSender = mqSender,
         dialogmeldingProducer = dialogmeldingProducer,
         azureAdV2Client = azureAdV2Client,
+        httpClient = externalMockEnvironment.mockHttpClient,
+        httpClientPdfgen = externalMockEnvironment.mockHttpClient,
     )
 
     private val blockingApplicationRunner = BlockingApplicationRunner(

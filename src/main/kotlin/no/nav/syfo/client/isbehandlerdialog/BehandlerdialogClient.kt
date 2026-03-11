@@ -1,5 +1,6 @@
 package no.nav.syfo.client.isbehandlerdialog
 
+import io.ktor.client.HttpClient
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -11,6 +12,7 @@ class BehandlerdialogClient(
     private val azureAdV2Client: AzureAdV2Client,
     private val behandlerdialogClientId: String,
     behandlerdialogUrl: String,
+    private val httpClient: HttpClient,
 ) {
 
     private val meldingUrl = "$behandlerdialogUrl/$MELDINGER_PATH"

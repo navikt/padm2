@@ -17,8 +17,8 @@ import java.io.IOException
 class SyfohelsenettproxyClient(
     private val azureAdV2Client: AzureAdV2Client,
     private val endpointUrl: String,
+    private val helsenettClientId: String,
     private val httpClient: HttpClient,
-    private val helsenettClientId: String
 ) {
 
     suspend fun finnBehandler(

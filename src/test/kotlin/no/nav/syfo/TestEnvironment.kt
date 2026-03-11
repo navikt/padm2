@@ -3,23 +3,11 @@ package no.nav.syfo
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.api.access.PreAuthorizedClient
 import no.nav.syfo.util.configuredJacksonMapper
-import java.net.ServerSocket
 
-fun testEnvironment(
-    azureTokenEndpoint: String = "azureTokenEndpoint",
-    clamAvURL: String,
-    dokarkivUrl: String,
-    pdfgenUrl: String,
-    pdlUrl: String,
-    syfohelsenettproxyEndpointUrl: String,
-    legeSuspensjonEndpointUrl: String,
-    smtssUrl: String,
-    smgcpUrl: String,
-    isbehandlerdialogUrl: String,
-) = Environment(
+fun testEnvironment() = Environment(
     aadAppClient = "isdialogmote-client-id",
     aadAppSecret = "isdialogmote-secret",
-    aadTokenEndpoint = azureTokenEndpoint,
+    aadTokenEndpoint = "http://azureadv2",
     aadAppPreAuthorizedApps = configuredJacksonMapper().writeValueAsString(testAzureAppPreAuthorizedApps),
     aadAppWellKnownUrl = "wellknown",
     databaseHost = "localhost",
@@ -36,10 +24,10 @@ fun testEnvironment(
     ),
     serviceuserUsername = "user",
     serviceuserPassword = "password",
-    clamavURL = clamAvURL,
+    clamavURL = "http://clamav",
     dokArkivClientId = "dokarkiv",
-    dokArkivUrl = dokarkivUrl,
-    syfopdfgen = pdfgenUrl,
+    dokArkivUrl = "http://dokarkiv",
+    syfopdfgen = "http://pdfgen",
     mqHostname = "mqhost",
     mqPort = 1234,
     mqGatewayName = "mqGateway",
@@ -49,17 +37,17 @@ fun testEnvironment(
     apprecQueueName = "apprecQueue",
     inputBackoutQueueName = "backoutQueue",
     pdlClientId = "pdl",
-    pdlUrl = pdlUrl,
+    pdlUrl = "http://pdl",
     syfohelsenettproxyClientId = "helsenett",
-    syfohelsenettproxyEndpointURL = syfohelsenettproxyEndpointUrl,
+    syfohelsenettproxyEndpointURL = "http://helsenettproxy",
     legeSuspensjonClientId = "legesuspensjon",
-    legeSuspensjonEndpointURL = legeSuspensjonEndpointUrl,
+    legeSuspensjonEndpointURL = "http://legesuspensjon",
     smtssClientId = "smtss",
-    smtssApiUrl = smtssUrl,
+    smtssApiUrl = "http://smtss",
     smgcpProxyClientId = "smgcp",
-    smgcpProxyUrl = smgcpUrl,
+    smgcpProxyUrl = "http://smgcp",
     isbehandlerdialogClientId = "isbehandlerdialog",
-    isbehandlerdialogUrl = isbehandlerdialogUrl,
+    isbehandlerdialogUrl = "http://isbehandlerdialog",
     jpRetryEnabled = true,
 )
 
@@ -67,10 +55,6 @@ fun testAppState() = ApplicationState(
     alive = true,
     ready = true
 )
-
-fun getRandomPort() = ServerSocket(0).use {
-    it.localPort
-}
 
 const val testIsBehandlerDialogClientId = "isbehandlerdialog-client-id"
 

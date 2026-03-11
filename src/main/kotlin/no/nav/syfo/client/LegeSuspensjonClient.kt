@@ -13,8 +13,8 @@ class LegeSuspensjonClient(
     private val azureAdV2Client: AzureAdV2Client,
     private val endpointUrl: String,
     private val endpointClientId: String,
-    private val httpClient: HttpClient,
     private val applicationName: String,
+    private val httpClient: HttpClient,
 ) {
 
     suspend fun sjekkSuspensjon(

@@ -13,6 +13,7 @@ import no.nav.syfo.client.SmgcpClient
 import no.nav.syfo.client.SmtssClient
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.client.httpClient
+import no.nav.syfo.client.httpClientPdfgen
 import no.nav.syfo.client.httpClientWithProxy
 import no.nav.syfo.client.isbehandlerdialog.BehandlerdialogClient
 import no.nav.syfo.client.wellknown.getWellKnown
@@ -134,12 +135,15 @@ fun launchListeners(
         mqSender = mqSender,
         dialogmeldingProducer = dialogmeldingProducer,
         azureAdV2Client = azureAdV2Client,
+        httpClient = httpClient,
+        httpClientPdfgen = httpClientPdfgen,
     )
 
     val behandlerdialogClient = BehandlerdialogClient(
         azureAdV2Client = azureAdV2Client,
         behandlerdialogClientId = env.isbehandlerdialogClientId,
         behandlerdialogUrl = env.isbehandlerdialogUrl,
+        httpClient = httpClient,
     )
 
     val arenaDialogmeldingService = ArenaDialogmeldingService(

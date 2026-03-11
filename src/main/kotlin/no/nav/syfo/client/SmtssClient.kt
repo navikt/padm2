@@ -16,7 +16,7 @@ class SmtssClient(
     private val azureAdV2Client: AzureAdV2Client,
     private val smtssClientId: String,
     private val smtssUrl: String,
-    private val httpClient: HttpClient
+    private val httpClient: HttpClient,
 ) {
     val path = "/api/v1/samhandler/emottak"
 
