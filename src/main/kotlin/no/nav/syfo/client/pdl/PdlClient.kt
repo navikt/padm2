@@ -58,10 +58,10 @@ class PdlClient(
             HttpStatusCode.OK -> {
                 val pdlPersonReponse = response.body<PdlIdenterResponse>()
                 if (pdlPersonReponse.errors.isNullOrEmpty()) {
-                    COUNT_CALL_PDL_IDENTER_SUCCESS.inc()
+                    COUNT_CALL_PDL_IDENTER_SUCCESS.increment()
                     pdlPersonReponse.data
                 } else {
-                    COUNT_CALL_PDL_IDENTER_FAIL.inc()
+                    COUNT_CALL_PDL_IDENTER_FAIL.increment()
                     pdlPersonReponse.errors.forEach {
                         logger.error("Error while requesting Identer from PersonDataLosningen: ${it.message}")
                     }
@@ -69,7 +69,7 @@ class PdlClient(
                 }
             }
             else -> {
-                COUNT_CALL_PDL_IDENTER_FAIL.inc()
+                COUNT_CALL_PDL_IDENTER_FAIL.increment()
                 throw RuntimeException("Request with url: $pdlUrl failed with response code ${response.status.value}")
             }
         }
