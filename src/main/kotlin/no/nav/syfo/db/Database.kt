@@ -2,10 +2,10 @@ package no.nav.syfo.db
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import com.zaxxer.hikari.metrics.prometheus.PrometheusMetricsTrackerFactory
 import java.sql.Connection
 import java.sql.ResultSet
 import no.nav.syfo.Environment
+import no.nav.syfo.metrics.METRICS_REGISTRY
 import org.flywaydb.core.Flyway
 
 class Database(
@@ -30,7 +30,7 @@ class Database(
                 maxLifetime = 300000
                 isAutoCommit = false
                 transactionIsolation = "TRANSACTION_REPEATABLE_READ"
-                metricsTrackerFactory = PrometheusMetricsTrackerFactory()
+                metricRegistry = METRICS_REGISTRY
                 validate()
             }
         )
