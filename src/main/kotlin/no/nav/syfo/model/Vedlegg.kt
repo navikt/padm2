@@ -3,7 +3,7 @@ package no.nav.syfo.model
 import no.nav.helse.base64container.Base64Container
 import no.nav.helse.msgHead.XMLDocument
 import no.nav.syfo.logger
-import no.nav.syfo.util.ImageToPDF
+import no.nav.syfo.util.convertImageToPDF
 import java.io.ByteArrayOutputStream
 
 data class Vedlegg(
@@ -28,7 +28,7 @@ fun Vedlegg.toPDFVedlegg(): Vedlegg {
     logger.info("Converting vedlegg of type ${this.mimeType} to PDFA")
 
     val image = ByteArrayOutputStream().use { outputStream ->
-        ImageToPDF(this.contentBase64.inputStream(), outputStream)
+        convertImageToPDF(this.contentBase64.inputStream(), outputStream)
         outputStream.toByteArray()
     }
 
