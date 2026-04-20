@@ -286,6 +286,25 @@ class BlockingApplicationRunnerTest {
     }
 
     @Test
+    fun `Prosesserer innkommet melding (cmyk vedlegg ok)`() {
+        val fellesformat =
+            getFileAsString("src/test/resources/dialogmelding_dialog_notat_cmyk_vedlegg.xml")
+        every { incomingMessage.text } returns (fellesformat)
+        val dialogmeldingId = runBlocking {
+            blockingApplicationRunner.processMessage(incomingMessage)
+        }
+        verify(exactly = 1) { mqSender.sendReceipt(any()) }
+        verify(exactly = 0) { mqSender.sendBackout(any()) }
+        verify(exactly = 0) { mqSender.sendArena(any()) }
+        val antallVedleggSlot = slot<Int>()
+        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), capture(antallVedleggSlot)) }
+        assertNotNull(dialogmeldingId)
+        val journalpostId = database.hentDialogmeldingOpplysningerJournalpostId(dialogmeldingId!!)
+        assertNotNull(journalpostId)
+        assertEquals(2, antallVedleggSlot.captured)
+    }
+
+    @Test
     fun `Prosesserer innkommet melding (vedlegg med mismatch type)`() {
         val fellesformat =
             getFileAsString("src/test/resources/dialogmelding_dialog_notat_vedlegg.xml")
