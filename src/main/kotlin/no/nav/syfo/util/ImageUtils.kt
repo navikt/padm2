@@ -14,11 +14,11 @@ import java.awt.image.BufferedImage
 import java.io.*
 import javax.imageio.ImageIO
 
-fun ImageToPDF(imageStream: InputStream, outputStream: OutputStream) {
+fun convertImageToPDF(imageStream: InputStream, outputStream: OutputStream) {
     PDDocument().use { document ->
         val page = PDPage(PDRectangle.A4)
         document.addPage(page)
-        val image = toPortait(toRGB(ImageIO.read(imageStream)))
+        val image = toPortait(toRgb(ImageIO.read(imageStream)))
 
         val quality = 1.0f
 
@@ -33,12 +33,30 @@ fun ImageToPDF(imageStream: InputStream, outputStream: OutputStream) {
     }
 }
 
-private fun toRGB(image: BufferedImage): BufferedImage {
-    if (image.type == BufferedImage.TYPE_INT_RGB) return image
+/**
+ * Konverterer et [BufferedImage] til fargemodellen TYPE_INT_RGB (standard 8-bit RGB).
+ *
+ * Noen bilder som mottas som vedlegg kan ha uvanlige fargemodeller, for eksempel:
+ * - CMYK (brukt i trykksaker)
+ * - 16-bit per kanal (høy fargdybde)
+ * - Bilder med alfakanal (gjennomsiktighet)
+ *
+ * JPEG-enkodingen i PDFBox (`JPEGFactory.createFromImage`) støtter kun bilder med
+ * 8-bit per kanal i RGB-format. Hvis bildet ikke er i riktig format, kastes feilen:
+ * "Illegal band size: should be 0 < size <= 8"
+ *
+ * Denne funksjonen tegner bildet inn i et nytt, tomt TYPE_INT_RGB-bilde slik at alle
+ * kanaler normaliseres til 8-bit RGB, uansett hva originalformatet var.
+ */
+private fun toRgb(image: BufferedImage): BufferedImage {
+    if (image.type == BufferedImage.TYPE_INT_RGB) {
+        return image
+    }
     val rgbImage = BufferedImage(image.width, image.height, BufferedImage.TYPE_INT_RGB)
-    val g = rgbImage.createGraphics()
-    g.drawImage(image, 0, 0, java.awt.Color.WHITE, null)
-    g.dispose()
+    rgbImage.createGraphics().apply {
+        drawImage(image, 0, 0, null)
+        dispose()
+    }
     return rgbImage
 }
 
