@@ -18,7 +18,7 @@ fun ImageToPDF(imageStream: InputStream, outputStream: OutputStream) {
     PDDocument().use { document ->
         val page = PDPage(PDRectangle.A4)
         document.addPage(page)
-        val image = toPortait(ImageIO.read(imageStream))
+        val image = toPortait(toRGB(ImageIO.read(imageStream)))
 
         val quality = 1.0f
 
@@ -31,6 +31,15 @@ fun ImageToPDF(imageStream: InputStream, outputStream: OutputStream) {
 
         document.save(outputStream)
     }
+}
+
+private fun toRGB(image: BufferedImage): BufferedImage {
+    if (image.type == BufferedImage.TYPE_INT_RGB) return image
+    val rgbImage = BufferedImage(image.width, image.height, BufferedImage.TYPE_INT_RGB)
+    val g = rgbImage.createGraphics()
+    g.drawImage(image, 0, 0, java.awt.Color.WHITE, null)
+    g.dispose()
+    return rgbImage
 }
 
 private fun toPortait(image: BufferedImage): BufferedImage {
