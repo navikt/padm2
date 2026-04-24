@@ -50,13 +50,13 @@ class BlockingApplicationRunner(
         } catch (e: Exception) {
             mqSender.sendBackout(message)
             MESSAGES_SENT_TO_BOQ.increment()
-            logger.error("Exception caught while storing message, sent to backout: {}", e.message)
+            logger.error("Exception caught while storing message, sent to backout: ${e.message}", e)
             null
         } catch (t: Throwable) {
             try {
                 mqSender.sendBackout(message)
                 MESSAGES_SENT_TO_BOQ.increment()
-                logger.error("Error caught while storing message, sent to backout: {}", t.message)
+                logger.error("Error caught while storing message, sent to backout: ${t.message}", t)
                 null
             } finally {
                 throw t
