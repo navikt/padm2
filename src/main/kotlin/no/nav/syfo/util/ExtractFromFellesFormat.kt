@@ -11,21 +11,52 @@ import java.util.HexFormat
 
 private val PDF_MAGIC_NUMBER: ByteArray = HexFormat.of().parseHex("255044462D") // binary "%PDF-"
 
-fun extractDialogmelding(fellesformat: XMLEIFellesformat): XMLDialogmelding =
-    fellesformat.get<XMLMsgHead>().document.first {
-        it.refDoc.msgType.v == "XML"
-    }.refDoc.content.any[0] as XMLDialogmelding
+fun extractDialogmelding(fellesformat: XMLEIFellesformat): XMLDialogmelding {
+    return tryGetDialogmelding(fellesformat.get<XMLMsgHead>())
+        ?: throw RuntimeException("No XMLDialogmelding found")
+}
+
+private fun tryGetDialogmelding(
+    xmlMsgHead: XMLMsgHead,
+    lookForNestedXmlMsgHead: Boolean = true,
+): XMLDialogmelding? {
+    xmlMsgHead.document.forEach { document ->
+        document.refDoc.content.any.forEach {
+            if (it is XMLDialogmelding) {
+                return it
+            } else if (lookForNestedXmlMsgHead && it is XMLMsgHead) {
+                return tryGetDialogmelding(it, false)
+            }
+        }
+    }
+    return null
+}
 
 fun extractPatient(fellesformat: XMLEIFellesformat): XMLPatient =
     fellesformat.get<XMLMsgHead>().msgInfo.patient
 
-fun extractValidVedlegg(fellesformat: XMLEIFellesformat) = fellesformat.get<XMLMsgHead>().document.filter {
+fun extractValidVedlegg(fellesformat: XMLEIFellesformat) = extractAllVedlegg(fellesformat).filter {
     it.isVedlegg() && it.pdfContentMatchesMimeType()
 }
 
-fun extractAllVedlegg(fellesformat: XMLEIFellesformat) = fellesformat.get<XMLMsgHead>().document.filter {
-    it.isVedlegg()
+fun extractAllVedlegg(fellesformat: XMLEIFellesformat): List<XMLDocument> {
+    val msgHead = fellesformat.get<XMLMsgHead>()
+    val vedlegg = mutableListOf<XMLDocument>()
+    vedlegg.addAll(extractAllVedleggFromMsgHead(msgHead))
+    msgHead.document.forEach { document ->
+        document.refDoc.content.any.forEach {
+            if (it is XMLMsgHead) {
+                vedlegg.addAll(extractAllVedleggFromMsgHead(it))
+            }
+        }
+    }
+    return vedlegg
 }
+
+private fun extractAllVedleggFromMsgHead(msgHead: XMLMsgHead) =
+    msgHead.document.filter {
+        it.isVedlegg()
+    }
 
 fun XMLDocument.isVedlegg() =
     this.refDoc.msgType.v == "A" &&
@@ -66,13 +97,13 @@ private fun isValidHpr(hprNr: String?) =
 fun no.nav.helse.dialogmelding.XMLHealthcareProfessional.toBehandler(): Behandler = Behandler(
     fornavn = givenName ?: "",
     etternavn = familyName,
-    mellomnavn = middleName ?: null
+    mellomnavn = middleName
 )
 
-fun no.nav.helse.msgHead.XMLHealthcareProfessional.toBehandler(): Behandler = Behandler(
+fun XMLHealthcareProfessional.toBehandler(): Behandler = Behandler(
     fornavn = givenName ?: "",
     etternavn = familyName,
-    mellomnavn = middleName ?: null
+    mellomnavn = middleName
 )
 
 fun extractBehandler(fellesformat: XMLEIFellesformat): Behandler? {
