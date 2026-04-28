@@ -16,13 +16,16 @@ fun extractDialogmelding(fellesformat: XMLEIFellesformat): XMLDialogmelding {
         ?: throw RuntimeException("No XMLDialogmelding found")
 }
 
-private fun tryGetDialogmelding(xmlMsgHead: XMLMsgHead): XMLDialogmelding? {
+private fun tryGetDialogmelding(
+    xmlMsgHead: XMLMsgHead,
+    lookForNestedXmlMsgHead: Boolean = true,
+): XMLDialogmelding? {
     xmlMsgHead.document.forEach { document ->
         document.refDoc.content.any.forEach {
             if (it is XMLDialogmelding) {
                 return it
-            } else if (it is XMLMsgHead) {
-                return tryGetDialogmelding(it)
+            } else if (lookForNestedXmlMsgHead && it is XMLMsgHead) {
+                return tryGetDialogmelding(it, false)
             }
         }
     }
