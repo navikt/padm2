@@ -10,6 +10,7 @@ import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.client.SmtssClient
 import no.nav.syfo.kafka.DialogmeldingProducer
 import no.nav.syfo.metrics.MESSAGES_STILL_FAIL_AFTER_1H
+import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.persistering.db.hentDialogmeldingOpplysningerJournalpostId
 import no.nav.syfo.services.EmottakService
 import no.nav.syfo.util.*
@@ -278,11 +279,13 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
         val antallVedleggSlot = slot<Int>()
-        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), capture(antallVedleggSlot)) }
+        val receivedDialogmelding = slot<ReceivedDialogmelding>()
+        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(capture(receivedDialogmelding), any(), any(), capture(antallVedleggSlot)) }
         assertNotNull(dialogmeldingId)
         val journalpostId = database.hentDialogmeldingOpplysningerJournalpostId(dialogmeldingId!!)
         assertNotNull(journalpostId)
         assertEquals(1, antallVedleggSlot.captured)
+        assertEquals(receivedDialogmelding.captured.personNrPasient, "01010142365")
     }
 
     @Test
