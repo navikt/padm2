@@ -32,8 +32,24 @@ private fun tryGetDialogmelding(
     return null
 }
 
-fun extractPatient(fellesformat: XMLEIFellesformat): XMLPatient =
-    fellesformat.get<XMLMsgHead>().msgInfo.patient
+fun extractPatient(fellesformat: XMLEIFellesformat): XMLPatient {
+    val msgHead = fellesformat.get<XMLMsgHead>()
+    return msgHead.msgInfo.patient ?: tryGetNestedPatient(msgHead)
+        ?: throw RuntimeException("No Patient found")
+}
+
+private fun tryGetNestedPatient(
+    xmlMsgHead: XMLMsgHead,
+): XMLPatient? {
+    xmlMsgHead.document.forEach { document ->
+        document.refDoc.content.any.forEach {
+            if (it is XMLMsgHead) {
+                return it.msgInfo.patient
+            }
+        }
+    }
+    return null
+}
 
 fun extractValidVedlegg(fellesformat: XMLEIFellesformat) = extractAllVedlegg(fellesformat).filter {
     it.isVedlegg() && it.pdfContentMatchesMimeType()
@@ -120,18 +136,19 @@ fun extractBehandlerNavn(fellesformat: XMLEIFellesformat): String? {
     return behandler?.getName()
 }
 
-fun extractPasientNavn(fellesformat: XMLEIFellesformat): String =
-    if (fellesformat.get<XMLMsgHead>().msgInfo.patient.middleName == null)
-        "${fellesformat.get<XMLMsgHead>().msgInfo.patient.familyName}, " +
-            "${fellesformat.get<XMLMsgHead>().msgInfo.patient.givenName}" else
-        "${fellesformat.get<XMLMsgHead>().msgInfo.patient.familyName}, " +
-            "${fellesformat.get<XMLMsgHead>().msgInfo.patient.givenName} " +
-            "${fellesformat.get<XMLMsgHead>().msgInfo.patient.middleName}"
+fun extractPasientNavn(fellesformat: XMLEIFellesformat): String {
+    val patient = extractPatient(fellesformat)
+    return if (patient.middleName == null) {
+        "${patient.familyName}, ${patient.givenName}"
+    } else {
+        "${patient.familyName}, ${patient.givenName} ${patient.middleName}"
+    }
+}
 
 inline fun <reified T> XMLEIFellesformat.get() = this.any.find { it is T } as T
 
 fun extractInnbyggerident(fellesformat: XMLEIFellesformat): String? =
-    fellesformat.get<XMLMsgHead>().msgInfo.patient.ident.find {
+    extractPatient(fellesformat).ident.find {
         it.typeId.v == "FNR" || it.typeId.v == "DNR"
     }?.id
 

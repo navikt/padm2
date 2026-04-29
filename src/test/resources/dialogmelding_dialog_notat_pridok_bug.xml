@@ -70,23 +70,6 @@
                     </Ident>
                 </Organisation>
             </Receiver>
-            <Patient>
-                <FamilyName>Test</FamilyName>
-                <GivenName>Etternavn</GivenName>
-                <DateOfBirth>1991-12-4</DateOfBirth>
-                <Sex DN="Mann" V="1" />
-                <Ident>
-                    <Id>01010142365</Id>
-                    <TypeId DN="Fødselsnummer" S="2.16.578.1.12.4.1.1.8116" V="FNR" />
-                </Ident>
-                <Address>
-                    <Type DN="Postadresse" V="PST" />
-                    <StreetAdr>Sannergata 2</StreetAdr>
-                    <PostalCode>0655</PostalCode>
-                    <City>OSLO</City>
-                    <County DN="OSLO" V="0712" />
-                </Address>
-            </Patient>
         </MsgInfo>
         <Document>
             <RefDoc>
