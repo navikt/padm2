@@ -98,4 +98,22 @@ class ArenaDialogmeldingServiceTest {
         coVerify(exactly = 1) { smtssClient.findBestTss(legePersonIdent, legekontorOrgName, msgId) }
         coVerify(exactly = 0) { emottakService.registerEmottakSubscription(any(), any(), any(), any(), any()) }
     }
+
+    @Test
+    fun `Send to Arena with Pridok-bug`() {
+        val dialogmeldingString = getFileAsString("src/test/resources/dialogmelding_dialog_notat_pridok_bug.xml")
+        val fellesformat = safeUnmarshal(dialogmeldingString)
+        val receivedDialogmelding = ReceivedDialogmelding.create(
+            dialogmeldingId = msgId,
+            fellesformat = fellesformat,
+            inputMessageText = dialogmeldingString,
+        )
+        coEvery { smtssClient.findBestTss(any(), any(), any()) } returns tssId
+        coJustRun { emottakService.registerEmottakSubscription(any(), any(), any(), any(), any()) }
+
+        runBlocking {
+            arenaDialogmeldingService.sendArenaDialogmeldingToMQ(receivedDialogmelding, fellesformat)
+        }
+        coVerify(exactly = 1) { mqSender.sendArena(any()) }
+    }
 }
