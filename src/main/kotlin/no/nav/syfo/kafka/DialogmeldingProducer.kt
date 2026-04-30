@@ -89,5 +89,12 @@ class DialogmeldingProducer(
 }
 
 fun XMLEIFellesformat.removeVedlegg() {
-    this.get<XMLMsgHead>().document.removeAll { it.isVedlegg() }
+    val outerMsgHead = this.get<XMLMsgHead>()
+    val firstXmlDoc = outerMsgHead.document.firstOrNull { it.refDoc.msgType.v == "XML" }
+    val innerMsgHead = firstXmlDoc?.refDoc?.content?.any?.firstOrNull { it is XMLMsgHead } as? XMLMsgHead
+    if (innerMsgHead != null) {
+        innerMsgHead.document.removeAll { it.isVedlegg() }
+    } else {
+        outerMsgHead.document.removeAll { it.isVedlegg() }
+    }
 }
