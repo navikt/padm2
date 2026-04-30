@@ -60,7 +60,8 @@ class FromKiropraktorTest {
             innbyggerident = extractInnbyggerident(fellesformat) ?: "",
             msgHead = msgHead,
             emottakblokk = emottakblokk,
-            dialogmelding = dialogmelding
+            dialogmelding,
+            msgHead.msgInfo.patient,
         )
 
         assertEquals("Henvendelse til NAV", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentNavn)

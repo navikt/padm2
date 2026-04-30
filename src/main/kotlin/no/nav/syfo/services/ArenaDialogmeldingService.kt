@@ -35,6 +35,9 @@ class ArenaDialogmeldingService(
             msgHead = msgHead,
             emottakBlokk = emottakBlokk,
         )
+        val patient = extractPatient(
+            fellesformat = fellesformatXml,
+        )
         val arenaDialogNotat = createArenaDialogNotat(
             fellesformat = fellesformatXml,
             tssid = tssId,
@@ -43,6 +46,7 @@ class ArenaDialogmeldingService(
             msgHead = msgHead,
             emottakblokk = emottakBlokk,
             dialogmelding = receivedDialogmelding.dialogmelding,
+            patient = patient,
         )
 
         sendArenaDialogNotat(

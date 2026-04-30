@@ -5,6 +5,7 @@ import no.nav.helse.arenadialognotat.*
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
+import no.nav.helse.msgHead.XMLPatient
 import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.logger
 import no.nav.syfo.metrics.TSS_MISS_COUNTER
@@ -21,7 +22,8 @@ fun createArenaDialogNotat(
     innbyggerident: String,
     msgHead: XMLMsgHead,
     emottakblokk: XMLMottakenhetBlokk,
-    dialogmelding: Dialogmelding
+    dialogmelding: Dialogmelding,
+    patient: XMLPatient,
 ): ArenaDialogNotat =
     ArenaDialogNotat().apply {
         val dialogmeldingXml = extractDialogmelding(fellesformat)
@@ -45,9 +47,9 @@ fun createArenaDialogNotat(
             person = PersonType().apply {
                 personFnr = innbyggerident
                 personNavn = NavnType().apply {
-                    fornavn = msgHead.msgInfo.patient.givenName
-                    mellomnavn = msgHead.msgInfo.patient?.middleName ?: ""
-                    etternavn = msgHead.msgInfo.patient.familyName
+                    fornavn = patient.givenName
+                    mellomnavn = patient.middleName ?: ""
+                    etternavn = patient.familyName
                 }
             }
         }

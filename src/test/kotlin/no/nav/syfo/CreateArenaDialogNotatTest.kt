@@ -52,7 +52,8 @@ internal class CreateArenaDialogNotatTest {
             personNumberPatient,
             msgHead,
             emottakblokk,
-            dialogmelding
+            dialogmelding,
+            msgHead.msgInfo.patient,
         )
 
         assertEquals("DM", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentType)
@@ -124,7 +125,8 @@ internal class CreateArenaDialogNotatTest {
             personNumberPatient,
             msgHead,
             emottakblokk,
-            dialogmelding
+            dialogmelding,
+            msgHead.msgInfo.patient,
         )
 
         assertEquals("DM", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentType)
@@ -187,7 +189,8 @@ internal class CreateArenaDialogNotatTest {
             personNumberPatient,
             msgHead,
             emottakblokk,
-            dialogmelding
+            dialogmelding,
+            msgHead.msgInfo.patient,
         )
 
         assertEquals("DM", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentType)
@@ -245,7 +248,8 @@ internal class CreateArenaDialogNotatTest {
             personNumberPatient,
             msgHead,
             emottakblokk,
-            dialogmelding
+            dialogmelding,
+            msgHead.msgInfo.patient,
         )
 
         assertEquals("45088649080", arenaDialogNotat.pasientData.person.personFnr)
@@ -284,7 +288,8 @@ internal class CreateArenaDialogNotatTest {
             personNumberPatient,
             msgHead,
             emottakblokk,
-            dialogmelding
+            dialogmelding,
+            msgHead.msgInfo.patient,
         )
 
         assertEquals("3", arenaDialogNotat.notatKategori)
@@ -325,7 +330,8 @@ internal class CreateArenaDialogNotatTest {
             personNumberPatient,
             msgHead,
             emottakblokk,
-            dialogmelding
+            dialogmelding,
+            msgHead.msgInfo.patient,
         )
 
         assertEquals("Hei,Det gjelder pas. Sender sm2013 som vedlegg", arenaDialogNotat.notatTekst)
