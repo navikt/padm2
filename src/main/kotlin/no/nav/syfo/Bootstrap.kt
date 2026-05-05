@@ -24,6 +24,7 @@ import no.nav.syfo.services.EmottakService
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.util.concurrent.TimeUnit
 import javax.jms.Session
 
 val logger: Logger = LoggerFactory.getLogger("no.nav.syfo.padm2")
@@ -77,6 +78,12 @@ fun main() {
                     database = database,
                 )
             }
+        }
+    )
+
+    Runtime.getRuntime().addShutdownHook(
+        Thread {
+            server.stop(10, 10, TimeUnit.SECONDS)
         }
     )
     server.start(wait = true)
