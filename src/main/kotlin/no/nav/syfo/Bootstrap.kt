@@ -80,12 +80,6 @@ fun main() {
             }
         }
     )
-
-    Runtime.getRuntime().addShutdownHook(
-        Thread {
-            server.stop(10, 10, TimeUnit.SECONDS)
-        }
-    )
     server.start(wait = true)
 }
 
