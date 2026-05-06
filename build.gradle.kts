@@ -30,7 +30,7 @@ val mockkVersion = "1.14.9"
 val nimbusJoseJwt = "10.9"
 val pdfboxVersion = "2.0.36"
 val postgresEmbedded = "2.2.2"
-val postgresVersion = "42.7.10"
+val postgresVersion = "42.7.11"
 val postgresRuntimeVersion = "17.9.0"
 val commonsCompressVersion = "1.28.0"
 
