@@ -25,15 +25,15 @@ class LegeSuspensjonClient(
         val token = azureAdV2Client.getSystemToken(endpointClientId)
             ?: throw RuntimeException("Failed to sjekk suspensjon: No token was found")
 
-        val httpResponse: HttpResponse = httpClient.get("$endpointUrl/api/v1/suspensjon/status") {
+        val httpResponse: HttpResponse = httpClient.post("$endpointUrl/api/v1/suspensjon/soek") {
             accept(ContentType.Application.Json)
+            contentType(ContentType.Application.Json)
             headers {
                 append("Nav-Call-Id", ediloggid)
                 append("Nav-Consumer-Id", applicationName)
-                append("Nav-Personident", behandlerId)
                 append("Authorization", "Bearer ${token.accessToken}")
             }
-            parameter("oppslagsdato", oppslagsdato)
+            setBody(SuspensjonSoekRequest(personident = behandlerId, oppslagsdato = oppslagsdato))
         }
 
         if (httpResponse.status != HttpStatusCode.OK) {
@@ -44,5 +44,7 @@ class LegeSuspensjonClient(
         return httpResponse.call.response.body()
     }
 }
+
+data class SuspensjonSoekRequest(val personident: String, val oppslagsdato: String)
 
 data class Suspendert(val suspendert: Boolean)
