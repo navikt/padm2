@@ -45,9 +45,11 @@ data class Environment(
     val serviceuserPassword: String = getEnvVar("SERVICEUSER_PASSWORD"),
     private val isbehandlerdialogApplicationName: String = "isbehandlerdialog",
     private val dokumentinnhentingApplicationName: String = "dokumentinnhenting",
+    private val sporhundApplicationName: String = "sporhund",
     val systemAPIAuthorizedConsumerApplicationNames: List<String> = listOf(
         isbehandlerdialogApplicationName,
         dokumentinnhentingApplicationName,
+        sporhundApplicationName,
     ),
     val smtssApiUrl: String = getEnvVar("SMTSS_URL"),
     val smtssClientId: String = getEnvVar("SMTSS_CLIENT_ID"),
