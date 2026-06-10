@@ -30,6 +30,7 @@ fun mockHttpClient(
                 requestUrl.startsWith(environment.smtssApiUrl) -> smtssMockResponse()
                 requestUrl.startsWith(environment.smgcpProxyUrl) -> smgcpMockResponse()
                 requestUrl.startsWith(environment.isbehandlerdialogUrl) -> behandlerdialogMockResponse(request)
+                requestUrl.startsWith(environment.aapInternUrl) -> aapInternMockResponse(request)
                 else -> error("Unhandled ${request.url}")
             }
         }
