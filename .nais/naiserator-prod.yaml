@@ -47,6 +47,8 @@ spec:
         - application: isbehandlerdialog
         - application: dokumentinnhenting
           namespace: aap
+        - application: sporhund
+          namespace: tbd          
     outbound:
       external:
         - host: "login.microsoftonline.com"
