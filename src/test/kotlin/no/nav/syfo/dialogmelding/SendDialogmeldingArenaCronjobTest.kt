@@ -7,6 +7,7 @@ import no.nav.syfo.application.SendDialogmeldingArenaCronjob
 import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.client.SmtssClient
 import no.nav.syfo.client.TssId
+import no.nav.syfo.client.`aap-intern`.AapInternClient
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.client.isbehandlerdialog.BehandlerdialogClient
 import no.nav.syfo.model.ReceivedDialogmelding
@@ -41,6 +42,12 @@ class SendDialogmeldingArenaCronjobTest {
             azureAdV2Client = azureAdV2ClientMock,
             behandlerdialogClientId = externalMockEnvironment.environment.isbehandlerdialogClientId,
             behandlerdialogUrl = externalMockEnvironment.environment.isbehandlerdialogUrl,
+            httpClient = externalMockEnvironment.mockHttpClient,
+        ),
+        aapInternClient = AapInternClient(
+            azureAdV2Client = azureAdV2ClientMock,
+            aapInternClientId = externalMockEnvironment.environment.aapInternClientId,
+            aapInternUrl = externalMockEnvironment.environment.aapInternUrl,
             httpClient = externalMockEnvironment.mockHttpClient,
         )
     )
@@ -220,6 +227,36 @@ class SendDialogmeldingArenaCronjobTest {
     fun `Does not send when melding lagret in modia`() {
         val fellesformatMeldingInBehandlerdialog =
             getFileAsString("src/test/resources/dialogmelding_dialog_notat_in_behandlerdialog.xml")
+        val fellesformatXmlMeldingInBehandlerdialog = safeUnmarshal(fellesformatMeldingInBehandlerdialog)
+        val receivedDialogmeldingInBehandlerdialog = ReceivedDialogmelding.create(
+            dialogmeldingId = UUID.randomUUID().toString(),
+            fellesformat = fellesformatXmlMeldingInBehandlerdialog,
+            inputMessageText = fellesformatMeldingInBehandlerdialog,
+        )
+        val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmeldingInBehandlerdialog)
+        database.lagreSendtKafka(dialogmeldingId)
+        database.lagreSendtApprec(dialogmeldingId)
+        database.updateSendtApprec(
+            dialogmeldingId = dialogmeldingId,
+            timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(11)),
+        )
+
+        runBlocking {
+            val result = sendDialogmeldingArenaCronjob.runJob()
+
+            assertEquals(1, result.updated)
+            assertEquals(0, result.failed)
+        }
+        verify(exactly = 0) { mqSender.sendArena(any()) }
+    }
+
+    @Test
+    fun `Does not send when melding lagret in kelvin`() {
+        val fellesformatMeldingInBehandlerdialog =
+            getFileAsString("src/test/resources/dialogmelding_dialog_notat_in_behandlerdialog.xml").replace(
+                UserConstants.MSG_ID_IN_BEHANDLERDIALOG,
+                UserConstants.MSG_ID_IN_KELVIN,
+            )
         val fellesformatXmlMeldingInBehandlerdialog = safeUnmarshal(fellesformatMeldingInBehandlerdialog)
         val receivedDialogmeldingInBehandlerdialog = ReceivedDialogmelding.create(
             dialogmeldingId = UUID.randomUUID().toString(),

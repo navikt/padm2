@@ -6,6 +6,7 @@ import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.client.SmtssClient
 import no.nav.syfo.client.TssId
+import no.nav.syfo.client.`aap-intern`.AapInternClient
 import no.nav.syfo.client.isbehandlerdialog.BehandlerdialogClient
 import no.nav.syfo.domain.PersonIdent
 import no.nav.syfo.model.ReceivedDialogmelding
@@ -22,12 +23,14 @@ class ArenaDialogmeldingServiceTest {
     private val smtssClient = mockk<SmtssClient>(relaxed = true)
     private val mqSender = mockk<MQSenderInterface>(relaxed = true)
     private val behandlerdialogClient = mockk<BehandlerdialogClient>(relaxed = true)
+    private val aapInternClient = mockk<AapInternClient>(relaxed = true)
 
     private val arenaDialogmeldingService = ArenaDialogmeldingService(
         mqSender = mqSender,
         smtssClient = smtssClient,
         emottakService = emottakService,
-        behandlerdialogClient = behandlerdialogClient
+        behandlerdialogClient = behandlerdialogClient,
+        aapInternClient = aapInternClient,
     )
 
     private val tssId = TssId("123")
