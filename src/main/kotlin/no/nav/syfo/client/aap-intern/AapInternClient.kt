@@ -38,7 +38,7 @@ class AapInternClient(
     }
 
     companion object {
-        const val MELDINGER_PATH = "/syfo/v1/dialogmelding"
+        const val MELDINGER_PATH = "syfo/v1/dialogmelding"
     }
 }
 
