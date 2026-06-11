@@ -9,7 +9,6 @@ import io.ktor.client.request.header
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
-import no.nav.syfo.application.SendDialogmeldingArenaCronjob
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.util.bearerHeader
 import org.slf4j.LoggerFactory
