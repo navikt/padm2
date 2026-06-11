@@ -9,8 +9,10 @@ import io.ktor.client.request.header
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
+import no.nav.syfo.application.SendDialogmeldingArenaCronjob
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.util.bearerHeader
+import org.slf4j.LoggerFactory
 
 class AapInternClient(
     private val azureAdV2Client: AzureAdV2Client,
@@ -31,7 +33,9 @@ class AapInternClient(
                 header(HttpHeaders.Authorization, bearerHeader(systemToken))
                 accept(ContentType.Application.Json)
             }
-            response.status == HttpStatusCode.OK && response.body<AAPResponse>().eksisterer
+            (response.status == HttpStatusCode.OK && response.body<AAPResponse>().eksisterer).also {
+                log.info("Dialogmelding $msgId finnes i Kelvin: $it")
+            }
         } catch (e: ResponseException) {
             throw RuntimeException("Could not fetch melding from isbehandlerdialog for msgId=$msgId", e)
         }
@@ -39,6 +43,7 @@ class AapInternClient(
 
     companion object {
         const val MELDINGER_PATH = "syfo/v1/dialogmelding"
+        private val log = LoggerFactory.getLogger(AapInternClient::class.java)
     }
 }
 
