@@ -1,4 +1,4 @@
-package no.nav.syfo.client.`aap-intern`
+package no.nav.syfo.client.aapintern
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body

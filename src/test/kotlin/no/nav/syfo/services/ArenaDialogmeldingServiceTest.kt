@@ -6,7 +6,7 @@ import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.client.SmtssClient
 import no.nav.syfo.client.TssId
-import no.nav.syfo.client.`aap-intern`.AapInternClient
+import no.nav.syfo.client.aapintern.AapInternClient
 import no.nav.syfo.client.isbehandlerdialog.BehandlerdialogClient
 import no.nav.syfo.domain.PersonIdent
 import no.nav.syfo.model.ReceivedDialogmelding
