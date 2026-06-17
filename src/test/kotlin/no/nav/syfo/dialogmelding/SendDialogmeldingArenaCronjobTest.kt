@@ -7,7 +7,7 @@ import no.nav.syfo.application.SendDialogmeldingArenaCronjob
 import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.client.SmtssClient
 import no.nav.syfo.client.TssId
-import no.nav.syfo.client.`aap-intern`.AapInternClient
+import no.nav.syfo.client.aapintern.AapInternClient
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.client.isbehandlerdialog.BehandlerdialogClient
 import no.nav.syfo.model.ReceivedDialogmelding

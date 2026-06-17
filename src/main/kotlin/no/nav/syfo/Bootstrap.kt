@@ -11,7 +11,7 @@ import no.nav.syfo.application.cronjob.launchCronjobs
 import no.nav.syfo.application.mq.*
 import no.nav.syfo.client.SmgcpClient
 import no.nav.syfo.client.SmtssClient
-import no.nav.syfo.client.`aap-intern`.AapInternClient
+import no.nav.syfo.client.aapintern.AapInternClient
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.client.httpClient
 import no.nav.syfo.client.httpClientPdfgen
