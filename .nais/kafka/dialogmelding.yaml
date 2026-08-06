@@ -17,7 +17,7 @@ spec:
     partitions: 1
     replication: 3
     retentionBytes: -1  # -1 means unlimited
-    retentionHours: -1  # -1 means unlimited
+    retentionHours: 8760  # 1 year
   acl:
     - team: teamsykefravr
       application: padm2
