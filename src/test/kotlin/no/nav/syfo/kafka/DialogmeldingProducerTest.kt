@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.ZoneOffset
+import kotlin.text.removePrefix
 
 internal class DialogmeldingProducerTest {
 
@@ -56,6 +57,31 @@ internal class DialogmeldingProducerTest {
         assertEquals(0, dialogmeldingForKafka.antallVedlegg)
         assertEquals(msgHead.msgInfo.conversationRef.refToConversation, dialogmeldingForKafka.conversationRef)
         assertEquals(msgHead.msgInfo.conversationRef.refToParent, dialogmeldingForKafka.parentRef)
+    }
+
+    @Test
+    internal fun `Tester mapping fra fellesformat til Kafka topic for dialogmeldinger fra isyfomock`() {
+        setupTestData(
+            getFileAsStringISO88591("src/test/resources/dialogmelding_dialog_notat.xml").replace(
+                "<MsgId>37340D30-FE14-42B5-985F-A8FF8FFA0CB5</MsgId>",
+                "<MsgId>syfomock-37340D30-FE14-42B5-985F-A8FF8FFA0CB5</MsgId>"
+            )
+        )
+
+        dialogmeldingProducer.sendDialogmelding(
+            receivedDialogmelding = receivedDialogmelding,
+            msgHead = msgHead,
+            journalpostId = journalpostId,
+            antallVedlegg = fellesformat.calculateNumberOfVedlegg(),
+        )
+        val slot = slot<ProducerRecord<String, DialogmeldingForKafka>>()
+
+        verify { kafkaProducerMock.send(capture(slot)) }
+
+        val producerRecord = slot.captured
+        assertEquals("teamsykefravr.dialogmelding", producerRecord.topic())
+        val dialogmeldingForKafka = producerRecord.value()
+        assertEquals(msgHead.msgInfo.msgId.removePrefix(SYFO_MOCK_PREFIX), dialogmeldingForKafka.msgId)
     }
 
     @Test

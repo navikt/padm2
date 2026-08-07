@@ -9,6 +9,7 @@ import no.nav.syfo.apprec.ApprecStatus
 import no.nav.syfo.apprec.createApprec
 import no.nav.syfo.logger
 import no.nav.syfo.metrics.APPREC_COUNTER
+import no.nav.syfo.util.SYFO_MOCK_PREFIX
 import no.nav.syfo.util.get
 import no.nav.syfo.util.getApprecMarshaller
 import no.nav.syfo.util.toString
@@ -34,4 +35,4 @@ fun sendReceipt(
 }
 
 private fun isTestDialogmelding(msgId: String): Boolean =
-    msgId.startsWith("syfomock-")
+    msgId.startsWith(SYFO_MOCK_PREFIX)

@@ -51,7 +51,7 @@ class DialogmeldingProducer(
     ): DialogmeldingForKafka {
         val xmlMsgInfo = msgHead.msgInfo
         return DialogmeldingForKafka(
-            msgId = xmlMsgInfo.msgId,
+            msgId = stripPrefix(xmlMsgInfo.msgId),
             msgType = xmlMsgInfo.type.v,
             navLogId = receivedDialogmelding.navLogId,
             mottattTidspunkt = receivedDialogmelding.mottattDato,
@@ -80,6 +80,10 @@ class DialogmeldingProducer(
             }.marshal(fellesformat, it)
             it.toString()
         }
+    }
+
+    private fun stripPrefix(msgId: String): String {
+        return msgId.removePrefix(SYFO_MOCK_PREFIX)
     }
 
     companion object {
