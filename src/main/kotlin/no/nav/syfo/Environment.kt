@@ -57,6 +57,7 @@ data class Environment(
     val smgcpProxyClientId: String = getEnvVar("SMGCP_PROXY_CLIENT_ID"),
     val isbehandlerdialogClientId: String = getEnvVar("ISBEHANDLERDIALOG_CLIENT_ID"),
     val isbehandlerdialogUrl: String = getEnvVar("ISBEHANDLERDIALOG_ENDPOINT_URL"),
+    val isDevGcp: Boolean = getEnvVar("IS_DEV_GCP", "false").toBoolean(),
 ) : MqConfig {
     fun jdbcUrl(): String {
         return "jdbc:postgresql://$databaseHost:$databasePort/$databaseName"

@@ -35,8 +35,12 @@ class MQSender(
     }
 
     override fun sendReceipt(payload: String) {
-        val queueName = env.apprecQueueName
-        send(queueName, payload)
+        if (!env.isDevGcp) {
+            val queueName = env.apprecQueueName
+            send(queueName, payload)
+        } else {
+            log.info("Not sending receipt to MQ in dev-gcp")
+        }
     }
 
     override fun sendBackout(message: Message) {
