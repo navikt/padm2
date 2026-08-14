@@ -2,6 +2,7 @@ package no.nav.syfo.services
 
 import java.time.format.DateTimeFormatter
 import net.logstash.logback.argument.StructuredArguments.fields
+import no.nav.syfo.Environment
 import no.nav.syfo.client.LegeSuspensjonClient
 import no.nav.syfo.client.SyfohelsenettproxyClient
 import no.nav.syfo.model.ReceivedDialogmelding
@@ -20,7 +21,8 @@ import org.slf4j.LoggerFactory
 
 class RuleService(
     val legeSuspensjonClient: LegeSuspensjonClient,
-    val syfohelsenettproxyClient: SyfohelsenettproxyClient
+    val syfohelsenettproxyClient: SyfohelsenettproxyClient,
+    val env: Environment,
 ) {
 
     private val log: Logger = LoggerFactory.getLogger("ruleservice")
@@ -39,7 +41,7 @@ class RuleService(
 
         val dialogmelding = receivedDialogmelding.dialogmelding
 
-        val behandlerSuspendert = legeSuspensjonClient.sjekkSuspensjon(
+        val behandlerSuspendert = if (env.isDevGcp) false else legeSuspensjonClient.sjekkSuspensjon(
             receivedDialogmelding.personNrLege,
             receivedDialogmelding.msgId,
             DateTimeFormatter.ISO_DATE.format(receivedDialogmelding.mottattDato)
@@ -51,7 +53,7 @@ class RuleService(
             loggingMeta = loggingMeta
         )
 
-        if (avsenderBehandler == null) {
+        if (avsenderBehandler == null && !env.isDevGcp) {
             return ValidationResult(
                 status = Status.INVALID,
                 ruleHits = listOf(
@@ -76,7 +78,7 @@ class RuleService(
                     avsenderfnr = receivedDialogmelding.personNrLege
                 )
             ),
-            HPRRuleChain.values().executeFlow(dialogmelding, avsenderBehandler),
+            if (env.isDevGcp) emptyList() else HPRRuleChain.values().executeFlow(dialogmelding, avsenderBehandler!!),
             LegesuspensjonRuleChain.values().executeFlow(dialogmelding, behandlerSuspendert)
         ).flatten()
 
