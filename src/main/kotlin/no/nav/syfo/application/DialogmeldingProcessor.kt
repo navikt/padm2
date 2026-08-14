@@ -207,7 +207,7 @@ class DialogmeldingProcessor(
                 )
             } else if (!innbyggerOK) {
                 handlePatientNotFound(loggingMeta)
-            } else if (!legeOK) {
+            } else if (!legeOK && !env.isDevGcp) {
                 handleBehandlerNotFound(loggingMeta)
             } else if (erTestFnr(receivedDialogmelding.personNrPasient) && env.cluster == "prod-gcp") {
                 handleTestFnrInProd(loggingMeta)
