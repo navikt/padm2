@@ -66,6 +66,7 @@ class DialogmeldingProcessor(
     val padm2ReglerService = RuleService(
         legeSuspensjonClient = legeSuspensjonClient,
         syfohelsenettproxyClient = syfohelsenettproxyClient,
+        env = env,
     )
     val journalService = JournalService(
         dokArkivClient = dokArkivClient,
