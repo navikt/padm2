@@ -49,6 +49,7 @@ fun testEnvironment() = Environment(
     isbehandlerdialogClientId = "isbehandlerdialog",
     isbehandlerdialogUrl = "http://isbehandlerdialog",
     jpRetryEnabled = true,
+    isDevGcp = false,
 )
 
 fun testAppState() = ApplicationState(

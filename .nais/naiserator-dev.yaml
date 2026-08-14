@@ -136,3 +136,5 @@ spec:
       value: "dev-gcp.teamsykefravr.isbehandlerdialog"
     - name: ISBEHANDLERDIALOG_ENDPOINT_URL
       value: "http://isbehandlerdialog"
+    - name: IS_DEV_GCP
+      value: "true"
