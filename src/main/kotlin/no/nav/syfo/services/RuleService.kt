@@ -53,7 +53,7 @@ class RuleService(
             loggingMeta = loggingMeta
         )
 
-        if (avsenderBehandler == null) {
+        if (avsenderBehandler == null && !env.isDevGcp) {
             return ValidationResult(
                 status = Status.INVALID,
                 ruleHits = listOf(
@@ -78,7 +78,7 @@ class RuleService(
                     avsenderfnr = receivedDialogmelding.personNrLege
                 )
             ),
-            HPRRuleChain.values().executeFlow(dialogmelding, avsenderBehandler),
+            if (env.isDevGcp) emptyList() else HPRRuleChain.values().executeFlow(dialogmelding, avsenderBehandler!!),
             LegesuspensjonRuleChain.values().executeFlow(dialogmelding, behandlerSuspendert)
         ).flatten()
 
