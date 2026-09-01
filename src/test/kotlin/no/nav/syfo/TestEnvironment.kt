@@ -48,8 +48,8 @@ fun testEnvironment() = Environment(
     smgcpProxyUrl = "http://smgcp",
     isbehandlerdialogClientId = "isbehandlerdialog",
     isbehandlerdialogUrl = "http://isbehandlerdialog",
-    aapInternClientId = "aapintern",
-    aapInternUrl = "http://aapintern",
+    aapInternClientId = "aap-api",
+    aapInternUrl = "http://aap-api",
     jpRetryEnabled = true,
     isDevGcp = false,
 )
