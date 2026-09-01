@@ -5,9 +5,9 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import no.nav.syfo.UserConstants.MSG_ID_IN_KELVIN
 import no.nav.syfo.UserConstants.MSG_ID_IN_KELVIN_WITH_ERROR
-import no.nav.syfo.client.aapintern.AAPResponse
+import no.nav.syfo.client.aapapi.AAPResponse
 
-fun MockRequestHandleScope.aapInternMockResponse(request: HttpRequestData): HttpResponseData {
+fun MockRequestHandleScope.aapApiMockResponse(request: HttpRequestData): HttpResponseData {
     val msgId = request.url.segments.get(request.url.segments.size - 2)
     return when (msgId) {
         MSG_ID_IN_KELVIN -> respond(body = eksisterer, statusCode = HttpStatusCode.OK)

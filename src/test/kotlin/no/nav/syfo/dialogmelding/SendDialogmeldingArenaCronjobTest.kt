@@ -7,7 +7,7 @@ import no.nav.syfo.application.SendDialogmeldingArenaCronjob
 import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.client.SmtssClient
 import no.nav.syfo.client.TssId
-import no.nav.syfo.client.aapintern.AapInternClient
+import no.nav.syfo.client.aapapi.AapApiClient
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.client.isbehandlerdialog.BehandlerdialogClient
 import no.nav.syfo.model.ReceivedDialogmelding
@@ -44,10 +44,10 @@ class SendDialogmeldingArenaCronjobTest {
             behandlerdialogUrl = externalMockEnvironment.environment.isbehandlerdialogUrl,
             httpClient = externalMockEnvironment.mockHttpClient,
         ),
-        aapInternClient = AapInternClient(
+        aapApiClient = AapApiClient(
             azureAdV2Client = azureAdV2ClientMock,
-            aapInternClientId = externalMockEnvironment.environment.aapInternClientId,
-            aapInternUrl = externalMockEnvironment.environment.aapInternUrl,
+            aapApiClientId = externalMockEnvironment.environment.aapApiClientId,
+            aapApiUrl = externalMockEnvironment.environment.aapApiUrl,
             httpClient = externalMockEnvironment.mockHttpClient,
         )
     )

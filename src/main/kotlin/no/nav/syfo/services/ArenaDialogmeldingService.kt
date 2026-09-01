@@ -5,7 +5,7 @@ import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.client.SmtssClient
-import no.nav.syfo.client.aapintern.AapInternClient
+import no.nav.syfo.client.aapapi.AapApiClient
 import no.nav.syfo.client.createArenaDialogNotat
 import no.nav.syfo.client.isbehandlerdialog.BehandlerdialogClient
 import no.nav.syfo.client.sendArenaDialogNotat
@@ -18,7 +18,7 @@ class ArenaDialogmeldingService(
     private val smtssClient: SmtssClient,
     private val emottakService: EmottakService,
     private val behandlerdialogClient: BehandlerdialogClient,
-    private val aapInternClient: AapInternClient,
+    private val aapApiClient: AapApiClient,
 ) {
     suspend fun sendArenaDialogmeldingToMQ(
         receivedDialogmelding: ReceivedDialogmelding,
@@ -63,7 +63,7 @@ class ArenaDialogmeldingService(
     }
 
     suspend fun isMeldingStoredInKelvin(msgId: String): Boolean {
-        return aapInternClient.isMeldingInKelvin(msgId)
+        return aapApiClient.isMeldingInKelvin(msgId)
     }
 
     private suspend fun getTssId(

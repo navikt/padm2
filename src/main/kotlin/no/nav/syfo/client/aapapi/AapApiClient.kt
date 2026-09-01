@@ -1,4 +1,4 @@
-package no.nav.syfo.client.aapintern
+package no.nav.syfo.client.aapapi
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -13,18 +13,18 @@ import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.util.bearerHeader
 import org.slf4j.LoggerFactory
 
-class AapInternClient(
+class AapApiClient(
     private val azureAdV2Client: AzureAdV2Client,
-    private val aapInternClientId: String,
-    aapInternUrl: String,
+    private val aapApiClientId: String,
+    aapApiUrl: String,
     private val httpClient: HttpClient,
 ) {
 
-    private val meldingUrl = "$aapInternUrl/$MELDINGER_PATH"
+    private val meldingUrl = "$aapApiUrl/$MELDINGER_PATH"
 
     suspend fun isMeldingInKelvin(msgId: String): Boolean {
         val systemToken = azureAdV2Client.getSystemToken(
-            scopeClientId = aapInternClientId,
+            scopeClientId = aapApiClientId,
         )?.accessToken ?: throw RuntimeException("Failed to get system token")
 
         return try {
@@ -42,7 +42,7 @@ class AapInternClient(
 
     companion object {
         const val MELDINGER_PATH = "syfo/v1/dialogmelding"
-        private val log = LoggerFactory.getLogger(AapInternClient::class.java)
+        private val log = LoggerFactory.getLogger(AapApiClient::class.java)
     }
 }
 
