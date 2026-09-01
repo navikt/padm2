@@ -11,6 +11,7 @@ import no.nav.syfo.application.cronjob.launchCronjobs
 import no.nav.syfo.application.mq.*
 import no.nav.syfo.client.SmgcpClient
 import no.nav.syfo.client.SmtssClient
+import no.nav.syfo.client.aapapi.AapApiClient
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.client.httpClient
 import no.nav.syfo.client.httpClientPdfgen
@@ -24,7 +25,6 @@ import no.nav.syfo.services.EmottakService
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.util.concurrent.TimeUnit
 import javax.jms.Session
 
 val logger: Logger = LoggerFactory.getLogger("no.nav.syfo.padm2")
@@ -78,14 +78,12 @@ fun main() {
                     database = database,
                 )
             }
+            monitor.subscribe(ApplicationStopPreparing) {
+                applicationState.ready = false
+            }
         }
     )
 
-    Runtime.getRuntime().addShutdownHook(
-        Thread {
-            server.stop(10, 10, TimeUnit.SECONDS)
-        }
-    )
     server.start(wait = true)
 }
 
@@ -146,11 +144,19 @@ fun launchListeners(
         httpClient = httpClient,
     )
 
+    val aapApiClient = AapApiClient(
+        azureAdV2Client = azureAdV2Client,
+        aapApiClientId = env.aapApiClientId,
+        aapApiUrl = env.aapApiUrl,
+        httpClient = httpClient,
+    )
+
     val arenaDialogmeldingService = ArenaDialogmeldingService(
         mqSender = mqSender,
         smtssClient = smtssClient,
         emottakService = emottakService,
         behandlerdialogClient = behandlerdialogClient,
+        aapApiClient = aapApiClient,
     )
 
     launchBackgroundTask(

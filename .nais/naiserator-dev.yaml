@@ -68,6 +68,8 @@ spec:
         - application: isbehandlerdialog
         - application: btsys-api
           namespace: team-rocket
+        - application: api-intern
+          namespace: aap
   observability:
     autoInstrumentation:
       enabled: true
@@ -136,5 +138,9 @@ spec:
       value: "dev-gcp.teamsykefravr.isbehandlerdialog"
     - name: ISBEHANDLERDIALOG_ENDPOINT_URL
       value: "http://isbehandlerdialog"
+    - name: AAP_API_CLIENT_ID
+      value: "dev-gcp.aap.api-intern"
+    - name: AAP_API_ENDPOINT_URL
+      value: "http://api-intern.aap"
     - name: IS_DEV_GCP
       value: "true"
