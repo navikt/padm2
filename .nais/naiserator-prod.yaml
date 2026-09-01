@@ -138,9 +138,9 @@ spec:
       value: "prod-gcp.teamsykefravr.isbehandlerdialog"
     - name: ISBEHANDLERDIALOG_ENDPOINT_URL
       value: "http://isbehandlerdialog"
-    - name: APP_INTERN_CLIENT_ID
+    - name: AAP_API_CLIENT_ID
       value: "prod-gcp.aap.app-api-intern"
-    - name: APP_INTERN_ENDPOINT_URL
-      value: "http://app-api-intern.aap"
+    - name: AAP_API_ENDPOINT_URL
+      value: "http://aap-api-intern.aap"
     - name: IS_DEV_GCP
       value: "false"

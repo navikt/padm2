@@ -11,7 +11,7 @@ import no.nav.syfo.application.cronjob.launchCronjobs
 import no.nav.syfo.application.mq.*
 import no.nav.syfo.client.SmgcpClient
 import no.nav.syfo.client.SmtssClient
-import no.nav.syfo.client.aapintern.AapInternClient
+import no.nav.syfo.client.aapapi.AapApiClient
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.client.httpClient
 import no.nav.syfo.client.httpClientPdfgen
@@ -144,10 +144,10 @@ fun launchListeners(
         httpClient = httpClient,
     )
 
-    val aapInternClient = AapInternClient(
+    val aapApiClient = AapApiClient(
         azureAdV2Client = azureAdV2Client,
-        aapInternClientId = env.aapInternClientId,
-        aapInternUrl = env.aapInternUrl,
+        aapApiClientId = env.aapApiClientId,
+        aapApiUrl = env.aapApiUrl,
         httpClient = httpClient,
     )
 
@@ -156,7 +156,7 @@ fun launchListeners(
         smtssClient = smtssClient,
         emottakService = emottakService,
         behandlerdialogClient = behandlerdialogClient,
-        aapInternClient = aapInternClient,
+        aapApiClient = aapApiClient,
     )
 
     launchBackgroundTask(

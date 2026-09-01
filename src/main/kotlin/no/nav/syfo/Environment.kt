@@ -57,8 +57,8 @@ data class Environment(
     val smgcpProxyClientId: String = getEnvVar("SMGCP_PROXY_CLIENT_ID"),
     val isbehandlerdialogClientId: String = getEnvVar("ISBEHANDLERDIALOG_CLIENT_ID"),
     val isbehandlerdialogUrl: String = getEnvVar("ISBEHANDLERDIALOG_ENDPOINT_URL"),
-    val aapInternClientId: String = getEnvVar("APP_INTERN_CLIENT_ID"),
-    val aapInternUrl: String = getEnvVar("AAP_INTERN_URL"),
+    val aapApiClientId: String = getEnvVar("AAP_API_CLIENT_ID"),
+    val aapApiUrl: String = getEnvVar("AAP_API_ENDPOINT_URL"),
     val isDevGcp: Boolean = getEnvVar("IS_DEV_GCP", "false").toBoolean(),
 ) : MqConfig {
     fun jdbcUrl(): String {
