@@ -41,6 +41,15 @@ spec:
           - name: padm2-db
         diskAutoresize: true
         tier: db-f1-micro
+        flags:
+          - name: "cloudsql.enable_pgaudit"
+            value: "on"
+          - name: "pgaudit.log"
+            value: "write,ddl,role"
+          - name: "pgaudit.log_parameter"
+            value: "on"
+          - name: "pgaudit.log_relation"
+            value: "on"
   accessPolicy:
     inbound:
       rules:
