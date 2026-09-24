@@ -38,9 +38,9 @@ fun Route.registerVedleggSystemApi(
                 val fellesformat = safeUnmarshal(fellesformatString)
 
                 val vedlegg = extractValidVedlegg(fellesformat)
-                        .map { it.toVedlegg() }
-                        .map { it.toPDFVedlegg() }
-                        .map { VedleggDTO(it.contentBase64) }
+                    .map { it.toVedlegg() }
+                    .map { it.toPDFVedlegg() }
+                    .map { VedleggDTO(it.contentBase64) }
                 call.respondBytes(
                     contentType = ContentType.Application.Json,
                     bytes = jacksonObjectMapper().configure().writeValueAsBytes(vedlegg),
