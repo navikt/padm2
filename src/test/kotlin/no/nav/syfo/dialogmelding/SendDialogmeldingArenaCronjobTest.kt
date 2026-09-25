@@ -288,7 +288,7 @@ class SendDialogmeldingArenaCronjobTest {
         database.lagreSendtApprec(dialogmeldingId)
         database.updateSendtApprec(
             dialogmeldingId = dialogmeldingId,
-            timestamp = Timestamp.valueOf(LocalDateTime.now().minusHours(1).minusMinutes(1)),
+            timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(61)),
         )
 
         runBlocking {
@@ -318,7 +318,7 @@ class SendDialogmeldingArenaCronjobTest {
         database.lagreSendtApprec(dialogmeldingId)
         database.updateSendtApprec(
             dialogmeldingId = dialogmeldingId,
-            timestamp = Timestamp.valueOf(LocalDateTime.now().minusHours(1).minusMinutes(1)),
+            timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(61)),
         )
 
         runBlocking {
