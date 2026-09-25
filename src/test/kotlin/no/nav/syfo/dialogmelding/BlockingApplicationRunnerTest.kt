@@ -605,7 +605,8 @@ class BlockingApplicationRunnerTest {
     fun `Prosesserer innkommet melding (pdfgen feiler, created-at nå)`() {
         val fellesformat = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
             .replace("01010142365", UserConstants.PATIENT_FNR_PDFGEN_FAIL)
-            .replace("mottattDatotid=\"2019-01-16T21:57:43\"", "mottattDatotid=\"${java.time.Instant.now()}\"")
+            .withMottattDatotid(java.time.Instant.now())
+            .toForesporselSvar()
         every { incomingMessage.text } returns (fellesformat)
         val dialogmeldingId = runBlocking {
             blockingApplicationRunner.processMessage(incomingMessage)
@@ -628,6 +629,58 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
         verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun `Prosesserer innkommet forespørselsvar umiddelbart`() {
+        val fellesformat = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
+            .withMottattDatotid(java.time.Instant.now())
+            .toForesporselSvar()
+        every { incomingMessage.text } returns (fellesformat)
+        runBlocking {
+            blockingApplicationRunner.processMessage(incomingMessage)
+        }
+        verify(exactly = 1) { mqSender.sendReceipt(any()) }
+        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun `Forsinker prosessering av henvendelse om sykefraværsoppfølging`() {
+        assertHenvendelseDelayed(temaKodeVersion = "1")
+    }
+
+    @Test
+    fun `Forsinker prosessering av henvendelse om pasient som ikke er sykmeldt`() {
+        assertHenvendelseDelayed(temaKodeVersion = "2")
+    }
+
+    private fun assertHenvendelseDelayed(temaKodeVersion: String) {
+        val fellesformat = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
+            .replace(
+                "S=\"2.16.578.1.12.4.1.1.8128\" V=\"1\"",
+                "S=\"2.16.578.1.12.4.1.1.8128\" V=\"$temaKodeVersion\""
+            )
+        every { incomingMessage.text } returns (fellesformat.withMottattDatotid(java.time.Instant.now()))
+        val dialogmeldingId = runBlocking {
+            blockingApplicationRunner.processMessage(incomingMessage)
+        }!!
+        verify(exactly = 0) { mqSender.sendReceipt(any()) }
+        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
+        assertNull(database.hentDialogmeldingOpplysningerJournalpostId(dialogmeldingId))
+
+        database.updateCreatedAt(dialogmeldingId, Timestamp.valueOf(LocalDateTime.now().minusMinutes(20)))
+        runBlocking { rerunCronJob.run() }
+        verify(exactly = 0) { mqSender.sendReceipt(any()) }
+        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
+
+        database.updateFellesformat(
+            dialogmeldingId,
+            fellesformat.withMottattDatotid(java.time.Instant.now().minus(java.time.Duration.ofMinutes(61))),
+        )
+        runBlocking { rerunCronJob.run() }
+        verify(exactly = 1) { mqSender.sendReceipt(any()) }
+        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
+        assertNotNull(database.hentDialogmeldingOpplysningerJournalpostId(dialogmeldingId))
     }
 
     @Test
@@ -712,3 +765,11 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
     }
 }
+
+private fun String.withMottattDatotid(mottattDatotid: java.time.Instant) =
+    replace("mottattDatotid=\"2019-01-16T21:57:43\"", "mottattDatotid=\"$mottattDatotid\"")
+
+private fun String.toForesporselSvar() =
+    replace("ebAction=\"Henvendelse\"", "ebAction=\"ForesporselSvar\"")
+        .replace("ebService=\"HenvendelseFraLege\"", "ebService=\"ForesporselFraSaksbehandler\"")
+        .replace("S=\"2.16.578.1.12.4.1.1.8128\" V=\"1\"", "S=\"2.16.578.1.12.4.1.1.9069\" V=\"5\"")

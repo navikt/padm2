@@ -57,7 +57,7 @@ class SendDialogmeldingArenaCronjobTest {
     )
 
     private val fellesformat =
-        getFileAsString("src/test/resources/dialogmelding_dialog_svar_foresporsel_om_pasient.xml")
+        getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
     private val fellesformatXml = safeUnmarshal(fellesformat)
     private val receivedDialogmelding = ReceivedDialogmelding.create(
         dialogmeldingId = UUID.randomUUID().toString(),
@@ -184,56 +184,6 @@ class SendDialogmeldingArenaCronjobTest {
     }
 
     @Test
-    fun `Delays both henvendelse themes until apprec is older than one hour`() {
-        val henvendelseFellesformat = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
-        val ikkeSykmeldtHenvendelseFellesformat = henvendelseFellesformat.replace(
-            """S="2.16.578.1.12.4.1.1.8128" V="1"""",
-            """S="2.16.578.1.12.4.1.1.8128" V="2"""",
-        )
-        val henvendelser = listOf(henvendelseFellesformat, ikkeSykmeldtHenvendelseFellesformat).map {
-            val xml = safeUnmarshal(it)
-            ReceivedDialogmelding.create(
-                dialogmeldingId = UUID.randomUUID().toString(),
-                fellesformat = xml,
-                inputMessageText = it,
-            )
-        }
-
-        henvendelser.forEach { henvendelse ->
-            val dialogmeldingId = createDialogmeldingOpplysning(henvendelse)
-            database.lagreSendtKafka(dialogmeldingId)
-            database.lagreSendtApprec(dialogmeldingId)
-            database.updateSendtApprec(
-                dialogmeldingId = dialogmeldingId,
-                timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(11)),
-            )
-        }
-
-        runBlocking {
-            val result = sendDialogmeldingArenaCronjob.runJob()
-
-            assertEquals(0, result.updated)
-            assertEquals(0, result.failed)
-        }
-        verify(exactly = 0) { mqSender.sendArena(any()) }
-
-        henvendelser.forEach { henvendelse ->
-            database.updateSendtApprec(
-                dialogmeldingId = henvendelse.dialogmelding.id,
-                timestamp = Timestamp.valueOf(LocalDateTime.now().minusHours(1).minusMinutes(1)),
-            )
-        }
-
-        runBlocking {
-            val result = sendDialogmeldingArenaCronjob.runJob()
-
-            assertEquals(2, result.updated)
-            assertEquals(0, result.failed)
-        }
-        verify(exactly = 2) { mqSender.sendArena(any()) }
-    }
-
-    @Test
     fun `Does not send when not published to kafka`() {
         val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmelding)
         database.lagreSendtApprec(dialogmeldingId)
@@ -288,7 +238,7 @@ class SendDialogmeldingArenaCronjobTest {
         database.lagreSendtApprec(dialogmeldingId)
         database.updateSendtApprec(
             dialogmeldingId = dialogmeldingId,
-            timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(61)),
+            timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(11)),
         )
 
         runBlocking {
@@ -318,7 +268,7 @@ class SendDialogmeldingArenaCronjobTest {
         database.lagreSendtApprec(dialogmeldingId)
         database.updateSendtApprec(
             dialogmeldingId = dialogmeldingId,
-            timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(61)),
+            timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(11)),
         )
 
         runBlocking {
@@ -372,7 +322,7 @@ class SendDialogmeldingArenaCronjobTest {
         database.lagreSendtApprec(dialogmeldingId)
         database.updateSendtApprec(
             dialogmeldingId = dialogmeldingId,
-            timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(61)),
+            timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(11)),
         )
 
         runBlocking {
@@ -410,7 +360,7 @@ class SendDialogmeldingArenaCronjobTest {
         database.lagreSendtApprec(dialogmeldingId)
         database.updateSendtApprec(
             dialogmeldingId = dialogmeldingId,
-            timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(61)),
+            timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(11)),
         )
 
         runBlocking {
@@ -449,14 +399,6 @@ class SendDialogmeldingArenaCronjobTest {
 
     @Test
     fun `Does not fail the whole job when one erroneous melding, while other meldinger are OK`() {
-        val fellesformatSuccessful =
-            getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
-        val fellesformatXmlSuccessful = safeUnmarshal(fellesformatSuccessful)
-        val receivedDialogmeldingSuccessful = ReceivedDialogmelding.create(
-            dialogmeldingId = UUID.randomUUID().toString(),
-            fellesformat = fellesformatXmlSuccessful,
-            inputMessageText = fellesformatSuccessful,
-        )
         val fellesformatOtherPerson =
             getFileAsString("src/test/resources/dialogmelding_dialog_svar_foresporsel_om_pasient.xml")
         val fellesformatXmlOtherPerson = safeUnmarshal(fellesformatOtherPerson)
@@ -466,7 +408,7 @@ class SendDialogmeldingArenaCronjobTest {
             inputMessageText = fellesformatOtherPerson,
         )
         val dialogmeldingIdWithError = createDialogmeldingOpplysning(receivedDialogmeldingWithError)
-        val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmeldingSuccessful)
+        val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmelding)
         database.lagreSendtKafka(dialogmeldingIdWithError)
         database.lagreSendtApprec(dialogmeldingIdWithError)
         database.updateSendtApprec(
@@ -477,7 +419,7 @@ class SendDialogmeldingArenaCronjobTest {
         database.lagreSendtApprec(dialogmeldingId)
         database.updateSendtApprec(
             dialogmeldingId = dialogmeldingId,
-            timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(61)),
+            timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(11)),
         )
 
         every {

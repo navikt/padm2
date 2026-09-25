@@ -10,7 +10,6 @@ import no.nav.syfo.persistering.db.lagreSendtArena
 import no.nav.syfo.services.ArenaDialogmeldingService
 import no.nav.syfo.util.safeUnmarshal
 import org.slf4j.LoggerFactory
-import java.time.LocalDateTime
 
 class SendDialogmeldingArenaCronjob(
     private val database: DatabaseInterface,
@@ -31,7 +30,7 @@ class SendDialogmeldingArenaCronjob(
     suspend fun runJob(): CronjobResult {
         val result = CronjobResult()
         val unpublishedArenaMeldinger = database.getUnpublishedArenaMeldinger()
-        unpublishedArenaMeldinger.forEach { (dialogmeldingId, fellesformat, msgId, apprec) ->
+        unpublishedArenaMeldinger.forEach { (dialogmeldingId, fellesformat, msgId) ->
             try {
                 val fellesformatXml = safeUnmarshal(fellesformat)
                 val receivedDialogmelding = ReceivedDialogmelding.create(
@@ -39,13 +38,6 @@ class SendDialogmeldingArenaCronjob(
                     fellesformat = fellesformatXml,
                     inputMessageText = fellesformat,
                 )
-                if (
-                    receivedDialogmelding.dialogmelding.henvendelseFraLegeHenvendelse != null &&
-                    apprec.isAfter(LocalDateTime.now().minusHours(1))
-                ) {
-                    // Delay henvendelser for 1 hour to allow time for oppfolgingstilfelle to be updated
-                    return@forEach
-                }
                 val sendToArena = !arenaDialogmeldingService.isMeldingStoredInBehandlerdialog(msgId) &&
                     !arenaDialogmeldingService.isMeldingStoredInKelvin(msgId) &&
                     receivedDialogmelding.dialogmelding.innkallingMoterespons == null

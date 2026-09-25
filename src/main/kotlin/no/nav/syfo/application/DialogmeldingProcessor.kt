@@ -23,6 +23,8 @@ import no.nav.syfo.util.*
 import no.nav.syfo.validation.isKodeverkValid
 import io.ktor.client.HttpClient
 import java.time.Duration
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 class DialogmeldingProcessor(
     val database: DatabaseInterface,
@@ -112,6 +114,16 @@ class DialogmeldingProcessor(
             fellesformat = fellesformat,
             inputMessageText = inputMessageText,
         )
+
+        if (
+            dialogmeldingType == DialogmeldingType.DIALOGMELDING_HENVENDELSE_FRA_LEGE_HENDVENDELSE &&
+            receivedDialogmelding.mottattDato.isAfter(LocalDateTime.now(ZoneId.of("Europe/Oslo")).minus(HENVENDELSE_DELAY))
+        ) {
+            // Delay henvendelser to allow time for sykmelding and oppfolgingstilfelle to be updated.
+            // RerunCronJob will process the henvendelse when the delay has passed.
+            logger.info("Delaying processing of henvendelse, {}", StructuredArguments.fields(loggingMeta))
+            return
+        }
 
         val innbyggerOK = pdlClient.personEksisterer(PersonIdent(receivedDialogmelding.personNrPasient))
         val legeOK = pdlClient.personEksisterer(PersonIdent(receivedDialogmelding.personNrLege))
@@ -225,5 +237,9 @@ class DialogmeldingProcessor(
         return initialValidationResult ?: padm2ReglerService.executeRuleChains(
             receivedDialogmelding = receivedDialogmelding,
         )
+    }
+
+    companion object {
+        private val HENVENDELSE_DELAY: Duration = Duration.ofHours(1)
     }
 }
