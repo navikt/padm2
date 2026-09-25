@@ -5,6 +5,7 @@ import no.nav.syfo.model.Dialogmelding
 import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.model.ValidationResult
 import no.nav.syfo.persistering.db.domain.DialogmeldingTidspunkt
+import no.nav.syfo.util.Quadruple
 import no.nav.syfo.util.objectMapper
 import org.postgresql.util.PGobject
 import java.sql.*
@@ -347,11 +348,11 @@ fun DatabaseInterface.hasSavedDialogmeldingDokument(dialogmeldingId: String, sha
         }
     }
 
-fun DatabaseInterface.getUnpublishedArenaMeldinger(): List<Triple<String, String, String>> =
+fun DatabaseInterface.getUnpublishedArenaMeldinger(): List<Quadruple<String, String, String, LocalDateTime>> =
     connection.use { connection ->
         connection.prepareStatement(
             """
-            SELECT id, fellesformat, msg_id
+            SELECT id, fellesformat, msg_id, apprec
             FROM dialogmeldingopplysninger d
             WHERE arena IS NULL
                 AND apprec IS NOT NULL
@@ -365,10 +366,11 @@ fun DatabaseInterface.getUnpublishedArenaMeldinger(): List<Triple<String, String
             """
         ).use {
             it.executeQuery().toList {
-                Triple(
+                Quadruple(
                     first = getString("id"),
                     second = getString("fellesformat"),
                     third = getString("msg_id"),
+                    fourth = getTimestamp("apprec").toLocalDateTime(),
                 )
             }
         }
