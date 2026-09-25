@@ -39,8 +39,10 @@ class SendDialogmeldingArenaCronjob(
                     fellesformat = fellesformatXml,
                     inputMessageText = fellesformat,
                 )
-                if (receivedDialogmelding.dialogmelding.henvendelseFraLegeHenvendelse != null
-                    &&  apprec.isAfter(LocalDateTime.now().minusHours(1))) {
+                if (
+                    receivedDialogmelding.dialogmelding.henvendelseFraLegeHenvendelse != null &&
+                    apprec.isAfter(LocalDateTime.now().minusHours(1))
+                ) {
                     // Delay henvendelser for 1 hour to allow time for oppfolgingstilfelle to be updated
                     return@forEach
                 }
