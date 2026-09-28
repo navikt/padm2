@@ -26,7 +26,8 @@ class RerunCronJob(
             } catch (e: Exception) {
                 logger.warn("Exception caught while reprocessing message, will try again later: ${e.message}", e)
                 result.failed++
-                if (mottattDatetime.isBefore(LocalDateTime.now().minusHours(1))) {
+                val processingDelay = DialogmeldingProcessor.processingDelay(fellesformat)
+                if (mottattDatetime.isBefore(LocalDateTime.now().minusHours(1).minus(processingDelay))) {
                     MESSAGES_STILL_FAIL_AFTER_1H.increment()
                 }
             }

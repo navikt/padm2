@@ -589,7 +589,7 @@ class BlockingApplicationRunnerTest {
         val failedMessages = MESSAGES_STILL_FAIL_AFTER_1H.count()
         database.updateCreatedAt(
             dialogmeldingId!!,
-            Timestamp.valueOf(LocalDateTime.now().minusMinutes(90L))
+            Timestamp.valueOf(LocalDateTime.now().minusMinutes(150L))
         )
         runBlocking {
             rerunCronJob.run()
@@ -599,6 +599,33 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 0) { mqSender.sendArena(any()) }
         verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
         assertEquals(failedMessages + 1.0, MESSAGES_STILL_FAIL_AFTER_1H.count())
+    }
+
+    @Test
+    fun `Prosesserer innkommet melding (pdfgen feiler, gammel created-at, feiler også ved rerun innen forsinkelse + 1 time)`() {
+        val fellesformat = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
+            .replace("01010142365", UserConstants.PATIENT_FNR_PDFGEN_FAIL)
+        every { incomingMessage.text } returns (fellesformat)
+        val dialogmeldingId = runBlocking {
+            blockingApplicationRunner.processMessage(incomingMessage)
+        }
+        verify(exactly = 0) { mqSender.sendReceipt(any()) }
+        verify(exactly = 0) { mqSender.sendBackout(any()) }
+        verify(exactly = 0) { mqSender.sendArena(any()) }
+        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
+        val failedMessages = MESSAGES_STILL_FAIL_AFTER_1H.count()
+        database.updateCreatedAt(
+            dialogmeldingId!!,
+            Timestamp.valueOf(LocalDateTime.now().minusMinutes(90L))
+        )
+        runBlocking {
+            rerunCronJob.run()
+        }
+        verify(exactly = 0) { mqSender.sendReceipt(any()) }
+        verify(exactly = 0) { mqSender.sendBackout(any()) }
+        verify(exactly = 0) { mqSender.sendArena(any()) }
+        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
+        assertEquals(failedMessages, MESSAGES_STILL_FAIL_AFTER_1H.count())
     }
 
     @Test
