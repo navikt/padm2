@@ -241,7 +241,8 @@ class DialogmeldingProcessor(
     }
 
     companion object {
-        private val HENVENDELSE_DELAY: Duration = Duration.ofHours(1)
+        val HENVENDELSE_DELAY: Duration = Duration.ofHours(1)
+        val ALERT_DELAY: Duration = Duration.ofHours(1)
 
         fun processingDelay(inputMessageText: String): Duration =
             try {
