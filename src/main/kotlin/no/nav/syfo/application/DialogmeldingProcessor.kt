@@ -23,6 +23,8 @@ import no.nav.syfo.util.*
 import no.nav.syfo.validation.isKodeverkValid
 import io.ktor.client.HttpClient
 import java.time.Duration
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 class DialogmeldingProcessor(
     val database: DatabaseInterface,
@@ -112,6 +114,17 @@ class DialogmeldingProcessor(
             fellesformat = fellesformat,
             inputMessageText = inputMessageText,
         )
+
+        val processingDelay = processingDelay(dialogmeldingType)
+        if (
+            !processingDelay.isZero &&
+            receivedDialogmelding.mottattDato.isAfter(LocalDateTime.now(ZoneId.of("Europe/Oslo")).minus(processingDelay))
+        ) {
+            // Delay henvendelser to allow time for sykmelding and oppfolgingstilfelle to be updated.
+            // RerunCronJob will process the henvendelse when the delay has passed.
+            logger.info("Delaying processing of henvendelse, {}", StructuredArguments.fields(loggingMeta))
+            return
+        }
 
         val innbyggerOK = pdlClient.personEksisterer(PersonIdent(receivedDialogmelding.personNrPasient))
         val legeOK = pdlClient.personEksisterer(PersonIdent(receivedDialogmelding.personNrLege))
@@ -225,5 +238,25 @@ class DialogmeldingProcessor(
         return initialValidationResult ?: padm2ReglerService.executeRuleChains(
             receivedDialogmelding = receivedDialogmelding,
         )
+    }
+
+    companion object {
+        val HENVENDELSE_DELAY: Duration = Duration.ofHours(1)
+        val ALERT_DELAY: Duration = Duration.ofHours(1)
+
+        fun processingDelay(inputMessageText: String): Duration =
+            try {
+                val emottakblokk = safeUnmarshal(inputMessageText).get<XMLMottakenhetBlokk>()
+                processingDelay(findDialogmeldingType(emottakblokk.ebService, emottakblokk.ebAction))
+            } catch (e: Exception) {
+                Duration.ZERO
+            }
+
+        private fun processingDelay(dialogmeldingType: DialogmeldingType): Duration =
+            if (dialogmeldingType == DialogmeldingType.DIALOGMELDING_HENVENDELSE_FRA_LEGE_HENDVENDELSE) {
+                HENVENDELSE_DELAY
+            } else {
+                Duration.ZERO
+            }
     }
 }
