@@ -11,8 +11,8 @@ import no.nav.syfo.metrics.INVALID_MESSAGE_NO_NOTICE
 import no.nav.syfo.metrics.TEST_FNR_IN_PROD
 import no.nav.syfo.model.*
 import no.nav.syfo.persistering.db.domain.DialogmeldingTidspunkt
-import no.nav.syfo.persistering.db.erFerdigstilt
-import no.nav.syfo.persistering.db.lagreFerdigstilt
+import no.nav.syfo.persistering.db.erDialogmeldingOpplysningerSendtApprec
+import no.nav.syfo.persistering.db.lagreSendtApprec
 import no.nav.syfo.services.JournalService
 import no.nav.syfo.services.sendReceipt
 import no.nav.syfo.util.LogType
@@ -59,7 +59,7 @@ suspend fun handleStatusINVALID(
         )
     }
 
-    if (!database.erFerdigstilt(receivedDialogmelding.dialogmelding.id)) {
+    if (!database.erDialogmeldingOpplysningerSendtApprec(receivedDialogmelding.dialogmelding.id)) {
         sendReceipt(
             mqSender = mqSender,
             fellesformat = fellesformat,
@@ -71,7 +71,7 @@ suspend fun handleStatusINVALID(
             }
         )
         logger.info("Apprec Receipt with status Avvist sent, {}", fields(loggingMeta))
-        database.lagreFerdigstilt(receivedDialogmelding.dialogmelding.id)
+        database.lagreSendtApprec(receivedDialogmelding.dialogmelding.id)
     }
 }
 

@@ -50,9 +50,9 @@ suspend fun handleStatusOK(
         database.lagreSendtKafka(receivedDialogmelding.dialogmelding.id)
     }
 
-    if (!database.erFerdigstilt(receivedDialogmelding.dialogmelding.id)) {
+    if (!database.erDialogmeldingOpplysningerSendtApprec(receivedDialogmelding.dialogmelding.id)) {
         sendReceipt(mqSender, fellesformat, ApprecStatus.OK)
         logger.info("Apprec Receipt with status OK sent, {}", StructuredArguments.fields(loggingMeta))
-        database.lagreFerdigstilt(receivedDialogmelding.dialogmelding.id)
+        database.lagreSendtApprec(receivedDialogmelding.dialogmelding.id)
     }
 }
