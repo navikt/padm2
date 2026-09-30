@@ -56,12 +56,12 @@ fun DatabaseInterface.dropData() {
     }
 }
 
-fun DatabaseInterface.updateSendtApprec(dialogmeldingId: String, timestamp: Timestamp) {
+fun DatabaseInterface.updateFerdigstilt(dialogmeldingId: String, timestamp: Timestamp) {
     connection.use { connection ->
         connection.prepareStatement(
             """
                 UPDATE DIALOGMELDINGOPPLYSNINGER
-                SET apprec=?
+                SET ferdigstilt=?
                 WHERE ID=?;
                 """
         ).use {

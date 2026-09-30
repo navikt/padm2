@@ -98,8 +98,8 @@ class SendDialogmeldingArenaCronjobTest {
     fun `Sends dialogmelding to arena when melding is sent to kafka, and has sent a positive apprec which is older than 10min, and not stored in Modia`() {
         val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmelding)
         database.lagreSendtKafka(dialogmeldingId)
-        database.lagreSendtApprec(dialogmeldingId)
-        database.updateSendtApprec(
+        database.lagreFerdigstilt(dialogmeldingId)
+        database.updateFerdigstilt(
             dialogmeldingId = dialogmeldingId,
             timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(11)),
         )
@@ -134,8 +134,8 @@ class SendDialogmeldingArenaCronjobTest {
     fun `Does not send when dialogmelding already sent to arena`() {
         val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmelding)
         database.lagreSendtKafka(dialogmeldingId)
-        database.lagreSendtApprec(dialogmeldingId)
-        database.updateSendtApprec(
+        database.lagreFerdigstilt(dialogmeldingId)
+        database.updateFerdigstilt(
             dialogmeldingId = dialogmeldingId,
             timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(11)),
         )
@@ -168,8 +168,8 @@ class SendDialogmeldingArenaCronjobTest {
     fun `Does not send when apprec sent within 10 minutes`() {
         val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmelding)
         database.lagreSendtKafka(dialogmeldingId)
-        database.lagreSendtApprec(dialogmeldingId)
-        database.updateSendtApprec(
+        database.lagreFerdigstilt(dialogmeldingId)
+        database.updateFerdigstilt(
             dialogmeldingId = dialogmeldingId,
             timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(1)),
         )
@@ -186,8 +186,8 @@ class SendDialogmeldingArenaCronjobTest {
     @Test
     fun `Does not send when not published to kafka`() {
         val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmelding)
-        database.lagreSendtApprec(dialogmeldingId)
-        database.updateSendtApprec(
+        database.lagreFerdigstilt(dialogmeldingId)
+        database.updateFerdigstilt(
             dialogmeldingId = dialogmeldingId,
             timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(11)),
         )
@@ -208,8 +208,8 @@ class SendDialogmeldingArenaCronjobTest {
             apprecStatus = Status.INVALID,
         )
         database.lagreSendtKafka(dialogmeldingId)
-        database.lagreSendtApprec(dialogmeldingId)
-        database.updateSendtApprec(
+        database.lagreFerdigstilt(dialogmeldingId)
+        database.updateFerdigstilt(
             dialogmeldingId = dialogmeldingId,
             timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(11)),
         )
@@ -235,8 +235,8 @@ class SendDialogmeldingArenaCronjobTest {
         )
         val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmeldingInBehandlerdialog)
         database.lagreSendtKafka(dialogmeldingId)
-        database.lagreSendtApprec(dialogmeldingId)
-        database.updateSendtApprec(
+        database.lagreFerdigstilt(dialogmeldingId)
+        database.updateFerdigstilt(
             dialogmeldingId = dialogmeldingId,
             timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(11)),
         )
@@ -265,8 +265,8 @@ class SendDialogmeldingArenaCronjobTest {
         )
         val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmeldingInBehandlerdialog)
         database.lagreSendtKafka(dialogmeldingId)
-        database.lagreSendtApprec(dialogmeldingId)
-        database.updateSendtApprec(
+        database.lagreFerdigstilt(dialogmeldingId)
+        database.updateFerdigstilt(
             dialogmeldingId = dialogmeldingId,
             timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(11)),
         )
@@ -292,8 +292,8 @@ class SendDialogmeldingArenaCronjobTest {
         )
         val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmeldingInBehandlerdialog)
         database.lagreSendtKafka(dialogmeldingId)
-        database.lagreSendtApprec(dialogmeldingId)
-        database.updateSendtApprec(
+        database.lagreFerdigstilt(dialogmeldingId)
+        database.updateFerdigstilt(
             dialogmeldingId = dialogmeldingId,
             timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(11)),
         )
@@ -319,8 +319,8 @@ class SendDialogmeldingArenaCronjobTest {
         )
         val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmeldingMeldingInBehandlerdialog)
         database.lagreSendtKafka(dialogmeldingId)
-        database.lagreSendtApprec(dialogmeldingId)
-        database.updateSendtApprec(
+        database.lagreFerdigstilt(dialogmeldingId)
+        database.updateFerdigstilt(
             dialogmeldingId = dialogmeldingId,
             timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(11)),
         )
@@ -357,8 +357,8 @@ class SendDialogmeldingArenaCronjobTest {
         )
         val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmeldingThrowsError)
         database.lagreSendtKafka(dialogmeldingId)
-        database.lagreSendtApprec(dialogmeldingId)
-        database.updateSendtApprec(
+        database.lagreFerdigstilt(dialogmeldingId)
+        database.updateFerdigstilt(
             dialogmeldingId = dialogmeldingId,
             timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(11)),
         )
@@ -376,8 +376,8 @@ class SendDialogmeldingArenaCronjobTest {
     fun `Fails when sending on MQ throws error`() {
         val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmelding)
         database.lagreSendtKafka(dialogmeldingId)
-        database.lagreSendtApprec(dialogmeldingId)
-        database.updateSendtApprec(
+        database.lagreFerdigstilt(dialogmeldingId)
+        database.updateFerdigstilt(
             dialogmeldingId = dialogmeldingId,
             timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(11)),
         )
@@ -410,14 +410,14 @@ class SendDialogmeldingArenaCronjobTest {
         val dialogmeldingIdWithError = createDialogmeldingOpplysning(receivedDialogmeldingWithError)
         val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmelding)
         database.lagreSendtKafka(dialogmeldingIdWithError)
-        database.lagreSendtApprec(dialogmeldingIdWithError)
-        database.updateSendtApprec(
+        database.lagreFerdigstilt(dialogmeldingIdWithError)
+        database.updateFerdigstilt(
             dialogmeldingId = dialogmeldingIdWithError,
             timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(11)),
         )
         database.lagreSendtKafka(dialogmeldingId)
-        database.lagreSendtApprec(dialogmeldingId)
-        database.updateSendtApprec(
+        database.lagreFerdigstilt(dialogmeldingId)
+        database.updateFerdigstilt(
             dialogmeldingId = dialogmeldingId,
             timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(11)),
         )
