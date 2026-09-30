@@ -153,3 +153,5 @@ spec:
       value: "http://api-intern.aap"
     - name: IS_DEV_GCP
       value: "true"
+    - name: PROCESSING_ENABLED
+      value: "false"
