@@ -53,7 +53,7 @@ fun Connection.opprettDialogmeldingOpplysninger(receivedDialogmelding: ReceivedD
                 journalforing,
                 dialogmelding_published,
                 arena,
-                apprec,
+                ferdigstilt,
                 sent_to_arena,
                 created_at
                 )
@@ -241,27 +241,27 @@ fun DatabaseInterface.lagreSendtKafka(dialogmeldingid: String) {
     }
 }
 
-fun DatabaseInterface.erDialogmeldingOpplysningerSendtApprec(dialogmeldingid: String) =
+fun DatabaseInterface.erFerdigstilt(dialogmeldingid: String) =
     connection.use { connection ->
         connection.prepareStatement(
             """
-                SELECT apprec
+                SELECT ferdigstilt
                 FROM DIALOGMELDINGOPPLYSNINGER
                 WHERE id=?;
                 """
         ).use {
             it.setString(1, dialogmeldingid)
-            val list = it.executeQuery().toList { getTimestamp("apprec") }
+            val list = it.executeQuery().toList { getTimestamp("ferdigstilt") }
             list.isNotEmpty() && list.firstOrNull() != null
         }
     }
 
-fun DatabaseInterface.lagreSendtApprec(dialogmeldingid: String) {
+fun DatabaseInterface.lagreFerdigstilt(dialogmeldingid: String) {
     connection.use { connection ->
         connection.prepareStatement(
             """
                 UPDATE DIALOGMELDINGOPPLYSNINGER 
-                SET apprec=?
+                SET ferdigstilt=?
                 WHERE ID=?;
                 """
         ).use {
@@ -282,7 +282,7 @@ fun DatabaseInterface.hentIkkeFullforteDialogmeldinger() =
             """
                 SELECT id, fellesformat, created_at
                 FROM dialogmeldingopplysninger
-                WHERE apprec IS NULL AND created_at < (NOW() - INTERVAL '10 minutes')
+                WHERE ferdigstilt IS NULL AND created_at < (NOW() - INTERVAL '10 minutes')
                 ORDER BY created_at ASC
                 """
         ).use {
@@ -354,8 +354,8 @@ fun DatabaseInterface.getUnpublishedArenaMeldinger(): List<Triple<String, String
             SELECT id, fellesformat, msg_id
             FROM dialogmeldingopplysninger d
             WHERE arena IS NULL
-                AND apprec IS NOT NULL
-                AND apprec < (NOW() - INTERVAL '10 minutes')
+                AND ferdigstilt IS NOT NULL
+                AND ferdigstilt < (NOW() - INTERVAL '10 minutes')
                 AND dialogmelding_published IS NOT NULL
                 AND EXISTS (
                     SELECT 1
