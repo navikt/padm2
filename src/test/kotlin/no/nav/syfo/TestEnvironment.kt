@@ -52,6 +52,7 @@ fun testEnvironment() = Environment(
     aapApiUrl = "http://aap-api",
     jpRetryEnabled = true,
     isDevGcp = false,
+    processingEnabled = true,
 )
 
 fun testAppState() = ApplicationState(
