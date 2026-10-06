@@ -43,7 +43,8 @@ fun Route.registerVedleggSystemApi(
 
                 call.respondBytes(
                     contentType = ContentType.Application.Json,
-                    bytes = vedleggAsBytes,)
+                    bytes = vedleggAsBytes,
+                )
             }
         }
     }
