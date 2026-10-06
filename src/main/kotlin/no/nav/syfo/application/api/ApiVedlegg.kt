@@ -1,6 +1,5 @@
 package no.nav.syfo.application.api
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
@@ -36,15 +35,15 @@ fun Route.registerVedleggSystemApi(
                 call.respond(HttpStatusCode.NoContent)
             } else {
                 val fellesformat = safeUnmarshal(fellesformatString)
-
                 val vedlegg = extractValidVedlegg(fellesformat)
                     .map { it.toVedlegg() }
                     .map { it.toPDFVedlegg() }
                     .map { VedleggDTO(it.contentBase64) }
+                val vedleggAsBytes = configuredJacksonMapper().writeValueAsBytes(vedlegg)
+
                 call.respondBytes(
                     contentType = ContentType.Application.Json,
-                    bytes = jacksonObjectMapper().configure().writeValueAsBytes(vedlegg),
-                )
+                    bytes = vedleggAsBytes,)
             }
         }
     }
