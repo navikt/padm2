@@ -92,6 +92,11 @@ fun launchListeners(
     env: Environment,
     database: Database,
 ) {
+    if (!env.processingEnabled) {
+        logger.warn("PROCESSING_ENABLED=false: MQ-consumer and cronjobs are not started")
+        return
+    }
+
     val dialogmeldingProducer = DialogmeldingProducer(
         kafkaProducerDialogmelding = KafkaProducer<String, DialogmeldingForKafka>(
             kafkaDialogmeldingProducerConfig(env.kafka)
