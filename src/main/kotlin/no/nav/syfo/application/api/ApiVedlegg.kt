@@ -1,7 +1,6 @@
 package no.nav.syfo.application.api
 
 import io.ktor.http.*
-import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import no.nav.syfo.application.api.access.APIConsumerAccessService
@@ -13,6 +12,7 @@ import no.nav.syfo.util.*
 
 const val vedleggSystemApiV1Path = "/api/system/v1/vedlegg"
 const val vedleggSystemApiMsgIdParam = "msgid"
+val mapper = configuredJacksonMapper()
 
 fun Route.registerVedleggSystemApi(
     apiConsumerAccessService: APIConsumerAccessService,
@@ -35,12 +35,14 @@ fun Route.registerVedleggSystemApi(
                 call.respond(HttpStatusCode.NoContent)
             } else {
                 val fellesformat = safeUnmarshal(fellesformatString)
+                val vedlegg = extractValidVedlegg(fellesformat)
+                    .map { it.toVedlegg() }
+                    .map { it.toPDFVedlegg() }
+                    .map { VedleggDTO(it.contentBase64) }
 
-                call.respond(
-                    extractValidVedlegg(fellesformat)
-                        .map { it.toVedlegg() }
-                        .map { it.toPDFVedlegg() }
-                        .map { VedleggDTO(it.contentBase64) }
+                call.respondBytes(
+                    contentType = ContentType.Application.Json,
+                    bytes = mapper.writeValueAsBytes(vedlegg),
                 )
             }
         }
