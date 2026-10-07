@@ -154,4 +154,4 @@ spec:
     - name: IS_DEV_GCP
       value: "false"
     - name: PROCESSING_ENABLED
-      value: "false"
+      value: "true"
