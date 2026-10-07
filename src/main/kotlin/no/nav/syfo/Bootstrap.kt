@@ -22,6 +22,7 @@ import no.nav.syfo.db.Database
 import no.nav.syfo.kafka.*
 import no.nav.syfo.services.ArenaDialogmeldingService
 import no.nav.syfo.services.EmottakService
+import no.nav.syfo.services.MqApprecService
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -135,7 +136,7 @@ fun launchListeners(
     val dialogmeldingProcessor = DialogmeldingProcessor(
         database = database,
         env = env,
-        mqSender = mqSender,
+        apprecService = MqApprecService(database, mqSender),
         dialogmeldingProducer = dialogmeldingProducer,
         azureAdV2Client = azureAdV2Client,
         httpClient = httpClient,

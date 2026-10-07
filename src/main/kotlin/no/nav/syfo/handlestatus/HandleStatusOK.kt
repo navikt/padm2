@@ -1,26 +1,20 @@
 package no.nav.syfo.handlestatus
 
-import net.logstash.logback.argument.StructuredArguments
-import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.msgHead.XMLMsgHead
-import no.nav.syfo.application.mq.MQSenderInterface
-import no.nav.syfo.apprec.ApprecStatus
 import no.nav.syfo.client.*
 import no.nav.syfo.db.DatabaseInterface
 import no.nav.syfo.kafka.DialogmeldingProducer
-import no.nav.syfo.logger
 import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.model.ValidationResult
 import no.nav.syfo.model.Vedlegg
 import no.nav.syfo.persistering.db.*
+import no.nav.syfo.services.ApprecService
 import no.nav.syfo.services.JournalService
-import no.nav.syfo.services.sendReceipt
 import no.nav.syfo.util.LoggingMeta
 
 suspend fun handleStatusOK(
     database: DatabaseInterface,
-    mqSender: MQSenderInterface,
-    fellesformat: XMLEIFellesformat,
+    apprecService: ApprecService,
     loggingMeta: LoggingMeta,
     journalService: JournalService,
     dialogmeldingProducer: DialogmeldingProducer,
@@ -50,9 +44,5 @@ suspend fun handleStatusOK(
         database.lagreSendtKafka(receivedDialogmelding.dialogmelding.id)
     }
 
-    if (!database.erFerdigstilt(receivedDialogmelding.dialogmelding.id)) {
-        sendReceipt(mqSender, fellesformat, ApprecStatus.OK)
-        logger.info("Apprec Receipt with status OK sent, {}", StructuredArguments.fields(loggingMeta))
-        database.lagreFerdigstilt(receivedDialogmelding.dialogmelding.id)
-    }
+    apprecService.ferdigstillOk(receivedDialogmelding, loggingMeta)
 }

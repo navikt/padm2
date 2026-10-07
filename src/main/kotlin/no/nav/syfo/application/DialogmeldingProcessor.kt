@@ -5,7 +5,6 @@ import no.nav.helse.dialogmelding.XMLDialogmelding
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.Environment
-import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.client.*
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.client.pdl.PdlClient
@@ -29,7 +28,7 @@ import java.time.ZoneId
 class DialogmeldingProcessor(
     val database: DatabaseInterface,
     val env: Environment,
-    val mqSender: MQSenderInterface,
+    val apprecService: ApprecService,
     val dialogmeldingProducer: DialogmeldingProducer,
     val azureAdV2Client: AzureAdV2Client,
     val httpClient: HttpClient,
@@ -151,8 +150,7 @@ class DialogmeldingProcessor(
         when (validationResult.status) {
             Status.OK -> handleStatusOK(
                 database = database,
-                mqSender = mqSender,
-                fellesformat = fellesformat,
+                apprecService = apprecService,
                 loggingMeta = loggingMeta,
                 journalService = journalService,
                 dialogmeldingProducer = dialogmeldingProducer,
@@ -165,10 +163,8 @@ class DialogmeldingProcessor(
             )
 
             Status.INVALID -> handleStatusINVALID(
-                database = database,
-                mqSender = mqSender,
+                apprecService = apprecService,
                 validationResult = validationResult,
-                fellesformat = fellesformat,
                 loggingMeta = loggingMeta,
                 journalService = journalService,
                 receivedDialogmelding = receivedDialogmelding,
