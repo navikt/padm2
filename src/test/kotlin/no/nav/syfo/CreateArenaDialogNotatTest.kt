@@ -86,7 +86,7 @@ internal class CreateArenaDialogNotatTest {
 
     @Test
     internal fun `Default to 0 when tss id is null`() {
-        val behandler = Behandler("Etternavn", "Fornavn", "Mellomnavn")
+        val behandler = Behandler(etternavn = "Etternavn", fornavn = "Fornavn", mellomnavn = "Mellomnavn")
         val avsender = createAvsender(FASTLEGE_FNR, null, behandler)
         assertEquals(FASTLEGE_FNR, avsender.lege.legeFnr)
         assertEquals(BigInteger("0"), avsender.lege.tssId)
