@@ -98,9 +98,7 @@ fun extractSenderOrganisationName(fellesformat: XMLEIFellesformat): String =
     fellesformat.get<XMLMsgHead>().msgInfo.sender.organisation?.organisationName ?: ""
 
 fun extractLegeHpr(dialogmeldingId: String, fellesformat: XMLEIFellesformat): String? {
-    val hpr = fellesformat.get<XMLMsgHead>().msgInfo.sender.organisation?.healthcareProfessional?.ident?.find {
-        it.typeId.v == "HPR"
-    }?.id
+    val hpr = extractBehandler(fellesformat)?.hprId
     return if (isValidHpr(hpr)) hpr else {
         logger.warn("Invalid hpr, ignoring. Dialogmeldingid: $dialogmeldingId")
         null
@@ -113,22 +111,28 @@ private fun isValidHpr(hprNr: String?) =
 fun no.nav.helse.dialogmelding.XMLHealthcareProfessional.toBehandler(): Behandler = Behandler(
     fornavn = givenName ?: "",
     etternavn = familyName,
-    mellomnavn = middleName
+    mellomnavn = middleName,
+    hprId = ident?.find { it.typeId.v == "HPR" }?.id
 )
 
 fun XMLHealthcareProfessional.toBehandler(): Behandler = Behandler(
     fornavn = givenName ?: "",
     etternavn = familyName,
-    mellomnavn = middleName
+    mellomnavn = middleName,
+    hprId = ident?.find { it.typeId.v == "HPR" }?.id
 )
+
+private fun extractBehandlerFromRoller(fellesformat: XMLEIFellesformat): Behandler? =
+    extractDialogmelding(fellesformat).notat.firstOrNull()
+        ?.rollerRelatertNotat?.firstOrNull()?.healthcareProfessional?.toBehandler()
 
 fun extractBehandler(fellesformat: XMLEIFellesformat): Behandler? {
     val behandlerInMsgHead = fellesformat.get<XMLMsgHead>().msgInfo.sender.organisation?.healthcareProfessional?.toBehandler()
+    val behandler = behandlerInMsgHead ?: return extractBehandlerFromRoller(fellesformat)
+    if (behandler.hprId != null) return behandler
 
-    return if (behandlerInMsgHead != null) behandlerInMsgHead else {
-        val rollerListe = extractDialogmelding(fellesformat).notat.first().rollerRelatertNotat
-        if (rollerListe.isNullOrEmpty()) null else rollerListe.first().healthcareProfessional?.toBehandler()
-    }
+    val hprFromRoller = extractBehandlerFromRoller(fellesformat)?.hprId
+    return behandler.copy(hprId = hprFromRoller)
 }
 
 fun extractBehandlerNavn(fellesformat: XMLEIFellesformat): String? {
