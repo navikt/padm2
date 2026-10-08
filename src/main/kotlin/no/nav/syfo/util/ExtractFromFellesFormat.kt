@@ -108,6 +108,7 @@ fun extractLegeHpr(dialogmeldingId: String, fellesformat: XMLEIFellesformat): St
 private fun isValidHpr(hprNr: String?) =
     hprNr != null && hprNr.length > 0 && hprNr.length <= 9 && hprNr.all { char -> char.isDigit() }
 
+// Fra rollerRelatertNotat
 fun no.nav.helse.dialogmelding.XMLHealthcareProfessional.toBehandler(): Behandler = Behandler(
     fornavn = givenName ?: "",
     etternavn = familyName,
@@ -116,6 +117,7 @@ fun no.nav.helse.dialogmelding.XMLHealthcareProfessional.toBehandler(): Behandle
     fnr = ident?.find { it.typeId.v == "FNR" || it.typeId.v == "DNR" }?.id
 )
 
+// Fra MsgHead
 fun XMLHealthcareProfessional.toBehandler(): Behandler = Behandler(
     fornavn = givenName ?: "",
     etternavn = familyName,
