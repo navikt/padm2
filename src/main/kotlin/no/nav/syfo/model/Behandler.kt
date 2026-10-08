@@ -5,6 +5,7 @@ data class Behandler(
     val fornavn: String,
     val mellomnavn: String?,
     val hprId: String? = null,
+    val fnr: String? = null,
 )
 
 fun Behandler.getName(): String = if (mellomnavn == null) "$fornavn $etternavn" else "$fornavn $mellomnavn $etternavn"

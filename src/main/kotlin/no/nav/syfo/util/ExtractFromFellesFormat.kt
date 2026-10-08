@@ -112,14 +112,16 @@ fun no.nav.helse.dialogmelding.XMLHealthcareProfessional.toBehandler(): Behandle
     fornavn = givenName ?: "",
     etternavn = familyName,
     mellomnavn = middleName,
-    hprId = ident?.find { it.typeId.v == "HPR" }?.id
+    hprId = ident?.find { it.typeId.v == "HPR" }?.id,
+    fnr = ident?.find { it.typeId.v == "FNR" || it.typeId.v == "DNR" }?.id
 )
 
 fun XMLHealthcareProfessional.toBehandler(): Behandler = Behandler(
     fornavn = givenName ?: "",
     etternavn = familyName,
     mellomnavn = middleName,
-    hprId = ident?.find { it.typeId.v == "HPR" }?.id
+    hprId = ident?.find { it.typeId.v == "HPR" }?.id,
+    fnr = ident?.find { it.typeId.v == "FNR" || it.typeId.v == "DNR" }?.id
 )
 
 private fun extractBehandlerFromRoller(fellesformat: XMLEIFellesformat): Behandler? =
@@ -129,10 +131,13 @@ private fun extractBehandlerFromRoller(fellesformat: XMLEIFellesformat): Behandl
 fun extractBehandler(fellesformat: XMLEIFellesformat): Behandler? {
     val behandlerInMsgHead = fellesformat.get<XMLMsgHead>().msgInfo.sender.organisation?.healthcareProfessional?.toBehandler()
     val behandler = behandlerInMsgHead ?: return extractBehandlerFromRoller(fellesformat)
-    if (behandler.hprId != null) return behandler
+    if (behandler.hprId != null && behandler.fnr != null) return behandler
 
-    val hprFromRoller = extractBehandlerFromRoller(fellesformat)?.hprId
-    return behandler.copy(hprId = hprFromRoller)
+    val behandlerFromRoller = extractBehandlerFromRoller(fellesformat)
+    return behandler.copy(
+        hprId = behandler.hprId ?: behandlerFromRoller?.hprId,
+        fnr = behandler.fnr ?: behandlerFromRoller?.fnr,
+    )
 }
 
 fun extractBehandlerNavn(fellesformat: XMLEIFellesformat): String? {
@@ -157,10 +162,7 @@ fun extractInnbyggerident(fellesformat: XMLEIFellesformat): String? =
     }?.id
 
 fun extractIdentFromBehandler(fellesformat: XMLEIFellesformat): String? {
-    val behandlerIdent = fellesformat.get<XMLMsgHead>()
-        .msgInfo.sender.organisation?.healthcareProfessional?.ident?.find {
-            it.typeId.v == "FNR" || it.typeId.v == "DNR"
-        }?.id
+    val behandlerIdent = extractBehandler(fellesformat)?.fnr
 
     if (behandlerIdent == null) {
         logger.info("Behandler did not include ident type fnr or dnr in dialogmelding")

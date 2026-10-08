@@ -1,7 +1,9 @@
 package no.nav.syfo
 
 import no.nav.helse.msgHead.XMLMsgHead
+import no.nav.syfo.util.extractBehandler
 import no.nav.syfo.util.extractIdentFromBehandler
+import no.nav.syfo.util.extractLegeHpr
 import no.nav.syfo.util.get
 import no.nav.syfo.util.getFileAsString
 import no.nav.syfo.util.safeUnmarshal
@@ -36,8 +38,7 @@ class ExtractFromFellesFormatTest {
     }
 
     @Test
-    internal fun `Does not find behandlerident in RollerRelatertNotat`() {
-        // We might want to support this at some point
+    internal fun `Does not find behandlerident in RollerRelatertNotat if it has no fnr or dnr`() {
         val fellesformat = safeUnmarshal(
             getFileAsString("src/test/resources/dialogmelding_kiropraktor.xml")
         )
@@ -45,6 +46,20 @@ class ExtractFromFellesFormatTest {
         val behandlerIdent = extractIdentFromBehandler(fellesformat)
 
         assertNull(behandlerIdent)
+    }
+
+    @Test
+    internal fun `Finds behandlerident and hprId only in RollerRelatertNotat`() {
+        val fellesformat = safeUnmarshal(
+            getFileAsString("src/test/resources/dialogmelding_kiropraktor_fnr_i_rolle.xml")
+        )
+
+        val behandler = extractBehandler(fellesformat)
+
+        assertEquals(BEHANDLER_FNR, behandler?.fnr)
+        assertEquals("123456789", behandler?.hprId)
+        assertEquals(BEHANDLER_FNR, extractIdentFromBehandler(fellesformat))
+        assertEquals("123456789", extractLegeHpr("dialogmeldingId", fellesformat))
     }
 
     @Test
