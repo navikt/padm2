@@ -5,14 +5,12 @@ import no.nav.helse.apprecV1.XMLCV
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.apprec.*
-import no.nav.syfo.db.DatabaseInterface
 import no.nav.syfo.logger
 import no.nav.syfo.metrics.INVALID_MESSAGE_NO_NOTICE
 import no.nav.syfo.metrics.TEST_FNR_IN_PROD
 import no.nav.syfo.model.*
 import no.nav.syfo.persistering.db.domain.DialogmeldingTidspunkt
-import no.nav.syfo.persistering.db.erFerdigstilt
-import no.nav.syfo.persistering.db.lagreFerdigstilt
+import no.nav.syfo.services.ApprecService
 import no.nav.syfo.services.JournalService
 import no.nav.syfo.services.sendReceipt
 import no.nav.syfo.util.LogType
@@ -25,10 +23,8 @@ val RULE_NAME_DUPLICATE = "DUPLICATE_DIALOGMELDING_CONTENT"
 val RULE_NAME_VIRUS_CHECK = "VIRUSSJEKK_FEILET"
 
 suspend fun handleStatusINVALID(
-    database: DatabaseInterface,
-    mqSender: MQSenderInterface,
+    apprecService: ApprecService,
     validationResult: ValidationResult,
-    fellesformat: XMLEIFellesformat,
     loggingMeta: LoggingMeta,
     journalService: JournalService,
     receivedDialogmelding: ReceivedDialogmelding,
@@ -59,20 +55,7 @@ suspend fun handleStatusINVALID(
         )
     }
 
-    if (!database.erFerdigstilt(receivedDialogmelding.dialogmelding.id)) {
-        sendReceipt(
-            mqSender = mqSender,
-            fellesformat = fellesformat,
-            apprecStatus = ApprecStatus.AVVIST,
-            apprecErrors = run {
-                val errors = mutableListOf<XMLCV>()
-                errors.addAll(validationResult.ruleHits.map { it.toApprecCV() })
-                errors
-            }
-        )
-        logger.info("Apprec Receipt with status Avvist sent, {}", fields(loggingMeta))
-        database.lagreFerdigstilt(receivedDialogmelding.dialogmelding.id)
-    }
+    apprecService.ferdigstillAvvist(receivedDialogmelding, validationResult, loggingMeta)
 }
 
 fun handleDuplicateDialogmeldingContent(
