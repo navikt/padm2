@@ -14,6 +14,7 @@ import no.nav.syfo.metrics.INVALID_PDF_VEDLEGG
 import no.nav.syfo.metrics.MESSAGES_SENT_TO_BOQ
 import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.persistering.persistReceivedMessage
+import no.nav.syfo.services.ApprecService
 import no.nav.syfo.util.*
 import java.util.*
 import javax.jms.Message
@@ -25,6 +26,7 @@ class BlockingApplicationRunner(
     val database: DatabaseInterface,
     val inputconsumer: MessageConsumer,
     val mqSender: MQSenderInterface,
+    val apprecService: ApprecService,
     val dialogmeldingProcessor: DialogmeldingProcessor,
 ) {
     suspend fun run() {
@@ -95,11 +97,8 @@ class BlockingApplicationRunner(
         )
         logger.info("Received message, {}", StructuredArguments.fields(loggingMeta))
         if (innbyggerIdent.isNullOrEmpty() || !elevenDigits.matches(innbyggerIdent)) {
-            handlePatientMissing(
-                mqSender,
-                fellesformat,
-                loggingMeta,
-            )
+            handlePatientMissing(loggingMeta)
+            apprecService.avvisPasientMangler(fellesformat, loggingMeta)
             return null
         }
 

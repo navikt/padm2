@@ -37,10 +37,12 @@ class VedleggSystemApiTest {
     private val incomingMessage = mockk<TextMessage>(relaxed = true)
     private val azureAdV2Client = mockk<AzureAdV2Client>(relaxed = true)
 
+    private val apprecService = MqApprecService(database, mqSender)
+
     private val dialogmeldingProcessor = DialogmeldingProcessor(
         database = database,
         env = externalMockEnvironment.environment,
-        apprecService = MqApprecService(database, mqSender),
+        apprecService = apprecService,
         dialogmeldingProducer = dialogmeldingProducer,
         azureAdV2Client = azureAdV2Client,
         httpClient = externalMockEnvironment.mockHttpClient,
@@ -52,6 +54,7 @@ class VedleggSystemApiTest {
         database = database,
         inputconsumer = mockk(),
         mqSender = mqSender,
+        apprecService = apprecService,
         dialogmeldingProcessor = dialogmeldingProcessor,
     )
 

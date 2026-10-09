@@ -133,10 +133,15 @@ fun launchListeners(
         smgcpClient = smgcpClient,
     )
 
+    val apprecService = MqApprecService(
+        database = database,
+        mqSender = mqSender,
+    )
+
     val dialogmeldingProcessor = DialogmeldingProcessor(
         database = database,
         env = env,
-        apprecService = MqApprecService(database, mqSender),
+        apprecService = apprecService,
         dialogmeldingProducer = dialogmeldingProducer,
         azureAdV2Client = azureAdV2Client,
         httpClient = httpClient,
@@ -180,6 +185,7 @@ fun launchListeners(
                 database = database,
                 inputconsumer = inputconsumer,
                 mqSender = mqSender,
+                apprecService = apprecService,
                 dialogmeldingProcessor = dialogmeldingProcessor,
             )
             blockingApplicationRunner.run()

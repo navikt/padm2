@@ -33,10 +33,12 @@ class BlockingApplicationRunnerTest {
     private val emottakService = mockk<EmottakService>(relaxed = true)
     private val smtssClient = mockk<SmtssClient>(relaxed = true)
 
+    private val apprecService = MqApprecService(database, mqSender)
+
     private val dialogmeldingProcessor = DialogmeldingProcessor(
         database = database,
         env = externalMockEnvironment.environment,
-        apprecService = MqApprecService(database, mqSender),
+        apprecService = apprecService,
         dialogmeldingProducer = dialogmeldingProducer,
         azureAdV2Client = azureAdV2Client,
         httpClient = externalMockEnvironment.mockHttpClient,
@@ -47,6 +49,7 @@ class BlockingApplicationRunnerTest {
         database = database,
         inputconsumer = mockk(),
         mqSender = mqSender,
+        apprecService = apprecService,
         dialogmeldingProcessor = dialogmeldingProcessor,
     )
     private val rerunCronJob = RerunCronJob(
