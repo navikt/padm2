@@ -39,7 +39,6 @@ internal class DialogmeldingProducerTest {
 
         dialogmeldingProducer.sendDialogmelding(
             receivedDialogmelding = receivedDialogmelding,
-            msgHead = msgHead,
             journalpostId = journalpostId,
             antallVedlegg = fellesformat.calculateNumberOfVedlegg(),
         )
@@ -64,7 +63,6 @@ internal class DialogmeldingProducerTest {
 
         dialogmeldingProducer.sendDialogmelding(
             receivedDialogmelding = receivedDialogmelding,
-            msgHead = msgHead,
             journalpostId = journalpostId,
             antallVedlegg = fellesformat.calculateNumberOfVedlegg(),
         )
@@ -89,7 +87,6 @@ internal class DialogmeldingProducerTest {
 
         dialogmeldingProducer.sendDialogmelding(
             receivedDialogmelding = receivedDialogmelding,
-            msgHead = msgHead,
             journalpostId = journalpostId,
             antallVedlegg = fellesformat.calculateNumberOfVedlegg(),
         )
@@ -117,7 +114,6 @@ internal class DialogmeldingProducerTest {
 
         dialogmeldingProducer.sendDialogmelding(
             receivedDialogmelding = receivedDialogmelding,
-            msgHead = msgHead,
             journalpostId = journalpostId,
             antallVedlegg = fellesformat.calculateNumberOfVedlegg(),
         )
@@ -145,7 +141,6 @@ internal class DialogmeldingProducerTest {
 
         dialogmeldingProducer.sendDialogmelding(
             receivedDialogmelding = receivedDialogmelding,
-            msgHead = msgHead,
             journalpostId = journalpostId,
             antallVedlegg = fellesformat.calculateNumberOfVedlegg(),
         )
@@ -171,7 +166,6 @@ internal class DialogmeldingProducerTest {
 
         dialogmeldingProducer.sendDialogmelding(
             receivedDialogmelding = receivedDialogmelding,
-            msgHead = msgHead,
             journalpostId = journalpostId,
             antallVedlegg = fellesformat.calculateNumberOfVedlegg(),
         )
@@ -218,10 +212,15 @@ internal class DialogmeldingProducerTest {
         msgHead = fellesformat.get()
         receivedDialogmelding = ReceivedDialogmelding(
             dialogmelding = dialogmelding,
+            dialogmeldingType = dialogmeldingType,
             personNrPasient = innbyggerident,
+            pasientNavn = extractPasientNavn(fellesformat),
             personNrLege = personNumberDoctor,
             navLogId = ediLoggId,
             msgId = msgId,
+            msgType = msgHead.msgInfo.type.v,
+            conversationRef = msgHead.msgInfo.conversationRef?.refToConversation,
+            parentRef = msgHead.msgInfo.conversationRef?.refToParent,
             legekontorOrgNr = legekontorOrgNr,
             legekontorOrgName = legekontorOrgName,
             legekontorHerId = legekontorHerId,

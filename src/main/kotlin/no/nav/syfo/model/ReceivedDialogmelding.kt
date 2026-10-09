@@ -10,10 +10,15 @@ import java.time.ZoneId
 
 data class ReceivedDialogmelding(
     val dialogmelding: Dialogmelding,
+    val dialogmeldingType: DialogmeldingType,
     val personNrPasient: String,
+    val pasientNavn: String,
     val personNrLege: String,
     val navLogId: String,
     val msgId: String,
+    val msgType: String,
+    val conversationRef: String?,
+    val parentRef: String?,
     val legekontorOrgNr: String?,
     val legekontorHerId: String?,
     val legekontorOrgName: String,
@@ -21,6 +26,12 @@ data class ReceivedDialogmelding(
     val legehpr: String?,
     val fellesformat: String,
 ) {
+    fun loggingMeta() = LoggingMeta(
+        mottakId = navLogId,
+        orgNr = legekontorOrgNr,
+        msgId = msgId,
+    )
+
     companion object {
         fun create(
             dialogmeldingId: String,
@@ -53,10 +64,15 @@ data class ReceivedDialogmelding(
 
             return ReceivedDialogmelding(
                 dialogmelding = dialogmelding,
+                dialogmeldingType = dialogmeldingType,
                 personNrPasient = innbyggerIdent!!,
+                pasientNavn = extractPasientNavn(fellesformat),
                 personNrLege = legeIdent,
                 navLogId = emottakblokk.ediLoggId,
                 msgId = msgHead.msgInfo.msgId,
+                msgType = msgHead.msgInfo.type.v,
+                conversationRef = msgHead.msgInfo.conversationRef?.refToConversation,
+                parentRef = msgHead.msgInfo.conversationRef?.refToParent,
                 legekontorOrgNr = legekontorOrgNr,
                 legekontorOrgName = legekontorOrgName,
                 legekontorHerId = legekontorHerId,

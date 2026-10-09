@@ -16,6 +16,7 @@ import java.time.format.DateTimeFormatter
 
 val RULE_NAME_DUPLICATE = "DUPLICATE_DIALOGMELDING_CONTENT"
 val RULE_NAME_VIRUS_CHECK = "VIRUSSJEKK_FEILET"
+val RULE_NAME_PATIENT_NOT_FOUND = "PATIENT_NOT_FOUND"
 
 suspend fun handleStatusINVALID(
     apprecService: ApprecService,
@@ -23,18 +24,16 @@ suspend fun handleStatusINVALID(
     loggingMeta: LoggingMeta,
     journalService: JournalService,
     receivedDialogmelding: ReceivedDialogmelding,
-    vedleggListe: List<Vedlegg>?,
-    pasientNavn: String,
+    vedlegg: List<Vedlegg>,
     navnSignerendeLege: String,
-    innbyggerOK: Boolean,
 ) {
-    if (innbyggerOK && !validationResult.isVirusCheck() && !validationResult.isDuplicate()) {
+    if (!validationResult.isPatientNotFound() && !validationResult.isVirusCheck() && !validationResult.isDuplicate()) {
         journalService.onJournalRequest(
             receivedDialogmelding,
             validationResult,
-            vedleggListe,
+            vedlegg,
             loggingMeta,
-            pasientNavn,
+            receivedDialogmelding.pasientNavn,
             navnSignerendeLege
         )
     } else {
@@ -108,7 +107,7 @@ fun handlePatientNotFound(
         status = Status.INVALID,
         ruleHits = listOf(
             RuleInfo(
-                ruleName = "PATIENT_NOT_FOUND",
+                ruleName = RULE_NAME_PATIENT_NOT_FOUND,
                 messageForSender = message,
                 messageForUser = message,
                 ruleStatus = Status.INVALID

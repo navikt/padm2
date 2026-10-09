@@ -19,6 +19,8 @@ import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.kafka.DialogmeldingProducer
 import no.nav.syfo.services.MqApprecService
+import no.nav.syfo.services.MqVedleggService
+import no.nav.syfo.services.Padm2ValidationService
 import no.nav.syfo.util.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -43,6 +45,13 @@ class VedleggSystemApiTest {
         database = database,
         env = externalMockEnvironment.environment,
         apprecService = apprecService,
+        validationService = Padm2ValidationService(
+            database = database,
+            env = externalMockEnvironment.environment,
+            azureAdV2Client = azureAdV2Client,
+            httpClient = externalMockEnvironment.mockHttpClient,
+        ),
+        vedleggService = MqVedleggService(),
         dialogmeldingProducer = dialogmeldingProducer,
         azureAdV2Client = azureAdV2Client,
         httpClient = externalMockEnvironment.mockHttpClient,

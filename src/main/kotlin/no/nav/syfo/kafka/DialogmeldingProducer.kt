@@ -15,14 +15,12 @@ class DialogmeldingProducer(
 ) {
     fun sendDialogmelding(
         receivedDialogmelding: ReceivedDialogmelding,
-        msgHead: XMLMsgHead,
         journalpostId: String,
         antallVedlegg: Int,
     ) {
         try {
             val dialogmeldingForKafka = createDialogmeldingForKafka(
                 receivedDialogmelding = receivedDialogmelding,
-                msgHead = msgHead,
                 journalpostId = journalpostId,
                 antallVedlegg = antallVedlegg,
             )
@@ -45,18 +43,16 @@ class DialogmeldingProducer(
 
     fun createDialogmeldingForKafka(
         receivedDialogmelding: ReceivedDialogmelding,
-        msgHead: XMLMsgHead,
         journalpostId: String,
         antallVedlegg: Int,
     ): DialogmeldingForKafka {
-        val xmlMsgInfo = msgHead.msgInfo
         return DialogmeldingForKafka(
-            msgId = xmlMsgInfo.msgId,
-            msgType = xmlMsgInfo.type.v,
+            msgId = receivedDialogmelding.msgId,
+            msgType = receivedDialogmelding.msgType,
             navLogId = receivedDialogmelding.navLogId,
             mottattTidspunkt = receivedDialogmelding.mottattDato,
-            conversationRef = xmlMsgInfo.conversationRef?.refToConversation,
-            parentRef = xmlMsgInfo.conversationRef?.refToParent,
+            conversationRef = receivedDialogmelding.conversationRef,
+            parentRef = receivedDialogmelding.parentRef,
             personIdentPasient = receivedDialogmelding.personNrPasient,
             personIdentBehandler = receivedDialogmelding.personNrLege,
             legekontorOrgNr = receivedDialogmelding.legekontorOrgNr,

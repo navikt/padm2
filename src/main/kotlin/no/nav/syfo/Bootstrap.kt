@@ -23,6 +23,8 @@ import no.nav.syfo.kafka.*
 import no.nav.syfo.services.ArenaDialogmeldingService
 import no.nav.syfo.services.EmottakService
 import no.nav.syfo.services.MqApprecService
+import no.nav.syfo.services.MqVedleggService
+import no.nav.syfo.services.Padm2ValidationService
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -142,6 +144,13 @@ fun launchListeners(
         database = database,
         env = env,
         apprecService = apprecService,
+        validationService = Padm2ValidationService(
+            database = database,
+            env = env,
+            azureAdV2Client = azureAdV2Client,
+            httpClient = httpClient,
+        ),
+        vedleggService = MqVedleggService(),
         dialogmeldingProducer = dialogmeldingProducer,
         azureAdV2Client = azureAdV2Client,
         httpClient = httpClient,

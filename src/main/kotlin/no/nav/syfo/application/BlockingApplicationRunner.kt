@@ -47,7 +47,7 @@ class BlockingApplicationRunner(
             is TextMessage -> message.text
             else -> throw RuntimeException("Incoming message needs to be a byte message or text message")
         }
-        val dialogmeldingId: String? = try {
+        val receivedDialogmelding: ReceivedDialogmelding? = try {
             storeMessage(inputMessageText)
         } catch (e: Exception) {
             mqSender.sendBackout(message)
@@ -66,18 +66,18 @@ class BlockingApplicationRunner(
         }
 
         try {
-            if (inputMessageText != null && dialogmeldingId != null) {
-                dialogmeldingProcessor.process(dialogmeldingId, inputMessageText)
+            if (receivedDialogmelding != null) {
+                dialogmeldingProcessor.process(receivedDialogmelding)
             }
         } catch (e: Exception) {
             logger.warn("Exception caught while processing message, will try again later: ${e.message}", e)
         }
-        return dialogmeldingId
+        return receivedDialogmelding?.dialogmelding?.id
     }
 
     private fun storeMessage(
         inputMessageText: String
-    ): String? {
+    ): ReceivedDialogmelding? {
         val fellesformat = safeUnmarshal(inputMessageText)
         val msgHead: XMLMsgHead = fellesformat.get()
         val emottakblokk = fellesformat.get<XMLMottakenhetBlokk>()
@@ -117,6 +117,6 @@ class BlockingApplicationRunner(
             database = database,
         )
         INCOMING_MESSAGE_COUNTER.increment()
-        return dialogmeldingId
+        return receivedDialogmelding
     }
 }
