@@ -1,7 +1,5 @@
 package no.nav.syfo.handlestatus
 
-import no.nav.helse.msgHead.XMLMsgHead
-import no.nav.syfo.client.*
 import no.nav.syfo.db.DatabaseInterface
 import no.nav.syfo.kafka.DialogmeldingProducer
 import no.nav.syfo.model.ReceivedDialogmelding
@@ -19,27 +17,24 @@ suspend fun handleStatusOK(
     journalService: JournalService,
     dialogmeldingProducer: DialogmeldingProducer,
     receivedDialogmelding: ReceivedDialogmelding,
+    vedlegg: List<Vedlegg>,
     validationResult: ValidationResult,
-    vedleggListe: List<Vedlegg>?,
-    msgHead: XMLMsgHead,
-    pasientNavn: String,
     navnSignerendeLege: String,
 ) {
     val journalpostId = journalService.onJournalRequest(
         receivedDialogmelding,
         validationResult,
-        vedleggListe,
+        vedlegg,
         loggingMeta,
-        pasientNavn,
+        receivedDialogmelding.pasientNavn,
         navnSignerendeLege
     )
 
     if (!database.erDialogmeldingOpplysningerSendtKafka(receivedDialogmelding.dialogmelding.id)) {
         dialogmeldingProducer.sendDialogmelding(
             receivedDialogmelding = receivedDialogmelding,
-            msgHead = msgHead,
             journalpostId = journalpostId,
-            antallVedlegg = vedleggListe?.size ?: 0,
+            antallVedlegg = vedlegg.size,
         )
         database.lagreSendtKafka(receivedDialogmelding.dialogmelding.id)
     }

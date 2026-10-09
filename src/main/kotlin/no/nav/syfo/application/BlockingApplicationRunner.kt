@@ -14,6 +14,7 @@ import no.nav.syfo.metrics.INVALID_PDF_VEDLEGG
 import no.nav.syfo.metrics.MESSAGES_SENT_TO_BOQ
 import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.persistering.persistReceivedMessage
+import no.nav.syfo.services.ApprecService
 import no.nav.syfo.util.*
 import java.util.*
 import javax.jms.Message
@@ -25,6 +26,7 @@ class BlockingApplicationRunner(
     val database: DatabaseInterface,
     val inputconsumer: MessageConsumer,
     val mqSender: MQSenderInterface,
+    val apprecService: ApprecService,
     val dialogmeldingProcessor: DialogmeldingProcessor,
 ) {
     suspend fun run() {
@@ -45,7 +47,7 @@ class BlockingApplicationRunner(
             is TextMessage -> message.text
             else -> throw RuntimeException("Incoming message needs to be a byte message or text message")
         }
-        val dialogmeldingId: String? = try {
+        val receivedDialogmelding: ReceivedDialogmelding? = try {
             storeMessage(inputMessageText)
         } catch (e: Exception) {
             mqSender.sendBackout(message)
@@ -64,18 +66,18 @@ class BlockingApplicationRunner(
         }
 
         try {
-            if (inputMessageText != null && dialogmeldingId != null) {
-                dialogmeldingProcessor.process(dialogmeldingId, inputMessageText)
+            if (receivedDialogmelding != null) {
+                dialogmeldingProcessor.process(receivedDialogmelding)
             }
         } catch (e: Exception) {
             logger.warn("Exception caught while processing message, will try again later: ${e.message}", e)
         }
-        return dialogmeldingId
+        return receivedDialogmelding?.dialogmelding?.id
     }
 
     private fun storeMessage(
         inputMessageText: String
-    ): String? {
+    ): ReceivedDialogmelding? {
         val fellesformat = safeUnmarshal(inputMessageText)
         val msgHead: XMLMsgHead = fellesformat.get()
         val emottakblokk = fellesformat.get<XMLMottakenhetBlokk>()
@@ -95,11 +97,8 @@ class BlockingApplicationRunner(
         )
         logger.info("Received message, {}", StructuredArguments.fields(loggingMeta))
         if (innbyggerIdent.isNullOrEmpty() || !elevenDigits.matches(innbyggerIdent)) {
-            handlePatientMissing(
-                mqSender,
-                fellesformat,
-                loggingMeta,
-            )
+            handlePatientMissing(loggingMeta)
+            apprecService.avvisPasientMangler(fellesformat, loggingMeta)
             return null
         }
 
@@ -118,6 +117,6 @@ class BlockingApplicationRunner(
             database = database,
         )
         INCOMING_MESSAGE_COUNTER.increment()
-        return dialogmeldingId
+        return receivedDialogmelding
     }
 }

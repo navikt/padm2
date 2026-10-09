@@ -1,6 +1,7 @@
 package no.nav.syfo.model
 
 import no.nav.syfo.handlestatus.RULE_NAME_DUPLICATE
+import no.nav.syfo.handlestatus.RULE_NAME_PATIENT_NOT_FOUND
 import no.nav.syfo.handlestatus.RULE_NAME_VIRUS_CHECK
 
 data class ValidationResult(
@@ -25,3 +26,6 @@ fun ValidationResult.isDuplicate() =
 
 fun ValidationResult.isVirusCheck() =
     (status == Status.INVALID) && ruleHits.any { ruleInfo -> ruleInfo.ruleName == RULE_NAME_VIRUS_CHECK }
+
+fun ValidationResult.isPatientNotFound() =
+    (status == Status.INVALID) && ruleHits.any { ruleInfo -> ruleInfo.ruleName == RULE_NAME_PATIENT_NOT_FOUND }

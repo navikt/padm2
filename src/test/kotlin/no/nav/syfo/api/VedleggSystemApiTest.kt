@@ -19,6 +19,8 @@ import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.kafka.DialogmeldingProducer
 import no.nav.syfo.services.MqApprecService
+import no.nav.syfo.services.MqVedleggService
+import no.nav.syfo.services.Padm2ValidationService
 import no.nav.syfo.util.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -37,10 +39,19 @@ class VedleggSystemApiTest {
     private val incomingMessage = mockk<TextMessage>(relaxed = true)
     private val azureAdV2Client = mockk<AzureAdV2Client>(relaxed = true)
 
+    private val apprecService = MqApprecService(database, mqSender)
+
     private val dialogmeldingProcessor = DialogmeldingProcessor(
         database = database,
         env = externalMockEnvironment.environment,
-        apprecService = MqApprecService(database, mqSender),
+        apprecService = apprecService,
+        validationService = Padm2ValidationService(
+            database = database,
+            env = externalMockEnvironment.environment,
+            azureAdV2Client = azureAdV2Client,
+            httpClient = externalMockEnvironment.mockHttpClient,
+        ),
+        vedleggService = MqVedleggService(),
         dialogmeldingProducer = dialogmeldingProducer,
         azureAdV2Client = azureAdV2Client,
         httpClient = externalMockEnvironment.mockHttpClient,
@@ -52,6 +63,7 @@ class VedleggSystemApiTest {
         database = database,
         inputconsumer = mockk(),
         mqSender = mqSender,
+        apprecService = apprecService,
         dialogmeldingProcessor = dialogmeldingProcessor,
     )
 
