@@ -27,6 +27,14 @@
                             <TypeId DN="HER-id" S="2.16.578.1.12.4.1.1.8116" V="HER"/>
                         </Ident>
                     </Organisation>
+                    <HealthcareProfessional>
+                        <FamilyName>Kiropraktorsen</FamilyName>
+                        <GivenName>Lisa</GivenName>
+                        <Ident>
+                            <Id>01010112377</Id>
+                            <TypeId DN="Fødselsnummer" S="2.16.578.1.12.4.1.1.8116" V="FNR"/>
+                        </Ident>
+                    </HealthcareProfessional>
                 </Organisation>
             </Sender>
             <Receiver>

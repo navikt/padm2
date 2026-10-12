@@ -49,16 +49,33 @@ class ExtractFromFellesFormatTest {
     }
 
     @Test
-    internal fun `Finds behandlerident and hprId only in RollerRelatertNotat`() {
+    internal fun `Finds hprId in RollerRelatertNotat when fnr matches behandler in MsgHead`() {
         val fellesformat = safeUnmarshal(
-            getFileAsString("src/test/resources/dialogmelding_kiropraktor_fnr_i_rolle.xml")
+            getFileAsString("src/test/resources/dialogmelding_kiropraktor_hpr_i_rolle_samme_fnr.xml")
         )
 
-        val behandler = extractBehandler(fellesformat)
-
-        assertEquals(BEHANDLER_FNR, behandler?.fnr)
-        assertEquals("123456789", behandler?.hprId)
+        assertEquals("123456789", extractBehandler(fellesformat)?.hprId)
         assertEquals(BEHANDLER_FNR, extractIdentFromBehandler(fellesformat))
+        assertEquals("123456789", extractLegeHpr("dialogmeldingId", fellesformat))
+    }
+
+    @Test
+    internal fun `Does not use hprId in RollerRelatertNotat when fnr differs from behandler in MsgHead`() {
+        val fellesformat = safeUnmarshal(
+            getFileAsString("src/test/resources/dialogmelding_kiropraktor_hpr_i_rolle_annet_fnr.xml")
+        )
+
+        assertNull(extractBehandler(fellesformat)?.hprId)
+        assertEquals("02020212345", extractIdentFromBehandler(fellesformat))
+        assertNull(extractLegeHpr("dialogmeldingId", fellesformat))
+    }
+
+    @Test
+    internal fun `Finds hprId in RollerRelatertNotat when there is no behandler in MsgHead`() {
+        val fellesformat = safeUnmarshal(
+            getFileAsString("src/test/resources/dialogmelding_kiropraktor.xml")
+        )
+
         assertEquals("123456789", extractLegeHpr("dialogmeldingId", fellesformat))
     }
 

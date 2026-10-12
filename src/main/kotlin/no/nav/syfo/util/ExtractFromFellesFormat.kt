@@ -113,8 +113,7 @@ fun no.nav.helse.dialogmelding.XMLHealthcareProfessional.toBehandler(): Behandle
     fornavn = givenName ?: "",
     etternavn = familyName,
     mellomnavn = middleName,
-    hprId = ident?.find { it.typeId.v == "HPR" }?.id,
-    fnr = ident?.find { it.typeId.v == "FNR" || it.typeId.v == "DNR" }?.id
+    hprId = ident?.find { it.typeId.v == "HPR" }?.id
 )
 
 // Fra MsgHead
@@ -122,24 +121,31 @@ fun XMLHealthcareProfessional.toBehandler(): Behandler = Behandler(
     fornavn = givenName ?: "",
     etternavn = familyName,
     mellomnavn = middleName,
-    hprId = ident?.find { it.typeId.v == "HPR" }?.id,
-    fnr = ident?.find { it.typeId.v == "FNR" || it.typeId.v == "DNR" }?.id
+    hprId = ident?.find { it.typeId.v == "HPR" }?.id
 )
 
-private fun extractBehandlerFromRoller(fellesformat: XMLEIFellesformat): Behandler? =
+private fun XMLHealthcareProfessional.fnr(): String? =
+    ident?.find { it.typeId.v == "FNR" || it.typeId.v == "DNR" }?.id
+
+private fun no.nav.helse.dialogmelding.XMLHealthcareProfessional.fnr(): String? =
+    ident?.find { it.typeId.v == "FNR" || it.typeId.v == "DNR" }?.id
+
+private fun extractHealthcareProfessionalFromRoller(
+    fellesformat: XMLEIFellesformat,
+): no.nav.helse.dialogmelding.XMLHealthcareProfessional? =
     extractDialogmelding(fellesformat).notat.firstOrNull()
-        ?.rollerRelatertNotat?.firstOrNull()?.healthcareProfessional?.toBehandler()
+        ?.rollerRelatertNotat?.firstOrNull()?.healthcareProfessional
 
 fun extractBehandler(fellesformat: XMLEIFellesformat): Behandler? {
-    val behandlerInMsgHead = fellesformat.get<XMLMsgHead>().msgInfo.sender.organisation?.healthcareProfessional?.toBehandler()
-    val behandler = behandlerInMsgHead ?: return extractBehandlerFromRoller(fellesformat)
-    if (behandler.hprId != null && behandler.fnr != null) return behandler
+    val professionalInMsgHead = fellesformat.get<XMLMsgHead>().msgInfo.sender.organisation?.healthcareProfessional
+    val professionalInRoller = extractHealthcareProfessionalFromRoller(fellesformat)
+    val behandler = professionalInMsgHead?.toBehandler() ?: return professionalInRoller?.toBehandler()
+    if (behandler.hprId != null) return behandler
 
-    val behandlerFromRoller = extractBehandlerFromRoller(fellesformat)
-    return behandler.copy(
-        hprId = behandler.hprId ?: behandlerFromRoller?.hprId,
-        fnr = behandler.fnr ?: behandlerFromRoller?.fnr,
-    )
+    // Personen i MsgHead er ikke nødvendigvis den som har skrevet dokumentet, så HPR hentes fra rollen kun ved samme fnr
+    val fnrInMsgHead = professionalInMsgHead.fnr()
+    val sameBehandlerInRoller = fnrInMsgHead != null && fnrInMsgHead == professionalInRoller?.fnr()
+    return if (sameBehandlerInRoller) behandler.copy(hprId = professionalInRoller?.toBehandler()?.hprId) else behandler
 }
 
 fun extractBehandlerNavn(fellesformat: XMLEIFellesformat): String? {
@@ -164,7 +170,8 @@ fun extractInnbyggerident(fellesformat: XMLEIFellesformat): String? =
     }?.id
 
 fun extractIdentFromBehandler(fellesformat: XMLEIFellesformat): String? {
-    val behandlerIdent = extractBehandler(fellesformat)?.fnr
+    val behandlerIdent = fellesformat.get<XMLMsgHead>()
+        .msgInfo.sender.organisation?.healthcareProfessional?.fnr()
 
     if (behandlerIdent == null) {
         logger.info("Behandler did not include ident type fnr or dnr in dialogmelding")
