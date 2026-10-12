@@ -15,7 +15,6 @@ fun testEnvironment() = Environment(
     databaseName = "padm2_dev",
     databaseUsername = "username",
     databasePassword = "password",
-    cluster = "dev-gcp",
     kafka = ApplicationEnvironmentKafka(
         bootstrapServers = "kafkaBootstrapServers",
         aivenCredstorePassword = "credstorepassord",

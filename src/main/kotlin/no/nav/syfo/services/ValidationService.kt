@@ -91,7 +91,7 @@ class Padm2ValidationService(
                 handlePatientNotFound(loggingMeta)
             } else if (!legeOK && !env.isDevGcp) {
                 handleBehandlerNotFound(loggingMeta)
-            } else if (erTestFnr(receivedDialogmelding.personNrPasient) && env.cluster == "prod-gcp") {
+            } else if (erTestFnr(receivedDialogmelding.personNrPasient) && !env.isDevGcp) {
                 handleTestFnrInProd(loggingMeta)
             } else if (dialogmeldingType.isHenvendelseFraLegeOrForesporselSvar() && dialogmeldingXml.notat.first().tekstNotatInnhold.isNullOrEmpty()) {
                 handleMeldingsTekstMangler(loggingMeta)

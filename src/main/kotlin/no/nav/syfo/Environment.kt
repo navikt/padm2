@@ -16,7 +16,6 @@ data class Environment(
     override val mqChannelName: String = getEnvVar("MQ_CHANNEL_NAME"),
     val inputQueueName: String = getEnvVar("MQ_INPUT_QUEUE_NAME"),
     val apprecQueueName: String = getEnvVar("MQ_APPREC_QUEUE_NAME"),
-    val cluster: String = getEnvVar("NAIS_CLUSTER_NAME"),
     val inputBackoutQueueName: String = getEnvVar("MQ_INPUT_BOQ_QUEUE_NAME"),
     val dokArkivClientId: String = getEnvVar("DOKARKIV_CLIENT_ID"),
     val dokArkivUrl: String = getEnvVar("DOK_ARKIV_URL"),
