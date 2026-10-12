@@ -1,25 +1,18 @@
 package no.nav.syfo.application
 
 import net.logstash.logback.argument.StructuredArguments
-import no.nav.helse.dialogmelding.XMLDialogmelding
-import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
-import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.Environment
 import no.nav.syfo.client.*
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
-import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.db.DatabaseInterface
-import no.nav.syfo.domain.PersonIdent
 import no.nav.syfo.handlestatus.*
 import no.nav.syfo.kafka.DialogmeldingProducer
 import no.nav.syfo.logger
 import no.nav.syfo.metrics.REQUEST_TIME
 import no.nav.syfo.model.*
-import no.nav.syfo.persistering.db.hentMottattTidspunkt
 import no.nav.syfo.persistering.persistRecivedMessageValidation
 import no.nav.syfo.services.*
 import no.nav.syfo.util.*
-import no.nav.syfo.validation.isKodeverkValid
 import io.ktor.client.HttpClient
 import java.time.Duration
 import java.time.LocalDateTime
@@ -29,6 +22,8 @@ class DialogmeldingProcessor(
     val database: DatabaseInterface,
     val env: Environment,
     val apprecService: ApprecService,
+    val validationService: ValidationService,
+    val vedleggService: VedleggService,
     val dialogmeldingProducer: DialogmeldingProducer,
     val azureAdV2Client: AzureAdV2Client,
     val httpClient: HttpClient,
@@ -37,13 +32,6 @@ class DialogmeldingProcessor(
     val pdfgenClient = PdfgenClient(
         url = env.syfopdfgen,
         httpClient = httpClientPdfgen,
-    )
-
-    val pdlClient = PdlClient(
-        azureAdV2Client = azureAdV2Client,
-        pdlClientId = env.pdlClientId,
-        pdlUrl = env.pdlUrl,
-        httpClient = httpClient,
     )
     val dokArkivClient = DokArkivClient(
         azureAdV2Client = azureAdV2Client,
@@ -57,18 +45,6 @@ class DialogmeldingProcessor(
         helsenettClientId = env.syfohelsenettproxyClientId,
         httpClient = httpClient,
     )
-    val legeSuspensjonClient = LegeSuspensjonClient(
-        azureAdV2Client = azureAdV2Client,
-        endpointUrl = env.legeSuspensjonEndpointURL,
-        endpointClientId = env.legeSuspensjonClientId,
-        applicationName = env.applicationName,
-        httpClient = httpClient,
-    )
-    val padm2ReglerService = RuleService(
-        legeSuspensjonClient = legeSuspensjonClient,
-        syfohelsenettproxyClient = syfohelsenettproxyClient,
-        env = env,
-    )
     val journalService = JournalService(
         dokArkivClient = dokArkivClient,
         pdfgenClient = pdfgenClient,
@@ -78,43 +54,14 @@ class DialogmeldingProcessor(
     val signerendeLegeService = SignerendeLegeService(
         syfohelsenettproxyClient = syfohelsenettproxyClient,
     )
-    val clamAvClient = ClamAvClient(
-        endpointUrl = env.clamavURL,
-        httpClient = httpClient,
-    )
-    val virusScanService = VirusScanService(
-        clamAvClient = clamAvClient,
-    )
 
     suspend fun process(
-        dialogmeldingId: String,
-        inputMessageText: String,
+        receivedDialogmelding: ReceivedDialogmelding,
     ) {
-        val fellesformat = safeUnmarshal(inputMessageText)
-        val msgHead: XMLMsgHead = fellesformat.get()
-        val emottakblokk = fellesformat.get<XMLMottakenhetBlokk>()
-        val msgId = msgHead.msgInfo.msgId
-        val dialogmeldingXml = extractDialogmelding(fellesformat)
-        val patientXml = extractPatient(fellesformat)
-        val dialogmeldingType = findDialogmeldingType(emottakblokk.ebService, emottakblokk.ebAction)
-        val xmlVedlegg = extractValidVedlegg(fellesformat)
-        val sha256String = sha256hashstring(dialogmeldingXml, patientXml, xmlVedlegg)
-        val pasientNavn = extractPasientNavn(fellesformat)
-
-        val loggingMeta = LoggingMeta.create(
-            emottakBlokk = emottakblokk,
-            fellesformatXml = fellesformat,
-            msgHead = msgHead,
-        )
+        val loggingMeta = receivedDialogmelding.loggingMeta()
         val starttime = System.currentTimeMillis()
 
-        val receivedDialogmelding = ReceivedDialogmelding.create(
-            dialogmeldingId = dialogmeldingId,
-            fellesformat = fellesformat,
-            inputMessageText = inputMessageText,
-        )
-
-        val processingDelay = processingDelay(dialogmeldingType)
+        val processingDelay = processingDelay(receivedDialogmelding.dialogmeldingType)
         if (
             !processingDelay.isZero &&
             receivedDialogmelding.mottattDato.isAfter(LocalDateTime.now(ZoneId.of("Europe/Oslo")).minus(processingDelay))
@@ -125,26 +72,18 @@ class DialogmeldingProcessor(
             return
         }
 
-        val innbyggerOK = pdlClient.personEksisterer(PersonIdent(receivedDialogmelding.personNrPasient))
-        val legeOK = pdlClient.personEksisterer(PersonIdent(receivedDialogmelding.personNrLege))
-
         val navnSignerendeLege = signerendeLegeService.signerendeLegeNavn(
             signerendeLegeFnr = receivedDialogmelding.personNrLege,
-            msgId = msgId,
+            msgId = receivedDialogmelding.msgId,
             loggingMeta = loggingMeta,
         )
-        val vedleggListe = xmlVedlegg.map { xml -> xml.toVedlegg() }
 
-        val validationResult = validateMessage(
-            msgId = msgId,
-            sha256String = sha256String,
-            loggingMeta = loggingMeta,
-            innbyggerOK = innbyggerOK,
-            legeOK = legeOK,
-            dialogmeldingType = dialogmeldingType,
-            dialogmeldingXml = dialogmeldingXml,
+        val vedlegg = vedleggService.hentVedlegg(receivedDialogmelding)
+
+        val validationResult = validationService.validate(
             receivedDialogmelding = receivedDialogmelding,
-            vedlegg = vedleggListe,
+            vedlegg = vedlegg,
+            loggingMeta = loggingMeta,
         )
 
         when (validationResult.status) {
@@ -155,10 +94,8 @@ class DialogmeldingProcessor(
                 journalService = journalService,
                 dialogmeldingProducer = dialogmeldingProducer,
                 receivedDialogmelding = receivedDialogmelding,
+                vedlegg = vedlegg,
                 validationResult = validationResult,
-                vedleggListe = vedleggListe,
-                msgHead = msgHead,
-                pasientNavn = pasientNavn,
                 navnSignerendeLege = navnSignerendeLege,
             )
 
@@ -168,10 +105,8 @@ class DialogmeldingProcessor(
                 loggingMeta = loggingMeta,
                 journalService = journalService,
                 receivedDialogmelding = receivedDialogmelding,
-                vedleggListe = vedleggListe,
-                pasientNavn = pasientNavn,
+                vedlegg = vedlegg,
                 navnSignerendeLege = navnSignerendeLege,
-                innbyggerOK = innbyggerOK,
             )
         }
 
@@ -196,59 +131,11 @@ class DialogmeldingProcessor(
         )
     }
 
-    suspend fun validateMessage(
-        msgId: String,
-        sha256String: String,
-        loggingMeta: LoggingMeta,
-        innbyggerOK: Boolean,
-        legeOK: Boolean,
-        dialogmeldingType: DialogmeldingType,
-        dialogmeldingXml: XMLDialogmelding,
-        receivedDialogmelding: ReceivedDialogmelding,
-        vedlegg: List<Vedlegg>,
-    ): ValidationResult {
-        val initialValidationResult: ValidationResult? =
-            if (dialogmeldingDokumentWithShaExists(receivedDialogmelding.dialogmelding.id, sha256String, database)) {
-                val tidMottattOpprinneligMelding = database.hentMottattTidspunkt(sha256String)
-                handleDuplicateDialogmeldingContent(
-                    loggingMeta,
-                    sha256String,
-                    tidMottattOpprinneligMelding,
-                )
-            } else if (!innbyggerOK) {
-                handlePatientNotFound(loggingMeta)
-            } else if (!legeOK && !env.isDevGcp) {
-                handleBehandlerNotFound(loggingMeta)
-            } else if (erTestFnr(receivedDialogmelding.personNrPasient) && env.cluster == "prod-gcp") {
-                handleTestFnrInProd(loggingMeta)
-            } else if (dialogmeldingType.isHenvendelseFraLegeOrForesporselSvar() && dialogmeldingXml.notat.first().tekstNotatInnhold.isNullOrEmpty()) {
-                handleMeldingsTekstMangler(loggingMeta)
-            } else if (!isKodeverkValid(msgId, dialogmeldingXml, dialogmeldingType)) {
-                handleInvalidDialogMeldingKodeverk(loggingMeta)
-            } else if (virusScanService.vedleggContainsVirus(vedlegg)) {
-                handleVedleggMayContainVirus(loggingMeta)
-            } else {
-                null
-            }
-
-        return initialValidationResult ?: padm2ReglerService.executeRuleChains(
-            receivedDialogmelding = receivedDialogmelding,
-        )
-    }
-
     companion object {
         val HENVENDELSE_DELAY: Duration = Duration.ofHours(1)
         val ALERT_DELAY: Duration = Duration.ofHours(1)
 
-        fun processingDelay(inputMessageText: String): Duration =
-            try {
-                val emottakblokk = safeUnmarshal(inputMessageText).get<XMLMottakenhetBlokk>()
-                processingDelay(findDialogmeldingType(emottakblokk.ebService, emottakblokk.ebAction))
-            } catch (e: Exception) {
-                Duration.ZERO
-            }
-
-        private fun processingDelay(dialogmeldingType: DialogmeldingType): Duration =
+        fun processingDelay(dialogmeldingType: DialogmeldingType): Duration =
             if (dialogmeldingType == DialogmeldingType.DIALOGMELDING_HENVENDELSE_FRA_LEGE_HENDVENDELSE) {
                 HENVENDELSE_DELAY
             } else {

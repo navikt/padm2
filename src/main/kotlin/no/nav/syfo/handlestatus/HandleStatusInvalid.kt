@@ -1,10 +1,6 @@
 package no.nav.syfo.handlestatus
 
 import net.logstash.logback.argument.StructuredArguments.fields
-import no.nav.helse.apprecV1.XMLCV
-import no.nav.helse.eiFellesformat2.XMLEIFellesformat
-import no.nav.syfo.application.mq.MQSenderInterface
-import no.nav.syfo.apprec.*
 import no.nav.syfo.logger
 import no.nav.syfo.metrics.INVALID_MESSAGE_NO_NOTICE
 import no.nav.syfo.metrics.TEST_FNR_IN_PROD
@@ -12,7 +8,6 @@ import no.nav.syfo.model.*
 import no.nav.syfo.persistering.db.domain.DialogmeldingTidspunkt
 import no.nav.syfo.services.ApprecService
 import no.nav.syfo.services.JournalService
-import no.nav.syfo.services.sendReceipt
 import no.nav.syfo.util.LogType
 import no.nav.syfo.util.LoggingMeta
 import no.nav.syfo.util.createLogEntry
@@ -21,6 +16,7 @@ import java.time.format.DateTimeFormatter
 
 val RULE_NAME_DUPLICATE = "DUPLICATE_DIALOGMELDING_CONTENT"
 val RULE_NAME_VIRUS_CHECK = "VIRUSSJEKK_FEILET"
+val RULE_NAME_PATIENT_NOT_FOUND = "PATIENT_NOT_FOUND"
 
 suspend fun handleStatusINVALID(
     apprecService: ApprecService,
@@ -28,18 +24,16 @@ suspend fun handleStatusINVALID(
     loggingMeta: LoggingMeta,
     journalService: JournalService,
     receivedDialogmelding: ReceivedDialogmelding,
-    vedleggListe: List<Vedlegg>?,
-    pasientNavn: String,
+    vedlegg: List<Vedlegg>,
     navnSignerendeLege: String,
-    innbyggerOK: Boolean,
 ) {
-    if (innbyggerOK && !validationResult.isVirusCheck() && !validationResult.isDuplicate()) {
+    if (!validationResult.isPatientNotFound() && !validationResult.isVirusCheck() && !validationResult.isDuplicate()) {
         journalService.onJournalRequest(
             receivedDialogmelding,
             validationResult,
-            vedleggListe,
+            vedlegg,
             loggingMeta,
-            pasientNavn,
+            receivedDialogmelding.pasientNavn,
             navnSignerendeLege
         )
     } else {
@@ -113,7 +107,7 @@ fun handlePatientNotFound(
         status = Status.INVALID,
         ruleHits = listOf(
             RuleInfo(
-                ruleName = "PATIENT_NOT_FOUND",
+                ruleName = RULE_NAME_PATIENT_NOT_FOUND,
                 messageForSender = message,
                 messageForUser = message,
                 ruleStatus = Status.INVALID
@@ -123,8 +117,6 @@ fun handlePatientNotFound(
 }
 
 fun handlePatientMissing(
-    mqSender: MQSenderInterface,
-    fellesformat: XMLEIFellesformat,
     loggingMeta: LoggingMeta
 ) {
     logger.warn(
@@ -134,17 +126,6 @@ fun handlePatientMissing(
             loggingMeta
         )
     )
-
-    sendReceipt(
-        mqSender,
-        fellesformat,
-        ApprecStatus.AVVIST,
-        listOf(
-            createApprecError("Pasienten er ikke funnet i dialogmeldingen eller fnr er ugyldig")
-        ),
-    )
-    logger.info("Apprec Receipt with status Avvist sent, {}", fields(loggingMeta))
-
     INVALID_MESSAGE_NO_NOTICE.increment()
 }
 
@@ -279,10 +260,4 @@ fun handleVedleggMayContainVirus(
             )
         )
     )
-}
-
-fun createApprecError(errorText: String): XMLCV = XMLCV().apply {
-    dn = errorText
-    v = "X99"
-    s = "2.16.578.1.12.4.1.1.8221"
 }

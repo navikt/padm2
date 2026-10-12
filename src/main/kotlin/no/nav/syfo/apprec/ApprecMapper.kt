@@ -19,6 +19,8 @@ import no.nav.helse.msgHead.XMLOrganisation
 import no.nav.syfo.model.RuleInfo
 import no.nav.syfo.util.get
 
+const val PATIENT_MISSING_MESSAGE = "Pasienten er ikke funnet i dialogmeldingen eller fnr er ugyldig"
+
 fun createApprec(fellesformat: XMLEIFellesformat, apprecStatus: ApprecStatus): XMLEIFellesformat {
     val xmlMottakenhetBlokk = fellesformat.get<XMLMottakenhetBlokk>()
     val xmlMsgHead = fellesformat.get<XMLMsgHead>()
@@ -117,13 +119,10 @@ fun XMLIdent.intoAdditionalId(): XMLAdditionalId {
     }
 }
 
-fun RuleInfo.toApprecCV(): AppRecCV {
-    val ruleInfo = this
-    return createApprecError(ruleInfo.messageForSender)
-}
+fun RuleInfo.toApprecCV() = createApprecError(this.messageForSender)
 
-fun createApprecError(textToTreater: String): AppRecCV = AppRecCV().apply {
-    dn = textToTreater
+fun createApprecError(text: String): AppRecCV = AppRecCV().apply {
+    dn = text
     v = "X99"
     s = "2.16.578.1.12.4.1.1.8221"
 }
