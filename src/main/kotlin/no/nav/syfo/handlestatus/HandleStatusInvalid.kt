@@ -25,7 +25,7 @@ suspend fun handleStatusINVALID(
     journalService: JournalService,
     receivedDialogmelding: ReceivedDialogmelding,
     vedlegg: List<Vedlegg>,
-    navnSignerendeLege: String,
+    avsenderBehandler: Behandler?,
 ) {
     if (!validationResult.isPatientNotFound() && !validationResult.isVirusCheck() && !validationResult.isDuplicate()) {
         journalService.onJournalRequest(
@@ -34,7 +34,7 @@ suspend fun handleStatusINVALID(
             vedlegg,
             loggingMeta,
             receivedDialogmelding.pasientNavn,
-            navnSignerendeLege
+            avsenderBehandler,
         )
     } else {
         logger.info(

@@ -2,6 +2,7 @@ package no.nav.syfo.handlestatus
 
 import no.nav.syfo.db.DatabaseInterface
 import no.nav.syfo.kafka.DialogmeldingProducer
+import no.nav.syfo.model.Behandler
 import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.model.ValidationResult
 import no.nav.syfo.model.Vedlegg
@@ -19,7 +20,7 @@ suspend fun handleStatusOK(
     receivedDialogmelding: ReceivedDialogmelding,
     vedlegg: List<Vedlegg>,
     validationResult: ValidationResult,
-    navnSignerendeLege: String,
+    avsenderBehandler: Behandler?,
 ) {
     val journalpostId = journalService.onJournalRequest(
         receivedDialogmelding,
@@ -27,12 +28,13 @@ suspend fun handleStatusOK(
         vedlegg,
         loggingMeta,
         receivedDialogmelding.pasientNavn,
-        navnSignerendeLege
+        avsenderBehandler,
     )
 
     if (!database.erDialogmeldingOpplysningerSendtKafka(receivedDialogmelding.dialogmelding.id)) {
         dialogmeldingProducer.sendDialogmelding(
             receivedDialogmelding = receivedDialogmelding,
+            avsenderBehandler = avsenderBehandler,
             journalpostId = journalpostId,
             antallVedlegg = vedlegg.size,
         )

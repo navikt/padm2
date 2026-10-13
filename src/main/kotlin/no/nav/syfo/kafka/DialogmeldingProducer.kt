@@ -15,12 +15,14 @@ class DialogmeldingProducer(
 ) {
     fun sendDialogmelding(
         receivedDialogmelding: ReceivedDialogmelding,
+        avsenderBehandler: Behandler?,
         journalpostId: String,
         antallVedlegg: Int,
     ) {
         try {
             val dialogmeldingForKafka = createDialogmeldingForKafka(
                 receivedDialogmelding = receivedDialogmelding,
+                avsenderBehandler = avsenderBehandler,
                 journalpostId = journalpostId,
                 antallVedlegg = antallVedlegg,
             )
@@ -43,6 +45,7 @@ class DialogmeldingProducer(
 
     fun createDialogmeldingForKafka(
         receivedDialogmelding: ReceivedDialogmelding,
+        avsenderBehandler: Behandler?,
         journalpostId: String,
         antallVedlegg: Int,
     ): DialogmeldingForKafka {
@@ -58,8 +61,12 @@ class DialogmeldingProducer(
             legekontorOrgNr = receivedDialogmelding.legekontorOrgNr,
             legekontorHerId = receivedDialogmelding.legekontorHerId,
             legekontorOrgName = receivedDialogmelding.legekontorOrgName,
-            legehpr = receivedDialogmelding.legehpr,
-            dialogmelding = receivedDialogmelding.dialogmelding,
+            legehpr = avsenderBehandler?.hprId,
+            dialogmelding = receivedDialogmelding.dialogmelding.let { dialogmelding ->
+                if (avsenderBehandler == null) dialogmelding else dialogmelding.copy(
+                    navnHelsepersonell = avsenderBehandler.getNavn(fallback = dialogmelding.navnHelsepersonell),
+                )
+            },
             antallVedlegg = antallVedlegg,
             journalpostId = journalpostId,
             fellesformatXML = cloneAndPrune(receivedDialogmelding.fellesformat),

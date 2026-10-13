@@ -39,6 +39,7 @@ internal class DialogmeldingProducerTest {
 
         dialogmeldingProducer.sendDialogmelding(
             receivedDialogmelding = receivedDialogmelding,
+            avsenderBehandler = null,
             journalpostId = journalpostId,
             antallVedlegg = fellesformat.calculateNumberOfVedlegg(),
         )
@@ -58,11 +59,35 @@ internal class DialogmeldingProducerTest {
     }
 
     @Test
+    internal fun `Kafka-melding bruker hpr og navn fra signerende lege`() {
+        setupTestData(getFileAsStringISO88591("src/test/resources/dialogmelding_dialog_notat.xml"))
+        val signerendeLege = Behandler(
+            fnr = receivedDialogmelding.personNrLege,
+            hprId = "7654321",
+            fornavn = "Signe",
+            mellomnavn = null,
+            etternavn = "Signerende",
+        )
+
+        val dialogmeldingForKafka = dialogmeldingProducer.createDialogmeldingForKafka(
+            receivedDialogmelding = receivedDialogmelding,
+            avsenderBehandler = signerendeLege,
+            journalpostId = journalpostId,
+            antallVedlegg = 0,
+        )
+
+        assertEquals(receivedDialogmelding.personNrLege, dialogmeldingForKafka.personIdentBehandler)
+        assertEquals("7654321", dialogmeldingForKafka.legehpr)
+        assertEquals("Signe Signerende", dialogmeldingForKafka.dialogmelding.navnHelsepersonell)
+    }
+
+    @Test
     internal fun `Tester mapping fra fellesformat til Kafka topic manglende conversationRef`() {
         setupTestData(getFileAsStringISO88591("src/test/resources/dialogmelding_dialog_notat_dnr.xml"))
 
         dialogmeldingProducer.sendDialogmelding(
             receivedDialogmelding = receivedDialogmelding,
+            avsenderBehandler = null,
             journalpostId = journalpostId,
             antallVedlegg = fellesformat.calculateNumberOfVedlegg(),
         )
@@ -87,6 +112,7 @@ internal class DialogmeldingProducerTest {
 
         dialogmeldingProducer.sendDialogmelding(
             receivedDialogmelding = receivedDialogmelding,
+            avsenderBehandler = null,
             journalpostId = journalpostId,
             antallVedlegg = fellesformat.calculateNumberOfVedlegg(),
         )
@@ -114,6 +140,7 @@ internal class DialogmeldingProducerTest {
 
         dialogmeldingProducer.sendDialogmelding(
             receivedDialogmelding = receivedDialogmelding,
+            avsenderBehandler = null,
             journalpostId = journalpostId,
             antallVedlegg = fellesformat.calculateNumberOfVedlegg(),
         )
@@ -141,6 +168,7 @@ internal class DialogmeldingProducerTest {
 
         dialogmeldingProducer.sendDialogmelding(
             receivedDialogmelding = receivedDialogmelding,
+            avsenderBehandler = null,
             journalpostId = journalpostId,
             antallVedlegg = fellesformat.calculateNumberOfVedlegg(),
         )
@@ -166,6 +194,7 @@ internal class DialogmeldingProducerTest {
 
         dialogmeldingProducer.sendDialogmelding(
             receivedDialogmelding = receivedDialogmelding,
+            avsenderBehandler = null,
             journalpostId = journalpostId,
             antallVedlegg = fellesformat.calculateNumberOfVedlegg(),
         )
@@ -197,7 +226,6 @@ internal class DialogmeldingProducerTest {
         val legekontorOrgName = extractSenderOrganisationName(fellesformat)
         val legekontorHerId = extractOrganisationHerNumberFromSender(fellesformat)?.id
         val dialogmeldingType = findDialogmeldingType(emottakblokk.ebService, emottakblokk.ebAction)
-        val legeHpr = extractLegeHpr(dialogmeldingId, fellesformat)
 
         val dialomeldingxml = extractDialogmelding(fellesformat)
         val signaturDato = LocalDateTime.of(2017, 11, 5, 0, 0, 0)
@@ -228,7 +256,6 @@ internal class DialogmeldingProducerTest {
                 .withZoneSameInstant(
                     ZoneOffset.UTC
                 ).toLocalDateTime(),
-            legehpr = legeHpr,
             fellesformat = inputMessageText,
         )
         journalpostId = "jpid"

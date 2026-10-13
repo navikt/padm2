@@ -54,6 +54,7 @@ internal class CreateArenaDialogNotatTest {
             emottakblokk,
             dialogmelding,
             msgHead.msgInfo.patient,
+            extractBehandler(felleformatDm),
         )
 
         assertEquals("DM", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentType)
@@ -78,7 +79,7 @@ internal class CreateArenaDialogNotatTest {
 
     @Test
     internal fun `Default to 0 when tss id is empty string`() {
-        val behandler = Behandler(etternavn = "Etternavn", fornavn = "Fornavn", mellomnavn = "Mellomnavn")
+        val behandler = Behandler(fnr = FASTLEGE_FNR, hprId = null, fornavn = "Fornavn", mellomnavn = "Mellomnavn", etternavn = "Etternavn")
         val avsender = createAvsender(FASTLEGE_FNR, "", behandler)
         assertEquals(FASTLEGE_FNR, avsender.lege.legeFnr)
         assertEquals(BigInteger("0"), avsender.lege.tssId)
@@ -86,7 +87,7 @@ internal class CreateArenaDialogNotatTest {
 
     @Test
     internal fun `Default to 0 when tss id is null`() {
-        val behandler = Behandler("Etternavn", "Fornavn", "Mellomnavn")
+        val behandler = Behandler(fnr = FASTLEGE_FNR, hprId = null, fornavn = "Fornavn", mellomnavn = "Mellomnavn", etternavn = "Etternavn")
         val avsender = createAvsender(FASTLEGE_FNR, null, behandler)
         assertEquals(FASTLEGE_FNR, avsender.lege.legeFnr)
         assertEquals(BigInteger("0"), avsender.lege.tssId)
@@ -127,6 +128,7 @@ internal class CreateArenaDialogNotatTest {
             emottakblokk,
             dialogmelding,
             msgHead.msgInfo.patient,
+            extractBehandler(felleformatDm),
         )
 
         assertEquals("DM", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentType)
@@ -191,6 +193,7 @@ internal class CreateArenaDialogNotatTest {
             emottakblokk,
             dialogmelding,
             msgHead.msgInfo.patient,
+            extractBehandler(felleformatDm),
         )
 
         assertEquals("DM", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentType)
@@ -250,6 +253,7 @@ internal class CreateArenaDialogNotatTest {
             emottakblokk,
             dialogmelding,
             msgHead.msgInfo.patient,
+            extractBehandler(felleformatDm),
         )
 
         assertEquals("45088649080", arenaDialogNotat.pasientData.person.personFnr)
@@ -290,6 +294,7 @@ internal class CreateArenaDialogNotatTest {
             emottakblokk,
             dialogmelding,
             msgHead.msgInfo.patient,
+            extractBehandler(felleformatDm),
         )
 
         assertEquals("3", arenaDialogNotat.notatKategori)
@@ -332,6 +337,7 @@ internal class CreateArenaDialogNotatTest {
             emottakblokk,
             dialogmelding,
             msgHead.msgInfo.patient,
+            extractBehandler(felleformatDm),
         )
 
         assertEquals("Hei,Det gjelder pas. Sender sm2013 som vedlegg", arenaDialogNotat.notatTekst)

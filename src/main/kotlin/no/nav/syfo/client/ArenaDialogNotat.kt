@@ -24,10 +24,10 @@ fun createArenaDialogNotat(
     emottakblokk: XMLMottakenhetBlokk,
     dialogmelding: Dialogmelding,
     patient: XMLPatient,
+    avsenderBehandler: Behandler?,
 ): ArenaDialogNotat =
     ArenaDialogNotat().apply {
         val dialogmeldingXml = extractDialogmelding(fellesformat)
-        val behandler = extractBehandler(fellesformat)
         eiaDokumentInfo = EiaDokumentInfoType().apply {
             dokumentInfo = DokumentInfoType().apply {
                 dokumentType = "DM"
@@ -37,7 +37,7 @@ fun createArenaDialogNotat(
                 ediLoggId = emottakblokk.ediLoggId
                 dokumentDato = msgHead.msgInfo.genDate
             }
-            avsender = createAvsender(legefnr, tssid, behandler)
+            avsender = createAvsender(legefnr, tssid, avsenderBehandler)
             avsenderSystem = EiaDokumentInfoType.AvsenderSystem().apply {
                 systemNavn = "SKJEMA-MOTTAK"
                 systemVersjon = "1.0.0"
@@ -70,7 +70,7 @@ fun createArenaDialogNotat(
 fun createAvsender(
     legefnr: String,
     tssid: String?,
-    behandler: Behandler?
+    behandler: Behandler?,
 ): EiaDokumentInfoType.Avsender {
     val validatedTssID = if (tssid.isNullOrBlank()) {
         TSS_MISS_COUNTER.increment()
