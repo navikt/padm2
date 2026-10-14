@@ -73,7 +73,7 @@ class BlockingApplicationRunnerTest {
         justRun { mqSender.sendArena(any()) }
         justRun { mqSender.sendReceipt(any()) }
         justRun { mqSender.sendBackout(any()) }
-        justRun { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        justRun { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
         coEvery { smtssClient.findBestTss(any(), any(), any()) } returns TssId("123")
         coJustRun { emottakService.registerEmottakSubscription(any(), any(), any(), any(), any()) }
     }
@@ -89,7 +89,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 1) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
         assertNotNull(dialogmeldingId)
         val journalpostId = database.hentDialogmeldingOpplysningerJournalpostId(dialogmeldingId!!)
         assertNotNull(journalpostId)
@@ -106,7 +106,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 1) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
         assertNotNull(dialogmeldingId)
         val journalpostId = database.hentDialogmeldingOpplysningerJournalpostId(dialogmeldingId!!)
         assertNotNull(journalpostId)
@@ -123,7 +123,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 1) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
     }
 
     @Test
@@ -137,7 +137,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 1) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
     }
 
     @Test
@@ -151,7 +151,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 1) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
     }
 
     @Test
@@ -166,7 +166,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 0) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
 
         externalMockEnvironment.pdfgenMock.alwaysFail = false
         database.updateCreatedAt(
@@ -179,7 +179,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 1) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
     }
 
     @Test
@@ -197,7 +197,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 1) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
     }
 
     @Test
@@ -213,7 +213,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 1) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
     }
 
     @Test
@@ -227,7 +227,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 1) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
     }
 
     @Test
@@ -241,7 +241,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 1) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
     }
 
     @Test
@@ -256,7 +256,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 1) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
         assertNotNull(dialogmeldingId)
         val journalpostId = database.hentDialogmeldingOpplysningerJournalpostId(dialogmeldingId!!)
         assertNull(journalpostId)
@@ -275,7 +275,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 0) { mqSender.sendArena(any()) }
         val antallVedleggSlot = slot<Int>()
         val receivedDialogmelding = slot<ReceivedDialogmelding>()
-        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(capture(receivedDialogmelding), any(), capture(antallVedleggSlot)) }
+        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(capture(receivedDialogmelding), any(), any(), capture(antallVedleggSlot)) }
         assertNotNull(dialogmeldingId)
         val journalpostId = database.hentDialogmeldingOpplysningerJournalpostId(dialogmeldingId!!)
         assertNotNull(journalpostId)
@@ -295,7 +295,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
         val antallVedleggSlot = slot<Int>()
-        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), capture(antallVedleggSlot)) }
+        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), capture(antallVedleggSlot)) }
         assertNotNull(dialogmeldingId)
         val journalpostId = database.hentDialogmeldingOpplysningerJournalpostId(dialogmeldingId!!)
         assertNotNull(journalpostId)
@@ -314,7 +314,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
         val antallVedleggSlot = slot<Int>()
-        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), capture(antallVedleggSlot)) }
+        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), capture(antallVedleggSlot)) }
         assertNotNull(dialogmeldingId)
         val journalpostId = database.hentDialogmeldingOpplysningerJournalpostId(dialogmeldingId!!)
         assertNotNull(journalpostId)
@@ -334,7 +334,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
         val antallVedleggSlot = slot<Int>()
-        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), capture(antallVedleggSlot)) }
+        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), capture(antallVedleggSlot)) }
         assertNotNull(dialogmeldingId)
         val journalpostId = database.hentDialogmeldingOpplysningerJournalpostId(dialogmeldingId!!)
         assertNotNull(journalpostId)
@@ -352,7 +352,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 1) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
         every { incomingMessage.text } returns (
             fellesformat.replace("<Id>01010142365</Id>", "<Id>45088649080</Id>")
             )
@@ -362,7 +362,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 2) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 2) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 2) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
         assertNotNull(dialogmeldingId)
         val journalpostId = database.hentDialogmeldingOpplysningerJournalpostId(dialogmeldingId!!)
         assertNotNull(journalpostId)
@@ -379,14 +379,14 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 1) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
         val dialogmeldingId = runBlocking {
             blockingApplicationRunner.processMessage(incomingMessage)
         }
         verify(exactly = 2) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
         assertNotNull(dialogmeldingId)
         val journalpostId = database.hentDialogmeldingOpplysningerJournalpostId(dialogmeldingId!!)
         assertNull(journalpostId)
@@ -403,14 +403,14 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 1) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
         runBlocking {
             blockingApplicationRunner.processMessage(incomingMessage)
         }
         verify(exactly = 2) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
     }
 
     @Test
@@ -424,7 +424,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 1) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
         every { incomingMessage.text } returns (
             fellesformat.replace(
                 "Et siste bilde fra lege",
@@ -437,7 +437,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 2) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 2) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 2) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
     }
 
     @Test
@@ -451,7 +451,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 1) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
         every { incomingMessage.text } returns (
             fellesformat.replace(
                 "Et siste bilde fra lege",
@@ -464,7 +464,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 2) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
     }
 
     @Test
@@ -478,7 +478,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 1) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
         val fellesformatNestenDuplikat =
             getFileAsStringISO88591("src/test/resources/dialogmelding_dialog_notat_vedlegg.xml")
                 .replace("Et vedlegg fra lege", "Et vedlegg fra lege nesten likt")
@@ -489,7 +489,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 2) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 2) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 2) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
     }
 
     @Test
@@ -503,7 +503,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 1) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
     }
 
     @Test
@@ -517,7 +517,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 1) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
     }
 
     @Test
@@ -531,7 +531,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 1) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
     }
 
     @Test
@@ -545,7 +545,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 1) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
 
         val fellesformatGyldigMenSammeShaString = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
         every { incomingMessage.text } returns (fellesformatGyldigMenSammeShaString)
@@ -555,7 +555,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 2) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
     }
 
     @Test
@@ -569,7 +569,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 0) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
         val failedMessages = MESSAGES_STILL_FAIL_AFTER_1H.count()
         externalMockEnvironment.pdfgenMock.allowFail = false
         database.updateCreatedAt(
@@ -583,7 +583,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 1) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
         assertEquals(failedMessages, MESSAGES_STILL_FAIL_AFTER_1H.count())
     }
 
@@ -598,7 +598,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 0) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
         val failedMessages = MESSAGES_STILL_FAIL_AFTER_1H.count()
         database.updateCreatedAt(
             dialogmeldingId!!,
@@ -610,7 +610,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 0) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
         assertEquals(failedMessages + 1.0, MESSAGES_STILL_FAIL_AFTER_1H.count())
     }
 
@@ -625,7 +625,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 0) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
         val failedMessages = MESSAGES_STILL_FAIL_AFTER_1H.count()
         database.updateCreatedAt(
             dialogmeldingId!!,
@@ -637,7 +637,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 0) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
         assertEquals(failedMessages, MESSAGES_STILL_FAIL_AFTER_1H.count())
     }
 
@@ -654,7 +654,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 0) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
         externalMockEnvironment.pdfgenMock.allowFail = false
         database.updateCreatedAt(
             dialogmeldingId!!,
@@ -668,7 +668,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 0) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
     }
 
     @Test
@@ -681,7 +681,7 @@ class BlockingApplicationRunnerTest {
             blockingApplicationRunner.processMessage(incomingMessage)
         }
         verify(exactly = 1) { mqSender.sendReceipt(any()) }
-        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
     }
 
     @Test
@@ -705,13 +705,13 @@ class BlockingApplicationRunnerTest {
             blockingApplicationRunner.processMessage(incomingMessage)
         }!!
         verify(exactly = 0) { mqSender.sendReceipt(any()) }
-        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
         assertNull(database.hentDialogmeldingOpplysningerJournalpostId(dialogmeldingId))
 
         database.updateCreatedAt(dialogmeldingId, Timestamp.valueOf(LocalDateTime.now().minusMinutes(20)))
         runBlocking { rerunCronJob.run() }
         verify(exactly = 0) { mqSender.sendReceipt(any()) }
-        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
 
         database.updateFellesformat(
             dialogmeldingId,
@@ -719,7 +719,7 @@ class BlockingApplicationRunnerTest {
         )
         runBlocking { rerunCronJob.run() }
         verify(exactly = 1) { mqSender.sendReceipt(any()) }
-        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
         assertNotNull(database.hentDialogmeldingOpplysningerJournalpostId(dialogmeldingId))
     }
 
@@ -734,7 +734,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 1) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
     }
 
     @Test
@@ -748,7 +748,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 1) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
     }
 
     @Test
@@ -762,7 +762,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 0) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
         externalMockEnvironment.pdlMock.pdlAlwaysFail = false
         database.updateCreatedAt(
             dialogmeldingId!!,
@@ -774,7 +774,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 1) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 1) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
     }
 
     @Test
@@ -788,7 +788,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 1) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
     }
 
     @Test
@@ -802,7 +802,7 @@ class BlockingApplicationRunnerTest {
         verify(exactly = 1) { mqSender.sendReceipt(any()) }
         verify(exactly = 0) { mqSender.sendBackout(any()) }
         verify(exactly = 0) { mqSender.sendArena(any()) }
-        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any()) }
+        verify(exactly = 0) { dialogmeldingProducer.sendDialogmelding(any(), any(), any(), any()) }
     }
 }
 

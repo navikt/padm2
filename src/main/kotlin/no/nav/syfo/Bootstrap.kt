@@ -11,6 +11,7 @@ import no.nav.syfo.application.cronjob.launchCronjobs
 import no.nav.syfo.application.mq.*
 import no.nav.syfo.client.SmgcpClient
 import no.nav.syfo.client.SmtssClient
+import no.nav.syfo.client.SyfohelsenettproxyClient
 import no.nav.syfo.client.aapapi.AapApiClient
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.client.httpClient
@@ -131,6 +132,13 @@ fun launchListeners(
         httpClient = httpClient,
     )
 
+    val syfohelsenettproxyClient = SyfohelsenettproxyClient(
+        azureAdV2Client = azureAdV2Client,
+        endpointUrl = env.syfohelsenettproxyEndpointURL,
+        helsenettClientId = env.syfohelsenettproxyClientId,
+        httpClient = httpClient,
+    )
+
     val emottakService = EmottakService(
         smgcpClient = smgcpClient,
     )
@@ -177,6 +185,7 @@ fun launchListeners(
         emottakService = emottakService,
         behandlerdialogClient = behandlerdialogClient,
         aapApiClient = aapApiClient,
+        syfohelsenettproxyClient = syfohelsenettproxyClient,
     )
 
     launchBackgroundTask(

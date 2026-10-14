@@ -5,6 +5,7 @@ import kotlinx.coroutines.runBlocking
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.client.SmtssClient
+import no.nav.syfo.client.SyfohelsenettproxyClient
 import no.nav.syfo.client.TssId
 import no.nav.syfo.client.aapapi.AapApiClient
 import no.nav.syfo.client.isbehandlerdialog.BehandlerdialogClient
@@ -24,6 +25,7 @@ class ArenaDialogmeldingServiceTest {
     private val mqSender = mockk<MQSenderInterface>(relaxed = true)
     private val behandlerdialogClient = mockk<BehandlerdialogClient>(relaxed = true)
     private val aapApiClient = mockk<AapApiClient>(relaxed = true)
+    private val syfohelsenettproxyClient = mockk<SyfohelsenettproxyClient>(relaxed = true)
 
     private val arenaDialogmeldingService = ArenaDialogmeldingService(
         mqSender = mqSender,
@@ -31,6 +33,7 @@ class ArenaDialogmeldingServiceTest {
         emottakService = emottakService,
         behandlerdialogClient = behandlerdialogClient,
         aapApiClient = aapApiClient,
+        syfohelsenettproxyClient = syfohelsenettproxyClient,
     )
 
     private val tssId = TssId("123")

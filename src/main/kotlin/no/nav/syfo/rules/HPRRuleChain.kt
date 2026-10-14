@@ -1,6 +1,6 @@
 package no.nav.syfo.rules
 
-import no.nav.syfo.client.HelsenettProxyBehandler
+import no.nav.syfo.client.HprBehandler
 import no.nav.syfo.model.HelsepersonellKategori
 import no.nav.syfo.model.Status
 
@@ -9,8 +9,8 @@ enum class HPRRuleChain(
     override val status: Status,
     override val messageForUser: String,
     override val messageForSender: String,
-    override val predicate: (RuleData<HelsenettProxyBehandler>) -> Boolean
-) : Rule<RuleData<HelsenettProxyBehandler>> {
+    override val predicate: (RuleData<HprBehandler>) -> Boolean
+) : Rule<RuleData<HprBehandler>> {
 
     BEHANDLER_IKKE_GYLDIG_I_HPR(
         1402,
@@ -68,7 +68,7 @@ enum class HPRRuleChain(
 }
 
 fun harAktivHelsepersonellAutorisasjonsSom(
-    behandler: HelsenettProxyBehandler,
+    behandler: HprBehandler,
     helsepersonerVerdi: List<String>
 ): Boolean =
     behandler.godkjenninger.any { godkjenning ->

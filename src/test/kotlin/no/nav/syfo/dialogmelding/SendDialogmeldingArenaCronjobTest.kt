@@ -16,6 +16,7 @@ import no.nav.syfo.model.ValidationResult
 import no.nav.syfo.persistering.db.*
 import no.nav.syfo.services.ArenaDialogmeldingService
 import no.nav.syfo.services.EmottakService
+import no.nav.syfo.client.SyfohelsenettproxyClient
 import no.nav.syfo.util.getFileAsString
 import no.nav.syfo.util.safeUnmarshal
 import org.junit.jupiter.api.Assertions.*
@@ -49,7 +50,13 @@ class SendDialogmeldingArenaCronjobTest {
             aapApiClientId = externalMockEnvironment.environment.aapApiClientId,
             aapApiUrl = externalMockEnvironment.environment.aapApiUrl,
             httpClient = externalMockEnvironment.mockHttpClient,
-        )
+        ),
+        syfohelsenettproxyClient = SyfohelsenettproxyClient(
+            azureAdV2Client = azureAdV2ClientMock,
+            endpointUrl = externalMockEnvironment.environment.syfohelsenettproxyEndpointURL,
+            helsenettClientId = externalMockEnvironment.environment.syfohelsenettproxyClientId,
+            httpClient = externalMockEnvironment.mockHttpClient,
+        ),
     )
     private val sendDialogmeldingArenaCronjob = SendDialogmeldingArenaCronjob(
         database = database,

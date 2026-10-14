@@ -141,6 +141,7 @@ internal class DokArkivClientTest {
             pdf = byteArrayOf(),
             avsenderFnr = "12345678901",
             avsenderHpr = hprNrWithFiveDigits,
+            avsenderNavn = signerendeLegeNavn,
             ediLoggId = "asd",
             signaturDato = LocalDateTime.now(),
             validationResult = ValidationResult(Status.OK, emptyList()),
@@ -150,7 +151,7 @@ internal class DokArkivClientTest {
 
         assertEquals("0000$hprNrWithFiveDigits", journalpostRequest.avsenderMottaker!!.id)
         assertEquals(IdType.HPR.value, journalpostRequest.avsenderMottaker?.idType)
-        assertEquals(dialogmelding.navnHelsepersonell, journalpostRequest.avsenderMottaker?.navn)
+        assertEquals(signerendeLegeNavn, journalpostRequest.avsenderMottaker?.navn)
     }
 
     @Test
@@ -160,6 +161,7 @@ internal class DokArkivClientTest {
             pdf = byteArrayOf(),
             avsenderFnr = "invalid",
             avsenderHpr = null,
+            avsenderNavn = signerendeLegeNavn,
             ediLoggId = "asd",
             signaturDato = LocalDateTime.now(),
             validationResult = ValidationResult(Status.OK, emptyList()),
@@ -181,6 +183,7 @@ internal class DokArkivClientTest {
             pdf = byteArrayOf(),
             avsenderFnr = validDnr,
             avsenderHpr = null,
+            avsenderNavn = signerendeLegeNavn,
             ediLoggId = "asd",
             signaturDato = LocalDateTime.now(),
             validationResult = ValidationResult(Status.OK, emptyList()),
@@ -190,8 +193,10 @@ internal class DokArkivClientTest {
 
         assertEquals(validDnr, journalpostRequest.avsenderMottaker?.id)
         assertEquals(IdType.PERSON_IDENT.value, journalpostRequest.avsenderMottaker?.idType)
-        assertEquals(dialogmelding.navnHelsepersonell, journalpostRequest.avsenderMottaker?.navn)
+        assertEquals(signerendeLegeNavn, journalpostRequest.avsenderMottaker?.navn)
     }
+
+    val signerendeLegeNavn = "Signe Signerende"
 
     val dialogmelding = Dialogmelding(
         id = "1234",

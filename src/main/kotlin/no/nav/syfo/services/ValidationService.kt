@@ -4,7 +4,7 @@ import io.ktor.client.HttpClient
 import no.nav.syfo.Environment
 import no.nav.syfo.client.ClamAvClient
 import no.nav.syfo.client.LegeSuspensjonClient
-import no.nav.syfo.client.SyfohelsenettproxyClient
+import no.nav.syfo.client.HprBehandler
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.db.DatabaseInterface
@@ -22,6 +22,7 @@ import no.nav.syfo.validation.isKodeverkValid
 interface ValidationService {
     suspend fun validate(
         receivedDialogmelding: ReceivedDialogmelding,
+        signerendeLege: HprBehandler?,
         vedlegg: List<Vedlegg>,
         loggingMeta: LoggingMeta,
     ): ValidationResult
@@ -53,17 +54,12 @@ class Padm2ValidationService(
             applicationName = env.applicationName,
             httpClient = httpClient,
         ),
-        syfohelsenettproxyClient = SyfohelsenettproxyClient(
-            azureAdV2Client = azureAdV2Client,
-            endpointUrl = env.syfohelsenettproxyEndpointURL,
-            helsenettClientId = env.syfohelsenettproxyClientId,
-            httpClient = httpClient,
-        ),
         env = env,
     )
 
     override suspend fun validate(
         receivedDialogmelding: ReceivedDialogmelding,
+        signerendeLege: HprBehandler?,
         vedlegg: List<Vedlegg>,
         loggingMeta: LoggingMeta,
     ): ValidationResult {
@@ -105,6 +101,7 @@ class Padm2ValidationService(
 
         return initialValidationResult ?: ruleService.executeRuleChains(
             receivedDialogmelding = receivedDialogmelding,
+            signerendeLege = signerendeLege,
         )
     }
 }
@@ -115,6 +112,7 @@ class Padm2ValidationService(
 class PreValidatedService : ValidationService {
     override suspend fun validate(
         receivedDialogmelding: ReceivedDialogmelding,
+        signerendeLege: HprBehandler?,
         vedlegg: List<Vedlegg>,
         loggingMeta: LoggingMeta,
     ): ValidationResult = ValidationResult(Status.OK, emptyList())

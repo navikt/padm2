@@ -21,7 +21,7 @@ class JournalService(
         vedleggListe: List<Vedlegg>?,
         loggingMeta: LoggingMeta,
         pasientNavn: String,
-        navnSignerendeLege: String,
+        avsenderBehandler: Behandler?,
     ): String {
         val journalpostId = database.hentDialogmeldingOpplysningerJournalpostId(receivedDialogmelding.dialogmelding.id)
         return if (journalpostId == null) {
@@ -34,7 +34,8 @@ class JournalService(
                 validationResult,
                 receivedDialogmelding.personNrPasient,
                 pasientNavn,
-                navnSignerendeLege,
+                avsenderBehandler?.getNavn(etternavnFoerst = true, fallback = UKJENT_BEHANDLER_NAVN)
+                    ?: UKJENT_BEHANDLER_NAVN,
                 antallVedlegg
             )
             val pdf = pdfgenClient.createPdf(pdfPayload)
@@ -44,7 +45,8 @@ class JournalService(
                 receivedDialogmelding.dialogmelding,
                 pdf,
                 receivedDialogmelding.personNrLege,
-                receivedDialogmelding.legehpr,
+                avsenderBehandler?.hprId,
+                avsenderBehandler?.getNavn(fallback = UKJENT_BEHANDLER_NAVN) ?: UKJENT_BEHANDLER_NAVN,
                 receivedDialogmelding.navLogId,
                 receivedDialogmelding.dialogmelding.signaturDato,
                 validationResult,

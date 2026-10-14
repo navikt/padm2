@@ -65,6 +65,7 @@ fun createJournalpostPayload(
     pdf: ByteArray,
     avsenderFnr: String,
     avsenderHpr: String?,
+    avsenderNavn: String,
     ediLoggId: String,
     signaturDato: LocalDateTime,
     validationResult: ValidationResult,
@@ -74,6 +75,7 @@ fun createJournalpostPayload(
     avsenderMottaker = createAvsenderMottaker(
         avsenderFnr = avsenderFnr,
         avsenderHpr = avsenderHpr,
+        avsenderNavn = avsenderNavn,
         dialogmelding = dialogmelding,
     ),
 
@@ -153,23 +155,24 @@ fun leggtilDokument(
 private fun createAvsenderMottaker(
     avsenderFnr: String,
     avsenderHpr: String?,
+    avsenderNavn: String,
     dialogmelding: Dialogmelding,
 ) = if (avsenderHpr != null) {
-    createAvsenderMottakerValidHpr(avsenderHpr, dialogmelding)
+    createAvsenderMottakerValidHpr(avsenderHpr, avsenderNavn)
 } else {
     when (validatePersonAndDNumber(avsenderFnr)) {
-        true -> createAvsenderMottakerValidFnr(avsenderFnr, dialogmelding)
+        true -> createAvsenderMottakerValidFnr(avsenderFnr, avsenderNavn)
         else -> createAvsenderMottakerNotValidFnr(dialogmelding)
     }
 }
 
 private fun createAvsenderMottakerValidHpr(
     hprNr: String,
-    dialogmelding: Dialogmelding,
+    avsenderNavn: String,
 ): AvsenderMottaker = AvsenderMottaker(
     id = hprNrWithNineDigits(hprNr),
     idType = IdType.HPR.value,
-    navn = dialogmelding.navnHelsepersonell
+    navn = avsenderNavn,
 )
 
 private fun hprNrWithNineDigits(hprnummer: String): String {
@@ -178,13 +181,14 @@ private fun hprNrWithNineDigits(hprnummer: String): String {
 
 private fun createAvsenderMottakerValidFnr(
     avsenderFnr: String,
-    dialogmelding: Dialogmelding
+    avsenderNavn: String,
 ): AvsenderMottaker = AvsenderMottaker(
     id = avsenderFnr,
     idType = IdType.PERSON_IDENT.value,
-    navn = dialogmelding.navnHelsepersonell,
+    navn = avsenderNavn,
 )
 
+// Uten id kan vi bruke navnet fra XML-en uten å blande det med identen til signerende lege.
 private fun createAvsenderMottakerNotValidFnr(
     dialogmelding: Dialogmelding
 ): AvsenderMottaker = AvsenderMottaker(

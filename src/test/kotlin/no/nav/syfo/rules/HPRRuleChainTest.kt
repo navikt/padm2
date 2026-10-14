@@ -2,7 +2,7 @@ package no.nav.syfo.rules
 
 import io.mockk.mockk
 import no.nav.syfo.client.Godkjenning
-import no.nav.syfo.client.HelsenettProxyBehandler
+import no.nav.syfo.client.HprBehandler
 import no.nav.syfo.client.Kode
 import no.nav.syfo.model.Dialogmelding
 import no.nav.syfo.model.HelsepersonellKategori
@@ -14,12 +14,12 @@ internal class HPRRuleChainTest {
 
     val dialogmelding = mockk<Dialogmelding>()
 
-    fun ruleData(dialogmelding: Dialogmelding, behandler: HelsenettProxyBehandler) =
+    fun ruleData(dialogmelding: Dialogmelding, behandler: HprBehandler) =
         RuleData(dialogmelding, behandler)
 
     @Test
     internal fun `Should check rule BEHANDLER_IKKE_GYLDIG_I_HPR, should trigger rule`() {
-        val behandler = HelsenettProxyBehandler(
+        val behandler = HprBehandler(
             godkjenninger = listOf(
                 Godkjenning(
                     autorisasjon = Kode(
@@ -41,7 +41,7 @@ internal class HPRRuleChainTest {
 
     @Test
     internal fun `Should check rule BEHANDLER_IKKE_GYLDIG_I_HPR, should NOT trigger rule`() {
-        val behandler = HelsenettProxyBehandler(
+        val behandler = HprBehandler(
             listOf(
                 Godkjenning(
                     autorisasjon = Kode(
@@ -63,7 +63,7 @@ internal class HPRRuleChainTest {
 
     @Test
     internal fun `Should check rule BEHANDLER_NOT_VALID_AUTHORIZATION_IN_HPR, should trigger rule`() {
-        val behandler = HelsenettProxyBehandler(
+        val behandler = HprBehandler(
             listOf(
                 Godkjenning(
                     autorisasjon = Kode(
@@ -85,7 +85,7 @@ internal class HPRRuleChainTest {
 
     @Test
     internal fun `Should check rule BEHANDLER_MANGLER_AUTORISASJON_I_HPR, should NOT trigger rule`() {
-        val behandler = HelsenettProxyBehandler(
+        val behandler = HprBehandler(
             listOf(
                 Godkjenning(
                     autorisasjon = Kode(
@@ -107,7 +107,7 @@ internal class HPRRuleChainTest {
 
     @Test
     internal fun `Should check rule BEHANDLER_MANGLER_AUTORISASJON_I_HPR, should trigger rule`() {
-        val behandler = HelsenettProxyBehandler(
+        val behandler = HprBehandler(
             listOf(
                 Godkjenning(
                     autorisasjon = Kode(
@@ -134,7 +134,7 @@ internal class HPRRuleChainTest {
 
     @Test
     internal fun `Should check rule BEHANDLER_IKKE_LE_KI_MT_TL_FT_I_HPR, should NOT trigger rule`() {
-        val behandler = HelsenettProxyBehandler(
+        val behandler = HprBehandler(
             listOf(
                 Godkjenning(
                     autorisasjon = Kode(
@@ -161,7 +161,7 @@ internal class HPRRuleChainTest {
 
     @Test
     internal fun `Should check rule BEHANDLER_IKKE_LE_KI_MT_TL_FT_I_HPR, should trigger rule`() {
-        val behandler = HelsenettProxyBehandler(
+        val behandler = HprBehandler(
             listOf(
                 Godkjenning(
                     autorisasjon = Kode(
@@ -188,7 +188,7 @@ internal class HPRRuleChainTest {
 
     @Test
     internal fun `Should check rule BEHANDLER_IKKE_LE_KI_MT_TL_FT_PS_I_HPR, should NOT trigger rule`() {
-        val behandler = HelsenettProxyBehandler(
+        val behandler = HprBehandler(
             listOf(
                 Godkjenning(
                     autorisasjon = Kode(

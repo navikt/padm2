@@ -18,7 +18,7 @@ suspend fun MockRequestHandleScope.dokarkivMockResponse(request: HttpRequestData
     val journalpostRequest = request.receiveBody<JournalpostRequest>()
     return if (
         journalpostRequest.bruker!!.id != UserConstants.PATIENT_FNR_NO_AKTOER_ID &&
-        !journalpostRequest.avsenderMottaker!!.id!!.contains('-')
+        journalpostRequest.avsenderMottaker!!.id?.contains('-') != true
     ) {
         if (journalpostRequest.bruker!!.id == UserConstants.PATIENT_FNR_JP_CONFLICT) {
             respond(dokarkivJournalpostResponse, HttpStatusCode.Conflict)
