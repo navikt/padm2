@@ -34,8 +34,8 @@ class JournalService(
                 validationResult,
                 receivedDialogmelding.personNrPasient,
                 pasientNavn,
-                avsenderBehandler?.getNavn(etternavnFoerst = true, fallback = receivedDialogmelding.personNrLege)
-                    ?: receivedDialogmelding.personNrLege,
+                avsenderBehandler?.getNavn(etternavnFoerst = true, fallback = UKJENT_BEHANDLER_NAVN)
+                    ?: UKJENT_BEHANDLER_NAVN,
                 antallVedlegg
             )
             val pdf = pdfgenClient.createPdf(pdfPayload)
