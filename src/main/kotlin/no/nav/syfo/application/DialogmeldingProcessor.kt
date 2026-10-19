@@ -51,9 +51,6 @@ class DialogmeldingProcessor(
         database = database,
         jpRetryEnabled = env.jpRetryEnabled,
     )
-    val signerendeLegeService = SignerendeLegeService(
-        syfohelsenettproxyClient = syfohelsenettproxyClient,
-    )
 
     suspend fun process(
         receivedDialogmelding: ReceivedDialogmelding,
@@ -72,16 +69,18 @@ class DialogmeldingProcessor(
             return
         }
 
-        val navnSignerendeLege = signerendeLegeService.signerendeLegeNavn(
-            signerendeLegeFnr = receivedDialogmelding.personNrLege,
+        val signerendeLege = syfohelsenettproxyClient.finnBehandler(
+            behandlerFnr = receivedDialogmelding.personNrLege,
             msgId = receivedDialogmelding.msgId,
             loggingMeta = loggingMeta,
         )
+        val avsenderBehandler = signerendeLege?.toBehandler(receivedDialogmelding.personNrLege)
 
         val vedlegg = vedleggService.hentVedlegg(receivedDialogmelding)
 
         val validationResult = validationService.validate(
             receivedDialogmelding = receivedDialogmelding,
+            signerendeLege = signerendeLege,
             vedlegg = vedlegg,
             loggingMeta = loggingMeta,
         )
@@ -96,7 +95,7 @@ class DialogmeldingProcessor(
                 receivedDialogmelding = receivedDialogmelding,
                 vedlegg = vedlegg,
                 validationResult = validationResult,
-                navnSignerendeLege = navnSignerendeLege,
+                avsenderBehandler = avsenderBehandler,
             )
 
             Status.INVALID -> handleStatusINVALID(
@@ -106,7 +105,7 @@ class DialogmeldingProcessor(
                 journalService = journalService,
                 receivedDialogmelding = receivedDialogmelding,
                 vedlegg = vedlegg,
-                navnSignerendeLege = navnSignerendeLege,
+                avsenderBehandler = avsenderBehandler,
             )
         }
 

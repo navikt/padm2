@@ -11,6 +11,7 @@ import io.ktor.http.HttpStatusCode.Companion.NotFound
 import net.logstash.logback.argument.StructuredArguments.fields
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.logger
+import no.nav.syfo.model.Behandler
 import no.nav.syfo.util.LoggingMeta
 import java.io.IOException
 
@@ -25,7 +26,7 @@ class SyfohelsenettproxyClient(
         behandlerFnr: String,
         msgId: String,
         loggingMeta: LoggingMeta
-    ): HelsenettProxyBehandler? {
+    ): HprBehandler? {
         logger.info("Henter behandler fra syfohelsenettproxy for msgId {}", msgId)
 
         val accessToken = azureAdV2Client.getSystemToken(helsenettClientId)?.accessToken
@@ -40,7 +41,7 @@ class SyfohelsenettproxyClient(
                     append("behandlerFnr", behandlerFnr)
                 }
             }
-            response.body<HelsenettProxyBehandler>()
+            response.body<HprBehandler>()
         } catch (exception: ResponseException) {
             when (exception.response.status) {
                 BadRequest -> {
@@ -60,13 +61,21 @@ class SyfohelsenettproxyClient(
     }
 }
 
-data class HelsenettProxyBehandler(
+data class HprBehandler(
     val godkjenninger: List<Godkjenning>,
     val fnr: String?,
     val hprNummer: Int?,
     val fornavn: String?,
     val mellomnavn: String?,
     val etternavn: String?
+)
+
+fun HprBehandler.toBehandler(signerendeLegeFnr: String): Behandler = Behandler(
+    fnr = signerendeLegeFnr,
+    hprId = hprNummer?.toString(),
+    fornavn = fornavn,
+    mellomnavn = mellomnavn,
+    etternavn = etternavn,
 )
 
 data class Godkjenning(

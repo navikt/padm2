@@ -62,6 +62,7 @@ class FromKiropraktorTest {
             emottakblokk = emottakblokk,
             dialogmelding,
             msgHead.msgInfo.patient,
+            extractBehandler(fellesformat),
         )
 
         assertEquals("Henvendelse til NAV", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentNavn)

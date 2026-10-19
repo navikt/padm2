@@ -13,7 +13,7 @@ fun MockRequestHandleScope.syfohelsenettproxyMockResponse(request: HttpRequestDa
         respond(content = "", status = HttpStatusCode.NotFound, headers = headersOf())
     } else {
         respond(
-            HelsenettProxyBehandler(
+            HprBehandler(
                 godkjenninger = listOf(
                     Godkjenning(
                         autorisasjon = Kode(

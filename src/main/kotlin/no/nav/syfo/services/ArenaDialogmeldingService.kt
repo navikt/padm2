@@ -5,10 +5,12 @@ import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.client.SmtssClient
+import no.nav.syfo.client.SyfohelsenettproxyClient
 import no.nav.syfo.client.aapapi.AapApiClient
 import no.nav.syfo.client.createArenaDialogNotat
 import no.nav.syfo.client.isbehandlerdialog.BehandlerdialogClient
 import no.nav.syfo.client.sendArenaDialogNotat
+import no.nav.syfo.client.toBehandler
 import no.nav.syfo.domain.PersonIdent
 import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.util.*
@@ -19,6 +21,7 @@ class ArenaDialogmeldingService(
     private val emottakService: EmottakService,
     private val behandlerdialogClient: BehandlerdialogClient,
     private val aapApiClient: AapApiClient,
+    private val syfohelsenettproxyClient: SyfohelsenettproxyClient,
 ) {
     suspend fun sendArenaDialogmeldingToMQ(
         receivedDialogmelding: ReceivedDialogmelding,
@@ -40,6 +43,12 @@ class ArenaDialogmeldingService(
         val patient = extractPatient(
             fellesformat = fellesformatXml,
         )
+        val avsenderBehandler = syfohelsenettproxyClient.finnBehandler(
+            behandlerFnr = receivedDialogmelding.personNrLege,
+            msgId = receivedDialogmelding.msgId,
+            loggingMeta = loggingMeta,
+        )?.toBehandler(receivedDialogmelding.personNrLege)
+
         val arenaDialogNotat = createArenaDialogNotat(
             fellesformat = fellesformatXml,
             tssid = tssId,
@@ -49,6 +58,7 @@ class ArenaDialogmeldingService(
             emottakblokk = emottakBlokk,
             dialogmelding = receivedDialogmelding.dialogmelding,
             patient = patient,
+            avsenderBehandler = avsenderBehandler,
         )
 
         sendArenaDialogNotat(

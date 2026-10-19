@@ -4,7 +4,7 @@ import java.time.format.DateTimeFormatter
 import net.logstash.logback.argument.StructuredArguments.fields
 import no.nav.syfo.Environment
 import no.nav.syfo.client.LegeSuspensjonClient
-import no.nav.syfo.client.SyfohelsenettproxyClient
+import no.nav.syfo.client.HprBehandler
 import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.model.RuleInfo
 import no.nav.syfo.model.RuleMetadata
@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory
 
 class RuleService(
     val legeSuspensjonClient: LegeSuspensjonClient,
-    val syfohelsenettproxyClient: SyfohelsenettproxyClient,
     val env: Environment,
 ) {
 
@@ -29,6 +28,7 @@ class RuleService(
 
     suspend fun executeRuleChains(
         receivedDialogmelding: ReceivedDialogmelding,
+        signerendeLege: HprBehandler?,
     ): ValidationResult {
         val loggingMeta = LoggingMeta(
             mottakId = receivedDialogmelding.navLogId,
@@ -47,13 +47,7 @@ class RuleService(
             DateTimeFormatter.ISO_DATE.format(receivedDialogmelding.mottattDato)
         ).suspendert
 
-        val avsenderBehandler = syfohelsenettproxyClient.finnBehandler(
-            behandlerFnr = receivedDialogmelding.personNrLege,
-            msgId = receivedDialogmelding.msgId,
-            loggingMeta = loggingMeta
-        )
-
-        if (avsenderBehandler == null && !env.isDevGcp) {
+        if (signerendeLege == null && !env.isDevGcp) {
             return ValidationResult(
                 status = Status.INVALID,
                 ruleHits = listOf(
@@ -78,7 +72,7 @@ class RuleService(
                     avsenderfnr = receivedDialogmelding.personNrLege
                 )
             ),
-            if (env.isDevGcp) emptyList() else HPRRuleChain.values().executeFlow(dialogmelding, avsenderBehandler!!),
+            if (env.isDevGcp) emptyList() else HPRRuleChain.values().executeFlow(dialogmelding, signerendeLege!!),
             LegesuspensjonRuleChain.values().executeFlow(dialogmelding, behandlerSuspendert)
         ).flatten()
 
