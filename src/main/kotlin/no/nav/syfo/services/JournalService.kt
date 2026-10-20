@@ -2,7 +2,9 @@ package no.nav.syfo.services
 
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.client.*
+import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.db.DatabaseInterface
+import no.nav.syfo.domain.PersonIdent
 import no.nav.syfo.logger
 import no.nav.syfo.metrics.MELDING_LAGER_I_JOARK
 import no.nav.syfo.model.*
@@ -12,6 +14,7 @@ import no.nav.syfo.util.LoggingMeta
 class JournalService(
     private val dokArkivClient: DokArkivClient,
     private val pdfgenClient: PdfgenClient,
+    private val pdlClient: PdlClient,
     private val database: DatabaseInterface,
     private val jpRetryEnabled: Boolean = true,
 ) {
@@ -20,7 +23,6 @@ class JournalService(
         validationResult: ValidationResult,
         vedleggListe: List<Vedlegg>?,
         loggingMeta: LoggingMeta,
-        pasientNavn: String,
         avsenderBehandler: Behandler?,
     ): String {
         val journalpostId = database.hentDialogmeldingOpplysningerJournalpostId(receivedDialogmelding.dialogmelding.id)
@@ -28,12 +30,13 @@ class JournalService(
             logger.info("Prover aa lagre i Joark {}", StructuredArguments.fields(loggingMeta))
 
             val antallVedlegg = vedleggListe?.size ?: 0
+            val pasientNavn = pdlClient.hentPersonNavn(PersonIdent(receivedDialogmelding.personNrPasient))
 
             val pdfPayload = createPdfPayload(
                 receivedDialogmelding.dialogmelding,
                 validationResult,
                 receivedDialogmelding.personNrPasient,
-                pasientNavn,
+                pasientNavn.etternavnFoerst(),
                 avsenderBehandler?.getNavn(etternavnFoerst = true, fallback = UKJENT_BEHANDLER_NAVN)
                     ?: UKJENT_BEHANDLER_NAVN,
                 antallVedlegg

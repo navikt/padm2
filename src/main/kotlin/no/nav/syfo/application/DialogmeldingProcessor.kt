@@ -4,6 +4,7 @@ import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.Environment
 import no.nav.syfo.client.*
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
+import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.db.DatabaseInterface
 import no.nav.syfo.handlestatus.*
 import no.nav.syfo.kafka.DialogmeldingProducer
@@ -48,6 +49,12 @@ class DialogmeldingProcessor(
     val journalService = JournalService(
         dokArkivClient = dokArkivClient,
         pdfgenClient = pdfgenClient,
+        pdlClient = PdlClient(
+            azureAdV2Client = azureAdV2Client,
+            pdlClientId = env.pdlClientId,
+            pdlUrl = env.pdlUrl,
+            httpClient = httpClient,
+        ),
         database = database,
         jpRetryEnabled = env.jpRetryEnabled,
     )

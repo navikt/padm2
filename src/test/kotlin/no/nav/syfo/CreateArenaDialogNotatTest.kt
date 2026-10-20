@@ -8,6 +8,7 @@ import no.nav.syfo.client.createArenaDialogNotat
 import no.nav.syfo.client.createAvsender
 import no.nav.syfo.model.Behandler
 import no.nav.syfo.model.DialogmeldingKodeverk
+import no.nav.syfo.model.PersonNavn
 import no.nav.syfo.model.findDialogmeldingType
 import no.nav.syfo.model.toDialogmelding
 import no.nav.syfo.util.*
@@ -53,7 +54,7 @@ internal class CreateArenaDialogNotatTest {
             msgHead,
             emottakblokk,
             dialogmelding,
-            msgHead.msgInfo.patient,
+            PersonNavn(fornavn = "Etternavn", mellomnavn = null, etternavn = "Test"),
             extractBehandler(felleformatDm),
         )
 
@@ -127,7 +128,7 @@ internal class CreateArenaDialogNotatTest {
             msgHead,
             emottakblokk,
             dialogmelding,
-            msgHead.msgInfo.patient,
+            PersonNavn(fornavn = "Etternavn", mellomnavn = null, etternavn = "Test"),
             extractBehandler(felleformatDm),
         )
 
@@ -192,7 +193,7 @@ internal class CreateArenaDialogNotatTest {
             msgHead,
             emottakblokk,
             dialogmelding,
-            msgHead.msgInfo.patient,
+            PersonNavn(fornavn = "Etternavn", mellomnavn = null, etternavn = "Test"),
             extractBehandler(felleformatDm),
         )
 
@@ -252,7 +253,7 @@ internal class CreateArenaDialogNotatTest {
             msgHead,
             emottakblokk,
             dialogmelding,
-            msgHead.msgInfo.patient,
+            PersonNavn(fornavn = "Etternavn", mellomnavn = null, etternavn = "Test"),
             extractBehandler(felleformatDm),
         )
 
@@ -293,7 +294,7 @@ internal class CreateArenaDialogNotatTest {
             msgHead,
             emottakblokk,
             dialogmelding,
-            msgHead.msgInfo.patient,
+            PersonNavn(fornavn = "Etternavn", mellomnavn = null, etternavn = "Test"),
             extractBehandler(felleformatDm),
         )
 
@@ -336,7 +337,7 @@ internal class CreateArenaDialogNotatTest {
             msgHead,
             emottakblokk,
             dialogmelding,
-            msgHead.msgInfo.patient,
+            PersonNavn(fornavn = "Etternavn", mellomnavn = null, etternavn = "Test"),
             extractBehandler(felleformatDm),
         )
 

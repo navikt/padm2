@@ -17,8 +17,12 @@ suspend fun MockRequestHandleScope.pdlMockResponse(
     if (state.pdlAlwaysFail) {
         return respond(content = "", status = HttpStatusCode.ServiceUnavailable, headers = headersOf())
     }
-    val pdlRequest = request.receiveBody<PdlHentIdenterRequest>()
-    val personIdentNumber = pdlRequest.variables.ident
+    val pdlRequest = request.receiveBody<Map<String, Any>>()
+    if ((pdlRequest["query"] as String).contains("hentPerson")) {
+        return respond(generatePdlPersonResponse())
+    }
+    @Suppress("UNCHECKED_CAST")
+    val personIdentNumber = (pdlRequest["variables"] as Map<String, Any>)["ident"] as String
     val response = if (personIdentNumber == PATIENT_FNR_NO_AKTOER_ID) {
         generatePdlIdenterResponse(
             identValueTypeList = emptyList(),
@@ -58,4 +62,19 @@ fun generatePdlIdenterResponse(
         ),
     ),
     errors = errors,
+)
+
+fun generatePdlPersonResponse() = PdlPersonResponse(
+    data = PdlHentPerson(
+        hentPerson = PdlPerson(
+            navn = listOf(
+                PdlNavn(
+                    fornavn = "KOVID",
+                    mellomnavn = "NITTEN",
+                    etternavn = "KORONASEN",
+                ),
+            ),
+        ),
+    ),
+    errors = null,
 )

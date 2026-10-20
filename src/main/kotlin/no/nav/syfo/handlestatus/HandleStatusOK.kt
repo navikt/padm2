@@ -27,7 +27,6 @@ suspend fun handleStatusOK(
         validationResult,
         vedlegg,
         loggingMeta,
-        receivedDialogmelding.pasientNavn,
         avsenderBehandler,
     )
 

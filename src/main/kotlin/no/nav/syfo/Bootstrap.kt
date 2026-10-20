@@ -18,6 +18,7 @@ import no.nav.syfo.client.httpClient
 import no.nav.syfo.client.httpClientPdfgen
 import no.nav.syfo.client.httpClientWithProxy
 import no.nav.syfo.client.isbehandlerdialog.BehandlerdialogClient
+import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.client.wellknown.getWellKnown
 import no.nav.syfo.db.Database
 import no.nav.syfo.kafka.*
@@ -143,6 +144,13 @@ fun launchListeners(
         smgcpClient = smgcpClient,
     )
 
+    val pdlClient = PdlClient(
+        azureAdV2Client = azureAdV2Client,
+        pdlClientId = env.pdlClientId,
+        pdlUrl = env.pdlUrl,
+        httpClient = httpClient,
+    )
+
     val apprecService = MqApprecService(
         database = database,
         mqSender = mqSender,
@@ -186,6 +194,7 @@ fun launchListeners(
         behandlerdialogClient = behandlerdialogClient,
         aapApiClient = aapApiClient,
         syfohelsenettproxyClient = syfohelsenettproxyClient,
+        pdlClient = pdlClient,
     )
 
     launchBackgroundTask(

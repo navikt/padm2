@@ -5,13 +5,13 @@ import no.nav.helse.arenadialognotat.*
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
-import no.nav.helse.msgHead.XMLPatient
 import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.logger
 import no.nav.syfo.metrics.TSS_MISS_COUNTER
 import no.nav.syfo.model.Behandler
 import no.nav.syfo.model.Dialogmelding
 import no.nav.syfo.model.DialogmeldingtypeKodeverk
+import no.nav.syfo.model.PersonNavn
 import no.nav.syfo.util.*
 
 const val MAKS_TEKSTLENGDE = 2000
@@ -24,7 +24,7 @@ fun createArenaDialogNotat(
     msgHead: XMLMsgHead,
     emottakblokk: XMLMottakenhetBlokk,
     dialogmelding: Dialogmelding,
-    patient: XMLPatient,
+    pasientNavn: PersonNavn,
     avsenderBehandler: Behandler?,
 ): ArenaDialogNotat =
     ArenaDialogNotat().apply {
@@ -48,9 +48,9 @@ fun createArenaDialogNotat(
             person = PersonType().apply {
                 personFnr = innbyggerident
                 personNavn = NavnType().apply {
-                    fornavn = patient.givenName
-                    mellomnavn = patient.middleName ?: ""
-                    etternavn = patient.familyName
+                    fornavn = pasientNavn.fornavn
+                    mellomnavn = pasientNavn.mellomnavn ?: ""
+                    etternavn = pasientNavn.etternavn
                 }
             }
         }

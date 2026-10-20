@@ -33,7 +33,6 @@ suspend fun handleStatusINVALID(
             validationResult,
             vedlegg,
             loggingMeta,
-            receivedDialogmelding.pasientNavn,
             avsenderBehandler,
         )
     } else {

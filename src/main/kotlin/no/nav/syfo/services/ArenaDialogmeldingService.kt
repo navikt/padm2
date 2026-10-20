@@ -9,6 +9,7 @@ import no.nav.syfo.client.SyfohelsenettproxyClient
 import no.nav.syfo.client.aapapi.AapApiClient
 import no.nav.syfo.client.createArenaDialogNotat
 import no.nav.syfo.client.isbehandlerdialog.BehandlerdialogClient
+import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.client.sendArenaDialogNotat
 import no.nav.syfo.client.toBehandler
 import no.nav.syfo.domain.PersonIdent
@@ -22,6 +23,7 @@ class ArenaDialogmeldingService(
     private val behandlerdialogClient: BehandlerdialogClient,
     private val aapApiClient: AapApiClient,
     private val syfohelsenettproxyClient: SyfohelsenettproxyClient,
+    private val pdlClient: PdlClient,
 ) {
     suspend fun sendArenaDialogmeldingToMQ(
         receivedDialogmelding: ReceivedDialogmelding,
@@ -40,8 +42,8 @@ class ArenaDialogmeldingService(
             msgHead = msgHead,
             emottakBlokk = emottakBlokk,
         )
-        val patient = extractPatient(
-            fellesformat = fellesformatXml,
+        val pasientNavn = pdlClient.hentPersonNavn(
+            personIdent = PersonIdent(receivedDialogmelding.personNrPasient),
         )
         val avsenderBehandler = syfohelsenettproxyClient.finnBehandler(
             behandlerFnr = receivedDialogmelding.personNrLege,
@@ -57,7 +59,7 @@ class ArenaDialogmeldingService(
             msgHead = msgHead,
             emottakblokk = emottakBlokk,
             dialogmelding = receivedDialogmelding.dialogmelding,
-            patient = patient,
+            pasientNavn = pasientNavn,
             avsenderBehandler = avsenderBehandler,
         )
 

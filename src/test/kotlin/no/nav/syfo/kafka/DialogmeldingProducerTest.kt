@@ -242,7 +242,6 @@ internal class DialogmeldingProducerTest {
             dialogmelding = dialogmelding,
             dialogmeldingType = dialogmeldingType,
             personNrPasient = innbyggerident,
-            pasientNavn = extractPasientNavn(fellesformat),
             personNrLege = personNumberDoctor,
             navLogId = ediLoggId,
             msgId = msgId,

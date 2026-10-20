@@ -5,6 +5,7 @@ import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.client.createArenaDialogNotat
 import no.nav.syfo.client.createAvsender
 import no.nav.syfo.model.DialogmeldingKodeverk
+import no.nav.syfo.model.PersonNavn
 import no.nav.syfo.model.findDialogmeldingType
 import no.nav.syfo.model.toDialogmelding
 import no.nav.syfo.util.*
@@ -61,7 +62,7 @@ class FromKiropraktorTest {
             msgHead = msgHead,
             emottakblokk = emottakblokk,
             dialogmelding,
-            msgHead.msgInfo.patient,
+            PersonNavn(fornavn = "Nakke", mellomnavn = null, etternavn = "Kinken"),
             extractBehandler(fellesformat),
         )
 
