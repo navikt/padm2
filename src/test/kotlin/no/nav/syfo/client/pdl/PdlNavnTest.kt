@@ -28,8 +28,8 @@ class PdlNavnTest {
 
     @Test
     fun `Etternavn foerst med mellomnavn`() {
-        val personNavn = PersonNavn(fornavn = "Kovid", mellomnavn = "Nitten", etternavn = "Koronasen")
+        val personNavn = PersonNavn(fornavn = "Kari", mellomnavn = "Marie", etternavn = "Nordmann")
 
-        assertEquals("Koronasen, Kovid Nitten", personNavn.etternavnFoerst())
+        assertEquals("Nordmann, Kari Marie", personNavn.etternavnFoerst())
     }
 }

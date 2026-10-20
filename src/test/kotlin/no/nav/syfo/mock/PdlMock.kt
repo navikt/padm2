@@ -69,9 +69,9 @@ fun generatePdlPersonResponse() = PdlPersonResponse(
         hentPerson = PdlPerson(
             navn = listOf(
                 PdlNavn(
-                    fornavn = "KOVID",
-                    mellomnavn = "NITTEN",
-                    etternavn = "KORONASEN",
+                    fornavn = "KARI",
+                    mellomnavn = "MARIE",
+                    etternavn = "NORDMANN",
                 ),
             ),
         ),
