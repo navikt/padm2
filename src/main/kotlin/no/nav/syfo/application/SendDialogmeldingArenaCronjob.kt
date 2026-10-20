@@ -35,8 +35,7 @@ class SendDialogmeldingArenaCronjob(
                 val fellesformatXml = safeUnmarshal(fellesformat)
                 val receivedDialogmelding = ReceivedDialogmelding.create(
                     dialogmeldingId = dialogmeldingId,
-                    fellesformat = fellesformatXml,
-                    inputMessageText = fellesformat,
+                    fellesformat = fellesformat,
                 )
                 val sendToArena = !arenaDialogmeldingService.isMeldingStoredInBehandlerdialog(msgId) &&
                     !arenaDialogmeldingService.isMeldingStoredInKelvin(msgId) &&

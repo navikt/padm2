@@ -11,6 +11,7 @@ import no.nav.syfo.logger
 import no.nav.syfo.metrics.TSS_MISS_COUNTER
 import no.nav.syfo.model.Behandler
 import no.nav.syfo.model.Dialogmelding
+import no.nav.syfo.model.DialogmeldingtypeKodeverk
 import no.nav.syfo.util.*
 
 const val MAKS_TEKSTLENGDE = 2000
@@ -32,7 +33,7 @@ fun createArenaDialogNotat(
             dokumentInfo = DokumentInfoType().apply {
                 dokumentType = "DM"
                 dokumentTypeVersjon = "1.0"
-                dokumentNavn = msgHead.msgInfo.type.dn
+                dokumentNavn = DialogmeldingtypeKodeverk.visningsnavn(msgHead.msgInfo.type.v)
                 dokumentreferanse = msgHead.msgInfo.msgId
                 ediLoggId = emottakblokk.ediLoggId
                 dokumentDato = msgHead.msgInfo.genDate

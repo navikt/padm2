@@ -44,8 +44,7 @@ class ArenaDialogmeldingServiceTest {
     private val fellesformat = safeUnmarshal(dialogmeldingString)
     private val receivedDialogmelding = ReceivedDialogmelding.create(
         dialogmeldingId = msgId,
-        fellesformat = fellesformat,
-        inputMessageText = dialogmeldingString,
+        fellesformat = dialogmeldingString,
     )
 
     private val emottakBlokk = fellesformat.get<XMLMottakenhetBlokk>()
@@ -111,8 +110,7 @@ class ArenaDialogmeldingServiceTest {
         val fellesformat = safeUnmarshal(dialogmeldingString)
         val receivedDialogmelding = ReceivedDialogmelding.create(
             dialogmeldingId = msgId,
-            fellesformat = fellesformat,
-            inputMessageText = dialogmeldingString,
+            fellesformat = dialogmeldingString,
         )
         coEvery { smtssClient.findBestTss(any(), any(), any()) } returns tssId
         coJustRun { emottakService.registerEmottakSubscription(any(), any(), any(), any(), any()) }

@@ -65,7 +65,7 @@ class FromKiropraktorTest {
             extractBehandler(fellesformat),
         )
 
-        assertEquals("Henvendelse til NAV", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentNavn)
+        assertEquals("Notat", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentNavn)
         assertEquals("0f1daa95-45d0-4a18-8d5d-b79bd069d3b7", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentreferanse)
         assertEquals("2102090840kiro66788.1", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.ediLoggId)
         assertEquals("10108000398", arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeFnr)

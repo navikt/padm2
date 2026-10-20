@@ -106,8 +106,7 @@ class BlockingApplicationRunner(
 
         val receivedDialogmelding = ReceivedDialogmelding.create(
             dialogmeldingId = dialogmeldingId,
-            fellesformat = fellesformat,
-            inputMessageText = inputMessageText,
+            fellesformat = inputMessageText,
         )
 
         persistReceivedMessage(
