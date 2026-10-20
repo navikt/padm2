@@ -29,8 +29,7 @@ class RerunCronJob(
                 logger.info("Attempting reprocessing of $dialogmeldingId")
                 val receivedDialogmelding = ReceivedDialogmelding.create(
                     dialogmeldingId = dialogmeldingId,
-                    fellesformat = safeUnmarshal(fellesformat),
-                    inputMessageText = fellesformat,
+                    fellesformat = fellesformat,
                 )
                 dialogmeldingProcessor.process(receivedDialogmelding)
                 result.updated++

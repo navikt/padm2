@@ -133,7 +133,7 @@ internal class CreateArenaDialogNotatTest {
 
         assertEquals("DM", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentType)
         assertEquals("1.0", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentTypeVersjon)
-        assertEquals("Svar p.. foresp..rsel", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentNavn)
+        assertEquals("Svar på forespørsel", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentNavn)
         assertEquals("9be88bc5-4219-473e-954b-c0dd115ff4e0", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentreferanse)
         assertEquals("1901162204amsa22108.1", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.ediLoggId)
         assertEquals(2020, arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.year)

@@ -18,7 +18,6 @@ import no.nav.syfo.services.ArenaDialogmeldingService
 import no.nav.syfo.services.EmottakService
 import no.nav.syfo.client.SyfohelsenettproxyClient
 import no.nav.syfo.util.getFileAsString
-import no.nav.syfo.util.safeUnmarshal
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -65,11 +64,9 @@ class SendDialogmeldingArenaCronjobTest {
 
     private val fellesformat =
         getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
-    private val fellesformatXml = safeUnmarshal(fellesformat)
     private val receivedDialogmelding = ReceivedDialogmelding.create(
         dialogmeldingId = UUID.randomUUID().toString(),
-        fellesformat = fellesformatXml,
-        inputMessageText = fellesformat,
+        fellesformat = fellesformat,
     )
 
     @BeforeEach
@@ -234,11 +231,9 @@ class SendDialogmeldingArenaCronjobTest {
     fun `Does not send when melding lagret in modia`() {
         val fellesformatMeldingInBehandlerdialog =
             getFileAsString("src/test/resources/dialogmelding_dialog_notat_in_behandlerdialog.xml")
-        val fellesformatXmlMeldingInBehandlerdialog = safeUnmarshal(fellesformatMeldingInBehandlerdialog)
         val receivedDialogmeldingInBehandlerdialog = ReceivedDialogmelding.create(
             dialogmeldingId = UUID.randomUUID().toString(),
-            fellesformat = fellesformatXmlMeldingInBehandlerdialog,
-            inputMessageText = fellesformatMeldingInBehandlerdialog,
+            fellesformat = fellesformatMeldingInBehandlerdialog,
         )
         val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmeldingInBehandlerdialog)
         database.lagreSendtKafka(dialogmeldingId)
@@ -264,11 +259,9 @@ class SendDialogmeldingArenaCronjobTest {
                 UserConstants.MSG_ID_IN_BEHANDLERDIALOG,
                 UserConstants.MSG_ID_IN_KELVIN,
             )
-        val fellesformatXmlMeldingInBehandlerdialog = safeUnmarshal(fellesformatMeldingInBehandlerdialog)
         val receivedDialogmeldingInBehandlerdialog = ReceivedDialogmelding.create(
             dialogmeldingId = UUID.randomUUID().toString(),
-            fellesformat = fellesformatXmlMeldingInBehandlerdialog,
-            inputMessageText = fellesformatMeldingInBehandlerdialog,
+            fellesformat = fellesformatMeldingInBehandlerdialog,
         )
         val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmeldingInBehandlerdialog)
         database.lagreSendtKafka(dialogmeldingId)
@@ -291,11 +284,9 @@ class SendDialogmeldingArenaCronjobTest {
     fun `Does not send when melding is svar på dialogmøteinnkalling`() {
         val fellesformatMeldingSvarMoteinnkalling =
             getFileAsString("src/test/resources/dialogmelding_dialog_svar_innkalling_dialogmote.xml")
-        val fellesformatXmlMeldingInBehandlerdialog = safeUnmarshal(fellesformatMeldingSvarMoteinnkalling)
         val receivedDialogmeldingInBehandlerdialog = ReceivedDialogmelding.create(
             dialogmeldingId = UUID.randomUUID().toString(),
-            fellesformat = fellesformatXmlMeldingInBehandlerdialog,
-            inputMessageText = fellesformatMeldingSvarMoteinnkalling,
+            fellesformat = fellesformatMeldingSvarMoteinnkalling,
         )
         val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmeldingInBehandlerdialog)
         database.lagreSendtKafka(dialogmeldingId)
@@ -318,11 +309,9 @@ class SendDialogmeldingArenaCronjobTest {
     fun `Does not process dialogmelding when already checked whether it should be sent to arena`() {
         val fellesformatMeldingInBehandlerdialog =
             getFileAsString("src/test/resources/dialogmelding_dialog_notat_in_behandlerdialog.xml")
-        val fellesformatXmlMeldingInBehandlerdialog = safeUnmarshal(fellesformatMeldingInBehandlerdialog)
         val receivedDialogmeldingMeldingInBehandlerdialog = ReceivedDialogmelding.create(
             dialogmeldingId = UUID.randomUUID().toString(),
-            fellesformat = fellesformatXmlMeldingInBehandlerdialog,
-            inputMessageText = fellesformatMeldingInBehandlerdialog,
+            fellesformat = fellesformatMeldingInBehandlerdialog,
         )
         val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmeldingMeldingInBehandlerdialog)
         database.lagreSendtKafka(dialogmeldingId)
@@ -356,11 +345,9 @@ class SendDialogmeldingArenaCronjobTest {
     fun `Fails when behandlerdialog gives InternalServerError`() {
         val fellesformatMeldingThrowsError =
             getFileAsString("src/test/resources/dialogmelding_dialog_notat_in_behandlerdialog_with_error.xml")
-        val fellesformatXmlMeldingThrowsError = safeUnmarshal(fellesformatMeldingThrowsError)
         val receivedDialogmeldingThrowsError = ReceivedDialogmelding.create(
             dialogmeldingId = UUID.randomUUID().toString(),
-            fellesformat = fellesformatXmlMeldingThrowsError,
-            inputMessageText = fellesformatMeldingThrowsError,
+            fellesformat = fellesformatMeldingThrowsError,
         )
         val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmeldingThrowsError)
         database.lagreSendtKafka(dialogmeldingId)
@@ -408,11 +395,9 @@ class SendDialogmeldingArenaCronjobTest {
     fun `Does not fail the whole job when one erroneous melding, while other meldinger are OK`() {
         val fellesformatOtherPerson =
             getFileAsString("src/test/resources/dialogmelding_dialog_svar_foresporsel_om_pasient.xml")
-        val fellesformatXmlOtherPerson = safeUnmarshal(fellesformatOtherPerson)
         val receivedDialogmeldingWithError = ReceivedDialogmelding.create(
             dialogmeldingId = UUID.randomUUID().toString(),
-            fellesformat = fellesformatXmlOtherPerson,
-            inputMessageText = fellesformatOtherPerson,
+            fellesformat = fellesformatOtherPerson,
         )
         val dialogmeldingIdWithError = createDialogmeldingOpplysning(receivedDialogmeldingWithError)
         val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmelding)

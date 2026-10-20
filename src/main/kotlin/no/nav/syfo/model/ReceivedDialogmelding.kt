@@ -1,6 +1,5 @@
 package no.nav.syfo.model
 
-import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.util.*
@@ -33,19 +32,19 @@ data class ReceivedDialogmelding(
     companion object {
         fun create(
             dialogmeldingId: String,
-            fellesformat: XMLEIFellesformat,
-            inputMessageText: String,
+            fellesformat: String,
         ): ReceivedDialogmelding {
-            val emottakblokk = fellesformat.get<XMLMottakenhetBlokk>()
-            val msgHead: XMLMsgHead = fellesformat.get()
+            val fellesformatXml = safeUnmarshal(fellesformat)
+            val emottakblokk = fellesformatXml.get<XMLMottakenhetBlokk>()
+            val msgHead: XMLMsgHead = fellesformatXml.get()
             val legeIdent = emottakblokk.avsenderFnrFraDigSignatur
-            val legekontorOrgName = extractSenderOrganisationName(fellesformat)
-            val legekontorHerId = extractOrganisationHerNumberFromSender(fellesformat)?.id
-            val dialogmeldingXml = extractDialogmelding(fellesformat)
+            val legekontorOrgName = extractSenderOrganisationName(fellesformatXml)
+            val legekontorHerId = extractOrganisationHerNumberFromSender(fellesformatXml)?.id
+            val dialogmeldingXml = extractDialogmelding(fellesformatXml)
             val dialogmeldingType = findDialogmeldingType(emottakblokk.ebService, emottakblokk.ebAction)
-            val behandlerNavn = extractBehandlerNavn(fellesformat)
-            val innbyggerIdent = extractInnbyggerident(fellesformat)
-            val legekontorOrgNr = extractOrganisationNumberFromSender(fellesformat)?.id
+            val behandlerNavn = extractBehandlerNavn(fellesformatXml)
+            val innbyggerIdent = extractInnbyggerident(fellesformatXml)
+            val legekontorOrgNr = extractOrganisationNumberFromSender(fellesformatXml)?.id
 
             val dialogmelding = dialogmeldingXml.toDialogmelding(
                 dialogmeldingId = dialogmeldingId,
@@ -58,7 +57,7 @@ data class ReceivedDialogmelding(
                 dialogmelding = dialogmelding,
                 dialogmeldingType = dialogmeldingType,
                 personNrPasient = innbyggerIdent!!,
-                pasientNavn = extractPasientNavn(fellesformat),
+                pasientNavn = extractPasientNavn(fellesformatXml),
                 personNrLege = legeIdent,
                 navLogId = emottakblokk.ediLoggId,
                 msgId = msgHead.msgInfo.msgId,
@@ -72,7 +71,7 @@ data class ReceivedDialogmelding(
                     .withZoneSameInstant(
                         ZoneId.of("Europe/Oslo")
                     ).toLocalDateTime(),
-                fellesformat = inputMessageText,
+                fellesformat = fellesformat,
             )
         }
     }
