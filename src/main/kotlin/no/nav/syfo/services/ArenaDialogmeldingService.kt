@@ -1,11 +1,11 @@
 package no.nav.syfo.services
 
-import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.client.SmtssClient
 import no.nav.syfo.client.SyfohelsenettproxyClient
+import no.nav.syfo.client.TssId
 import no.nav.syfo.client.aapapi.AapApiClient
 import no.nav.syfo.client.createArenaDialogNotat
 import no.nav.syfo.client.isbehandlerdialog.BehandlerdialogClient
@@ -27,20 +27,11 @@ class ArenaDialogmeldingService(
 ) {
     suspend fun sendArenaDialogmeldingToMQ(
         receivedDialogmelding: ReceivedDialogmelding,
-        fellesformatXml: XMLEIFellesformat,
     ) {
-        val msgHead: XMLMsgHead = fellesformatXml.get()
-        val emottakBlokk = fellesformatXml.get<XMLMottakenhetBlokk>()
-        val loggingMeta = LoggingMeta.create(
-            emottakBlokk = emottakBlokk,
-            fellesformatXml = fellesformatXml,
-            msgHead = msgHead,
-        )
+        val loggingMeta = receivedDialogmelding.loggingMeta()
         val tssId = getTssId(
             receivedDialogmelding = receivedDialogmelding,
             loggingMeta = loggingMeta,
-            msgHead = msgHead,
-            emottakBlokk = emottakBlokk,
         )
         val pasientNavn = pdlClient.hentPersonNavn(
             personIdent = PersonIdent(receivedDialogmelding.personNrPasient),
@@ -52,13 +43,8 @@ class ArenaDialogmeldingService(
         )?.toBehandler(receivedDialogmelding.personNrLege)
 
         val arenaDialogNotat = createArenaDialogNotat(
-            fellesformat = fellesformatXml,
+            receivedDialogmelding = receivedDialogmelding,
             tssid = tssId,
-            legefnr = receivedDialogmelding.personNrLege,
-            innbyggerident = receivedDialogmelding.personNrPasient,
-            msgHead = msgHead,
-            emottakblokk = emottakBlokk,
-            dialogmelding = receivedDialogmelding.dialogmelding,
             pasientNavn = pasientNavn,
             avsenderBehandler = avsenderBehandler,
         )
@@ -80,8 +66,6 @@ class ArenaDialogmeldingService(
 
     private suspend fun getTssId(
         receivedDialogmelding: ReceivedDialogmelding,
-        msgHead: XMLMsgHead,
-        emottakBlokk: XMLMottakenhetBlokk,
         loggingMeta: LoggingMeta,
     ): String {
         val tssId = smtssClient.findBestTss(
@@ -91,15 +75,30 @@ class ArenaDialogmeldingService(
         )
 
         if (tssId != null && tssId.tssid.isNotBlank()) {
-            emottakService.registerEmottakSubscription(
+            registerEmottakSubscription(
                 tssId = tssId,
-                partnerReferanse = emottakBlokk.partnerReferanse,
-                sender = msgHead.msgInfo.sender,
-                msgId = msgHead.msgInfo.msgId,
+                receivedDialogmelding = receivedDialogmelding,
                 loggingMeta = loggingMeta,
             )
         }
 
         return tssId?.tssid ?: ""
+    }
+
+    // eMottak-abonnement gjelder kun meldinger mottatt via MQ, og krever data fra fellesformatet.
+    private suspend fun registerEmottakSubscription(
+        tssId: TssId,
+        receivedDialogmelding: ReceivedDialogmelding,
+        loggingMeta: LoggingMeta,
+    ) {
+        val fellesformatXml = safeUnmarshal(receivedDialogmelding.fellesformat)
+        val msgHead: XMLMsgHead = fellesformatXml.get()
+        emottakService.registerEmottakSubscription(
+            tssId = tssId,
+            partnerReferanse = fellesformatXml.get<XMLMottakenhetBlokk>().partnerReferanse,
+            sender = msgHead.msgInfo.sender,
+            msgId = receivedDialogmelding.msgId,
+            loggingMeta = loggingMeta,
+        )
     }
 }

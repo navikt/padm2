@@ -72,7 +72,7 @@ class ArenaDialogmeldingServiceTest {
         coJustRun { emottakService.registerEmottakSubscription(any(), any(), any(), any(), any()) }
 
         runBlocking {
-            arenaDialogmeldingService.sendArenaDialogmeldingToMQ(receivedDialogmelding, fellesformat)
+            arenaDialogmeldingService.sendArenaDialogmeldingToMQ(receivedDialogmelding)
         }
 
         coVerify(exactly = 1) { smtssClient.findBestTss(legePersonIdent, legekontorOrgName, msgId) }
@@ -92,7 +92,7 @@ class ArenaDialogmeldingServiceTest {
         coEvery { smtssClient.findBestTss(any(), any(), any()) } returns null
 
         runBlocking {
-            arenaDialogmeldingService.sendArenaDialogmeldingToMQ(receivedDialogmelding, fellesformat)
+            arenaDialogmeldingService.sendArenaDialogmeldingToMQ(receivedDialogmelding)
         }
 
         coVerify(exactly = 1) { smtssClient.findBestTss(legePersonIdent, legekontorOrgName, msgId) }
@@ -105,7 +105,7 @@ class ArenaDialogmeldingServiceTest {
         coEvery { smtssClient.findBestTss(any(), any(), any()) } returns emptyTssId
 
         runBlocking {
-            arenaDialogmeldingService.sendArenaDialogmeldingToMQ(receivedDialogmelding, fellesformat)
+            arenaDialogmeldingService.sendArenaDialogmeldingToMQ(receivedDialogmelding)
         }
 
         coVerify(exactly = 1) { smtssClient.findBestTss(legePersonIdent, legekontorOrgName, msgId) }
@@ -124,7 +124,7 @@ class ArenaDialogmeldingServiceTest {
         coJustRun { emottakService.registerEmottakSubscription(any(), any(), any(), any(), any()) }
 
         runBlocking {
-            arenaDialogmeldingService.sendArenaDialogmeldingToMQ(receivedDialogmelding, fellesformat)
+            arenaDialogmeldingService.sendArenaDialogmeldingToMQ(receivedDialogmelding)
         }
         coVerify(exactly = 1) { mqSender.sendArena(any()) }
     }
