@@ -7,7 +7,6 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.client.azuread.v2.AzureAdV2Token
-import no.nav.syfo.client.httpClient
 import no.nav.syfo.domain.PersonIdent
 import no.nav.syfo.model.PersonNavn
 import no.nav.syfo.util.*
@@ -49,12 +48,12 @@ class PdlClient(
         }
 
         if (response.status != HttpStatusCode.OK) {
-            COUNT_CALL_PDL_IDENTER_FAIL.increment()
+            COUNT_CALL_PDL_FAIL.increment()
             throw RuntimeException("Request with url: $pdlUrl failed with response code ${response.status.value}")
         }
         val pdlPersonResponse = response.body<PdlPersonResponse>()
         if (!pdlPersonResponse.errors.isNullOrEmpty()) {
-            COUNT_CALL_PDL_IDENTER_FAIL.increment()
+            COUNT_CALL_PDL_FAIL.increment()
             pdlPersonResponse.errors.forEach {
                 logger.error("Error while requesting Person from PersonDataLosningen: ${it.message}")
             }
@@ -62,10 +61,10 @@ class PdlClient(
         }
         val navn = pdlPersonResponse.data?.hentPerson?.navn?.firstOrNull()
         if (navn == null) {
-            COUNT_CALL_PDL_IDENTER_FAIL.increment()
+            COUNT_CALL_PDL_FAIL.increment()
             throw RuntimeException("PDL returned no navn for person")
         }
-        COUNT_CALL_PDL_IDENTER_SUCCESS.increment()
+        COUNT_CALL_PDL_SUCCESS.increment()
         return navn.toPersonNavn()
     }
 
@@ -97,10 +96,10 @@ class PdlClient(
             HttpStatusCode.OK -> {
                 val pdlPersonReponse = response.body<PdlIdenterResponse>()
                 if (pdlPersonReponse.errors.isNullOrEmpty()) {
-                    COUNT_CALL_PDL_IDENTER_SUCCESS.increment()
+                    COUNT_CALL_PDL_SUCCESS.increment()
                     pdlPersonReponse.data
                 } else {
-                    COUNT_CALL_PDL_IDENTER_FAIL.increment()
+                    COUNT_CALL_PDL_FAIL.increment()
                     pdlPersonReponse.errors.forEach {
                         logger.error("Error while requesting Identer from PersonDataLosningen: ${it.message}")
                     }
@@ -108,7 +107,7 @@ class PdlClient(
                 }
             }
             else -> {
-                COUNT_CALL_PDL_IDENTER_FAIL.increment()
+                COUNT_CALL_PDL_FAIL.increment()
                 throw RuntimeException("Request with url: $pdlUrl failed with response code ${response.status.value}")
             }
         }
