@@ -5,12 +5,23 @@ import no.nav.helse.msgHead.XMLDocument
 import no.nav.syfo.logger
 import no.nav.syfo.util.convertImageToPDF
 import java.io.ByteArrayOutputStream
+import java.util.HexFormat
+
+val GYLDIGE_VEDLEGG_MIME_TYPER = listOf("application/pdf", "image/tiff", "image/png", "image/jpeg", "image/pjpeg", "image/jpg", "image/pjpg")
+
+private val PDF_MAGIC_NUMBER: ByteArray = HexFormat.of().parseHex("255044462D") // binary "%PDF-"
 
 data class Vedlegg(
     val mimeType: String,
     val beskrivelse: String,
     val contentBase64: ByteArray
 )
+
+fun Vedlegg.erGyldig(): Boolean =
+    mimeType in GYLDIGE_VEDLEGG_MIME_TYPER && innholdStemmerMedMimeType(mimeType, contentBase64)
+
+fun innholdStemmerMedMimeType(mimeType: String, innhold: ByteArray): Boolean =
+    mimeType != "application/pdf" || innhold.copyOf(PDF_MAGIC_NUMBER.size) contentEquals PDF_MAGIC_NUMBER
 
 fun XMLDocument.toVedlegg(): Vedlegg {
     return Vedlegg(

@@ -2,9 +2,11 @@ package no.nav.syfo.persistering.db
 
 import no.nav.syfo.db.*
 import no.nav.syfo.model.Dialogmelding
+import no.nav.syfo.model.DialogmeldingSource
 import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.model.ValidationResult
 import no.nav.syfo.persistering.db.domain.DialogmeldingTidspunkt
+import no.nav.syfo.persistering.db.domain.LagretDialogmelding
 import no.nav.syfo.util.objectMapper
 import org.postgresql.util.PGobject
 import java.sql.*
@@ -55,9 +57,10 @@ fun Connection.opprettDialogmeldingOpplysninger(receivedDialogmelding: ReceivedD
                 arena,
                 ferdigstilt,
                 sent_to_arena,
-                created_at
+                created_at,
+                source
                 )
-            VALUES  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             RETURNING id
             """
     ).use {
@@ -76,6 +79,7 @@ fun Connection.opprettDialogmeldingOpplysninger(receivedDialogmelding: ReceivedD
         it.setNull(13, Types.TIMESTAMP)
         it.setBoolean(14, false)
         it.setTimestamp(15, Timestamp.valueOf(LocalDateTime.now()))
+        it.setString(16, receivedDialogmelding.source.name)
         it.executeQuery().toList { getString("id") }
     }
 
@@ -296,13 +300,13 @@ fun DatabaseInterface.hentIkkeFullforteDialogmeldinger() =
         }
     }
 
-fun DatabaseInterface.hentFellesformat(
+fun DatabaseInterface.hentSisteDialogmelding(
     msgId: String,
-): String? =
+): LagretDialogmelding? =
     connection.use { connection ->
         connection.prepareStatement(
             """
-                SELECT fellesformat
+                SELECT id, source, fellesformat
                 FROM dialogmeldingopplysninger
                 WHERE msg_id = ?
                 ORDER BY mottatt_tidspunkt DESC
@@ -310,7 +314,11 @@ fun DatabaseInterface.hentFellesformat(
         ).use {
             it.setString(1, msgId)
             it.executeQuery().toList {
-                getString("fellesformat")
+                LagretDialogmelding(
+                    id = getString("id"),
+                    source = DialogmeldingSource.valueOf(getString("source")),
+                    fellesformat = getString("fellesformat"),
+                )
             }.firstOrNull()
         }
     }

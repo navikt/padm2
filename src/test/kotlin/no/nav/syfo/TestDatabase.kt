@@ -39,6 +39,9 @@ class TestDatabaseNotResponding : DatabaseInterface {
 fun DatabaseInterface.dropData() {
     val queryList = listOf(
         """
+        DELETE FROM DIALOGMELDINGVEDLEGG
+        """.trimIndent(),
+        """
         DELETE FROM BEHANDLINGSUTFALL
         """.trimIndent(),
         """

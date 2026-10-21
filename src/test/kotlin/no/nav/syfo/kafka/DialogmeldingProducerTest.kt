@@ -255,6 +255,7 @@ internal class DialogmeldingProducerTest {
                 .withZoneSameInstant(
                     ZoneOffset.UTC
                 ).toLocalDateTime(),
+            source = DialogmeldingSource.MQ,
             fellesformat = inputMessageText,
         )
         journalpostId = "jpid"

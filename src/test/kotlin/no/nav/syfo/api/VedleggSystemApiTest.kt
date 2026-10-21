@@ -18,6 +18,12 @@ import no.nav.syfo.application.api.vedleggSystemApiV1Path
 import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.kafka.DialogmeldingProducer
+import no.nav.syfo.model.DialogmeldingSource
+import no.nav.syfo.model.ReceivedDialogmelding
+import no.nav.syfo.model.Vedlegg
+import no.nav.syfo.persistering.db.hentVedlegg
+import no.nav.syfo.persistering.db.lagreVedlegg
+import no.nav.syfo.persistering.db.opprettDialogmeldingOpplysninger
 import no.nav.syfo.services.MqApprecService
 import no.nav.syfo.services.MqVedleggService
 import no.nav.syfo.services.Padm2ValidationService
@@ -27,6 +33,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.sql.SQLException
 import java.util.*
 import javax.jms.TextMessage
 
@@ -183,6 +190,64 @@ class VedleggSystemApiTest {
                     header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                 }
                 assertEquals(HttpStatusCode.NoContent, response.status)
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("Dialogmelding mottatt via Kafka")
+    inner class Kafka {
+
+        private val pdf = "%PDF-1.4 innhold".toByteArray()
+
+        private fun lagreKafkaDialogmelding(msgId: String): String {
+            val receivedDialogmelding = ReceivedDialogmelding.create(
+                dialogmeldingId = UUID.randomUUID().toString(),
+                fellesformat = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml"),
+            ).copy(msgId = msgId, source = DialogmeldingSource.KAFKA)
+            return database.connection.use {
+                val id = it.opprettDialogmeldingOpplysninger(receivedDialogmelding)
+                it.commit()
+                id
+            }
+        }
+
+        @Test
+        fun `should get valid vedlegg from DIALOGMELDINGVEDLEGG`() {
+            testApplication {
+                val client = setupApiAndClient()
+                val dialogmeldingId = lagreKafkaDialogmelding(msgId)
+                database.lagreVedlegg(dialogmeldingId, 0, Vedlegg("application/pdf", "Epikrise", pdf))
+                database.lagreVedlegg(dialogmeldingId, 1, Vedlegg("application/pdf", "Ikke PDF", "tekst".toByteArray()))
+                database.lagreVedlegg(dialogmeldingId, 2, Vedlegg("text/plain", "Ukjent type", "tekst".toByteArray()))
+
+                val response = client.get(url) {
+                    bearerAuth(validToken)
+                    header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                }
+
+                assertEquals(HttpStatusCode.OK, response.status)
+                val vedleggListe = response.body<List<VedleggDTO>>()
+                assertEquals(1, vedleggListe.size)
+                assertArrayEquals(pdf, vedleggListe.first().bytes)
+            }
+        }
+
+        @Test
+        fun `lagreVedlegg is idempotent per vedlegg_nr`() {
+            val dialogmeldingId = lagreKafkaDialogmelding(msgId)
+            database.lagreVedlegg(dialogmeldingId, 0, Vedlegg("application/pdf", "Epikrise", pdf))
+            database.lagreVedlegg(dialogmeldingId, 0, Vedlegg("application/pdf", "Epikrise", pdf))
+
+            assertEquals(1, database.hentVedlegg(dialogmeldingId).size)
+        }
+
+        @Test
+        fun `msg_id is unique for Kafka source`() {
+            lagreKafkaDialogmelding(msgId)
+
+            assertThrows(SQLException::class.java) {
+                lagreKafkaDialogmelding(msgId)
             }
         }
     }
