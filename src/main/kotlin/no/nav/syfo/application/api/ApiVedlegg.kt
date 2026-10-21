@@ -11,7 +11,7 @@ import no.nav.syfo.model.erGyldig
 import no.nav.syfo.model.toPDFVedlegg
 import no.nav.syfo.model.toVedlegg
 import no.nav.syfo.persistering.db.domain.LagretDialogmelding
-import no.nav.syfo.persistering.db.hentSisteDialogmelding
+import no.nav.syfo.persistering.db.hentLagretDialogmelding
 import no.nav.syfo.persistering.db.hentVedlegg
 import no.nav.syfo.util.*
 
@@ -34,9 +34,9 @@ fun Route.registerVedleggSystemApi(
             )
             val msgId = call.parameters[vedleggSystemApiMsgIdParam]
             val lagretDialogmelding = msgId?.let {
-                database.hentSisteDialogmelding(it)
+                database.hentLagretDialogmelding(it)
             }
-            val vedlegg = lagretDialogmelding?.let { database.hentGyldigeVedlegg(it) }
+            val vedlegg = lagretDialogmelding?.let { hentGyldigeVedlegg(database, it) }
             if (vedlegg == null) {
                 call.respond(HttpStatusCode.NoContent)
             } else {
@@ -53,14 +53,17 @@ fun Route.registerVedleggSystemApi(
     }
 }
 
-private fun DatabaseInterface.hentGyldigeVedlegg(lagretDialogmelding: LagretDialogmelding): List<Vedlegg>? =
+private fun hentGyldigeVedlegg(
+    database: DatabaseInterface,
+    lagretDialogmelding: LagretDialogmelding,
+): List<Vedlegg>? =
     when (lagretDialogmelding.source) {
         DialogmeldingSource.EMOTTAK ->
             lagretDialogmelding.fellesformat
                 ?.takeIf { it.isNotEmpty() }
                 ?.let { fellesformat -> extractValidVedlegg(safeUnmarshal(fellesformat)).map { it.toVedlegg() } }
         DialogmeldingSource.HELSEMELDING ->
-            hentVedlegg(lagretDialogmelding.id).filter { it.erGyldig() }
+            database.hentVedlegg(lagretDialogmelding.id).filter { it.erGyldig() }
     }
 
 data class VedleggDTO(

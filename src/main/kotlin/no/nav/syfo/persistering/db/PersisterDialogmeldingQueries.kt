@@ -300,7 +300,7 @@ fun DatabaseInterface.hentIkkeFullforteDialogmeldinger() =
         }
     }
 
-fun DatabaseInterface.hentSisteDialogmelding(
+fun DatabaseInterface.hentLagretDialogmelding(
     msgId: String,
 ): LagretDialogmelding? =
     connection.use { connection ->
