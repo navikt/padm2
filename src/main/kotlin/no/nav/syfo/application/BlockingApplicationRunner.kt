@@ -112,7 +112,7 @@ class BlockingApplicationRunner(
         persistReceivedMessage(
             receivedDialogmelding = receivedDialogmelding,
             sha256String = sha256String,
-            loggingMeta = loggingMeta,
+            loggingMeta = receivedDialogmelding.loggingMeta(),
             database = database,
         )
         INCOMING_MESSAGE_COUNTER.increment()

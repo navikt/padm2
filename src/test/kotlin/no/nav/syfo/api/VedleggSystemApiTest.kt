@@ -195,16 +195,16 @@ class VedleggSystemApiTest {
     }
 
     @Nested
-    @DisplayName("Dialogmelding mottatt via Kafka")
-    inner class Kafka {
+    @DisplayName("Dialogmelding mottatt fra Helsemelding")
+    inner class Helsemelding {
 
         private val pdf = "%PDF-1.4 innhold".toByteArray()
 
-        private fun lagreKafkaDialogmelding(msgId: String): String {
+        private fun lagreHelsemeldingDialogmelding(msgId: String): String {
             val receivedDialogmelding = ReceivedDialogmelding.create(
                 dialogmeldingId = UUID.randomUUID().toString(),
                 fellesformat = getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml"),
-            ).copy(msgId = msgId, source = DialogmeldingSource.KAFKA)
+            ).copy(msgId = msgId, source = DialogmeldingSource.HELSEMELDING)
             return database.connection.use {
                 val id = it.opprettDialogmeldingOpplysninger(receivedDialogmelding)
                 it.commit()
@@ -216,7 +216,7 @@ class VedleggSystemApiTest {
         fun `should get valid vedlegg from DIALOGMELDINGVEDLEGG`() {
             testApplication {
                 val client = setupApiAndClient()
-                val dialogmeldingId = lagreKafkaDialogmelding(msgId)
+                val dialogmeldingId = lagreHelsemeldingDialogmelding(msgId)
                 database.lagreVedlegg(dialogmeldingId, 0, Vedlegg("application/pdf", "Epikrise", pdf))
                 database.lagreVedlegg(dialogmeldingId, 1, Vedlegg("application/pdf", "Ikke PDF", "tekst".toByteArray()))
                 database.lagreVedlegg(dialogmeldingId, 2, Vedlegg("text/plain", "Ukjent type", "tekst".toByteArray()))
@@ -235,7 +235,7 @@ class VedleggSystemApiTest {
 
         @Test
         fun `lagreVedlegg is idempotent per vedlegg_nr`() {
-            val dialogmeldingId = lagreKafkaDialogmelding(msgId)
+            val dialogmeldingId = lagreHelsemeldingDialogmelding(msgId)
             database.lagreVedlegg(dialogmeldingId, 0, Vedlegg("application/pdf", "Epikrise", pdf))
             database.lagreVedlegg(dialogmeldingId, 0, Vedlegg("application/pdf", "Epikrise", pdf))
 
@@ -243,11 +243,11 @@ class VedleggSystemApiTest {
         }
 
         @Test
-        fun `msg_id is unique for Kafka source`() {
-            lagreKafkaDialogmelding(msgId)
+        fun `msg_id is unique for Helsemelding source`() {
+            lagreHelsemeldingDialogmelding(msgId)
 
             assertThrows(SQLException::class.java) {
-                lagreKafkaDialogmelding(msgId)
+                lagreHelsemeldingDialogmelding(msgId)
             }
         }
     }

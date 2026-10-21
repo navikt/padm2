@@ -71,7 +71,7 @@ class ArenaDialogmeldingService(
         val tssId = smtssClient.findBestTss(
             legePersonIdent = PersonIdent(receivedDialogmelding.personNrLege),
             legekontorOrgName = receivedDialogmelding.legekontorOrgName,
-            dialogmeldingId = receivedDialogmelding.msgId,
+            requestId = receivedDialogmelding.msgId,
         )
 
         if (tssId != null && tssId.tssid.isNotBlank()) {

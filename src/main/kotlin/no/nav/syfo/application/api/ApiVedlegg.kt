@@ -55,11 +55,11 @@ fun Route.registerVedleggSystemApi(
 
 private fun DatabaseInterface.hentGyldigeVedlegg(lagretDialogmelding: LagretDialogmelding): List<Vedlegg>? =
     when (lagretDialogmelding.source) {
-        DialogmeldingSource.MQ ->
+        DialogmeldingSource.EMOTTAK ->
             lagretDialogmelding.fellesformat
                 ?.takeIf { it.isNotEmpty() }
                 ?.let { fellesformat -> extractValidVedlegg(safeUnmarshal(fellesformat)).map { it.toVedlegg() } }
-        DialogmeldingSource.KAFKA ->
+        DialogmeldingSource.HELSEMELDING ->
             hentVedlegg(lagretDialogmelding.id).filter { it.erGyldig() }
     }
 

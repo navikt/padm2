@@ -27,6 +27,7 @@ data class ReceivedDialogmelding(
         mottakId = navLogId,
         orgNr = legekontorOrgNr,
         msgId = msgId,
+        dialogmeldingId = dialogmelding.id,
     )
 
     companion object {
@@ -70,7 +71,7 @@ data class ReceivedDialogmelding(
                     .withZoneSameInstant(
                         ZoneId.of("Europe/Oslo")
                     ).toLocalDateTime(),
-                source = DialogmeldingSource.MQ,
+                source = DialogmeldingSource.EMOTTAK,
                 fellesformat = fellesformat,
             )
         }
