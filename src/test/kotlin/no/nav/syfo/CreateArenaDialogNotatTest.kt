@@ -1,60 +1,40 @@
 package no.nav.syfo
 
-import java.time.LocalDateTime
-import java.util.UUID
-import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
-import no.nav.helse.msgHead.XMLMsgHead
+import no.nav.helse.arenadialognotat.ArenaDialogNotat
 import no.nav.syfo.client.createArenaDialogNotat
 import no.nav.syfo.client.createAvsender
 import no.nav.syfo.model.Behandler
 import no.nav.syfo.model.DialogmeldingKodeverk
-import no.nav.syfo.model.findDialogmeldingType
-import no.nav.syfo.model.toDialogmelding
+import no.nav.syfo.model.PersonNavn
+import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.util.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.math.BigInteger
+import java.time.LocalDateTime
+import java.util.UUID
 
 internal class CreateArenaDialogNotatTest {
 
     private val FASTLEGE_FNR = "21312341414"
+    private val TSS_ID = "1321415"
+    private val PASIENT_NAVN = PersonNavn(fornavn = "Etternavn", mellomnavn = null, etternavn = "Test")
+
+    private fun createArenaDialogNotat(fellesformat: String): ArenaDialogNotat =
+        createArenaDialogNotat(
+            receivedDialogmelding = ReceivedDialogmelding.create(
+                dialogmeldingId = UUID.randomUUID().toString(),
+                fellesformat = fellesformat,
+            ),
+            tssid = TSS_ID,
+            pasientNavn = PASIENT_NAVN,
+            avsenderBehandler = extractBehandler(safeUnmarshal(fellesformat)),
+        )
 
     @Test
     internal fun `Tester mapping fra fellesformat til ArenaDialogNotat svar foresporsel pasient`() {
-        val felleformatDm = safeUnmarshal(
-            getFileAsString("src/test/resources/dialogmelding_dialog_svar_foresporsel_om_pasient.xml")
-        )
-
-        val msgHead: XMLMsgHead = felleformatDm.get()
-        val emottakblokk = felleformatDm.get<XMLMottakenhetBlokk>()
-        val personNumberPatient = extractInnbyggerident(felleformatDm) ?: ""
-        val personNumberDoctor = emottakblokk.avsenderFnrFraDigSignatur
-        val tssid = "1321415"
-
-        val dialomeldingxml = extractDialogmelding(felleformatDm)
-        val dialogmeldingId = UUID.randomUUID().toString()
-        val signaturDato = LocalDateTime.of(2017, 11, 5, 0, 0, 0)
-        val navnHelsePersonellNavn = "Per Hansen"
-
-        val dialogmeldingType = findDialogmeldingType(emottakblokk.ebService, emottakblokk.ebAction)
-
-        val dialogmelding = dialomeldingxml.toDialogmelding(
-            dialogmeldingId = dialogmeldingId,
-            dialogmeldingType = dialogmeldingType,
-            signaturDato = signaturDato,
-            navnHelsePersonellNavn = navnHelsePersonellNavn
-        )
-
         val arenaDialogNotat = createArenaDialogNotat(
-            felleformatDm,
-            tssid,
-            personNumberDoctor,
-            personNumberPatient,
-            msgHead,
-            emottakblokk,
-            dialogmelding,
-            msgHead.msgInfo.patient,
-            extractBehandler(felleformatDm),
+            getFileAsString("src/test/resources/dialogmelding_dialog_svar_foresporsel_om_pasient.xml")
         )
 
         assertEquals("DM", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentType)
@@ -63,7 +43,7 @@ internal class CreateArenaDialogNotatTest {
         assertEquals("b62016eb-6c2d-417a-8ecc-157b3c5ee2ca", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentreferanse)
         assertEquals("FiktivTestdata0001", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.ediLoggId)
         assertEquals(FASTLEGE_FNR, arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeFnr)
-        assertEquals(tssid.toBigInteger(), arenaDialogNotat.eiaDokumentInfo.avsender.lege.tssId)
+        assertEquals(TSS_ID.toBigInteger(), arenaDialogNotat.eiaDokumentInfo.avsender.lege.tssId)
         assertEquals("Inga", arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.fornavn)
         assertEquals("Valda", arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.etternavn)
         assertEquals("3143242342", arenaDialogNotat.pasientData.person.personFnr)
@@ -95,40 +75,8 @@ internal class CreateArenaDialogNotatTest {
 
     @Test
     internal fun `Tester mapping fra fellesformat til ArenaDialogNotat svar innkalling dialogmote`() {
-        val felleformatDm = safeUnmarshal(
-            getFileAsString("src/test/resources/dialogmelding_dialog_svar_innkalling_dialogmote.xml")
-        )
-
-        val msgHead: XMLMsgHead = felleformatDm.get()
-        val emottakblokk = felleformatDm.get<XMLMottakenhetBlokk>()
-        val personNumberPatient = extractInnbyggerident(felleformatDm) ?: ""
-        val personNumberDoctor = emottakblokk.avsenderFnrFraDigSignatur
-        val tssid = "1321415"
-
-        val dialomeldingxml = extractDialogmelding(felleformatDm)
-        val dialogmeldingId = UUID.randomUUID().toString()
-        val signaturDato = LocalDateTime.of(2017, 11, 5, 0, 0, 0)
-        val navnHelsePersonellNavn = "Per Hansen"
-
-        val dialogmeldingType = findDialogmeldingType(emottakblokk.ebService, emottakblokk.ebAction)
-
-        val dialogmelding = dialomeldingxml.toDialogmelding(
-            dialogmeldingId = dialogmeldingId,
-            dialogmeldingType = dialogmeldingType,
-            signaturDato = signaturDato,
-            navnHelsePersonellNavn = navnHelsePersonellNavn
-        )
-
         val arenaDialogNotat = createArenaDialogNotat(
-            felleformatDm,
-            tssid,
-            personNumberDoctor,
-            personNumberPatient,
-            msgHead,
-            emottakblokk,
-            dialogmelding,
-            msgHead.msgInfo.patient,
-            extractBehandler(felleformatDm),
+            getFileAsString("src/test/resources/dialogmelding_dialog_svar_innkalling_dialogmote.xml")
         )
 
         assertEquals("DM", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentType)
@@ -140,7 +88,7 @@ internal class CreateArenaDialogNotatTest {
         assertEquals(9, arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.monthValue)
         assertEquals(21, arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato.dayOfMonth)
         assertEquals("01010112377", arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeFnr)
-        assertEquals(tssid.toBigInteger(), arenaDialogNotat.eiaDokumentInfo.avsender.lege.tssId)
+        assertEquals(TSS_ID.toBigInteger(), arenaDialogNotat.eiaDokumentInfo.avsender.lege.tssId)
         assertEquals("Inga", arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.fornavn)
         assertEquals("Valda", arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.etternavn)
         assertEquals("01010142365", arenaDialogNotat.pasientData.person.personFnr)
@@ -159,43 +107,11 @@ internal class CreateArenaDialogNotatTest {
 
     @Test
     internal fun `Tester mapping fra fellesformat til ArenaDialogNotat notat`() {
-        val felleformatDm = safeUnmarshal(
+        val arenaDialogNotat = createArenaDialogNotat(
             getFileAsStringISO88591("src/test/resources/dialogmelding_dialog_notat.xml")
         )
 
-        val msgHead: XMLMsgHead = felleformatDm.get()
-        val emottakblokk = felleformatDm.get<XMLMottakenhetBlokk>()
-        val personNumberPatient = extractInnbyggerident(felleformatDm) ?: ""
-        val personNumberDoctor = emottakblokk.avsenderFnrFraDigSignatur
-        val tssid = "1321415"
-
-        val dialomeldingxml = extractDialogmelding(felleformatDm)
-        val dialogmeldingId = UUID.randomUUID().toString()
-        val signaturDato = LocalDateTime.of(2017, 11, 5, 0, 0, 0)
-        val navnHelsePersonellNavn = "Per Hansen"
-
-        val dialogmeldingType = findDialogmeldingType(emottakblokk.ebService, emottakblokk.ebAction)
-
-        val dialogmelding = dialomeldingxml.toDialogmelding(
-            dialogmeldingId = dialogmeldingId,
-            dialogmeldingType = dialogmeldingType,
-            signaturDato = signaturDato,
-            navnHelsePersonellNavn = navnHelsePersonellNavn
-        )
-
         val localDateTime = LocalDateTime.parse("2019-01-16T22:51:35.5317672")
-        val arenaDialogNotat = createArenaDialogNotat(
-            felleformatDm,
-            tssid,
-            personNumberDoctor,
-            personNumberPatient,
-            msgHead,
-            emottakblokk,
-            dialogmelding,
-            msgHead.msgInfo.patient,
-            extractBehandler(felleformatDm),
-        )
-
         assertEquals("DM", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentType)
         assertEquals("1.0", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentTypeVersjon)
         assertEquals("Notat", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentNavn)
@@ -203,7 +119,7 @@ internal class CreateArenaDialogNotatTest {
         assertEquals("1901162157lege21826.1", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.ediLoggId)
         assertEquals(localDateTime, arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentDato)
         assertEquals("01010112377", arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeFnr)
-        assertEquals(tssid.toBigInteger(), arenaDialogNotat.eiaDokumentInfo.avsender.lege.tssId)
+        assertEquals(TSS_ID.toBigInteger(), arenaDialogNotat.eiaDokumentInfo.avsender.lege.tssId)
         assertEquals("Inga", arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.fornavn)
         assertEquals("Valda", arenaDialogNotat.eiaDokumentInfo.avsender.lege.legeNavn.etternavn)
         assertEquals("01010142365", arenaDialogNotat.pasientData.person.personFnr)
@@ -220,40 +136,8 @@ internal class CreateArenaDialogNotatTest {
 
     @Test
     internal fun `Tester mapping fra fellesformat til ArenaDialogNotat notat, med dnr for pasient i stedet for fnr`() {
-        val felleformatDm = safeUnmarshal(
-            getFileAsStringISO88591("src/test/resources/dialogmelding_dialog_notat_dnr.xml")
-        )
-
-        val msgHead: XMLMsgHead = felleformatDm.get()
-        val emottakblokk = felleformatDm.get<XMLMottakenhetBlokk>()
-        val personNumberPatient = extractInnbyggerident(felleformatDm) ?: ""
-        val personNumberDoctor = emottakblokk.avsenderFnrFraDigSignatur
-        val tssid = "1321415"
-
-        val dialomeldingxml = extractDialogmelding(felleformatDm)
-        val dialogmeldingId = UUID.randomUUID().toString()
-        val signaturDato = LocalDateTime.of(2017, 11, 5, 0, 0, 0)
-        val navnHelsePersonellNavn = "Per Hansen"
-
-        val dialogmeldingType = findDialogmeldingType(emottakblokk.ebService, emottakblokk.ebAction)
-
-        val dialogmelding = dialomeldingxml.toDialogmelding(
-            dialogmeldingId = dialogmeldingId,
-            dialogmeldingType = dialogmeldingType,
-            signaturDato = signaturDato,
-            navnHelsePersonellNavn = navnHelsePersonellNavn
-        )
-
         val arenaDialogNotat = createArenaDialogNotat(
-            felleformatDm,
-            tssid,
-            personNumberDoctor,
-            personNumberPatient,
-            msgHead,
-            emottakblokk,
-            dialogmelding,
-            msgHead.msgInfo.patient,
-            extractBehandler(felleformatDm),
+            getFileAsStringISO88591("src/test/resources/dialogmelding_dialog_notat_dnr.xml")
         )
 
         assertEquals("45088649080", arenaDialogNotat.pasientData.person.personFnr)
@@ -261,40 +145,8 @@ internal class CreateArenaDialogNotatTest {
 
     @Test
     internal fun `Tester mapping av arena biten`() {
-        val felleformatDm = safeUnmarshal(
-            getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
-        )
-
-        val msgHead: XMLMsgHead = felleformatDm.get()
-        val emottakblokk = felleformatDm.get<XMLMottakenhetBlokk>()
-        val personNumberPatient = extractInnbyggerident(felleformatDm) ?: ""
-        val personNumberDoctor = emottakblokk.avsenderFnrFraDigSignatur
-        val tssid = "1321415"
-
-        val dialomeldingxml = extractDialogmelding(felleformatDm)
-        val dialogmeldingId = UUID.randomUUID().toString()
-        val signaturDato = LocalDateTime.of(2017, 11, 5, 0, 0, 0)
-        val navnHelsePersonellNavn = "Per Hansen"
-
-        val dialogmeldingType = findDialogmeldingType(emottakblokk.ebService, emottakblokk.ebAction)
-
-        val dialogmelding = dialomeldingxml.toDialogmelding(
-            dialogmeldingId = dialogmeldingId,
-            dialogmeldingType = dialogmeldingType,
-            signaturDato = signaturDato,
-            navnHelsePersonellNavn = navnHelsePersonellNavn
-        )
-
         val arenaDialogNotat = createArenaDialogNotat(
-            felleformatDm,
-            tssid,
-            personNumberDoctor,
-            personNumberPatient,
-            msgHead,
-            emottakblokk,
-            dialogmelding,
-            msgHead.msgInfo.patient,
-            extractBehandler(felleformatDm),
+            getFileAsString("src/test/resources/dialogmelding_dialog_notat.xml")
         )
 
         assertEquals("3", arenaDialogNotat.notatKategori)
@@ -304,40 +156,8 @@ internal class CreateArenaDialogNotatTest {
 
     @Test
     internal fun `Tester mapping av arena tekstNotatInnhold`() {
-        val felleformatDm = safeUnmarshal(
-            getFileAsString("src/test/resources/dialogmelding_dialog_notat_vedlegg.xml")
-        )
-
-        val msgHead: XMLMsgHead = felleformatDm.get()
-        val emottakblokk = felleformatDm.get<XMLMottakenhetBlokk>()
-        val personNumberPatient = extractInnbyggerident(felleformatDm) ?: ""
-        val personNumberDoctor = emottakblokk.avsenderFnrFraDigSignatur
-        val tssid = "1321415"
-
-        val dialomeldingxml = extractDialogmelding(felleformatDm)
-        val dialogmeldingId = UUID.randomUUID().toString()
-        val signaturDato = LocalDateTime.of(2017, 11, 5, 0, 0, 0)
-        val navnHelsePersonellNavn = "Per Hansen"
-
-        val dialogmeldingType = findDialogmeldingType(emottakblokk.ebService, emottakblokk.ebAction)
-
-        val dialogmelding = dialomeldingxml.toDialogmelding(
-            dialogmeldingId = dialogmeldingId,
-            dialogmeldingType = dialogmeldingType,
-            signaturDato = signaturDato,
-            navnHelsePersonellNavn = navnHelsePersonellNavn
-        )
-
         val arenaDialogNotat = createArenaDialogNotat(
-            felleformatDm,
-            tssid,
-            personNumberDoctor,
-            personNumberPatient,
-            msgHead,
-            emottakblokk,
-            dialogmelding,
-            msgHead.msgInfo.patient,
-            extractBehandler(felleformatDm),
+            getFileAsString("src/test/resources/dialogmelding_dialog_notat_vedlegg.xml")
         )
 
         assertEquals("Hei,Det gjelder pas. Sender sm2013 som vedlegg", arenaDialogNotat.notatTekst)

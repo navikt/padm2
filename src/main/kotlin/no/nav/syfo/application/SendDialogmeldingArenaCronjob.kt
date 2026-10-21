@@ -8,7 +8,6 @@ import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.persistering.db.getUnpublishedArenaMeldinger
 import no.nav.syfo.persistering.db.lagreSendtArena
 import no.nav.syfo.services.ArenaDialogmeldingService
-import no.nav.syfo.util.safeUnmarshal
 import org.slf4j.LoggerFactory
 
 class SendDialogmeldingArenaCronjob(
@@ -32,7 +31,6 @@ class SendDialogmeldingArenaCronjob(
         val unpublishedArenaMeldinger = database.getUnpublishedArenaMeldinger()
         unpublishedArenaMeldinger.forEach { (dialogmeldingId, fellesformat, msgId) ->
             try {
-                val fellesformatXml = safeUnmarshal(fellesformat)
                 val receivedDialogmelding = ReceivedDialogmelding.create(
                     dialogmeldingId = dialogmeldingId,
                     fellesformat = fellesformat,
@@ -43,7 +41,6 @@ class SendDialogmeldingArenaCronjob(
                 if (sendToArena) {
                     arenaDialogmeldingService.sendArenaDialogmeldingToMQ(
                         receivedDialogmelding = receivedDialogmelding,
-                        fellesformatXml = fellesformatXml
                     )
                 }
                 database.lagreSendtArena(

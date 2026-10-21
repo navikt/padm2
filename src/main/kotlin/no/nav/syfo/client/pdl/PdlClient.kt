@@ -7,8 +7,8 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.client.azuread.v2.AzureAdV2Token
-import no.nav.syfo.client.httpClient
 import no.nav.syfo.domain.PersonIdent
+import no.nav.syfo.model.PersonNavn
 import no.nav.syfo.util.*
 import org.slf4j.LoggerFactory
 
@@ -28,6 +28,44 @@ class PdlClient(
             ident = personIdent.value,
             token = token,
         )?.hentIdenter?.identer?.isNotEmpty() ?: false
+    }
+
+    suspend fun hentPersonNavn(
+        personIdent: PersonIdent,
+    ): PersonNavn {
+        val token = azureAdV2Client.getSystemToken(pdlClientId)
+            ?: throw RuntimeException("Failed to send request to PDL: No token was found")
+        val request = PdlHentPersonRequest(
+            query = getPdlQuery("/pdl/hentPerson.graphql"),
+            variables = PdlHentPersonRequestVariables(ident = personIdent.value),
+        )
+
+        val response: HttpResponse = httpClient.post(pdlUrl) {
+            setBody(request)
+            header(HttpHeaders.ContentType, "application/json")
+            header(HttpHeaders.Authorization, bearerHeader(token.accessToken))
+            header(BEHANDLINGSNUMMER_HEADER_KEY, BEHANDLINGSNUMMER_HEADER_VALUE)
+        }
+
+        if (response.status != HttpStatusCode.OK) {
+            COUNT_CALL_PDL_FAIL.increment()
+            throw RuntimeException("Request with url: $pdlUrl failed with response code ${response.status.value}")
+        }
+        val pdlPersonResponse = response.body<PdlPersonResponse>()
+        if (!pdlPersonResponse.errors.isNullOrEmpty()) {
+            COUNT_CALL_PDL_FAIL.increment()
+            pdlPersonResponse.errors.forEach {
+                logger.error("Error while requesting Person from PersonDataLosningen: ${it.message}")
+            }
+            throw RuntimeException("PDL returned errors for hentPerson")
+        }
+        val navn = pdlPersonResponse.data?.hentPerson?.navn?.firstOrNull()
+        if (navn == null) {
+            COUNT_CALL_PDL_FAIL.increment()
+            throw RuntimeException("PDL returned no navn for person")
+        }
+        COUNT_CALL_PDL_SUCCESS.increment()
+        return navn.toPersonNavn()
     }
 
     private suspend fun identer(
@@ -58,10 +96,10 @@ class PdlClient(
             HttpStatusCode.OK -> {
                 val pdlPersonReponse = response.body<PdlIdenterResponse>()
                 if (pdlPersonReponse.errors.isNullOrEmpty()) {
-                    COUNT_CALL_PDL_IDENTER_SUCCESS.increment()
+                    COUNT_CALL_PDL_SUCCESS.increment()
                     pdlPersonReponse.data
                 } else {
-                    COUNT_CALL_PDL_IDENTER_FAIL.increment()
+                    COUNT_CALL_PDL_FAIL.increment()
                     pdlPersonReponse.errors.forEach {
                         logger.error("Error while requesting Identer from PersonDataLosningen: ${it.message}")
                     }
@@ -69,7 +107,7 @@ class PdlClient(
                 }
             }
             else -> {
-                COUNT_CALL_PDL_IDENTER_FAIL.increment()
+                COUNT_CALL_PDL_FAIL.increment()
                 throw RuntimeException("Request with url: $pdlUrl failed with response code ${response.status.value}")
             }
         }

@@ -10,6 +10,7 @@ import no.nav.syfo.client.TssId
 import no.nav.syfo.client.aapapi.AapApiClient
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.client.isbehandlerdialog.BehandlerdialogClient
+import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.model.Status
 import no.nav.syfo.model.ValidationResult
@@ -54,6 +55,12 @@ class SendDialogmeldingArenaCronjobTest {
             azureAdV2Client = azureAdV2ClientMock,
             endpointUrl = externalMockEnvironment.environment.syfohelsenettproxyEndpointURL,
             helsenettClientId = externalMockEnvironment.environment.syfohelsenettproxyClientId,
+            httpClient = externalMockEnvironment.mockHttpClient,
+        ),
+        pdlClient = PdlClient(
+            azureAdV2Client = azureAdV2ClientMock,
+            pdlClientId = externalMockEnvironment.environment.pdlClientId,
+            pdlUrl = externalMockEnvironment.environment.pdlUrl,
             httpClient = externalMockEnvironment.mockHttpClient,
         ),
     )
@@ -414,21 +421,14 @@ class SendDialogmeldingArenaCronjobTest {
             timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(11)),
         )
 
-        every {
-            mqSender.sendArena(
-                match<String> { arenaDialogNotatStringifyed ->
-                    arenaDialogNotatStringifyed.contains(UserConstants.PATIENT_FNR_FORESPORSEL_SVAR)
-                }
-            )
-        } throws Exception()
-
+        // Meldingen med feil har ugyldig pasient-fnr (10 siffer), og feiler ved oppslag av pasientnavn før sending på MQ
         runBlocking {
             val result = sendDialogmeldingArenaCronjob.runJob()
 
             assertEquals(1, result.updated)
             assertEquals(1, result.failed)
         }
-        verify(exactly = 2) { mqSender.sendArena(any()) }
+        verify(exactly = 1) { mqSender.sendArena(any()) }
 
         val arena = database.getSentToArena(dialogmeldingId)
         assertNotNull(arena?.first)

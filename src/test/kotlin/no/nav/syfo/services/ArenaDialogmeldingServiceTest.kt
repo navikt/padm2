@@ -9,7 +9,9 @@ import no.nav.syfo.client.SyfohelsenettproxyClient
 import no.nav.syfo.client.TssId
 import no.nav.syfo.client.aapapi.AapApiClient
 import no.nav.syfo.client.isbehandlerdialog.BehandlerdialogClient
+import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.domain.PersonIdent
+import no.nav.syfo.model.PersonNavn
 import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.util.LoggingMeta
 import no.nav.syfo.util.get
@@ -26,6 +28,7 @@ class ArenaDialogmeldingServiceTest {
     private val behandlerdialogClient = mockk<BehandlerdialogClient>(relaxed = true)
     private val aapApiClient = mockk<AapApiClient>(relaxed = true)
     private val syfohelsenettproxyClient = mockk<SyfohelsenettproxyClient>(relaxed = true)
+    private val pdlClient = mockk<PdlClient>()
 
     private val arenaDialogmeldingService = ArenaDialogmeldingService(
         mqSender = mqSender,
@@ -34,6 +37,7 @@ class ArenaDialogmeldingServiceTest {
         behandlerdialogClient = behandlerdialogClient,
         aapApiClient = aapApiClient,
         syfohelsenettproxyClient = syfohelsenettproxyClient,
+        pdlClient = pdlClient,
     )
 
     private val tssId = TssId("123")
@@ -51,6 +55,10 @@ class ArenaDialogmeldingServiceTest {
     private val personNumberDoctor = emottakBlokk.avsenderFnrFraDigSignatur
     private val legePersonIdent = PersonIdent(personNumberDoctor)
 
+    init {
+        coEvery { pdlClient.hentPersonNavn(any()) } returns PersonNavn(fornavn = "Test", mellomnavn = null, etternavn = "Testesen")
+    }
+
     @AfterEach
     fun afterEach() {
         clearMocks(mqSender, emottakService, smtssClient)
@@ -64,7 +72,7 @@ class ArenaDialogmeldingServiceTest {
         coJustRun { emottakService.registerEmottakSubscription(any(), any(), any(), any(), any()) }
 
         runBlocking {
-            arenaDialogmeldingService.sendArenaDialogmeldingToMQ(receivedDialogmelding, fellesformat)
+            arenaDialogmeldingService.sendArenaDialogmeldingToMQ(receivedDialogmelding)
         }
 
         coVerify(exactly = 1) { smtssClient.findBestTss(legePersonIdent, legekontorOrgName, msgId) }
@@ -84,7 +92,7 @@ class ArenaDialogmeldingServiceTest {
         coEvery { smtssClient.findBestTss(any(), any(), any()) } returns null
 
         runBlocking {
-            arenaDialogmeldingService.sendArenaDialogmeldingToMQ(receivedDialogmelding, fellesformat)
+            arenaDialogmeldingService.sendArenaDialogmeldingToMQ(receivedDialogmelding)
         }
 
         coVerify(exactly = 1) { smtssClient.findBestTss(legePersonIdent, legekontorOrgName, msgId) }
@@ -97,7 +105,7 @@ class ArenaDialogmeldingServiceTest {
         coEvery { smtssClient.findBestTss(any(), any(), any()) } returns emptyTssId
 
         runBlocking {
-            arenaDialogmeldingService.sendArenaDialogmeldingToMQ(receivedDialogmelding, fellesformat)
+            arenaDialogmeldingService.sendArenaDialogmeldingToMQ(receivedDialogmelding)
         }
 
         coVerify(exactly = 1) { smtssClient.findBestTss(legePersonIdent, legekontorOrgName, msgId) }
@@ -116,7 +124,7 @@ class ArenaDialogmeldingServiceTest {
         coJustRun { emottakService.registerEmottakSubscription(any(), any(), any(), any(), any()) }
 
         runBlocking {
-            arenaDialogmeldingService.sendArenaDialogmeldingToMQ(receivedDialogmelding, fellesformat)
+            arenaDialogmeldingService.sendArenaDialogmeldingToMQ(receivedDialogmelding)
         }
         coVerify(exactly = 1) { mqSender.sendArena(any()) }
     }

@@ -1,12 +1,10 @@
 package no.nav.syfo
 
-import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
-import no.nav.helse.msgHead.XMLMsgHead
 import no.nav.syfo.client.createArenaDialogNotat
 import no.nav.syfo.client.createAvsender
 import no.nav.syfo.model.DialogmeldingKodeverk
-import no.nav.syfo.model.findDialogmeldingType
-import no.nav.syfo.model.toDialogmelding
+import no.nav.syfo.model.PersonNavn
+import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.util.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -40,29 +38,16 @@ class FromKiropraktorTest {
 
     @Test
     internal fun `Create ArenaDialogNotat from Kiropraktor message`() {
-        val fellesformat = safeUnmarshal(
-            getFileAsString("src/test/resources/dialogmelding_kiropraktor.xml")
-        )
-        val msgHead: XMLMsgHead = fellesformat.get()
-        val emottakblokk = fellesformat.get<XMLMottakenhetBlokk>()
-
-        val dialogmelding = extractDialogmelding(fellesformat).toDialogmelding(
-            dialogmeldingId = UUID.randomUUID().toString(),
-            dialogmeldingType = findDialogmeldingType(emottakblokk.ebService, emottakblokk.ebAction),
-            signaturDato = LocalDateTime.of(2017, 11, 5, 0, 0, 0),
-            navnHelsePersonellNavn = extractBehandlerNavn(fellesformat)
-        )
+        val fellesformat = getFileAsString("src/test/resources/dialogmelding_kiropraktor.xml")
 
         val arenaDialogNotat = createArenaDialogNotat(
-            fellesformat = fellesformat,
+            receivedDialogmelding = ReceivedDialogmelding.create(
+                dialogmeldingId = UUID.randomUUID().toString(),
+                fellesformat = fellesformat,
+            ),
             tssid = TSS_ID,
-            legefnr = emottakblokk.avsenderFnrFraDigSignatur,
-            innbyggerident = extractInnbyggerident(fellesformat) ?: "",
-            msgHead = msgHead,
-            emottakblokk = emottakblokk,
-            dialogmelding,
-            msgHead.msgInfo.patient,
-            extractBehandler(fellesformat),
+            pasientNavn = PersonNavn(fornavn = "Nakke", mellomnavn = null, etternavn = "Kinken"),
+            avsenderBehandler = extractBehandler(safeUnmarshal(fellesformat)),
         )
 
         assertEquals("Notat", arenaDialogNotat.eiaDokumentInfo.dokumentInfo.dokumentNavn)

@@ -124,15 +124,6 @@ fun extractBehandlerNavn(fellesformat: XMLEIFellesformat): String? {
     return behandler?.getNavn(fallback = "")
 }
 
-fun extractPasientNavn(fellesformat: XMLEIFellesformat): String {
-    val patient = extractPatient(fellesformat)
-    return if (patient.middleName == null) {
-        "${patient.familyName}, ${patient.givenName}"
-    } else {
-        "${patient.familyName}, ${patient.givenName} ${patient.middleName}"
-    }
-}
-
 inline fun <reified T> XMLEIFellesformat.get() = this.any.find { it is T } as T
 
 fun extractInnbyggerident(fellesformat: XMLEIFellesformat): String? =

@@ -2,43 +2,36 @@ package no.nav.syfo.client
 
 import net.logstash.logback.argument.StructuredArguments.fields
 import no.nav.helse.arenadialognotat.*
-import no.nav.helse.eiFellesformat2.XMLEIFellesformat
-import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
-import no.nav.helse.msgHead.XMLMsgHead
-import no.nav.helse.msgHead.XMLPatient
 import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.logger
 import no.nav.syfo.metrics.TSS_MISS_COUNTER
 import no.nav.syfo.model.Behandler
 import no.nav.syfo.model.Dialogmelding
 import no.nav.syfo.model.DialogmeldingtypeKodeverk
+import no.nav.syfo.model.PersonNavn
+import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.util.*
 
 const val MAKS_TEKSTLENGDE = 2000
 
 fun createArenaDialogNotat(
-    fellesformat: XMLEIFellesformat,
+    receivedDialogmelding: ReceivedDialogmelding,
     tssid: String?,
-    legefnr: String,
-    innbyggerident: String,
-    msgHead: XMLMsgHead,
-    emottakblokk: XMLMottakenhetBlokk,
-    dialogmelding: Dialogmelding,
-    patient: XMLPatient,
+    pasientNavn: PersonNavn,
     avsenderBehandler: Behandler?,
 ): ArenaDialogNotat =
     ArenaDialogNotat().apply {
-        val dialogmeldingXml = extractDialogmelding(fellesformat)
+        val dialogmelding = receivedDialogmelding.dialogmelding
         eiaDokumentInfo = EiaDokumentInfoType().apply {
             dokumentInfo = DokumentInfoType().apply {
                 dokumentType = "DM"
                 dokumentTypeVersjon = "1.0"
-                dokumentNavn = DialogmeldingtypeKodeverk.visningsnavn(msgHead.msgInfo.type.v)
-                dokumentreferanse = msgHead.msgInfo.msgId
-                ediLoggId = emottakblokk.ediLoggId
-                dokumentDato = msgHead.msgInfo.genDate
+                dokumentNavn = DialogmeldingtypeKodeverk.visningsnavn(receivedDialogmelding.msgType)
+                dokumentreferanse = receivedDialogmelding.msgId
+                ediLoggId = receivedDialogmelding.navLogId
+                dokumentDato = dialogmelding.signaturDato
             }
-            avsender = createAvsender(legefnr, tssid, avsenderBehandler)
+            avsender = createAvsender(receivedDialogmelding.personNrLege, tssid, avsenderBehandler)
             avsenderSystem = EiaDokumentInfoType.AvsenderSystem().apply {
                 systemNavn = "SKJEMA-MOTTAK"
                 systemVersjon = "1.0.0"
@@ -46,27 +39,37 @@ fun createArenaDialogNotat(
         }
         pasientData = PasientDataType().apply {
             person = PersonType().apply {
-                personFnr = innbyggerident
+                personFnr = receivedDialogmelding.personNrPasient
                 personNavn = NavnType().apply {
-                    fornavn = patient.givenName
-                    mellomnavn = patient.middleName ?: ""
-                    etternavn = patient.familyName
+                    fornavn = pasientNavn.fornavn
+                    mellomnavn = pasientNavn.mellomnavn ?: ""
+                    etternavn = pasientNavn.etternavn
                 }
             }
         }
         notatKategori = findArenaNotatKategori(dialogmelding)
         notatKode = findArenaNotatKode(dialogmelding)
         notatTittel = findArenaNotatTittel(dialogmelding)
-        notatTekst = dialogmeldingXml.notat?.firstOrNull()?.tekstNotatInnhold.toString()
+        notatTekst = findArenaNotatTekst(dialogmelding) ?: ""
 
         if (notatTekst.length > MAKS_TEKSTLENGDE) {
             val kuttetTekst = " [Ufullstendig tekst, les mer i Gosys]"
             notatTekst = "${notatTekst.substring(0, MAKS_TEKSTLENGDE - kuttetTekst.length)}$kuttetTekst"
         }
 
-        svarReferanse = dialogmeldingXml.notat?.firstOrNull()?.dokIdNotat ?: ""
-        notatDato = msgHead.msgInfo.genDate
+        svarReferanse = findArenaSvarReferanse(dialogmelding) ?: ""
+        notatDato = dialogmelding.signaturDato
     }
+
+fun findArenaNotatTekst(dialogmelding: Dialogmelding): String? =
+    dialogmelding.foresporselFraSaksbehandlerForesporselSvar?.tekstNotatInnhold
+        ?: dialogmelding.henvendelseFraLegeHenvendelse?.tekstNotatInnhold
+        ?: dialogmelding.innkallingMoterespons?.tekstNotatInnhold
+
+fun findArenaSvarReferanse(dialogmelding: Dialogmelding): String? =
+    dialogmelding.foresporselFraSaksbehandlerForesporselSvar?.dokIdNotat
+        ?: dialogmelding.henvendelseFraLegeHenvendelse?.dokIdNotat
+        ?: dialogmelding.innkallingMoterespons?.dokIdNotat
 
 fun createAvsender(
     legefnr: String,
