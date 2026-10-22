@@ -16,7 +16,7 @@ class MqVedleggService : VedleggService {
 }
 
 /**
- * Vedlegg for meldinger fra Team Helsemelding hentes via deres API. Kommer i Fase 4b.
+ * Vedlegg for meldinger fra Team Helsemelding hentes via deres API. Kommer i neste PR.
  */
 class HelsemeldingVedleggService : VedleggService {
     override suspend fun hentVedlegg(receivedDialogmelding: ReceivedDialogmelding): List<Vedlegg> =
