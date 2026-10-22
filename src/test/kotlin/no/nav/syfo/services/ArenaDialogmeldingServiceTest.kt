@@ -11,6 +11,7 @@ import no.nav.syfo.client.aapapi.AapApiClient
 import no.nav.syfo.client.isbehandlerdialog.BehandlerdialogClient
 import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.domain.PersonIdent
+import no.nav.syfo.model.DialogmeldingSource
 import no.nav.syfo.model.PersonNavn
 import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.util.LoggingMeta
@@ -110,6 +111,23 @@ class ArenaDialogmeldingServiceTest {
 
         coVerify(exactly = 1) { smtssClient.findBestTss(legePersonIdent, legekontorOrgName, msgId) }
         coVerify(exactly = 0) { emottakService.registerEmottakSubscription(any(), any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun `Don't update emottak subscription for dialogmelding from Helsemelding`() {
+        val helsemeldingDialogmelding = receivedDialogmelding.copy(
+            source = DialogmeldingSource.HELSEMELDING,
+            fellesformat = null,
+        )
+        coEvery { smtssClient.findBestTss(any(), any(), any()) } returns tssId
+
+        runBlocking {
+            arenaDialogmeldingService.sendArenaDialogmeldingToMQ(helsemeldingDialogmelding)
+        }
+
+        coVerify(exactly = 1) { smtssClient.findBestTss(legePersonIdent, legekontorOrgName, msgId) }
+        coVerify(exactly = 0) { emottakService.registerEmottakSubscription(any(), any(), any(), any(), any()) }
+        coVerify(exactly = 1) { mqSender.sendArena(any()) }
     }
 
     @Test

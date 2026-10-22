@@ -5,9 +5,12 @@ import kotlinx.coroutines.runBlocking
 import no.nav.syfo.*
 import no.nav.syfo.application.*
 import no.nav.syfo.application.mq.MQSenderInterface
+import no.nav.syfo.services.HelsemeldingVedleggService
 import no.nav.syfo.services.MqApprecService
 import no.nav.syfo.services.MqVedleggService
+import no.nav.syfo.services.NoOpApprecService
 import no.nav.syfo.services.Padm2ValidationService
+import no.nav.syfo.services.PreValidatedService
 import no.nav.syfo.client.TssId
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.client.SmtssClient
@@ -40,14 +43,21 @@ class BlockingApplicationRunnerTest {
     private val dialogmeldingProcessor = DialogmeldingProcessor(
         database = database,
         env = externalMockEnvironment.environment,
-        apprecService = apprecService,
-        validationService = Padm2ValidationService(
-            database = database,
-            env = externalMockEnvironment.environment,
-            azureAdV2Client = azureAdV2Client,
-            httpClient = externalMockEnvironment.mockHttpClient,
+        emottakTjenester = KildeavhengigeTjenester(
+            apprecService = apprecService,
+            validationService = Padm2ValidationService(
+                database = database,
+                env = externalMockEnvironment.environment,
+                azureAdV2Client = azureAdV2Client,
+                httpClient = externalMockEnvironment.mockHttpClient,
+            ),
+            vedleggService = MqVedleggService(),
         ),
-        vedleggService = MqVedleggService(),
+        helsemeldingTjenester = KildeavhengigeTjenester(
+            apprecService = NoOpApprecService(database),
+            validationService = PreValidatedService(),
+            vedleggService = HelsemeldingVedleggService(),
+        ),
         dialogmeldingProducer = dialogmeldingProducer,
         azureAdV2Client = azureAdV2Client,
         httpClient = externalMockEnvironment.mockHttpClient,

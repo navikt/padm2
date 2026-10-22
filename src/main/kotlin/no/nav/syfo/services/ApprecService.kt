@@ -45,7 +45,7 @@ class MqApprecService(
     override fun ferdigstillOk(receivedDialogmelding: ReceivedDialogmelding, loggingMeta: LoggingMeta) {
         val id = receivedDialogmelding.dialogmelding.id
         if (!database.erFerdigstilt(id)) {
-            sendReceipt(safeUnmarshal(receivedDialogmelding.fellesformat), ApprecStatus.OK)
+            sendReceipt(safeUnmarshal(receivedDialogmelding.requireFellesformat()), ApprecStatus.OK)
             logger.info("Apprec Receipt with status OK sent, {}", StructuredArguments.fields(loggingMeta))
             database.lagreFerdigstilt(id)
         }
@@ -59,7 +59,7 @@ class MqApprecService(
         val id = receivedDialogmelding.dialogmelding.id
         if (!database.erFerdigstilt(id)) {
             sendReceipt(
-                fellesformat = safeUnmarshal(receivedDialogmelding.fellesformat),
+                fellesformat = safeUnmarshal(receivedDialogmelding.requireFellesformat()),
                 apprecStatus = ApprecStatus.AVVIST,
                 apprecErrors = validationResult.ruleHits.map { it.toApprecCV() },
             )

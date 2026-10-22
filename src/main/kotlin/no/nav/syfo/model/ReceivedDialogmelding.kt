@@ -21,8 +21,12 @@ data class ReceivedDialogmelding(
     val legekontorOrgName: String,
     val mottattDato: LocalDateTime,
     val source: DialogmeldingSource,
-    val fellesformat: String,
+    val fellesformat: String?,
+    val kafkaMelding: String? = null,
 ) {
+    fun requireFellesformat(): String =
+        requireNotNull(fellesformat) { "Dialogmelding ${dialogmelding.id} fra $source mangler fellesformat" }
+
     fun loggingMeta() = LoggingMeta(
         mottakId = navLogId,
         orgNr = legekontorOrgNr,

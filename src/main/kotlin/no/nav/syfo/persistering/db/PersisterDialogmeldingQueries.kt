@@ -58,9 +58,10 @@ fun Connection.opprettDialogmeldingOpplysninger(receivedDialogmelding: ReceivedD
                 ferdigstilt,
                 sent_to_arena,
                 created_at,
-                source
+                source,
+                kafka_melding
                 )
-            VALUES  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             RETURNING id
             """
     ).use {
@@ -80,6 +81,15 @@ fun Connection.opprettDialogmeldingOpplysninger(receivedDialogmelding: ReceivedD
         it.setBoolean(14, false)
         it.setTimestamp(15, Timestamp.valueOf(LocalDateTime.now()))
         it.setString(16, receivedDialogmelding.source.name)
+        it.setObject(
+            17,
+            receivedDialogmelding.kafkaMelding?.let { kafkaMelding ->
+                PGobject().apply {
+                    type = "jsonb"
+                    value = kafkaMelding
+                }
+            },
+        )
         it.executeQuery().toList { getString("id") }
     }
 
@@ -280,21 +290,20 @@ fun DatabaseInterface.lagreFerdigstilt(dialogmeldingid: String) {
     }
 }
 
-fun DatabaseInterface.hentIkkeFullforteDialogmeldinger() =
+fun DatabaseInterface.hentIkkeFullforteDialogmeldinger(): List<Pair<LagretDialogmelding, LocalDateTime>> =
     connection.use { connection ->
         connection.prepareStatement(
             """
-                SELECT id, fellesformat, created_at
+                SELECT id, source, fellesformat, kafka_melding, created_at
                 FROM dialogmeldingopplysninger
                 WHERE ferdigstilt IS NULL AND created_at < (NOW() - INTERVAL '10 minutes')
                 ORDER BY created_at ASC
                 """
         ).use {
             it.executeQuery().toList {
-                Triple(
-                    first = getString("id"),
-                    second = getString("fellesformat"),
-                    third = getTimestamp("created_at").toLocalDateTime(),
+                Pair(
+                    first = toLagretDialogmelding(),
+                    second = getTimestamp("created_at").toLocalDateTime(),
                 )
             }
         }
@@ -306,22 +315,24 @@ fun DatabaseInterface.hentLagretDialogmelding(
     connection.use { connection ->
         connection.prepareStatement(
             """
-                SELECT id, source, fellesformat
+                SELECT id, source, fellesformat, kafka_melding
                 FROM dialogmeldingopplysninger
                 WHERE msg_id = ?
                 ORDER BY mottatt_tidspunkt DESC
                 """
         ).use {
             it.setString(1, msgId)
-            it.executeQuery().toList {
-                LagretDialogmelding(
-                    id = getString("id"),
-                    source = DialogmeldingSource.valueOf(getString("source")),
-                    fellesformat = getString("fellesformat"),
-                )
-            }.firstOrNull()
+            it.executeQuery().toList { toLagretDialogmelding() }.firstOrNull()
         }
     }
+
+private fun ResultSet.toLagretDialogmelding(): LagretDialogmelding =
+    LagretDialogmelding(
+        id = getString("id"),
+        source = DialogmeldingSource.valueOf(getString("source")),
+        fellesformat = getString("fellesformat"),
+        kafkaMelding = getString("kafka_melding"),
+    )
 
 fun DatabaseInterface.hentMottattTidspunkt(shaString: String) =
     connection.use { connection ->
@@ -355,11 +366,11 @@ fun DatabaseInterface.hasSavedDialogmeldingDokument(dialogmeldingId: String, sha
         }
     }
 
-fun DatabaseInterface.getUnpublishedArenaMeldinger(): List<Triple<String, String, String>> =
+fun DatabaseInterface.getUnpublishedArenaMeldinger(): List<LagretDialogmelding> =
     connection.use { connection ->
         connection.prepareStatement(
             """
-            SELECT id, fellesformat, msg_id
+            SELECT id, source, fellesformat, kafka_melding
             FROM dialogmeldingopplysninger d
             WHERE arena IS NULL
                 AND ferdigstilt IS NOT NULL
@@ -372,13 +383,7 @@ fun DatabaseInterface.getUnpublishedArenaMeldinger(): List<Triple<String, String
                 );
             """
         ).use {
-            it.executeQuery().toList {
-                Triple(
-                    first = getString("id"),
-                    second = getString("fellesformat"),
-                    third = getString("msg_id"),
-                )
-            }
+            it.executeQuery().toList { toLagretDialogmelding() }
         }
     }
 
