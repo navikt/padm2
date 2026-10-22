@@ -20,12 +20,14 @@ data class ReceivedDialogmelding(
     val legekontorHerId: String?,
     val legekontorOrgName: String,
     val mottattDato: LocalDateTime,
+    val source: DialogmeldingSource,
     val fellesformat: String,
 ) {
     fun loggingMeta() = LoggingMeta(
         mottakId = navLogId,
         orgNr = legekontorOrgNr,
         msgId = msgId,
+        dialogmeldingId = dialogmelding.id,
     )
 
     companion object {
@@ -69,6 +71,7 @@ data class ReceivedDialogmelding(
                     .withZoneSameInstant(
                         ZoneId.of("Europe/Oslo")
                     ).toLocalDateTime(),
+                source = DialogmeldingSource.EMOTTAK,
                 fellesformat = fellesformat,
             )
         }

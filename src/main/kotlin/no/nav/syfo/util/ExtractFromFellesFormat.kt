@@ -5,11 +5,10 @@ import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.msgHead.*
 import no.nav.syfo.logger
 import no.nav.syfo.model.Behandler
+import no.nav.syfo.model.GYLDIGE_VEDLEGG_MIME_TYPER
 import no.nav.syfo.model.getNavn
+import no.nav.syfo.model.innholdStemmerMedMimeType
 import no.nav.syfo.model.toBase64Container
-import java.util.HexFormat
-
-private val PDF_MAGIC_NUMBER: ByteArray = HexFormat.of().parseHex("255044462D") // binary "%PDF-"
 
 fun extractDialogmelding(fellesformat: XMLEIFellesformat): XMLDialogmelding {
     return tryGetDialogmelding(fellesformat.get<XMLMsgHead>())
@@ -75,14 +74,10 @@ private fun extractAllVedleggFromMsgHead(msgHead: XMLMsgHead) =
     }
 
 fun XMLDocument.isVedlegg() =
-    this.refDoc.msgType.v == "A" &&
-        listOf("application/pdf", "image/tiff", "image/png", "image/jpeg", "image/pjpeg", "image/jpg", "image/pjpg").contains(this.refDoc.mimeType)
+    this.refDoc.msgType.v == "A" && GYLDIGE_VEDLEGG_MIME_TYPER.contains(this.refDoc.mimeType)
 
 private fun XMLDocument.pdfContentMatchesMimeType() =
-    this.refDoc.mimeType != "application/pdf" || toBase64Container().value.binaryContentIsPdf()
-
-private fun ByteArray.binaryContentIsPdf() =
-    copyOf(PDF_MAGIC_NUMBER.size) contentEquals PDF_MAGIC_NUMBER
+    innholdStemmerMedMimeType(this.refDoc.mimeType, toBase64Container().value)
 
 fun extractOrganisationNumberFromSender(fellesformat: XMLEIFellesformat): XMLIdent? =
     fellesformat.get<XMLMsgHead>().msgInfo.sender.organisation.ident.find {

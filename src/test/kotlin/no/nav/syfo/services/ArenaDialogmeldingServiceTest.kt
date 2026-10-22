@@ -67,7 +67,7 @@ class ArenaDialogmeldingServiceTest {
     @Test
     fun `Update emottak subscription if TSS`() {
         val partnerReferanse = "13123"
-        val loggingMeta = LoggingMeta("1901162157lege21826.1", "223456789", msgId, "")
+        val loggingMeta = LoggingMeta("1901162157lege21826.1", "223456789", msgId, receivedDialogmelding.dialogmelding.id)
         coEvery { smtssClient.findBestTss(any(), any(), any()) } returns tssId
         coJustRun { emottakService.registerEmottakSubscription(any(), any(), any(), any(), any()) }
 

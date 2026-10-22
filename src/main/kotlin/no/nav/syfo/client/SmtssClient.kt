@@ -23,7 +23,7 @@ class SmtssClient(
     suspend fun findBestTss(
         legePersonIdent: PersonIdent,
         legekontorOrgName: String,
-        dialogmeldingId: String,
+        requestId: String,
     ): TssId? {
         val token = azureAdV2Client.getSystemToken(smtssClientId)
             ?: throw RuntimeException("Failed to send request to smtss: No token was found")
@@ -38,20 +38,20 @@ class SmtssClient(
                 header("samhandlerFnr", legePersonIdent.value)
                 header("samhandlerOrgName", kontorOrgNameNoIllegalChars)
                 header(HttpHeaders.Authorization, bearerHeader(token.accessToken))
-                header("requestId", dialogmeldingId)
+                header("requestId", requestId)
             }
             val responseBody = response.body<TssId>()
-            logger.info("Fant tssId: ${responseBody.tssid}, requestId: $dialogmeldingId")
+            logger.info("Fant tssId: ${responseBody.tssid}, requestId: $requestId")
             responseBody
         } catch (exception: ResponseException) {
             when (exception.response.status) {
                 HttpStatusCode.NotFound -> {
-                    logger.info("Fant ikke tssId i smtss, fikk 404, requestId: $dialogmeldingId")
+                    logger.info("Fant ikke tssId i smtss, fikk 404, requestId: $requestId")
                     null
                 }
                 else -> {
-                    logger.error("Fant ikke tssId i smtss, noe feilet med status: ${exception.response.status}, requestId: $dialogmeldingId")
-                    throw IOException("Vi fikk en uventet feil fra smtss, prøver på nytt! ${exception.response.bodyAsChannel()}, requestId: $dialogmeldingId")
+                    logger.error("Fant ikke tssId i smtss, noe feilet med status: ${exception.response.status}, requestId: $requestId")
+                    throw IOException("Vi fikk en uventet feil fra smtss, prøver på nytt! ${exception.response.bodyAsChannel()}, requestId: $requestId")
                 }
             }
         }

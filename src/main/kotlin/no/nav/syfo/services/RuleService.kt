@@ -15,7 +15,6 @@ import no.nav.syfo.rules.LegesuspensjonRuleChain
 import no.nav.syfo.rules.Rule
 import no.nav.syfo.rules.ValidationRuleChain
 import no.nav.syfo.rules.executeFlow
-import no.nav.syfo.util.LoggingMeta
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -30,12 +29,7 @@ class RuleService(
         receivedDialogmelding: ReceivedDialogmelding,
         signerendeLege: HprBehandler?,
     ): ValidationResult {
-        val loggingMeta = LoggingMeta(
-            mottakId = receivedDialogmelding.navLogId,
-            orgNr = receivedDialogmelding.legekontorOrgNr,
-            msgId = receivedDialogmelding.msgId,
-            dialogmeldingId = receivedDialogmelding.dialogmelding.id
-        )
+        val loggingMeta = receivedDialogmelding.loggingMeta()
 
         log.info("Received a dialogmelding, going to rules, {}", fields(loggingMeta))
 
