@@ -83,11 +83,9 @@ fun Connection.opprettDialogmeldingOpplysninger(receivedDialogmelding: ReceivedD
         it.setString(16, receivedDialogmelding.source.name)
         it.setObject(
             17,
-            receivedDialogmelding.kafkaMelding?.let { kafkaMelding ->
-                PGobject().apply {
-                    type = "jsonb"
-                    value = kafkaMelding
-                }
+            PGobject().apply {
+                type = "jsonb"
+                value = receivedDialogmelding.kafkaMelding
             },
         )
         it.executeQuery().toList { getString("id") }

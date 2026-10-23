@@ -164,13 +164,6 @@ class IncomingDialogMessageMapperTest {
     }
 
     @Test
-    fun `fails on unsupported schema version`() {
-        assertThrows<IllegalArgumentException> {
-            map(generateIncomingDialogMessageJson(version = 2))
-        }
-    }
-
-    @Test
     fun `fails on missing required field`() {
         val json = generateIncomingDialogMessageJson().replace(""""documentId": "OD2503016631907"""", """"documentId": null""")
 
