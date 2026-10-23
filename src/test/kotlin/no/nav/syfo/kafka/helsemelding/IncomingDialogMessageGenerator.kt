@@ -3,13 +3,12 @@ package no.nav.syfo.kafka.helsemelding
 fun generateIncomingDialogMessageJson(
     id: String = "6a8c0c7e-2b7f-4a8e-9d1c-3f1b2e4d5a60",
     type: IncomingDialogMessageType = IncomingDialogMessageType.PATIENT_INQUIRY,
-    version: Int = SUPPORTED_SCHEMA_VERSION,
     message: String? = "Henvendelse fra lege",
     conversationReference: Boolean = true,
 ): String =
     """
     {
-        "version": $version,
+        "version": "1",
         "id": "$id",
         "type": "${type.name}",
         "receivedAt": "2026-06-03T12:00:00Z",

@@ -14,17 +14,12 @@ import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.time.ZoneId
 
-const val SUPPORTED_SCHEMA_VERSION = 1
 private const val KODEVERK_OID_PREFIX = "2.16.578.1.12.4.1.1."
 
 private val helsemeldingMapper = configuredJacksonMapper()
 
 fun parseIncomingDialogMessage(kafkaMelding: String): IncomingDialogMessage =
-    helsemeldingMapper.readValue(kafkaMelding, IncomingDialogMessage::class.java).also {
-        require(it.version == SUPPORTED_SCHEMA_VERSION) {
-            "Ukjent schema-versjon ${it.version} for melding ${it.id}"
-        }
-    }
+    helsemeldingMapper.readValue(kafkaMelding, IncomingDialogMessage::class.java)
 
 fun receivedDialogmeldingFromHelsemelding(
     dialogmeldingId: String,
