@@ -12,5 +12,13 @@ interface VedleggService {
 
 class MqVedleggService : VedleggService {
     override suspend fun hentVedlegg(receivedDialogmelding: ReceivedDialogmelding): List<Vedlegg> =
-        extractValidVedlegg(safeUnmarshal(receivedDialogmelding.fellesformat)).map { it.toVedlegg() }
+        extractValidVedlegg(safeUnmarshal(receivedDialogmelding.requireFellesformat())).map { it.toVedlegg() }
+}
+
+/**
+ * Vedlegg for meldinger fra Team Helsemelding hentes via deres API. Kommer i neste PR.
+ */
+class HelsemeldingVedleggService : VedleggService {
+    override suspend fun hentVedlegg(receivedDialogmelding: ReceivedDialogmelding): List<Vedlegg> =
+        throw NotImplementedError("Henting av vedlegg fra Team Helsemelding er ikke implementert")
 }

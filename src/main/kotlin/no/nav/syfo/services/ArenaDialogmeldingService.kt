@@ -13,6 +13,7 @@ import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.client.sendArenaDialogNotat
 import no.nav.syfo.client.toBehandler
 import no.nav.syfo.domain.PersonIdent
+import no.nav.syfo.model.DialogmeldingSource
 import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.util.*
 
@@ -74,7 +75,11 @@ class ArenaDialogmeldingService(
             requestId = receivedDialogmelding.msgId,
         )
 
-        if (tssId != null && tssId.tssid.isNotBlank()) {
+        if (
+            tssId != null &&
+            tssId.tssid.isNotBlank() &&
+            receivedDialogmelding.source == DialogmeldingSource.EMOTTAK
+        ) {
             registerEmottakSubscription(
                 tssId = tssId,
                 receivedDialogmelding = receivedDialogmelding,
@@ -85,13 +90,13 @@ class ArenaDialogmeldingService(
         return tssId?.tssid ?: ""
     }
 
-    // eMottak-abonnement gjelder kun meldinger mottatt via MQ, og krever data fra fellesformatet.
+    // eMottak-abonnement gjelder kun meldinger mottatt fra eMottak, og krever data fra fellesformatet.
     private suspend fun registerEmottakSubscription(
         tssId: TssId,
         receivedDialogmelding: ReceivedDialogmelding,
         loggingMeta: LoggingMeta,
     ) {
-        val fellesformatXml = safeUnmarshal(receivedDialogmelding.fellesformat)
+        val fellesformatXml = safeUnmarshal(receivedDialogmelding.requireFellesformat())
         val msgHead: XMLMsgHead = fellesformatXml.get()
         emottakService.registerEmottakSubscription(
             tssId = tssId,
