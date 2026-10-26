@@ -63,7 +63,7 @@ class Padm2ValidationService(
         vedlegg: List<Vedlegg>,
         loggingMeta: LoggingMeta,
     ): ValidationResult {
-        val fellesformat = safeUnmarshal(receivedDialogmelding.fellesformat)
+        val fellesformat = safeUnmarshal(receivedDialogmelding.requireFellesformat())
         val dialogmeldingXml = extractDialogmelding(fellesformat)
         val sha256String = sha256hashstring(
             dialogmeldingXml,

@@ -13,6 +13,7 @@ import kotlinx.coroutines.runBlocking
 import no.nav.syfo.*
 import no.nav.syfo.application.BlockingApplicationRunner
 import no.nav.syfo.application.DialogmeldingProcessor
+import no.nav.syfo.application.KildeavhengigeTjenester
 import no.nav.syfo.application.api.VedleggDTO
 import no.nav.syfo.application.api.vedleggSystemApiV1Path
 import no.nav.syfo.application.mq.MQSenderInterface
@@ -24,9 +25,12 @@ import no.nav.syfo.model.Vedlegg
 import no.nav.syfo.persistering.db.hentVedlegg
 import no.nav.syfo.persistering.db.lagreVedlegg
 import no.nav.syfo.persistering.db.opprettDialogmeldingOpplysninger
+import no.nav.syfo.services.HelsemeldingVedleggService
 import no.nav.syfo.services.MqApprecService
 import no.nav.syfo.services.MqVedleggService
+import no.nav.syfo.services.NoOpApprecService
 import no.nav.syfo.services.Padm2ValidationService
+import no.nav.syfo.services.PreValidatedService
 import no.nav.syfo.util.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -51,14 +55,21 @@ class VedleggSystemApiTest {
     private val dialogmeldingProcessor = DialogmeldingProcessor(
         database = database,
         env = externalMockEnvironment.environment,
-        apprecService = apprecService,
-        validationService = Padm2ValidationService(
-            database = database,
-            env = externalMockEnvironment.environment,
-            azureAdV2Client = azureAdV2Client,
-            httpClient = externalMockEnvironment.mockHttpClient,
+        emottakTjenester = KildeavhengigeTjenester(
+            apprecService = apprecService,
+            validationService = Padm2ValidationService(
+                database = database,
+                env = externalMockEnvironment.environment,
+                azureAdV2Client = azureAdV2Client,
+                httpClient = externalMockEnvironment.mockHttpClient,
+            ),
+            vedleggService = MqVedleggService(),
         ),
-        vedleggService = MqVedleggService(),
+        helsemeldingTjenester = KildeavhengigeTjenester(
+            apprecService = NoOpApprecService(database),
+            validationService = PreValidatedService(),
+            vedleggService = HelsemeldingVedleggService(),
+        ),
         dialogmeldingProducer = dialogmeldingProducer,
         azureAdV2Client = azureAdV2Client,
         httpClient = externalMockEnvironment.mockHttpClient,

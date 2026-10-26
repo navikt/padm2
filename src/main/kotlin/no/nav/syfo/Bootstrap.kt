@@ -24,9 +24,12 @@ import no.nav.syfo.db.Database
 import no.nav.syfo.kafka.*
 import no.nav.syfo.services.ArenaDialogmeldingService
 import no.nav.syfo.services.EmottakService
+import no.nav.syfo.services.HelsemeldingVedleggService
 import no.nav.syfo.services.MqApprecService
 import no.nav.syfo.services.MqVedleggService
+import no.nav.syfo.services.NoOpApprecService
 import no.nav.syfo.services.Padm2ValidationService
+import no.nav.syfo.services.PreValidatedService
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -159,14 +162,21 @@ fun launchListeners(
     val dialogmeldingProcessor = DialogmeldingProcessor(
         database = database,
         env = env,
-        apprecService = apprecService,
-        validationService = Padm2ValidationService(
-            database = database,
-            env = env,
-            azureAdV2Client = azureAdV2Client,
-            httpClient = httpClient,
+        emottakTjenester = KildeavhengigeTjenester(
+            apprecService = apprecService,
+            validationService = Padm2ValidationService(
+                database = database,
+                env = env,
+                azureAdV2Client = azureAdV2Client,
+                httpClient = httpClient,
+            ),
+            vedleggService = MqVedleggService(),
         ),
-        vedleggService = MqVedleggService(),
+        helsemeldingTjenester = KildeavhengigeTjenester(
+            apprecService = NoOpApprecService(database = database),
+            validationService = PreValidatedService(),
+            vedleggService = HelsemeldingVedleggService(),
+        ),
         dialogmeldingProducer = dialogmeldingProducer,
         azureAdV2Client = azureAdV2Client,
         httpClient = httpClient,

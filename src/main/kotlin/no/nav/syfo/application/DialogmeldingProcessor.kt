@@ -19,12 +19,17 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZoneId
 
-class DialogmeldingProcessor(
-    val database: DatabaseInterface,
-    val env: Environment,
+data class KildeavhengigeTjenester(
     val apprecService: ApprecService,
     val validationService: ValidationService,
     val vedleggService: VedleggService,
+)
+
+class DialogmeldingProcessor(
+    val database: DatabaseInterface,
+    val env: Environment,
+    val emottakTjenester: KildeavhengigeTjenester,
+    val helsemeldingTjenester: KildeavhengigeTjenester,
     val dialogmeldingProducer: DialogmeldingProducer,
     val azureAdV2Client: AzureAdV2Client,
     val httpClient: HttpClient,
@@ -64,6 +69,7 @@ class DialogmeldingProcessor(
     ) {
         val loggingMeta = receivedDialogmelding.loggingMeta()
         val starttime = System.currentTimeMillis()
+        val (apprecService, validationService, vedleggService) = tjenesterFor(receivedDialogmelding.source)
 
         val processingDelay = processingDelay(receivedDialogmelding.dialogmeldingType)
         if (
@@ -136,6 +142,12 @@ class DialogmeldingProcessor(
             StructuredArguments.fields(loggingMeta)
         )
     }
+
+    private fun tjenesterFor(source: DialogmeldingSource): KildeavhengigeTjenester =
+        when (source) {
+            DialogmeldingSource.EMOTTAK -> emottakTjenester
+            DialogmeldingSource.HELSEMELDING -> helsemeldingTjenester
+        }
 
     companion object {
         val HENVENDELSE_DELAY: Duration = Duration.ofHours(1)

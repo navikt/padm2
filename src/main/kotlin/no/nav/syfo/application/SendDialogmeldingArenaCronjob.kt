@@ -4,7 +4,6 @@ import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.application.cronjob.Cronjob
 import no.nav.syfo.application.cronjob.CronjobResult
 import no.nav.syfo.db.DatabaseInterface
-import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.persistering.db.getUnpublishedArenaMeldinger
 import no.nav.syfo.persistering.db.lagreSendtArena
 import no.nav.syfo.services.ArenaDialogmeldingService
@@ -29,12 +28,10 @@ class SendDialogmeldingArenaCronjob(
     suspend fun runJob(): CronjobResult {
         val result = CronjobResult()
         val unpublishedArenaMeldinger = database.getUnpublishedArenaMeldinger()
-        unpublishedArenaMeldinger.forEach { (dialogmeldingId, fellesformat, msgId) ->
+        unpublishedArenaMeldinger.forEach { lagretDialogmelding ->
             try {
-                val receivedDialogmelding = ReceivedDialogmelding.create(
-                    dialogmeldingId = dialogmeldingId,
-                    fellesformat = fellesformat,
-                )
+                val receivedDialogmelding = lagretDialogmelding.toReceivedDialogmelding()
+                val msgId = receivedDialogmelding.msgId
                 val sendToArena = !arenaDialogmeldingService.isMeldingStoredInBehandlerdialog(msgId) &&
                     !arenaDialogmeldingService.isMeldingStoredInKelvin(msgId) &&
                     receivedDialogmelding.dialogmelding.innkallingMoterespons == null
@@ -44,7 +41,7 @@ class SendDialogmeldingArenaCronjob(
                     )
                 }
                 database.lagreSendtArena(
-                    dialogmeldingid = dialogmeldingId,
+                    dialogmeldingid = lagretDialogmelding.id,
                     isSent = sendToArena,
                 )
                 result.updated++
