@@ -60,6 +60,7 @@ data class Environment(
     val aapApiUrl: String = getEnvVar("AAP_API_ENDPOINT_URL"),
     val isDevGcp: Boolean = getEnvVar("IS_DEV_GCP", "false").toBoolean(),
     val processingEnabled: Boolean = getEnvVar("PROCESSING_ENABLED", "true").toBoolean(),
+    val kafkaConsumerEnabled: Boolean = getEnvVar("KAFKA_CONSUMER_ENABLED", "false").toBoolean(),
 ) : MqConfig {
     fun jdbcUrl(): String {
         return "jdbc:postgresql://$databaseHost:$databasePort/$databaseName"

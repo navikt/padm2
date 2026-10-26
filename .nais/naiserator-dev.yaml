@@ -155,3 +155,5 @@ spec:
       value: "true"
     - name: PROCESSING_ENABLED
       value: "true"
+    - name: KAFKA_CONSUMER_ENABLED
+      value: "false"

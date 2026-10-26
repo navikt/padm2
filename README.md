@@ -33,6 +33,13 @@ This application owns and produces to the following topic:
 
 * teamsykefravr.dialogmelding
 
+This application consumes dialogmeldinger from Team Helsemelding on the following topic
+(enabled with `KAFKA_CONSUMER_ENABLED`):
+
+* helsemelding.dialog.in
+
+Dialogmeldinger from this topic are stored and processed the same way as dialogmeldinger received from eMottak (MQ).
+
 ### Importing flowchart from gliffy confluence
 1. Open a web browser and go the confluence site that has the gliffy diagram you want to import, example site:
 https://confluence.adeo.no/display/KES/SyfoSmMottak.

@@ -22,6 +22,9 @@ import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.client.wellknown.getWellKnown
 import no.nav.syfo.db.Database
 import no.nav.syfo.kafka.*
+import no.nav.syfo.kafka.helsemelding.HELSEMELDING_DIALOGMELDING_TOPIC
+import no.nav.syfo.kafka.helsemelding.HelsemeldingDialogmeldingConsumer
+import no.nav.syfo.kafka.helsemelding.kafkaHelsemeldingConsumerConfig
 import no.nav.syfo.services.ArenaDialogmeldingService
 import no.nav.syfo.services.EmottakService
 import no.nav.syfo.services.HelsemeldingVedleggService
@@ -30,6 +33,7 @@ import no.nav.syfo.services.MqVedleggService
 import no.nav.syfo.services.NoOpApprecService
 import no.nav.syfo.services.Padm2ValidationService
 import no.nav.syfo.services.PreValidatedService
+import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -227,6 +231,21 @@ fun launchListeners(
             )
             blockingApplicationRunner.run()
         }
+    }
+
+    if (env.kafkaConsumerEnabled) {
+        launchBackgroundTask(
+            applicationState = applicationState,
+        ) {
+            HelsemeldingDialogmeldingConsumer(
+                kafkaConsumer = KafkaConsumer(kafkaHelsemeldingConsumerConfig(env.kafka)),
+                applicationState = applicationState,
+                database = database,
+                dialogmeldingProcessor = dialogmeldingProcessor,
+            ).run()
+        }
+    } else {
+        logger.info("KAFKA_CONSUMER_ENABLED=false: Consumer for $HELSEMELDING_DIALOGMELDING_TOPIC is not started")
     }
 
     launchCronjobs(
