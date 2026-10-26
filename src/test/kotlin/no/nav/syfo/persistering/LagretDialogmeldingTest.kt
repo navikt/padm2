@@ -10,6 +10,7 @@ import no.nav.syfo.persistering.db.opprettDialogmeldingOpplysninger
 import no.nav.syfo.updateCreatedAt
 import no.nav.syfo.util.getFileAsString
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.sql.Timestamp
@@ -46,7 +47,21 @@ class LagretDialogmeldingTest {
         )
 
         assertEquals(receivedDialogmelding, lagreOgHentIkkeFullfort(receivedDialogmelding))
+        assertTrue(kafkaMeldingErSqlNull(receivedDialogmelding.dialogmelding.id))
     }
+
+    private fun kafkaMeldingErSqlNull(dialogmeldingId: String): Boolean =
+        database.connection.use { connection ->
+            connection.prepareStatement(
+                "SELECT kafka_melding IS NULL AS er_null FROM dialogmeldingopplysninger WHERE id = ?"
+            ).use {
+                it.setString(1, dialogmeldingId)
+                it.executeQuery().run {
+                    next()
+                    getBoolean("er_null")
+                }
+            }
+        }
 
     @Test
     fun `rebuilds dialogmelding from Helsemelding`() {
