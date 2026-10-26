@@ -39,10 +39,6 @@ fun ResultSet.toDialogmeldingTidspunkt(): DialogmeldingTidspunkt =
         mottattTidspunkt = getTimestamp("mottatt_tidspunkt").toLocalDateTime(),
     )
 
-/**
- * Lagrer en dialogmelding mottatt fra Team Helsemelding.
- * Returnerer false (og lagrer ingenting) hvis meldingen med samme msgId allerede er lagret.
- */
 fun DatabaseInterface.lagreMottattDialogmeldingFraHelsemelding(
     receivedDialogmelding: ReceivedDialogmelding,
 ): Boolean {
@@ -200,21 +196,6 @@ fun DatabaseInterface.hentDialogmeldingOpplysningerJournalpostId(dialogmeldingid
             it.setString(1, dialogmeldingid)
             val list = it.executeQuery().toList { getString("journalpostid") }
             list.firstOrNull()
-        }
-    }
-
-private const val queryGetArena = """
-    SELECT arena
-    FROM DIALOGMELDINGOPPLYSNINGER
-    WHERE id=?;
-"""
-
-fun DatabaseInterface.erDialogmeldingOpplysningerSendtArena(dialogmeldingid: String) =
-    connection.use { connection ->
-        connection.prepareStatement(queryGetArena).use {
-            it.setString(1, dialogmeldingid)
-            val list = it.executeQuery().toList { getTimestamp("arena") }
-            list.isNotEmpty() && list.firstOrNull() != null
         }
     }
 

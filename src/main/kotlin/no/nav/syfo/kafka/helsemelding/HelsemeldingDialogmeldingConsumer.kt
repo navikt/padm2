@@ -61,7 +61,6 @@ class HelsemeldingDialogmeldingConsumer(
             )
         } catch (e: Exception) {
             HELSEMELDING_INVALID_MESSAGE_COUNTER.increment()
-            // Logger ikke e.message/stacktrace, da den kan inneholde deler av meldingen (fnr).
             logger.error(
                 "Skipping invalid message from $HELSEMELDING_DIALOGMELDING_TOPIC: " +
                     "partition=${record.partition()}, offset=${record.offset()}, " +

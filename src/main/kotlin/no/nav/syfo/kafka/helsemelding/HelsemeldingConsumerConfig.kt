@@ -9,7 +9,6 @@ import java.util.Properties
 const val HELSEMELDING_DIALOGMELDING_TOPIC = "helsemelding.dialog.in"
 private const val HELSEMELDING_CONSUMER_GROUP_ID = "padm2-helsemelding-dialog-in-v1"
 
-// Verdien leses som String og parses i vår kode, slik at en ugyldig melding ikke får poll() til å kaste.
 fun kafkaHelsemeldingConsumerConfig(
     kafkaEnvironment: ApplicationEnvironmentKafka,
 ): Properties = Properties().apply {
