@@ -20,5 +20,5 @@ class MqVedleggService : VedleggService {
  */
 class HelsemeldingVedleggService : VedleggService {
     override suspend fun hentVedlegg(receivedDialogmelding: ReceivedDialogmelding): List<Vedlegg> =
-        throw NotImplementedError("Henting av vedlegg fra Team Helsemelding er ikke implementert")
+        error("Henting av vedlegg fra Team Helsemelding er ikke implementert")
 }

@@ -78,3 +78,18 @@ val DONT_UPDATE_EMOTTAK_MISSING_PARTNERREF: Counter = Counter
     .builder("${METRICS_NS}_dont_update_emottak_missing_partnerref")
     .description("Counts the number of missing partnerref leading to not updating emottak")
     .register(METRICS_REGISTRY)
+
+val HELSEMELDING_INCOMING_MESSAGE_COUNTER: Counter = Counter
+    .builder("${METRICS_NS}_helsemelding_incoming_message_count")
+    .description("Counts the number of messages consumed from helsemelding.dialog.in")
+    .register(METRICS_REGISTRY)
+
+val HELSEMELDING_INVALID_MESSAGE_COUNTER: Counter = Counter
+    .builder("${METRICS_NS}_helsemelding_invalid_message_count")
+    .description("Counts the number of skipped invalid messages from helsemelding.dialog.in")
+    .register(METRICS_REGISTRY)
+
+val HELSEMELDING_DUPLICATE_MESSAGE_COUNTER: Counter = Counter
+    .builder("${METRICS_NS}_helsemelding_duplicate_message_count")
+    .description("Counts the number of skipped duplicate messages from helsemelding.dialog.in")
+    .register(METRICS_REGISTRY)

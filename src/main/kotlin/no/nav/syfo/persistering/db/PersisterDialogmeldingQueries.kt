@@ -39,8 +39,40 @@ fun ResultSet.toDialogmeldingTidspunkt(): DialogmeldingTidspunkt =
         mottattTidspunkt = getTimestamp("mottatt_tidspunkt").toLocalDateTime(),
     )
 
-fun Connection.opprettDialogmeldingOpplysninger(receivedDialogmelding: ReceivedDialogmelding): String {
-    val ids = this.prepareStatement(
+fun DatabaseInterface.lagreMottattDialogmeldingFraHelsemelding(
+    receivedDialogmelding: ReceivedDialogmelding,
+): Boolean {
+    require(receivedDialogmelding.source == DialogmeldingSource.HELSEMELDING) {
+        "Forventet source HELSEMELDING, var ${receivedDialogmelding.source}"
+    }
+    return connection.use { connection ->
+        val id = connection.opprettDialogmeldingOpplysningerHvisNy(receivedDialogmelding)
+        if (id != null) {
+            connection.opprettDialogmeldingDokument(receivedDialogmelding.dialogmelding, sha256String = null)
+            connection.commit()
+            true
+        } else {
+            connection.rollback()
+            false
+        }
+    }
+}
+
+fun Connection.opprettDialogmeldingOpplysninger(receivedDialogmelding: ReceivedDialogmelding): String =
+    insertDialogmeldingOpplysninger(receivedDialogmelding, onConflict = "").singleOrNull()
+        ?: throw SQLException("Creating DIALOGMELDINGOPPLYSNINGER failed, no rows affected.")
+
+private fun Connection.opprettDialogmeldingOpplysningerHvisNy(receivedDialogmelding: ReceivedDialogmelding): String? =
+    insertDialogmeldingOpplysninger(
+        receivedDialogmelding = receivedDialogmelding,
+        onConflict = "ON CONFLICT (msg_id) WHERE source = 'HELSEMELDING' DO NOTHING",
+    ).singleOrNull()
+
+private fun Connection.insertDialogmeldingOpplysninger(
+    receivedDialogmelding: ReceivedDialogmelding,
+    onConflict: String,
+): List<String> =
+    this.prepareStatement(
         """
             INSERT INTO DIALOGMELDINGOPPLYSNINGER(
                 id,
@@ -62,6 +94,7 @@ fun Connection.opprettDialogmeldingOpplysninger(receivedDialogmelding: ReceivedD
                 kafka_melding
                 )
             VALUES  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            $onConflict
             RETURNING id
             """
     ).use {
@@ -91,13 +124,7 @@ fun Connection.opprettDialogmeldingOpplysninger(receivedDialogmelding: ReceivedD
         it.executeQuery().toList { getString("id") }
     }
 
-    if (ids.size != 1) {
-        throw SQLException("Creating DIALOGMELDINGOPPLYSNINGER failed, no rows affected.")
-    }
-    return ids.first()
-}
-
-private fun Connection.opprettDialogmeldingDokument(dialogmelding: Dialogmelding, sha256String: String) {
+private fun Connection.opprettDialogmeldingDokument(dialogmelding: Dialogmelding, sha256String: String?) {
     this.prepareStatement(
         """
             INSERT INTO DIALOGMELDINGDOKUMENT(id, dialogmelding, sha_string) VALUES  (?, ?, ?)
@@ -169,21 +196,6 @@ fun DatabaseInterface.hentDialogmeldingOpplysningerJournalpostId(dialogmeldingid
             it.setString(1, dialogmeldingid)
             val list = it.executeQuery().toList { getString("journalpostid") }
             list.firstOrNull()
-        }
-    }
-
-private const val queryGetArena = """
-    SELECT arena
-    FROM DIALOGMELDINGOPPLYSNINGER
-    WHERE id=?;
-"""
-
-fun DatabaseInterface.erDialogmeldingOpplysningerSendtArena(dialogmeldingid: String) =
-    connection.use { connection ->
-        connection.prepareStatement(queryGetArena).use {
-            it.setString(1, dialogmeldingid)
-            val list = it.executeQuery().toList { getTimestamp("arena") }
-            list.isNotEmpty() && list.firstOrNull() != null
         }
     }
 
