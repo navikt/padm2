@@ -69,7 +69,7 @@ class DialogmeldingProducer(
             },
             antallVedlegg = antallVedlegg,
             journalpostId = journalpostId,
-            fellesformatXML = cloneAndPrune(receivedDialogmelding.requireFellesformat()),
+            fellesformatXML = receivedDialogmelding.fellesformat?.let { cloneAndPrune(it) },
         )
     }
 

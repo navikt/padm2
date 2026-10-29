@@ -29,4 +29,4 @@ Feltet `dialogmelding` kan finnes her ([Dialogmelding](../../src/main/kotlin/no/
 * `dialogmelding: Dialogmelding` Se [Dialogmelding](../../src/main/kotlin/no/nav/syfo/model/Dialogmelding.kt)
 * `antallVedlegg: Int` Antall vedlegg som følger med meldingen
 * `journalpostId: String` Journalpost-id til journalposten lagret i Joark
-* `fellesformatXML: String` XML-en som ble sendt til oss fra avsender. Inneholder ikke eventuelle vedlegg
+* `fellesformatXML: String?` XML-en som ble sendt til oss fra avsender. Inneholder ikke eventuelle vedlegg. Er `null` for dialogmeldinger mottatt fra Team Helsemelding (`helsemelding.dialog.in`)

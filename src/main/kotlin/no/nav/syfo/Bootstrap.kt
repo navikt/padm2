@@ -14,6 +14,7 @@ import no.nav.syfo.client.SmtssClient
 import no.nav.syfo.client.SyfohelsenettproxyClient
 import no.nav.syfo.client.aapapi.AapApiClient
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
+import no.nav.syfo.client.helsemelding.AttachmentServiceClient
 import no.nav.syfo.client.httpClient
 import no.nav.syfo.client.httpClientPdfgen
 import no.nav.syfo.client.httpClientWithProxy
@@ -179,7 +180,14 @@ fun launchListeners(
         helsemeldingTjenester = KildeavhengigeTjenester(
             apprecService = NoOpApprecService(database = database),
             validationService = PreValidatedService(),
-            vedleggService = HelsemeldingVedleggService(),
+            vedleggService = HelsemeldingVedleggService(
+                attachmentServiceClient = AttachmentServiceClient(
+                    azureAdV2Client = azureAdV2Client,
+                    attachmentServiceClientId = env.attachmentServiceClientId,
+                    attachmentServiceUrl = env.attachmentServiceUrl,
+                    httpClient = httpClient,
+                ),
+            ),
         ),
         dialogmeldingProducer = dialogmeldingProducer,
         azureAdV2Client = azureAdV2Client,

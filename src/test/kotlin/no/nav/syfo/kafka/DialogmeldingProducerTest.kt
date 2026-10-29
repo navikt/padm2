@@ -6,6 +6,8 @@ import java.util.UUID
 import no.nav.helse.eiFellesformat2.XMLEIFellesformat
 import no.nav.helse.eiFellesformat2.XMLMottakenhetBlokk
 import no.nav.helse.msgHead.XMLMsgHead
+import no.nav.syfo.kafka.helsemelding.generateIncomingDialogMessageJson
+import no.nav.syfo.kafka.helsemelding.receivedDialogmeldingFromHelsemelding
 import no.nav.syfo.model.*
 import no.nav.syfo.util.*
 import org.apache.kafka.clients.producer.KafkaProducer
@@ -82,6 +84,26 @@ internal class DialogmeldingProducerTest {
     }
 
     @Test
+    internal fun `Kafka-melding for dialogmelding fra Helsemelding har ikke fellesformatXML`() {
+        val msgId = UUID.randomUUID().toString()
+        val fraHelsemelding = receivedDialogmeldingFromHelsemelding(
+            dialogmeldingId = UUID.randomUUID().toString(),
+            kafkaMelding = generateIncomingDialogMessageJson(id = msgId),
+        )
+
+        val dialogmeldingForKafka = dialogmeldingProducer.createDialogmeldingForKafka(
+            receivedDialogmelding = fraHelsemelding,
+            avsenderBehandler = null,
+            journalpostId = "123",
+            antallVedlegg = 1,
+        )
+
+        assertEquals(msgId, dialogmeldingForKafka.msgId)
+        assertEquals(1, dialogmeldingForKafka.antallVedlegg)
+        assertNull(dialogmeldingForKafka.fellesformatXML)
+    }
+
+    @Test
     internal fun `Tester mapping fra fellesformat til Kafka topic manglende conversationRef`() {
         setupTestData(getFileAsStringISO88591("src/test/resources/dialogmelding_dialog_notat_dnr.xml"))
 
@@ -128,7 +150,7 @@ internal class DialogmeldingProducerTest {
         assertEquals("DIALOG_NOTAT", dialogmeldingForKafka.msgType)
         assertEquals(2, dialogmeldingForKafka.antallVedlegg)
 
-        val fellesformatFromKafkaMessage = safeUnmarshal(dialogmeldingForKafka.fellesformatXML)
+        val fellesformatFromKafkaMessage = safeUnmarshal(dialogmeldingForKafka.fellesformatXML!!)
         assertEquals(0, fellesformatFromKafkaMessage.calculateNumberOfVedlegg())
     }
 
@@ -156,7 +178,7 @@ internal class DialogmeldingProducerTest {
         assertEquals("DIALOG_NOTAT", dialogmeldingForKafka.msgType)
         assertEquals(2, dialogmeldingForKafka.antallVedlegg)
 
-        val fellesformatFromKafkaMessage = safeUnmarshal(dialogmeldingForKafka.fellesformatXML)
+        val fellesformatFromKafkaMessage = safeUnmarshal(dialogmeldingForKafka.fellesformatXML!!)
         assertEquals(0, fellesformatFromKafkaMessage.calculateNumberOfVedlegg())
     }
 
@@ -184,7 +206,7 @@ internal class DialogmeldingProducerTest {
         assertEquals("DIALOG_NOTAT", dialogmeldingForKafka.msgType)
         assertEquals(2, dialogmeldingForKafka.antallVedlegg)
 
-        val fellesformatFromKafkaMessage = safeUnmarshal(dialogmeldingForKafka.fellesformatXML)
+        val fellesformatFromKafkaMessage = safeUnmarshal(dialogmeldingForKafka.fellesformatXML!!)
         assertEquals(0, fellesformatFromKafkaMessage.calculateNumberOfVedlegg())
     }
 

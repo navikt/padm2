@@ -79,6 +79,8 @@ spec:
           namespace: team-rocket
         - application: api-intern
           namespace: aap
+        - application: attachment-service
+          namespace: helsemelding
   observability:
     autoInstrumentation:
       enabled: true
@@ -151,6 +153,10 @@ spec:
       value: "prod-gcp.aap.api-intern"
     - name: AAP_API_ENDPOINT_URL
       value: "http://api-intern.aap"
+    - name: HELSEMELDING_ATTACHMENT_SERVICE_CLIENT_ID
+      value: "prod-gcp.helsemelding.attachment-service"
+    - name: HELSEMELDING_ATTACHMENT_SERVICE_URL
+      value: "http://attachment-service.helsemelding"
     - name: IS_DEV_GCP
       value: "false"
     - name: PROCESSING_ENABLED

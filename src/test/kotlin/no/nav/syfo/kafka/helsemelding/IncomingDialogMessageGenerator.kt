@@ -5,6 +5,7 @@ fun generateIncomingDialogMessageJson(
     type: IncomingDialogMessageType = IncomingDialogMessageType.PATIENT_INQUIRY,
     message: String? = "Henvendelse fra lege",
     conversationReference: Boolean = true,
+    numberOfAttachments: Int = 1,
 ): String =
     """
     {
@@ -15,7 +16,7 @@ fun generateIncomingDialogMessageJson(
         "patientIdent": "01010112345",
         "conversationReference": ${if (conversationReference) """{"parentMessageId": "parent-message-id", "conversationId": "conversation-id"}""" else "null"},
         "message": ${message?.let { "\"$it\"" } ?: "null"},
-        "numberOfAttachments": 1,
+        "numberOfAttachments": $numberOfAttachments,
         "provider": {
             "ident": "02020212345",
             "hprNumber": "987654321",
