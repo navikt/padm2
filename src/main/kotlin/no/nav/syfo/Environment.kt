@@ -58,6 +58,8 @@ data class Environment(
     val isbehandlerdialogUrl: String = getEnvVar("ISBEHANDLERDIALOG_ENDPOINT_URL"),
     val aapApiClientId: String = getEnvVar("AAP_API_CLIENT_ID"),
     val aapApiUrl: String = getEnvVar("AAP_API_ENDPOINT_URL"),
+    val attachmentServiceClientId: String = getEnvVar("HELSEMELDING_ATTACHMENT_SERVICE_CLIENT_ID"),
+    val attachmentServiceUrl: String = getEnvVar("HELSEMELDING_ATTACHMENT_SERVICE_URL"),
     val isDevGcp: Boolean = getEnvVar("IS_DEV_GCP", "false").toBoolean(),
     val processingEnabled: Boolean = getEnvVar("PROCESSING_ENABLED", "true").toBoolean(),
     val kafkaConsumerEnabled: Boolean = getEnvVar("KAFKA_CONSUMER_ENABLED", "false").toBoolean(),
