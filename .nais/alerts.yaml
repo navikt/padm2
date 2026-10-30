@@ -39,7 +39,7 @@ spec:
             namespace: teamsykefravr
             severity: danger
         - alert: PADM2-NO-MESSAGE
-          expr: (sum(increase(padm2_incoming_message_count_total{app="padm2"} [1h])) or vector(0)) + (sum(increase(padm2_helsemelding_incoming_message_count_total{app="padm2"} [1h])) or vector(0)) < 1 and (day_of_week() > 0 < 6 and hour() > 6 < 17)
+          expr: sum(increase(padm2_incoming_message_count_total{app="padm2"} [1h])) < 1 and (day_of_week() > 0 < 6 and hour() > 6 < 17)
           for: 5m
           annotations:
             consequence: PADM2 mottar ingen meldinger
