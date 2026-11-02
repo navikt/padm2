@@ -187,6 +187,7 @@ fun launchListeners(
                     attachmentServiceUrl = env.attachmentServiceUrl,
                     httpClient = httpClient,
                 ),
+                database = database,
             ),
         ),
         dialogmeldingProducer = dialogmeldingProducer,

@@ -56,7 +56,7 @@ class BlockingApplicationRunnerTest {
         helsemeldingTjenester = KildeavhengigeTjenester(
             apprecService = NoOpApprecService(database),
             validationService = PreValidatedService(),
-            vedleggService = HelsemeldingVedleggService(attachmentServiceClient = mockk()),
+            vedleggService = HelsemeldingVedleggService(attachmentServiceClient = mockk(), database = database),
         ),
         dialogmeldingProducer = dialogmeldingProducer,
         azureAdV2Client = azureAdV2Client,

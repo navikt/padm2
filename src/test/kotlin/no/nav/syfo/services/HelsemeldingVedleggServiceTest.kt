@@ -11,6 +11,11 @@ import no.nav.syfo.mock.MSG_ID_MED_VEDLEGG
 import no.nav.syfo.mock.gyldigPdf
 import no.nav.syfo.mock.pngBilde
 import no.nav.syfo.model.ReceivedDialogmelding
+import no.nav.syfo.dropData
+import no.nav.syfo.persistering.db.hentVedlegg
+import no.nav.syfo.persistering.db.lagreMottattDialogmeldingFraHelsemelding
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -23,7 +28,10 @@ class HelsemeldingVedleggServiceTest {
     private val externalMockEnvironment = ExternalMockEnvironment.instance
     private val environment = externalMockEnvironment.environment
 
+    private val database = externalMockEnvironment.database
+
     private val vedleggService = HelsemeldingVedleggService(
+        database = database,
         attachmentServiceClient = AttachmentServiceClient(
             azureAdV2Client = AzureAdV2Client(
                 aadAppClient = environment.aadAppClient,
@@ -41,13 +49,18 @@ class HelsemeldingVedleggServiceTest {
         receivedDialogmeldingFromHelsemelding(
             dialogmeldingId = UUID.randomUUID().toString(),
             kafkaMelding = generateIncomingDialogMessageJson(id = msgId, numberOfAttachments = numberOfAttachments),
-        )
+        ).also { database.lagreMottattDialogmeldingFraHelsemelding(it) }
+
+    @BeforeEach
+    @AfterEach
+    fun cleanDb() {
+        database.dropData()
+    }
 
     @Test
     fun `henter vedlegg og filtrerer bort ugyldige`() {
-        val vedlegg = runBlocking {
-            vedleggService.hentVedlegg(dialogmelding(msgId = MSG_ID_MED_VEDLEGG, numberOfAttachments = 3))
-        }
+        val dialogmelding = dialogmelding(msgId = MSG_ID_MED_VEDLEGG, numberOfAttachments = 3)
+        val vedlegg = runBlocking { vedleggService.hentVedlegg(dialogmelding) }
 
         assertEquals(2, vedlegg.size)
         assertEquals("application/pdf", vedlegg[0].mimeType)
@@ -55,6 +68,15 @@ class HelsemeldingVedleggServiceTest {
         assertArrayEquals(gyldigPdf, vedlegg[0].contentBase64)
         assertEquals("image/png", vedlegg[1].mimeType)
         assertArrayEquals(pngBilde, vedlegg[1].contentBase64)
+
+        val lagret = database.hentVedlegg(dialogmelding.dialogmelding.id)
+        assertEquals(2, lagret.size)
+        assertArrayEquals(gyldigPdf, lagret[0].contentBase64)
+        assertArrayEquals(pngBilde, lagret[1].contentBase64)
+
+        // Ny prosessering skal ikke gi duplikater
+        runBlocking { vedleggService.hentVedlegg(dialogmelding) }
+        assertEquals(2, database.hentVedlegg(dialogmelding.dialogmelding.id).size)
     }
 
     @Test
