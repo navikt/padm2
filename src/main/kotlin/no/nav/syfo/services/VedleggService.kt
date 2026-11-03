@@ -2,12 +2,14 @@ package no.nav.syfo.services
 
 import no.nav.syfo.client.helsemelding.AttachmentDTO
 import no.nav.syfo.client.helsemelding.AttachmentServiceClient
+import no.nav.syfo.db.DatabaseInterface
 import no.nav.syfo.kafka.helsemelding.parseIncomingDialogMessage
 import no.nav.syfo.metrics.INVALID_PDF_VEDLEGG
 import no.nav.syfo.model.ReceivedDialogmelding
 import no.nav.syfo.model.Vedlegg
 import no.nav.syfo.model.erGyldig
 import no.nav.syfo.model.toVedlegg
+import no.nav.syfo.persistering.db.lagreVedleggListe
 import no.nav.syfo.util.extractValidVedlegg
 import no.nav.syfo.util.safeUnmarshal
 import java.util.Base64
@@ -23,6 +25,7 @@ class MqVedleggService : VedleggService {
 
 class HelsemeldingVedleggService(
     private val attachmentServiceClient: AttachmentServiceClient,
+    private val database: DatabaseInterface,
 ) : VedleggService {
     override suspend fun hentVedlegg(receivedDialogmelding: ReceivedDialogmelding): List<Vedlegg> {
         val kafkaMelding = requireNotNull(receivedDialogmelding.kafkaMelding) {
@@ -43,6 +46,8 @@ class HelsemeldingVedleggService(
                 if (it.size < alleVedlegg.size) {
                     INVALID_PDF_VEDLEGG.increment()
                 }
+                // Må være lagret før publisering; isbehandlerdialog henter dem fra vedlegg-API-et vårt.
+                database.lagreVedleggListe(receivedDialogmelding.dialogmelding.id, it)
             }
         }
     }

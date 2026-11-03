@@ -18,6 +18,15 @@ fun DatabaseInterface.lagreVedlegg(dialogmeldingId: String, vedleggNr: Int, vedl
     }
 }
 
+fun DatabaseInterface.lagreVedleggListe(dialogmeldingId: String, vedleggListe: List<Vedlegg>) {
+    connection.use { connection ->
+        vedleggListe.forEachIndexed { index, vedlegg ->
+            connection.lagreVedlegg(dialogmeldingId, index, vedlegg)
+        }
+        connection.commit()
+    }
+}
+
 fun Connection.lagreVedlegg(dialogmeldingId: String, vedleggNr: Int, vedlegg: Vedlegg) {
     prepareStatement(queryLagreVedlegg).use {
         it.setString(1, dialogmeldingId)
