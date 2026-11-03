@@ -3,11 +3,11 @@ package no.nav.syfo.client
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.*
 import io.ktor.client.engine.*
-import io.ktor.client.engine.apache.*
+import io.ktor.client.engine.apache5.*
 import io.ktor.client.plugins.*
 import io.ktor.serialization.jackson.*
 import no.nav.syfo.util.configure
-import org.apache.http.impl.conn.SystemDefaultRoutePlanner
+import org.apache.hc.client5.http.impl.routing.SystemDefaultRoutePlanner
 import java.net.ProxySelector
 
 val commonConfig: HttpClientConfig<out HttpClientEngineConfig>.() -> Unit = {
@@ -44,7 +44,7 @@ val retryAllConfig: HttpClientConfig<out HttpClientEngineConfig>.() -> Unit = {
     expectSuccess = true
 }
 
-val proxyConfig: HttpClientConfig<ApacheEngineConfig>.() -> Unit = {
+val proxyConfig: HttpClientConfig<Apache5EngineConfig>.() -> Unit = {
     this.commonConfig()
     engine {
         customizeClient {
@@ -53,7 +53,7 @@ val proxyConfig: HttpClientConfig<ApacheEngineConfig>.() -> Unit = {
     }
 }
 
-val httpClient = HttpClient(Apache, commonConfig)
-val httpClientRetryAll = HttpClient(Apache, retryAllConfig)
-val httpClientWithProxy = HttpClient(Apache, proxyConfig)
-val httpClientPdfgen = HttpClient(Apache, pdfGenConfig)
+val httpClient = HttpClient(Apache5, commonConfig)
+val httpClientRetryAll = HttpClient(Apache5, retryAllConfig)
+val httpClientWithProxy = HttpClient(Apache5, proxyConfig)
+val httpClientPdfgen = HttpClient(Apache5, pdfGenConfig)
