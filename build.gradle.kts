@@ -14,8 +14,8 @@ val jacksonVersion = "2.23.0"
 val jacksonDatabindVersion = "3.3.0"
 val javaTimeAdapterVersion = "1.1.3"
 val kafkaVersion = "4.4.0"
-val kithApprecVersion = "2019.09.09-08-50-693492ddc1d3f98e70c1638c94dcb95a66036d12"
-val kithHodemeldingVersion = "2019.09.09-08-50-693492ddc1d3f98e70c1638c94dcb95a66036d12"
+val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
+val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
 val ktorVersion = "3.6.1"
 val logbackVersion = "1.6.6"
 val logstashEncoderVersion = "9.0"
@@ -106,10 +106,9 @@ dependencies {
     }
     implementation("org.apache.kafka:kafka_2.13:$kafkaVersion", excludeLog4j)
     constraints {
-        implementation("commons-beanutils:commons-beanutils") {
-            because("org.apache.kafka:kafka_2.13:$kafkaVersion -> https://www.cve.org/CVERecord?id=CVE-2025-48734")
+        implementation("at.yawk.lz4:lz4-java") {
             version {
-                require("1.11.0")
+                require("1.11.4")
             }
         }
     }
