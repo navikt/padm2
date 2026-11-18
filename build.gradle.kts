@@ -106,6 +106,16 @@ dependencies {
     }
     implementation("org.apache.kafka:kafka_2.13:$kafkaVersion", excludeLog4j)
     constraints {
+        implementation("org.json:json") {
+            version {
+                require("20260814")
+            }
+        }
+        implementation("com.google.guava:guava") {
+            version {
+                require("33.8.0-jre")
+            }
+        }
         implementation("at.yawk.lz4:lz4-java") {
             version {
                 require("1.11.4")
