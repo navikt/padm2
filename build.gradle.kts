@@ -9,7 +9,7 @@ val dialogmeldingVersion = "1.5d21db9"
 val fellesformat2Version = "1.0329dd1"
 val flywayVersion = "11.19.0"
 val hikariVersion = "7.1.0"
-val ibmMqVersion = "9.4.4.0"
+val ibmMqVersion = "10.0.1.0"
 val jacksonVersion = "2.23.0"
 val jacksonDatabindVersion = "3.3.0"
 val javaTimeAdapterVersion = "1.1.3"
@@ -106,6 +106,16 @@ dependencies {
     }
     implementation("org.apache.kafka:kafka_2.13:$kafkaVersion", excludeLog4j)
     constraints {
+        implementation("org.json:json") {
+            version {
+                require("20260814")
+            }
+        }
+        implementation("com.google.guava:guava") {
+            version {
+                require("33.8.0-jre")
+            }
+        }
         implementation("at.yawk.lz4:lz4-java") {
             version {
                 require("1.11.4")
