@@ -34,6 +34,7 @@ class SendDialogmeldingArenaCronjob(
                 val msgId = receivedDialogmelding.msgId
                 val sendToArena = !arenaDialogmeldingService.isMeldingStoredInBehandlerdialog(msgId) &&
                     !arenaDialogmeldingService.isMeldingStoredInKelvin(msgId) &&
+                    !arenaDialogmeldingService.isMeldingStoredInSpeil(msgId) &&
                     receivedDialogmelding.dialogmelding.innkallingMoterespons == null
                 if (sendToArena) {
                     arenaDialogmeldingService.sendArenaDialogmeldingToMQ(

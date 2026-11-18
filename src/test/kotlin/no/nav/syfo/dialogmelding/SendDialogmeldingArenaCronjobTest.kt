@@ -8,6 +8,7 @@ import no.nav.syfo.application.mq.MQSenderInterface
 import no.nav.syfo.client.SmtssClient
 import no.nav.syfo.client.TssId
 import no.nav.syfo.client.aapapi.AapApiClient
+import no.nav.syfo.client.sporhund.SporhundClient
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.client.isbehandlerdialog.BehandlerdialogClient
 import no.nav.syfo.client.pdl.PdlClient
@@ -49,6 +50,12 @@ class SendDialogmeldingArenaCronjobTest {
             azureAdV2Client = azureAdV2ClientMock,
             aapApiClientId = externalMockEnvironment.environment.aapApiClientId,
             aapApiUrl = externalMockEnvironment.environment.aapApiUrl,
+            httpClient = externalMockEnvironment.mockHttpClient,
+        ),
+        sporhundClient = SporhundClient(
+            azureAdV2Client = azureAdV2ClientMock,
+            sporhundClientId = externalMockEnvironment.environment.sporhundClientId,
+            sporhundUrl = externalMockEnvironment.environment.sporhundUrl,
             httpClient = externalMockEnvironment.mockHttpClient,
         ),
         syfohelsenettproxyClient = SyfohelsenettproxyClient(
@@ -271,6 +278,34 @@ class SendDialogmeldingArenaCronjobTest {
             fellesformat = fellesformatMeldingInBehandlerdialog,
         )
         val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmeldingInBehandlerdialog)
+        database.lagreSendtKafka(dialogmeldingId)
+        database.lagreFerdigstilt(dialogmeldingId)
+        database.updateFerdigstilt(
+            dialogmeldingId = dialogmeldingId,
+            timestamp = Timestamp.valueOf(LocalDateTime.now().minusMinutes(11)),
+        )
+
+        runBlocking {
+            val result = sendDialogmeldingArenaCronjob.runJob()
+
+            assertEquals(1, result.updated)
+            assertEquals(0, result.failed)
+        }
+        verify(exactly = 0) { mqSender.sendArena(any()) }
+    }
+
+    @Test
+    fun `Does not send when melding lagret in speil`() {
+        val fellesformatMeldingInSpeil =
+            getFileAsString("src/test/resources/dialogmelding_dialog_notat_in_behandlerdialog.xml").replace(
+                UserConstants.MSG_ID_IN_BEHANDLERDIALOG,
+                UserConstants.MSG_ID_IN_SPEIL,
+            )
+        val receivedDialogmeldingInSpeil = ReceivedDialogmelding.create(
+            dialogmeldingId = UUID.randomUUID().toString(),
+            fellesformat = fellesformatMeldingInSpeil,
+        )
+        val dialogmeldingId = createDialogmeldingOpplysning(receivedDialogmeldingInSpeil)
         database.lagreSendtKafka(dialogmeldingId)
         database.lagreFerdigstilt(dialogmeldingId)
         database.updateFerdigstilt(

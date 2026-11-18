@@ -81,6 +81,8 @@ spec:
           namespace: aap
         - application: attachment-service
           namespace: helsemelding
+        - application: sporhund
+          namespace: tbd
   observability:
     autoInstrumentation:
       enabled: true
@@ -153,6 +155,10 @@ spec:
       value: "dev-gcp.aap.api-intern"
     - name: AAP_API_ENDPOINT_URL
       value: "http://api-intern.aap"
+    - name: SPORHUND_CLIENT_ID
+      value: "dev-gcp.tbd.sporhund"
+    - name: SPORHUND_ENDPOINT_URL
+      value: "http://sporhund.tbd"
     - name: HELSEMELDING_ATTACHMENT_SERVICE_CLIENT_ID
       value: "dev-gcp.helsemelding.attachment-service"
     - name: HELSEMELDING_ATTACHMENT_SERVICE_URL
