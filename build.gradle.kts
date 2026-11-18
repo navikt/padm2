@@ -111,6 +111,11 @@ dependencies {
                 require("20260814")
             }
         }
+        implementation("com.sun.mail:jakarta.mail") {
+            version {
+                require("1.6.8")
+            }
+        }
         implementation("com.google.guava:guava") {
             version {
                 require("33.8.0-jre")
