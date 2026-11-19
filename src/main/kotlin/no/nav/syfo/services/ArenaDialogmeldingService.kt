@@ -11,6 +11,7 @@ import no.nav.syfo.client.createArenaDialogNotat
 import no.nav.syfo.client.isbehandlerdialog.BehandlerdialogClient
 import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.client.sendArenaDialogNotat
+import no.nav.syfo.client.sporhund.SporhundClient
 import no.nav.syfo.client.toBehandler
 import no.nav.syfo.domain.PersonIdent
 import no.nav.syfo.model.DialogmeldingSource
@@ -23,6 +24,7 @@ class ArenaDialogmeldingService(
     private val emottakService: EmottakService,
     private val behandlerdialogClient: BehandlerdialogClient,
     private val aapApiClient: AapApiClient,
+    private val sporhundClient: SporhundClient,
     private val syfohelsenettproxyClient: SyfohelsenettproxyClient,
     private val pdlClient: PdlClient,
 ) {
@@ -63,6 +65,10 @@ class ArenaDialogmeldingService(
 
     suspend fun isMeldingStoredInKelvin(msgId: String): Boolean {
         return aapApiClient.isMeldingInKelvin(msgId)
+    }
+
+    suspend fun isMeldingStoredInSpeil(msgId: String): Boolean {
+        return sporhundClient.isMeldingInSpeil(msgId)
     }
 
     private suspend fun getTssId(

@@ -13,6 +13,7 @@ import no.nav.syfo.client.SmgcpClient
 import no.nav.syfo.client.SmtssClient
 import no.nav.syfo.client.SyfohelsenettproxyClient
 import no.nav.syfo.client.aapapi.AapApiClient
+import no.nav.syfo.client.sporhund.SporhundClient
 import no.nav.syfo.client.azuread.v2.AzureAdV2Client
 import no.nav.syfo.client.helsemelding.AttachmentServiceClient
 import no.nav.syfo.client.httpClient
@@ -210,12 +211,20 @@ fun launchListeners(
         httpClient = httpClient,
     )
 
+    val sporhundClient = SporhundClient(
+        azureAdV2Client = azureAdV2Client,
+        sporhundClientId = env.sporhundClientId,
+        sporhundUrl = env.sporhundUrl,
+        httpClient = httpClient,
+    )
+
     val arenaDialogmeldingService = ArenaDialogmeldingService(
         mqSender = mqSender,
         smtssClient = smtssClient,
         emottakService = emottakService,
         behandlerdialogClient = behandlerdialogClient,
         aapApiClient = aapApiClient,
+        sporhundClient = sporhundClient,
         syfohelsenettproxyClient = syfohelsenettproxyClient,
         pdlClient = pdlClient,
     )

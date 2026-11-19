@@ -8,6 +8,7 @@ import no.nav.syfo.client.SmtssClient
 import no.nav.syfo.client.SyfohelsenettproxyClient
 import no.nav.syfo.client.TssId
 import no.nav.syfo.client.aapapi.AapApiClient
+import no.nav.syfo.client.sporhund.SporhundClient
 import no.nav.syfo.client.isbehandlerdialog.BehandlerdialogClient
 import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.domain.PersonIdent
@@ -28,6 +29,7 @@ class ArenaDialogmeldingServiceTest {
     private val mqSender = mockk<MQSenderInterface>(relaxed = true)
     private val behandlerdialogClient = mockk<BehandlerdialogClient>(relaxed = true)
     private val aapApiClient = mockk<AapApiClient>(relaxed = true)
+    private val sporhundClient = mockk<SporhundClient>(relaxed = true)
     private val syfohelsenettproxyClient = mockk<SyfohelsenettproxyClient>(relaxed = true)
     private val pdlClient = mockk<PdlClient>()
 
@@ -37,6 +39,7 @@ class ArenaDialogmeldingServiceTest {
         emottakService = emottakService,
         behandlerdialogClient = behandlerdialogClient,
         aapApiClient = aapApiClient,
+        sporhundClient = sporhundClient,
         syfohelsenettproxyClient = syfohelsenettproxyClient,
         pdlClient = pdlClient,
     )
