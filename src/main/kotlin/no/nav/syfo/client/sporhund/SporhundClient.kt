@@ -41,7 +41,7 @@ class SporhundClient(
     }
 
     companion object {
-        const val MELDINGER_PATH = "syfo/v1/dialogmelding"
+        const val MELDINGER_PATH = "api/syfo/v1/dialogmelding"
         private val log = LoggerFactory.getLogger(SporhundClient::class.java)
     }
 }
